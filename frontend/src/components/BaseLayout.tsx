@@ -2,16 +2,20 @@ import React from "react";
 
 import SideBar from "@/components/SideBar";
 import { type Session } from "next-auth";
+import { FooterMenu } from "./FooterMenu";
+import { usePathname } from "next/navigation";
 
+const BaseLayout = ({ session, children }: { session: Session; children: React.ReactNode }) => {
+  let path: string = usePathname();
+  path = path.split("/")[1];
 
-const BaseLayout = ({ session }: { session: Session }) => {
   return (
     <>
-    <SideBar session={session} />
-          ここが認証後の場所になる。
-          ここTL、フッター
+      <SideBar session={session} />
+      {children}
+      <FooterMenu path={path} />
     </>
   );
 }
-  
+
 export default BaseLayout;

@@ -35,8 +35,7 @@ const LoginPage = () => {
     }
   };
 
-  const handleLogin = () => async (event: React.MouseEvent) => {
-    event.preventDefault();
+  const handleLogin = async () => {
     setIsValidatingServer(true);
     const isOK = await getIsServerAvailable();
     setIsServerAvailable(isOK);
@@ -45,7 +44,6 @@ const LoginPage = () => {
       return;
     }
     const result = await signIn("twitter");
-
     if (result) {
       redirect("/");
     }
@@ -60,15 +58,21 @@ const LoginPage = () => {
           placeholder="サーバー名を入力"
           value={serverName}
           onChange={(e) => setServerName(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") {
+              handleLogin();
+            }
+          }}
           className="w-full"
         />
         {isServerAvailable === false && (
           <div className="text-red-500 text-sm">サーバーが見つかりませんでした</div>
         )}
         <Button
-          onClick={handleLogin()}
+          onClick={handleLogin}
           type="button"
           className={clsx("w-full bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600", isValidatingServer && "bg-gray-300 hover:bg-gray-300")}
+          disabled={isValidatingServer || serverName === ""}
         >
           {
             isValidatingServer ? (

@@ -28,6 +28,7 @@ export default async function RootLayout({
     <html lang="ja">
       <head>
         <meta name="apple-mobile-web-app-title" content="MyWebSite" />
+        <link rel="manifest" href="manifest.json" crossOrigin="use-credentials"/>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
