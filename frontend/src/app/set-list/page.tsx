@@ -18,7 +18,9 @@ export default function SetList() {
     }
   }, [status, router]);
   if (status === "loading") {
-    return <div>セトリページ is Loading...</div>;
+    return (
+      <BaseLayout session={null}/>
+    )
   }
   if (!session) {
     return null;

@@ -16,7 +16,9 @@ const Home = () => {
     }
   }, [status, router]);
   if (status === "loading") {
-    return <div>TL ページ is Loading...</div>;
+    return (
+      <BaseLayout session={null}/>
+    )
   }
   if (!session) {
     return null;
@@ -25,7 +27,7 @@ const Home = () => {
   return (
     <BaseLayout session={session}>
       <div className="w-full h-full flex flex-col items-center justify-center bg-slate-400">
-
+aaa
       </div>
     </BaseLayout>
   );

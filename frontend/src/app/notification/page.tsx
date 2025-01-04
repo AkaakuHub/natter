@@ -18,7 +18,9 @@ export default function Notification() {
     }
   }, [status, router]);
   if (status === "loading") {
-    return <div>通知ページ is Loading...</div>;
+    return (
+      <BaseLayout session={null}/>
+    )
   }
   if (!session) {
     return null;
