@@ -4,12 +4,12 @@ import type { NextAuthOptions } from "next-auth";
 
 declare module "next-auth" {
   interface User {
-      role?: string;
+    role?: string;
   }
 
   interface JWT {
-      role?: string;
-      accessToken?: string;
+    role?: string;
+    accessToken?: string;
   }
 }
 
@@ -40,6 +40,7 @@ export const nextAuthOptions: NextAuthOptions = {
         user: {
           ...session.user,
           role: token.role,
+          id: token.sub,
         },
       };
     },

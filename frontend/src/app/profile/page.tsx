@@ -8,6 +8,7 @@ import BaseLayout from "@/components/BaseLayout";
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { ExtendedSession } from "@/types";
 
 export default function Profile() {
   const { data: session, status } = useSession();
@@ -29,7 +30,7 @@ export default function Profile() {
   }
 
   return (
-    <BaseLayout session={session}>
+    <BaseLayout session={session as ExtendedSession}>
       <div className="flex flex-col items-center justify-center h-screen gap-8">
         <div>
           このページは誠意開発中です。

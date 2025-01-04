@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import BaseLayout from "@/components/BaseLayout";
 import { useRouter } from "next/navigation";
 import { redirect } from "next/navigation";
+import { ExtendedSession } from "@/types";
 
 const Home = () => {
   const { data: session, status } = useSession();
@@ -27,7 +28,7 @@ const Home = () => {
   }
 
   return (
-    <BaseLayout session={session}>
+    <BaseLayout session={session as ExtendedSession}>
       <div className="w-full h-full flex flex-col items-center justify-center bg-slate-400">
         aaa
       </div>

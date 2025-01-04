@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 
 import SideBar from "@/components/SideBar";
-import { type Session } from "next-auth";
 import { FooterMenu } from "./FooterMenu";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
@@ -11,8 +10,9 @@ import Image from "next/image";
 import { Swiper as SwiperComponent, SwiperSlide } from "swiper/react";
 import type Swiper from "swiper";
 import "swiper/css";
+import { ExtendedSession } from "@/types";
 
-const Header = ({ profileImage, profileOnClick }: { profileImage?: string, profileOnClick?: () => void }) => {
+const Header = ({ profileImage, profileOnClick, progress }: { profileImage?: string, profileOnClick?: () => void, progress: number }) => {
   return (
     <header className="border-b border-gray-200 p-4 relative flex items-center">
       {
@@ -24,6 +24,7 @@ const Header = ({ profileImage, profileOnClick }: { profileImage?: string, profi
             height={32}
             className="rounded-full"
             onClick={profileOnClick}
+            style={{ opacity: progress }}
           />
         ) : (
           <div className="rounded-full w-8 h-8 bg-gray-300" />
@@ -40,7 +41,7 @@ const Header = ({ profileImage, profileOnClick }: { profileImage?: string, profi
   );
 };
 
-const BaseLayout = ({ session, children }: { session: Session | null; children: React.ReactNode }) => {
+const BaseLayout = ({ session, children }: { session: ExtendedSession | null; children: React.ReactNode }) => {
   let path: string = usePathname();
   path = path.split("/")[1];
 
@@ -63,10 +64,16 @@ const BaseLayout = ({ session, children }: { session: Session | null; children: 
     }
   };
 
+  const mainSlideOnClick = () => {
+    if (swiperInstance) {
+      swiperInstance.slideTo(1);
+    }
+  }
+
   if (!session) {
     return (
       <div className="w-full h-screen">
-        <Header />
+        <Header progress={1} />
         {children}
         <FooterMenu path={path} />
       </div>
@@ -79,6 +86,7 @@ const BaseLayout = ({ session, children }: { session: Session | null; children: 
         spaceBetween={-100}
         slidesPerView={1}
         initialSlide={1}
+        speed={300}
         onSwiper={(swiper) => setSwiperInstance(swiper)}
       >
         <SwiperSlide>
@@ -86,17 +94,19 @@ const BaseLayout = ({ session, children }: { session: Session | null; children: 
             <SideBar session={session} />
           </div>
         </SwiperSlide>
-        <SwiperSlide>
+        <SwiperSlide
+          onClick={mainSlideOnClick}>
           <div className="w-full h-screen">
             <Header
               profileImage={session.user?.image ?? "no_avatar_image_128x128.png"}
               profileOnClick={profileOnClick}
+              progress={progress}
             />
             {children}
             <FooterMenu path={path} />
             <div
               className="inset-0 bg-slate-600 pointer-events-none w-full h-screen fixed"
-              style={{ opacity: 0.2 - progress * 0.2 }}
+              style={{ opacity: 0.5 - progress * 0.5 }}
             />
           </div>
         </SwiperSlide>
