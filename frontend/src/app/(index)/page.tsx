@@ -17,7 +17,9 @@ const Home = () => {
   }, [status, router]);
   if (status === "loading") {
     return (
-      <BaseLayout session={null}/>
+      <BaseLayout session={null}>
+        ここがスケルトン
+      </BaseLayout>
     )
   }
   if (!session) {
@@ -27,7 +29,7 @@ const Home = () => {
   return (
     <BaseLayout session={session}>
       <div className="w-full h-full flex flex-col items-center justify-center bg-slate-400">
-aaa
+        aaa
       </div>
     </BaseLayout>
   );

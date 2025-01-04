@@ -12,7 +12,35 @@ import { Swiper as SwiperComponent, SwiperSlide } from "swiper/react";
 import type Swiper from "swiper";
 import "swiper/css";
 
-const BaseLayout = ({ session, children }: { session: Session | null; children?: React.ReactNode }) => {
+const Header = ({ profileImage, profileOnClick }: { profileImage?: string, profileOnClick?: () => void }) => {
+  return (
+    <header className="border-b border-gray-200 p-4 relative flex items-center">
+      {
+        profileImage ? (
+          <Image
+            src={profileImage}
+            alt={profileImage}
+            width={32}
+            height={32}
+            className="rounded-full"
+            onClick={profileOnClick}
+          />
+        ) : (
+          <div className="rounded-full w-8 h-8 bg-gray-300" />
+        )
+      }
+      <Image
+        src="/web-app-manifest-192x192.png"
+        alt="logo"
+        width={32}
+        height={32}
+        className="absolute left-1/2 transform -translate-x-1/2"
+      />
+    </header>
+  );
+};
+
+const BaseLayout = ({ session, children }: { session: Session | null; children: React.ReactNode }) => {
   let path: string = usePathname();
   path = path.split("/")[1];
 
@@ -38,16 +66,8 @@ const BaseLayout = ({ session, children }: { session: Session | null; children?:
   if (!session) {
     return (
       <div className="w-full h-screen">
-        <header className="border-b border-gray-200 p-4 relative flex items-center">
-          <div className="rounded-full w-8 h-8 bg-gray-300" />
-          <Image
-            src="/web-app-manifest-192x192.png"
-            alt="logo"
-            width={32}
-            height={32}
-            className="absolute left-1/2 transform -translate-x-1/2"
-          />
-        </header>
+        <Header />
+        {children}
         <FooterMenu path={path} />
       </div>
     )
@@ -68,24 +88,10 @@ const BaseLayout = ({ session, children }: { session: Session | null; children?:
         </SwiperSlide>
         <SwiperSlide>
           <div className="w-full h-screen">
-            <header className="border-b border-gray-200 p-4 relative flex items-center">
-              <Image
-                src={session.user?.image ?? "no_avatar_image_128x128.png"}
-                alt={session.user?.name ?? "no_avatar_image_128x128.png"}
-                width={32}
-                height={32}
-                className="rounded-full"
-                onClick={profileOnClick}
-                style={{ opacity: progress }}
-              />
-              <Image
-                src="/web-app-manifest-192x192.png"
-                alt="logo"
-                width={32}
-                height={32}
-                className="absolute left-1/2 transform -translate-x-1/2"
-              />
-            </header>
+            <Header
+              profileImage={session.user?.image ?? "no_avatar_image_128x128.png"}
+              profileOnClick={profileOnClick}
+            />
             {children}
             <FooterMenu path={path} />
             <div

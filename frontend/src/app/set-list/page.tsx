@@ -19,7 +19,9 @@ export default function SetList() {
   }, [status, router]);
   if (status === "loading") {
     return (
-      <BaseLayout session={null}/>
+      <BaseLayout session={null}>
+        ここがスケルトン
+      </BaseLayout>
     )
   }
   if (!session) {
