@@ -1,27 +1,27 @@
 "use client";
 
 import React from "react";
+import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import BaseLayout from "@/components/BaseLayout";
 import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 const Home = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  React.useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
+  useEffect(() => {
+    if (status === "unauthenticated" || status === "loading") {
+      redirect("/login");
     }
   }, [status, router]);
 
   if (status === "loading") {
-    // セッション確認中のローディング表示
     return <div>Loading...</div>;
   }
 
   if (!session) {
-    // 未認証の場合（リダイレクト処理後）
     return null;
   }
 

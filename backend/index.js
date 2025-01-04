@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
 import sqlite3 from "sqlite3";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 const port = 3001;
@@ -22,8 +25,12 @@ db.serialize(() => {
 app.use(express.json());
 
 // サーバー存在確認エンドポイント
-app.get("/check-server", (req, res) => {
-    res.send({ status: "Server is running" });
+app.post("/check-server", (req, res) => {
+    const { key: KEY } = req.body;
+    console.log("KEY", KEY, "PASSKEY", process.env.PASSKEY);
+    if (KEY && KEY === process.env.PASSKEY) {
+        res.send({ status: "OK" });
+    }
 });
 
 app.listen(port, () => {

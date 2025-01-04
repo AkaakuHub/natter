@@ -6,7 +6,7 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
 
-  if (pathname.startsWith('/login') || pathname.startsWith('/api')) {
+  if (pathname.startsWith('/login') || pathname.startsWith('/api') || pathname.startsWith('/manifest.json')) {
     return NextResponse.next();
   }
 

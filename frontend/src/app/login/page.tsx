@@ -13,6 +13,7 @@ import clsx from "clsx";
 const LoginPage = () => {
   const { data: session, status } = useSession();
   const [serverName, setServerName] = useState("");
+  const [serverKey, setServerKey] = useState("");
   const [isServerAvailable, setIsServerAvailable] = useState(true);
   const [isValidatingServer, setIsValidatingServer] = useState(false);
 
@@ -23,17 +24,28 @@ const LoginPage = () => {
   }, [session, status]);
 
   const getIsServerAvailable = async () => {
+    const delay = async (ms: number) => {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    };
+
+    let responseStatus = false;
     try {
-      const response = await axios.get(`http://${serverName}/check-server`);
-      if (response.status !== 200) {
-        return false;
-      }
-      return true;
+        const response = await axios.post(
+            `http://${serverName}/check-server`,
+            { key: serverKey },
+            { timeout: 3000 }
+        );
+        responseStatus = response.status === 200;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      return false;
+    } catch (e) {
+        responseStatus = false;
     }
-  };
+
+    await delay(3000);
+
+    return responseStatus;
+};
+
 
   const handleLogin = async () => {
     setIsValidatingServer(true);
@@ -65,14 +77,26 @@ const LoginPage = () => {
           }}
           className="w-full"
         />
+        <Input
+          type="password"
+          placeholder="サーバーkeyを入力"
+          value={serverKey}
+          onChange={(e) => setServerKey(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") {
+              handleLogin();
+            }
+          }}
+          className="w-full"
+        />
         {isServerAvailable === false && (
-          <div className="text-red-500 text-sm">サーバーが見つかりませんでした</div>
+          <div className="text-red-500 text-sm">接続に失敗しました</div>
         )}
         <Button
           onClick={handleLogin}
           type="button"
           className={clsx("w-full bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600", isValidatingServer && "bg-gray-300 hover:bg-gray-300")}
-          disabled={isValidatingServer || serverName === ""}
+          disabled={isValidatingServer || serverName === "" || serverKey === ""}
         >
           {
             isValidatingServer ? (
