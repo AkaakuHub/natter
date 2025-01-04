@@ -10,17 +10,14 @@ import { redirect } from "next/navigation";
 const Home = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
-
   useEffect(() => {
-    if (status === "unauthenticated" || status === "loading") {
+    if (status === "unauthenticated") {
       redirect("/login");
     }
   }, [status, router]);
-
   if (status === "loading") {
-    return <div>Loading...</div>;
+    return <div>TL ページ is Loading...</div>;
   }
-
   if (!session) {
     return null;
   }
@@ -28,15 +25,8 @@ const Home = () => {
   return (
     <BaseLayout session={session}>
       <div className="w-full h-full flex flex-col items-center justify-center bg-slate-400">
-        <h1>Home</h1>
-        <p>Welcome to the home page</p>
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
+
       </div>
-      <br />
     </BaseLayout>
   );
 };

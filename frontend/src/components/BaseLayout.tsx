@@ -44,12 +44,13 @@ const BaseLayout = ({ session, children }: { session: Session; children: React.R
         onSwiper={(swiper) => setSwiperInstance(swiper)}
       >
         <SwiperSlide>
-          <div className="relative w-[calc(100vw-100px)] h-full">
+          <div className="relative w-[calc(100vw-100px)] h-screen">
             <SideBar session={session} />
           </div>
         </SwiperSlide>
         <SwiperSlide>
-          <div className="border-b border-gray-200 p-4 relative flex items-center">
+          <div className="w-full h-screen">
+          <header className="border-b border-gray-200 p-4 relative flex items-center">
             <Image
               src={session.user?.image ?? "no_avatar_image_128x128.png"}
               alt={session.user?.name ?? "no_avatar_image_128x128.png"}
@@ -66,13 +67,14 @@ const BaseLayout = ({ session, children }: { session: Session; children: React.R
               height={32}
               className="absolute left-1/2 transform -translate-x-1/2"
             />
-          </div>
-          <div
-            className="inset-0 bg-slate-600 pointer-events-none w-full h-full fixed"
-            style={{ opacity: 0.2 - progress * 0.2}}
-          />
+          </header>
           {children}
           <FooterMenu path={path} />
+          <div
+            className="inset-0 bg-slate-600 pointer-events-none w-full h-screen fixed"
+            style={{ opacity: 0.2 - progress * 0.2}}
+          />
+          </div>
         </SwiperSlide>
       </SwiperComponent>
     </div>
