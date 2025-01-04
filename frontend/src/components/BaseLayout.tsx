@@ -14,7 +14,7 @@ import { ExtendedSession } from "@/types";
 
 const Header = ({ profileImage, profileOnClick, progress }: { profileImage?: string, profileOnClick?: () => void, progress: number }) => {
   return (
-    <header className="border-b border-gray-200 p-4 relative flex items-center">
+    <header className="h-[64px] border-b border-gray-200 p-4 relative flex items-center">
       {
         profileImage ? (
           <Image
@@ -102,7 +102,9 @@ const BaseLayout = ({ session, children }: { session: ExtendedSession | null; ch
               profileOnClick={profileOnClick}
               progress={progress}
             />
-            {children}
+            <div className="overflow-y-auto h-[calc(100dvh-64px-60px)] w-full">
+              {children}
+            </div>
             <FooterMenu path={path} />
             <div
               className="inset-0 bg-slate-600 pointer-events-none w-full h-screen fixed"

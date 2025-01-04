@@ -29,7 +29,7 @@ const Home = () => {
 
   return (
     <BaseLayout session={session as ExtendedSession}>
-      <div className="w-full h-full flex flex-col items-center justify-center bg-slate-400">
+      <div className="w-full h-full flex flex-col items-center justify-center">
         aaa
       </div>
     </BaseLayout>
