@@ -62,7 +62,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
+    <div className="flex min-h-screen items-center justify-center bg-slate-100">
       <div className="flex flex-col items-center space-y-6 bg-white p-8 rounded-lg shadow-md">
         <Image src="/web-app-manifest-192x192.png" alt="logo" width={128} height={128} />
         <Input
@@ -95,7 +95,7 @@ const LoginPage = () => {
         <Button
           onClick={handleLogin}
           type="button"
-          className={clsx("w-full bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600", isValidatingServer && "bg-gray-300 hover:bg-gray-300")}
+          className={clsx("w-full bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600", isValidatingServer && "bg-slate-300 hover:bg-slate-300")}
           disabled={isValidatingServer || serverName === "" || serverKey === ""}
         >
           {

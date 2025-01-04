@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import SideBar from "@/components/SideBar";
 import { type Session } from "next-auth";
@@ -17,6 +17,17 @@ const BaseLayout = ({ session, children }: { session: Session; children: React.R
   path = path.split("/")[1];
 
   const [swiperInstance, setSwiperInstance] = useState<Swiper | null>(null);
+  const [progress, setProgress] = useState(1);
+
+  useEffect(() => {
+    if (swiperInstance) {
+      const updateProgress = () => setProgress(swiperInstance.progress);
+      swiperInstance.on("progress", updateProgress);
+      return () => {
+        swiperInstance.off("progress", updateProgress);
+      };
+    }
+  }, [swiperInstance]);
 
   const profileOnClick = () => {
     if (swiperInstance) {
@@ -25,15 +36,17 @@ const BaseLayout = ({ session, children }: { session: Session; children: React.R
   };
 
   return (
-    <>
+    <div className="w-full h-full relative">
       <SwiperComponent
-        spaceBetween={0}
+        spaceBetween={-100}
         slidesPerView={1}
         initialSlide={1}
-        onSwiper={(swiper) => setSwiperInstance(swiper)} // Swiper インスタンスを状態にセット
+        onSwiper={(swiper) => setSwiperInstance(swiper)}
       >
         <SwiperSlide>
-          <SideBar session={session} />
+          <div className="relative w-[calc(100vw-100px)] h-full">
+            <SideBar session={session} />
+          </div>
         </SwiperSlide>
         <SwiperSlide>
           <div className="border-b border-gray-200 p-4 relative flex items-center">
@@ -44,6 +57,7 @@ const BaseLayout = ({ session, children }: { session: Session; children: React.R
               height={32}
               className="rounded-full"
               onClick={profileOnClick}
+              style={{ opacity: progress }}
             />
             <Image
               src="/web-app-manifest-192x192.png"
@@ -53,11 +67,15 @@ const BaseLayout = ({ session, children }: { session: Session; children: React.R
               className="absolute left-1/2 transform -translate-x-1/2"
             />
           </div>
+          <div
+            className="inset-0 bg-slate-600 pointer-events-none w-full h-full fixed"
+            style={{ opacity: 0.2 - progress * 0.2}}
+          />
           {children}
           <FooterMenu path={path} />
         </SwiperSlide>
       </SwiperComponent>
-    </>
+    </div>
   );
 };
 

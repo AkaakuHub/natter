@@ -6,7 +6,7 @@ import { signOut } from "next-auth/react";
 
 const SideBar = ({ session }: { session: Session }) => {
   return (
-    <div className="w-[100vw] bg-gray-300 border-r border-gray-200 h-screen flex flex-col items-center justify-center">
+    <div className="w-full bg-slate-300 border-r border-gray-200 h-screen flex flex-col items-center justify-center">
       <Image
         src={session.user?.image ?? "no_avatar_image_128x128.png"}
         alt={session.user?.name ?? "no_avatar_image_128x128.png"}
@@ -16,7 +16,7 @@ const SideBar = ({ session }: { session: Session }) => {
       />
       <button
         onClick={() => signOut()}
-        className="rounded-lg bg-blue-500 px-4 py-[7px] text-white hover:bg-gray-600"
+        className="rounded-lg bg-blue-500 px-4 py-[7px] text-white hover:bg-slate-600"
       >
         ログアウト
       </button>
