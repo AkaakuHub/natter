@@ -2,8 +2,7 @@
 
 import React from "react"
 import Image from "next/image"
-import { Button } from "@/components/ui/button";
-import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export default function NotFound() {
   return (
@@ -13,15 +12,13 @@ export default function NotFound() {
       <div>
         お探しのページは見つかりませんでした。
       </div>
-      <Button
-        onClick={() => {
-          redirect("/")
-        }}
+      <Link
+        href="/"
         type="button"
         className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600"
       >
         トップに戻る
-      </Button>
+      </Link>
     </div>
   )
 }
