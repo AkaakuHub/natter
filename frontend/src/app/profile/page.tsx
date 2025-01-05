@@ -30,7 +30,7 @@ export default function Profile() {
 
   return (
     <BaseLayout session={session as ExtendedSession}>
-      <div className="flex flex-col items-center justify-center gap-8">
+      <div className="flex flex-col items-center justify-center gap-8 bg-slate-700 h-full">
         <div>
           このページは誠意開発中です。ここはprofileページです。
         </div>
