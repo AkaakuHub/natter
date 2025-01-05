@@ -27,7 +27,8 @@ app.use(express.json());
 // サーバー存在確認エンドポイント
 app.post("/check-server", (req, res) => {
     const { key: KEY } = req.body;
-    console.log("KEY", KEY, "PASSKEY", process.env.PASSKEY);
+    const now = new Date();
+    console.log(`${now.toLocaleString()}: ${KEY}, status=${KEY === process.env.PASSKEY ? "OK" : "NG"}`);
     if (KEY && KEY === process.env.PASSKEY) {
         res.send({ status: "OK" });
     }
