@@ -65,10 +65,10 @@ const BaseLayout = ({ session, children }: { session: ExtendedSession | null; ch
   };
 
   const mainSlideOnClick = () => {
-    if (swiperInstance) {
+    if (swiperInstance && progress === 0) {
       swiperInstance.slideTo(1);
     }
-  }
+  };
 
   if (!session) {
     return (
@@ -77,7 +77,7 @@ const BaseLayout = ({ session, children }: { session: ExtendedSession | null; ch
         {children}
         <FooterMenu path={path} />
       </div>
-    )
+    );
   }
 
   return (
@@ -94,8 +94,7 @@ const BaseLayout = ({ session, children }: { session: ExtendedSession | null; ch
             <SideBar session={session} />
           </div>
         </SwiperSlide>
-        <SwiperSlide
-          onClick={mainSlideOnClick}>
+        <SwiperSlide onClick={mainSlideOnClick}>
           <div className="w-full h-screen">
             <Header
               profileImage={session.user?.image ?? "no_avatar_image_128x128.png"}
