@@ -26,7 +26,7 @@ interface BottomMenuProps {
 
 export function FooterMenu({ path }: BottomMenuProps) {
   return (
-    <footer className="h-[60px] fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white">
+    <footer className="h-[60px] fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white z-20">
       <nav className="flex justify-between items-center max-w-md mx-auto py-2">
         {items.map((item, index) => {
           const IconComponent = item.icon;
