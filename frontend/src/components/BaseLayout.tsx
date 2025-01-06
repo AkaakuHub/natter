@@ -98,6 +98,24 @@ const BaseLayout = ({ session, children }: { session: ExtendedSession | null; ch
     // 0枚目: TimeLine, 1枚目: Profile
     return (
       <div className="w-full h-full relative">
+        <div className="fixed top-0 left-0 w-full h-screen z-0"
+        style={{
+          transform: `translateX(${-progress * 100}px)`,
+        }}
+        >
+          <Header
+            profileImage={session.user?.image ?? "no_avatar_image_128x128.png"}
+            profileOnClick={profileOnClick}
+            progress={1 - progress}
+          />
+          <div className="overflow-y-auto h-[calc(100dvh-64px-60px)] w-full">
+            <TimeLine session={session} />
+          </div>
+          <div
+            className="inset-0 bg-slate-600 pointer-events-none w-full h-screen fixed"
+            style={{ opacity: progress * 0.5 }}
+          />
+        </div>
         <SwiperComponent
           slidesPerView={1}
           initialSlide={1}
@@ -105,23 +123,11 @@ const BaseLayout = ({ session, children }: { session: ExtendedSession | null; ch
           onSwiper={(swiper) => setSwiperInstance(swiper)}
         >
           <SwiperSlide onClick={profileOnClick}>
-            <div className="w-full h-screen">
-              <Header
-                profileImage={session.user?.image ?? "no_avatar_image_128x128.png"}
-                profileOnClick={profileOnClick}
-                progress={progress}
-              />
-              <div className="overflow-y-auto h-[calc(100dvh-64px-60px)] w-full">
-                <TimeLine session={session} />
-              </div>
-              <div
-                className="inset-0 bg-slate-600 pointer-events-none w-full h-screen fixed"
-                style={{ opacity: progress * 0.5 }}
-              />
+            <div className="fixed top-0 left-0 w-full h-screen z-0">
             </div>
           </SwiperSlide>
           <SwiperSlide>
-            <div className="w-full h-screen">
+            <div className="w-full h-screen z-10">
               <div className="overflow-y-auto h-[calc(100dvh-60px)] w-full">
                 {children}
               </div>
