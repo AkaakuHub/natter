@@ -11,6 +11,7 @@ import type Swiper from "swiper";
 import "swiper/css";
 import { ExtendedSession } from "@/types";
 import TimeLine from "./TimeLine";
+import { useSessionContext } from "./SessionProvider";
 
 const Header = ({ profileImage, profileOnClick, progress }: { profileImage?: string, profileOnClick?: () => void, progress: number }) => {
   return (
@@ -41,13 +42,14 @@ const Header = ({ profileImage, profileOnClick, progress }: { profileImage?: str
   );
 };
 
-const BaseLayout = ({ session, children }: { session: ExtendedSession | null; children: React.ReactNode }) => {
+const BaseLayout = ({ children }: { children: React.ReactNode }) => {
   let path: string = usePathname();
   path = path.split("/")[1];
 
   const [swiperInstance, setSwiperInstance] = useState<Swiper | null>(null);
   const [progress, setProgress] = useState(1);
   const router = useRouter();
+  const session = useSessionContext().session as ExtendedSession;
 
   useEffect(() => {
     if (swiperInstance) {
@@ -85,14 +87,19 @@ const BaseLayout = ({ session, children }: { session: ExtendedSession | null; ch
   }, [swiperInstance, router, path]);
 
   if (!session) {
+    console.error("session is not found");
     return (
       <div className="w-full h-screen">
         <Header progress={1} />
-        {children}
+        <div className="h-full w-full flex items-center justify-center">
+          aaa
+        </div>
         <FooterMenu path={path} />
       </div>
     );
   }
+
+  console.log(path);
 
   if (path === "profile") {
     // 0枚目: TimeLine, 1枚目: Profile
@@ -109,7 +116,7 @@ const BaseLayout = ({ session, children }: { session: ExtendedSession | null; ch
             progress={1 - progress}
           />
           <div className="overflow-y-auto h-[calc(100dvh-64px-60px)] w-full">
-            <TimeLine session={session} />
+            <TimeLine/>
           </div>
           <div
             className="inset-0 bg-slate-600 pointer-events-none w-full h-screen fixed"
