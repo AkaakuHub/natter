@@ -125,11 +125,12 @@ const BaseLayout = ({ session, children }: { session: ExtendedSession | null; ch
           onSwiper={(swiper) => setSwiperInstance(swiper)}
         >
           <SwiperSlide onClick={profileOnClick}>
-            <div className="fixed top-0 left-0 w-full h-screen z-0">
+            <div className="fixed top-0 left-0 w-full h-screen">
             </div>
           </SwiperSlide>
           <SwiperSlide>
-            <div className="w-full h-screen z-10">
+            {/* TODO: ダークモード */}
+            <div className="w-full h-screen z-10 bg-white">
               <div className="overflow-y-auto h-[calc(100dvh-60px)] w-full">
                 {children}
               </div>
