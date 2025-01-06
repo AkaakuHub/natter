@@ -1,8 +1,10 @@
 "use client";
 
 import React from "react";
+import { useParams } from 'next/navigation'
 
-const Post = ({params} : {params: {id: string}}) => {
+const Post = () => {
+  const params = useParams<{ id: string }>();
   const postId = params.id;
   if (isNaN(parseInt(postId))) {
     return <div>Invalid ID</div>;
