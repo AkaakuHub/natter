@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
-import sqlite3 from "sqlite3";
 import dotenv from "dotenv";
+import { PrismaClient } from '@prisma/client'
 
 dotenv.config();
 
@@ -15,12 +15,7 @@ app.use(
     })
 );
 
-// データベースのセットアップ
-const db = new sqlite3.Database(":memory:");
-
-db.serialize(() => {
-    db.run("CREATE TABLE users (id INT, name TEXT)");
-});
+export const prisma = new PrismaClient();
 
 app.use(express.json());
 
@@ -34,6 +29,12 @@ app.post("/check-server", (req, res) => {
     }
 });
 
+app.get("/users", async (req, res) => {
+    const users = await prisma.user.findMany();
+    res.json(users);
+});
+
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
+
