@@ -64,7 +64,7 @@ const TimeLine = ({ session }: { session: ExtendedSession }) => {
   const getUserById = (userId: number) => mockData.users.find(user => user.id === userId);
 
   return (
-    <div className="w-full max-w-md mx-auto mt-4">
+    <div className="w-full max-w-md mx-auto">
       {mockData.posts.map(post => {
         const user = getUserById(post.userId);
         return user && post ? (

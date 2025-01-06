@@ -13,6 +13,15 @@ import { useState } from "react";
 import Image from "next/image";
 import PostComponent from "@/components/PostComponent";
 
+const TabKinds = ["tweets", "media", "likes"] as const;
+type TabType = typeof TabKinds[number];
+const TabNames: Record<TabType, string> = {
+  tweets: "ポスト",
+  media: "メディア",
+  likes: "いいね",
+};
+
+
 const getDominantColor = async (image: string): Promise<string> => {
   return new Promise((resolve) => {
     const canvas = document.createElement("canvas");
@@ -90,14 +99,13 @@ const TabsComponent = ({
   activeTab,
   onTabChange,
 }: {
-  activeTab: "tweets" | "media" | "likes";
-  onTabChange: (tab: "tweets" | "media" | "likes") => void;
+  activeTab: TabType;
+  onTabChange: (tab: TabType) => void;
 }) => {
-  const tabs = [
-    { id: "tweets", label: "ポスト" },
-    { id: "media", label: "メディア" },
-    { id: "likes", label: "いいね" },
-  ];
+  const tabs = TabKinds.map((tab) => ({
+    id: tab,
+    label: TabNames[tab],
+  }));
 
   return (
     <div className="border-b border-gray-300">
@@ -121,7 +129,7 @@ const TabsComponent = ({
 
 
 const ProfileInner = ({ session }: { session: ExtendedSession }) => {
-  const [activeTab, setActiveTab] = useState<"tweets" | "media" | "likes">(
+  const [activeTab, setActiveTab] = useState<TabType>(
     "tweets"
   );
   // モックデータ
@@ -158,6 +166,12 @@ const ProfileInner = ({ session }: { session: ExtendedSession }) => {
         ],
         createdAt: "2025-01-01T04:00:00",
       },
+      {
+        id: 5100005,
+        userId: 100001,
+        content: "this is a test post 5",
+        createdAt: "2025-01-01T05:00:00",
+      },
     ],
     users: [
       {
@@ -193,13 +207,19 @@ const ProfileInner = ({ session }: { session: ExtendedSession }) => {
 
       <TabsComponent activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <div className="p-4">
-        {filteredPosts.map((post) => {
-          const user = getUserById(post.userId);
-          return user && post ? (
-            <PostComponent key={post.id} user={user} post={post} />
-          ) : null;
-        })}
+      <div>
+        {filteredPosts.length !== 0 ?
+          filteredPosts.map((post) => {
+            const user = getUserById(post.userId);
+            return user && post ? (
+              <PostComponent key={post.id} user={user} post={post} />
+            ) : null;
+          })
+          : (
+            <div className="text-center p-4">
+              まだ{TabNames[activeTab]}はありません
+            </div>
+          )}
       </div>
     </div>
   );
