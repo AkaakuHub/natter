@@ -1,17 +1,16 @@
 "use client";
 
-import React from "react"
+import React, { useState, useEffect } from "react";
 import { redirect } from "next/navigation";
 import BaseLayout from "@/components/BaseLayout";
-
-import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { ExtendedSession } from "@/types";
-
-import { useState } from "react";
 import Image from "next/image";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
 import PostComponent from "@/components/PostComponent";
+import { ExtendedSession } from "@/types";
 
 const TabKinds = ["tweets", "media", "likes"] as const;
 type TabType = typeof TabKinds[number];
@@ -201,26 +200,32 @@ const ProfileInner = ({ session }: { session: ExtendedSession }) => {
         ? mockData.posts.filter((post) => post.images)
         : mockData.posts.filter((post) => post.liked === session.user?.id);
 
+  const handleTabChange = (tab: TabType) => setActiveTab(tab);
+
   return (
     <div className="w-full h-full bg-white text-black">
       <ProfileHeader session={session} />
-
-      <TabsComponent activeTab={activeTab} onTabChange={setActiveTab} />
-
-      <div>
-        {filteredPosts.length !== 0 ?
-          filteredPosts.map((post) => {
-            const user = getUserById(post.userId);
-            return user && post ? (
-              <PostComponent key={post.id} user={user} post={post} />
-            ) : null;
-          })
-          : (
-            <div className="text-center p-4">
-              まだ{TabNames[activeTab]}はありません
+      <TabsComponent activeTab={activeTab} onTabChange={handleTabChange} />
+      <Swiper
+        onSlideChange={(swiper) => handleTabChange(TabKinds[swiper.activeIndex])}
+        onSwiper={(swiper) => swiper.slideTo(TabKinds.indexOf(activeTab))}
+        className="h-full"
+      >
+        {TabKinds.map((tab) => (
+          <SwiperSlide key={tab}>
+            <div  className="overflow-y-auto h-[calc(100dvh-60px)] w-full">
+              {filteredPosts.length ? (
+                filteredPosts.map((post) => {
+                  const user = getUserById(post.userId);
+                  return user && <PostComponent key={post.id} user={user} post={post} />;
+                })
+              ) : (
+                <div className="text-center">まだ{TabNames[tab]}はありません</div>
+              )}
             </div>
-          )}
-      </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </div>
   );
 };

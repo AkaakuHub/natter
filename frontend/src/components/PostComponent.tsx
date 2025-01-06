@@ -24,7 +24,7 @@ interface PostComponentProps {
 const PostComponent = ({ user, post } : PostComponentProps) => {
   return (
   <Link
-  href={`/posts/${user?.id}`}
+  href={`/posts/${post?.id}`}
   key={post.id}
 >
   <div
