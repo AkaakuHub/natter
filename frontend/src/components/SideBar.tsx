@@ -4,7 +4,7 @@ import Image from "next/image";
 import type { ExtendedSession } from "@/types";
 import { signOut } from "next-auth/react";
 import { IconLogout, IconUser } from "@tabler/icons-react";
-import { redirect } from "next/navigation";
+import Link from "next/link";
 
 const SideBar = ({ session }: { session: ExtendedSession }) => {
   return (
@@ -28,17 +28,15 @@ const SideBar = ({ session }: { session: ExtendedSession }) => {
       </div>
 
       <div className="flex flex-col gap-4">
-        <button
+        <Link
           className="w-full text-left px-4 py-2 text-lg font-semibold bg-white border rounded-md hover:bg-gray-50 flex items-center"
-          onClick={() => {
-            redirect("/profile");
-          }}
+          href="/profile"
         >
           <IconUser className="w-6 h-6 mr-2" />
           <span>
           プロフィール
           </span>
-        </button>
+        </Link>
         <button
           className="w-full text-left px-4 py-2 text-lg font-semibold bg-red-500 text-white rounded-md hover:bg-red-600 flex items-center"
           onClick={() => signOut()}

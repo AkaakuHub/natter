@@ -1,5 +1,8 @@
+"use client";
+
 import { IconHome, IconVinyl, IconBell } from "@tabler/icons-react";
 import clsx from "clsx";
+import Link from "next/link";
 
 const items = [
   { label: "ホーム", icon: IconHome, href: "/" },
@@ -23,12 +26,12 @@ interface BottomMenuProps {
 
 export function FooterMenu({ path }: BottomMenuProps) {
   return (
-    <footer className="h-[60px] fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white">
+    <footer className="h-[60px] fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white z-20">
       <nav className="flex justify-between items-center max-w-md mx-auto py-2">
         {items.map((item, index) => {
           const IconComponent = item.icon;
           return (
-            <a
+            <Link
               key={index}
               href={item.href}
               className={clsx(
@@ -38,7 +41,7 @@ export function FooterMenu({ path }: BottomMenuProps) {
             >
               <IconComponent className="h-6 w-6" />
               <span className="text-xs mt-1">{item.label}</span>
-            </a>
+            </Link>
           );
         })}
       </nav>
