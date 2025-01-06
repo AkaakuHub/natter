@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { redirect } from "next/navigation";
-import BaseLayout from "@/components/BaseLayout";
+import BaseLayout from "@/components/layout/BaseLayout";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";

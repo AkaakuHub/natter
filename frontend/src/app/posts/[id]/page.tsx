@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { redirect, useParams, useRouter } from 'next/navigation'
 import { useSession } from "next-auth/react";
-import BaseLayout from "@/components/BaseLayout";
+import BaseLayout from "@/components/layout/BaseLayout";
 import { ExtendedSession } from "@/types";
 import Image from "next/image";
 
