@@ -120,6 +120,8 @@ const BaseLayout = ({ session, children }: { session: ExtendedSession | null; ch
           slidesPerView={1}
           initialSlide={1}
           speed={300}
+          resistance={true}
+          resistanceRatio={0}
           onSwiper={(swiper) => setSwiperInstance(swiper)}
         >
           <SwiperSlide onClick={profileOnClick}>
@@ -146,6 +148,8 @@ const BaseLayout = ({ session, children }: { session: ExtendedSession | null; ch
           slidesPerView={1}
           initialSlide={1}
           speed={300}
+          resistance={true}
+          resistanceRatio={0}
           onSwiper={(swiper) => setSwiperInstance(swiper)}
         >
           <SwiperSlide>
