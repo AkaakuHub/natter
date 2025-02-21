@@ -3,7 +3,7 @@
 import React from "react"
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
-import BaseLayout from "@/components/BaseLayout";
+import BaseLayout from "@/components/layout/BaseLayout";
 
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";

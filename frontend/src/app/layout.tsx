@@ -1,11 +1,11 @@
-import { Metadata } from "next";
+"use client";
+
+// import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-import { getServerSession } from "next-auth";
-import SessionProvider from "@/components/SessionProvider";
-import { nextAuthOptions } from "@/utils/next-auth-options";
-import { ExtendedSession } from "@/types";
+import NextAuthProvider from "@/app/providers";
+import { LayoutProvider } from "@/components/layout/useLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,12 +17,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Natter",
-  description: "A simple post app",
-};
+// export const metadata: Metadata = {
+//   title: "Natter",
+//   description: "A simple post app",
+// };
 
-export default async function RootLayout({
+// layout providerのせいで犠牲に...
+
+export default  function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -33,16 +35,16 @@ export default async function RootLayout({
     <html lang="ja">
       <head>
         <meta name="apple-mobile-web-app-title" content="MyWebSite" />
-        <link
-          rel="manifest"
-          href="manifest.json"
-          crossOrigin="use-credentials"
-        />
+        <link rel="manifest" href="manifest.json" crossOrigin="use-credentials" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProvider session={session as ExtendedSession}>{children}</SessionProvider>
+        <NextAuthProvider>
+          <LayoutProvider>
+            {children}
+          </LayoutProvider>
+        </NextAuthProvider>
       </body>
     </html>
   );
