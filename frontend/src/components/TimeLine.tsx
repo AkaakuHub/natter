@@ -6,7 +6,7 @@ import PostComponent from "./PostComponent";
 
 // 後ほど使うかも
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const TimeLine = ({ session }: { session: ExtendedSession }) => {
+const TimeLine = () => {
   // モックデータ
   const mockData = {
     posts: [
