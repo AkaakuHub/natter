@@ -15,5 +15,8 @@
     "express": "^4.21.2",
     "sqlite3": "^5.1.7"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "tsx": "^4.19.3"
+  }
 }
