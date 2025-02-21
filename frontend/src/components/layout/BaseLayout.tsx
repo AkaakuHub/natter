@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import SideBar from "@/components/SideBar";
 import { FooterMenu } from "../FooterMenu";
 import { usePathname } from "next/navigation";
@@ -14,6 +14,8 @@ import TimeLine from "../TimeLine";
 import { LayoutProvider, useLayoutStore } from "./useLayout";
 import ProfileComponent from "../Profile";
 import clsx from "clsx";
+import DetailedPostComponent from "../DetailedPost";
+import { strict } from "assert";
 
 const Header = ({ profileImage, profileOnClick, progress }: { profileImage?: string, profileOnClick?: () => void, progress: number }) => {
   return (
@@ -45,6 +47,9 @@ const Header = ({ profileImage, profileOnClick, progress }: { profileImage?: str
 };
 
 const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | null; children: React.ReactNode }) => {
+  const params = useParams<{ id: string }>();
+  const postId = params.id;
+
   let path: string = usePathname();
   path = path.split("/")[1];
 
@@ -55,6 +60,7 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
 
   const [prevPath, setPrevPath] = useState<string | null>(null);
   const prevPathRef = useRef<string | null>(null);
+  const [postIdFromHistory, setPostIdFromHistory] = useState<string>("");
 
   useEffect(() => {
     if (swiperInstance) {
@@ -86,18 +92,25 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
         if (swiperInstance.activeIndex === 0 && progress === 1) {
           console.log("layoutStore: ", layoutStore);
           // もし、layoutStore.componentNamesが空ならpopしない
-          if (layoutStore.componentNames.length >= 2) {
+          if (layoutStore.componentNames.length >= 1) {
             console.log("popします");
             const tempPath = layoutStore.pop();
             console.log("poped tempPath: ", tempPath);
           }
           // この状態での,layoutStoreの末尾を取得
           const last = layoutStore.componentNames.at(-2);
-          if (typeof last === "string") {
+          if (last?.name != null) {
             // setPrevPath(tempPath);
             console.log("router.pushします, last: ", last);
+            // もし、postIdがあればextraから取得
+            if (last.extra) {
+              console.log("postIdを値に保存します: ", last.extra);
+              setPostIdFromHistory(last.extra);
+            }
             // 空文字列ならfalse
-            router.push(last || "/");
+            router.push("/" + last.name || "/");
+          } else {
+            console.log("lastがnullなので、router.pushしません, last: ", last);
           }
         }
         // if (swiperInstance.activeIndex === 0 && path === "profile" && progress === 1) {
@@ -118,17 +131,30 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
     // pathが変更されたか確認
     if (prevPathRef.current !== path) {
       // layoutStoreが空でないことを確認し、最後の要素が現在のpathと異なる場合のみ処理を行う
-      if (layoutStore.componentNames.length === 0 || layoutStore.componentNames.at(-1) !== path) {
+      if (layoutStore.componentNames.length === 0 || layoutStore.componentNames.at(-1)?.name !== path) {
         // 現在のpathをpush
         console.log("pushします: ", path);
-        layoutStore.push(path);
+        // もし、path=postならpostIdを取得してextraにセット
+        if (path === "post") {
+          console.log("postIdも保存");
+          if (typeof postId === "string") {
+            console.log("postId: ", postId);
+            // setPostIdFromHistory(postId);
+            layoutStore.push({ name: path, extra: postId });
+          }
+        } else {
+          layoutStore.push({ name: path });
+        }
         console.log("後のcomponentNames: ", layoutStore.componentNames);
 
         // 最後の要素をprevPathにセット
         const tempPath = layoutStore.componentNames.at(-1); // pushする前の最後の要素を取得
-        if (typeof tempPath === "string") {
+        console.log("tempPath at last: ", tempPath);
+        if (tempPath?.name != null) {
           console.log("prevPathにセットしますtempPath: ", tempPath);
-          setPrevPath(tempPath);
+          setPrevPath(tempPath.name);
+        } else {
+          console.log("tempPath.nameがnullなので、prevPathにセットしません");
         }
       }
       // prevPathRefを更新
@@ -149,6 +175,7 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
   const componentDict: { [key: string]: React.ReactNode } = {
     "profile": <ProfileComponent session={session} />,
     "": <TimeLine />,
+    "post": <DetailedPostComponent session={session} postId={postIdFromHistory}/>,
   };
 
   if (prevPath !== null) {

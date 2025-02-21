@@ -4,13 +4,18 @@ import React from "react";
 import { createContext, type ReactNode, useContext } from "react";
 import { createStore, type StoreApi, useStore } from "zustand";
 
+interface ComponentInfo {
+  name: string;
+  extra?: string | null;
+}
+
 interface LayoutState {
-  componentNames: string[];
+  componentNames: ComponentInfo[];
 }
 
 interface LayoutAction {
-  pop: () => string | undefined;
-  push: (name: string) => void;
+  pop: () => ComponentInfo | undefined;
+  push: (componentInfo: ComponentInfo) => void;
 }
 
 export type LayoutStore = LayoutState & LayoutAction;
@@ -27,9 +32,9 @@ const createLayoutStore = (): StoreApi<LayoutStore> =>
       }));
       return last;
     },
-    push: (name: string) =>
+    push: (componentInfo: ComponentInfo) =>
       set((state) => ({
-        componentNames: [...state.componentNames, name],
+        componentNames: [...state.componentNames, componentInfo],
       })),
   }));
 
