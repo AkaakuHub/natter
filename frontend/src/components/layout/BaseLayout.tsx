@@ -123,7 +123,7 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
               progress={1 - progress}
             />
             <div className="overflow-y-auto h-[calc(100dvh-64px-60px)] w-full">
-              <TimeLine session={session} />
+              <TimeLine />
             </div>
             <div
               className="inset-0 bg-slate-600 pointer-events-none w-full h-screen fixed"
