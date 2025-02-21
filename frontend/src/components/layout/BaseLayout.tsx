@@ -91,14 +91,12 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
             console.log("poped tempPath: ", tempPath);
           }
           // この状態での,layoutStoreの末尾を取得
-          let last = layoutStore.componentNames.at(-2);
+          const last = layoutStore.componentNames.at(-2);
           if (typeof last === "string") {
             // setPrevPath(tempPath);
             console.log("router.pushします, last: ", last);
-            if (last == "") {
-              last = "/";
-            }
-            router.push(last);
+            // 空文字列ならfalse
+            router.push(last || "/");
           }
         }
         // if (swiperInstance.activeIndex === 0 && path === "profile" && progress === 1) {
