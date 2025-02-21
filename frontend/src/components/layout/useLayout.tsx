@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { createContext, type ReactNode, useContext } from "react";
 import { createStore, type StoreApi, useStore } from "zustand";

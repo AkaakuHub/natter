@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 // import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -6,6 +6,8 @@ import "./globals.css";
 
 import NextAuthProvider from "@/app/providers";
 import { LayoutProvider } from "@/components/layout/useLayout";
+import { getServerSession } from "next-auth";
+import { nextAuthOptions } from "@/utils/next-auth-options";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,7 +26,7 @@ const geistMono = Geist_Mono({
 
 // layout providerのせいで犠牲に...
 
-export default  function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;

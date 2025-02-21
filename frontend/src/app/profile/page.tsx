@@ -231,10 +231,27 @@ const ProfileInner = ({ session }: { session: ExtendedSession }) => {
 };
 
 export default function Profile() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      redirect("/login");
+    }
+  }, [status, router]);
+  if (status === "loading") {
+    return (
+      <BaseLayout session={null}>
+        ここがスケルトン
+      </BaseLayout>
+    )
+  }
+  if (!session) {
+    return null;
+  }
   return (
-    <BaseLayout>
+    <BaseLayout session={session as ExtendedSession}>
       <div className="flex flex-col items-center justify-center gap-8 bg-slate-700 h-full">
-        <ProfileInner/>
+        <ProfileInner session={session as ExtendedSession}/>
       </div>
     </BaseLayout>
 
