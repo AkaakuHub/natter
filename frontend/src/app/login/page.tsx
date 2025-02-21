@@ -64,7 +64,7 @@ const LoginPage = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100">
       <div className="flex flex-col items-center space-y-6 bg-white p-8 rounded-lg shadow-md">
-        <Image src="/web-app-manifest-192x192.png" alt="logo" width={128} height={128} />
+        <Image src="/images/logo.png" alt="logo" width={128} height={128} />
         <Input
           type="text"
           placeholder="サーバー名を入力"
