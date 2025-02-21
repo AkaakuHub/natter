@@ -8,8 +8,25 @@ import { ExtendedSession } from "@/types";
 import TimeLine from "@/components/TimeLine";
 
 const Home = () => {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      redirect("/login");
+    }
+  }, [status, router]);
+  if (status === "loading") {
+    return (
+      <BaseLayout session={null}>
+        ここがスケルトン
+      </BaseLayout>
+    )
+  }
+  if (!session) {
+    return null;
+  }
   return (
-    <BaseLayout >
+    <BaseLayout session={session as ExtendedSession}>
       <TimeLine />
     </BaseLayout>
   );

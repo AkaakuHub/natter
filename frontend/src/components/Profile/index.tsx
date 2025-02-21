@@ -2,16 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import { redirect } from "next/navigation";
-import BaseLayout from "@/components/BaseLayout";
+import BaseLayout from "@/components/layout/BaseLayout";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
-import PostComponent from "@/components/PostComponent";
+import PostComponent from "@/components/Post";
 import { ExtendedSession } from "@/types";
-import { useSessionContext } from "@/components/SessionProvider";
 
 const TabKinds = ["tweets", "media", "likes"] as const;
 type TabType = typeof TabKinds[number];
@@ -128,8 +127,7 @@ const TabsComponent = ({
 };
 
 
-const ProfileInner = () => {
-  const session = useSessionContext().session as ExtendedSession;
+const ProfileComponent = ({ session }: { session: ExtendedSession }) => {
   const [activeTab, setActiveTab] = useState<TabType>(
     "tweets"
   );
@@ -232,4 +230,4 @@ const ProfileInner = () => {
   );
 };
 
-export default ProfileInner;
+export default ProfileComponent;

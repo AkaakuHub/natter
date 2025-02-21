@@ -9,28 +9,33 @@ interface LayoutState {
 }
 
 interface LayoutAction {
-  pop: () => void;
+  pop: () => string | undefined;
   push: (name: string) => void;
 }
 
 export type LayoutStore = LayoutState & LayoutAction;
 
 const createLayoutStore = (): StoreApi<LayoutStore> =>
-  createStore<LayoutStore>((set) => ({
+  createStore<LayoutStore>((set, get) => ({
     componentNames: [],
-    pop: () =>
-      set((state) => ({
-        componentNames: state.componentNames.slice(0, -1),
-      })),
-    push: (name) =>
+    pop: () => {
+      const state = get();
+      const last = state.componentNames.at(-1);
+      // 最後の要素を削除して新しい配列に更新する
+      set((s) => ({
+        componentNames: s.componentNames.slice(0, -1),
+      }));
+      return last;
+    },
+    push: (name: string) =>
       set((state) => ({
         componentNames: [...state.componentNames, name],
       })),
   }));
 
-const LayoutContext = createContext<ReturnType<
-  typeof createLayoutStore
-> | null>(null);
+const LayoutContext = createContext<ReturnType<typeof createLayoutStore> | null>(
+  null
+);
 
 export const LayoutProvider = ({
   children,
