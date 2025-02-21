@@ -91,10 +91,13 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
             console.log("poped tempPath: ", tempPath);
           }
           // この状態での,layoutStoreの末尾を取得
-          const last = layoutStore.componentNames.at(-1);
+          let last = layoutStore.componentNames.at(-2);
           if (typeof last === "string") {
             // setPrevPath(tempPath);
             console.log("router.pushします, last: ", last);
+            if (last == "") {
+              last = "/";
+            }
             router.push(last);
           }
         }
@@ -123,7 +126,7 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
         console.log("後のcomponentNames: ", layoutStore.componentNames);
 
         // 最後の要素をprevPathにセット
-        const tempPath = layoutStore.componentNames.at(-2); // pushする前の最後の要素を取得
+        const tempPath = layoutStore.componentNames.at(-1); // pushする前の最後の要素を取得
         if (typeof tempPath === "string") {
           console.log("prevPathにセットしますtempPath: ", tempPath);
           setPrevPath(tempPath);
