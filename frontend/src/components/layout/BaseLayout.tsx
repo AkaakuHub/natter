@@ -13,6 +13,7 @@ import { ExtendedSession } from "@/types";
 import TimeLine from "../TimeLine";
 import { LayoutProvider, useLayoutStore } from "./useLayout";
 import ProfileComponent from "../Profile";
+import clsx from "clsx";
 
 const Header = ({ profileImage, profileOnClick, progress }: { profileImage?: string, profileOnClick?: () => void, progress: number }) => {
   return (
@@ -224,12 +225,12 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
                 profileOnClick={profileOnClick}
                 progress={progress}
               />
-              <div className="overflow-y-auto h-[calc(100dvh-64px-60px)] w-full">
+              <div className="overflow-y-auto h-[calc(100dvh-64px-60px)] w-full relative">
                 {children}
               </div>
               <FooterMenu path={path} />
               <div
-                className="inset-0 bg-slate-600 pointer-events-none w-full h-screen fixed"
+                className={clsx("absolute inset-0 bg-slate-600 pointer-events-none w-full h-screen fixed z-10", progress < 1 && "pointer-events-auto")}
                 style={{ opacity: 0.5 - progress * 0.5 }}
               />
             </div>
