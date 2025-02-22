@@ -2,7 +2,7 @@
 
 import React from "react";
 import { ExtendedSession } from "@/types";
-import PostComponent from "./PostComponent";
+import PostComponent from "../Post";
 
 // 後ほど使うかも
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

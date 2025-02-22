@@ -4,33 +4,43 @@ import React from "react";
 import { createContext, type ReactNode, useContext } from "react";
 import { createStore, type StoreApi, useStore } from "zustand";
 
+interface ComponentInfo {
+  name: string;
+  extra?: string | null;
+}
+
 interface LayoutState {
-  componentNames: string[];
+  componentNames: ComponentInfo[];
 }
 
 interface LayoutAction {
-  pop: () => void;
-  push: (name: string) => void;
+  pop: () => ComponentInfo | undefined;
+  push: (componentInfo: ComponentInfo) => void;
 }
 
 export type LayoutStore = LayoutState & LayoutAction;
 
 const createLayoutStore = (): StoreApi<LayoutStore> =>
-  createStore<LayoutStore>((set) => ({
+  createStore<LayoutStore>((set, get) => ({
     componentNames: [],
-    pop: () =>
+    pop: () => {
+      const state = get();
+      const last = state.componentNames.at(-1);
+      // 最後の要素を削除して新しい配列に更新する
+      set((s) => ({
+        componentNames: s.componentNames.slice(0, -1),
+      }));
+      return last;
+    },
+    push: (componentInfo: ComponentInfo) =>
       set((state) => ({
-        componentNames: state.componentNames.slice(0, -1),
-      })),
-    push: (name) =>
-      set((state) => ({
-        componentNames: [...state.componentNames, name],
+        componentNames: [...state.componentNames, componentInfo],
       })),
   }));
 
-const LayoutContext = createContext<ReturnType<
-  typeof createLayoutStore
-> | null>(null);
+const LayoutContext = createContext<ReturnType<typeof createLayoutStore> | null>(
+  null
+);
 
 export const LayoutProvider = ({
   children,

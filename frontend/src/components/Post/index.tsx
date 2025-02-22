@@ -38,7 +38,7 @@ const formatDate = (date: string | number | Date): string => {
 const PostComponent = ({ user, post }: PostComponentProps) => {
   return (
     <Link
-      href={`/posts/${post?.id}`}
+      href={`/post/${post?.id}`}
       key={post.id}
     >
       <div
