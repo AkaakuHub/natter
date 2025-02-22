@@ -164,6 +164,21 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
         } else {
           console.log("tempPath.nameがnullなので、prevPathにセットしません");
         }
+      } else {
+        // 適切にprevPathをセット
+        console.log("2: pushしません: ", path);
+        const tempPath = layoutStore.componentNames.at(-2);
+        console.log("2: tempPath at last: ", tempPath);
+        if (tempPath?.name != null) {
+          console.log("2: prevPathにセットしますtempPath: ", tempPath);
+          setPrevPath(tempPath.name);
+          if (tempPath.extra) {
+            console.log("2: postIdを値に保存します: ", tempPath.extra);
+            setPostIdFromHistory(tempPath.extra);
+          }
+        } else {
+          console.log("2: tempPath.nameがnullなので、prevPathにセットしません");
+        }
       }
       // prevPathRefを更新
       prevPathRef.current = path;
@@ -258,11 +273,11 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
           <SwiperSlide onClick={mainSlideOnClick}>
             <div className="w-full h-screen">
               {path !== "profile" && (
-              <Header
-                profileImage={session.user?.image ?? "no_avatar_image_128x128.png"}
-                profileOnClick={profileOnClick}
-                progress={progress}
-              />
+                <Header
+                  profileImage={session.user?.image ?? "no_avatar_image_128x128.png"}
+                  profileOnClick={profileOnClick}
+                  progress={progress}
+                />
               )}
               <div className="overflow-y-auto h-[calc(100dvh-64px-60px)] w-full relative">
                 {children}
