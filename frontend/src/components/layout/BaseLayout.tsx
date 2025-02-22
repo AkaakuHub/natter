@@ -92,10 +92,12 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
         if (swiperInstance.activeIndex === 0 && progress === 1) {
           console.log("layoutStore: ", layoutStore);
           // もし、layoutStore.componentNamesが空ならpopしない
-          if (layoutStore.componentNames.length >= 1) {
+          if (layoutStore.componentNames.length >= 1 && path !== "") {
             console.log("popします");
             const tempPath = layoutStore.pop();
             console.log("poped tempPath: ", tempPath);
+          } else {
+            console.log("layoutStore.componentNamesが空またはpathが空文字列なので、popしません");
           }
           // この状態での,layoutStoreの末尾を取得
           const last = layoutStore.componentNames.at(-2);
@@ -107,6 +109,12 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
               console.log("postIdを値に保存します: ", last.extra);
               setPostIdFromHistory(last.extra);
             }
+            //
+            // const lastLast = layoutStore.componentNames.at(-3);
+            // if (lastLast?.name != null) {
+            //   console.log("lastLast巻き戻し用をセット: ", lastLast);
+            //   setPrevPath(lastLast.name);
+            // }
             // 空文字列ならfalse
             router.push("/" + last.name || "/");
           } else {
@@ -175,7 +183,7 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
   const componentDict: { [key: string]: React.ReactNode } = {
     "profile": <ProfileComponent session={session} />,
     "": <TimeLine />,
-    "post": <DetailedPostComponent session={session} postId={postIdFromHistory}/>,
+    "post": <DetailedPostComponent session={session} postId={postIdFromHistory} />,
   };
 
   if (prevPath !== null) {
@@ -188,11 +196,13 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
             transform: `translateX(${-progress * 100}px)`,
           }}
         >
-          <Header
-            profileImage={session.user?.image ?? "no_avatar_image_128x128.png"}
-            profileOnClick={profileOnClick}
-            progress={1 - progress}
-          />
+          {prevPath !== "profile" && (
+            <Header
+              profileImage={session.user?.image ?? "no_avatar_image_128x128.png"}
+              profileOnClick={profileOnClick}
+              progress={1 - progress}
+            />
+          )}
           <div className="overflow-y-auto h-[calc(100dvh-64px-60px)] w-full">
             {/* <TimeLine /> */}
             {componentDict[prevPath]}
@@ -247,11 +257,13 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
           </SwiperSlide>
           <SwiperSlide onClick={mainSlideOnClick}>
             <div className="w-full h-screen">
+              {path !== "profile" && (
               <Header
                 profileImage={session.user?.image ?? "no_avatar_image_128x128.png"}
                 profileOnClick={profileOnClick}
                 progress={progress}
               />
+              )}
               <div className="overflow-y-auto h-[calc(100dvh-64px-60px)] w-full relative">
                 {children}
               </div>
