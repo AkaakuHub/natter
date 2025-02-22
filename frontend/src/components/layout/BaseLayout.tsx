@@ -140,6 +140,11 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
     if (prevPathRef.current !== path) {
       // layoutStoreが空でないことを確認し、最後の要素が現在のpathと異なる場合のみ処理を行う
       if (layoutStore.componentNames.length === 0 || layoutStore.componentNames.at(-1)?.name !== path) {
+        // もし、リロードしたら、必ず1つ前をTimeLineにするようにする
+        if (layoutStore.componentNames.length === 0 && path !== "") {
+          console.log("リロードしたので、prevをTimeLineにします");
+          layoutStore.push({ name: "" });
+        }
         // 現在のpathをpush
         console.log("pushします: ", path);
         // もし、path=postならpostIdを取得してextraにセット
