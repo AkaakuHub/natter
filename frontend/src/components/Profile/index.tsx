@@ -11,6 +11,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import PostComponent from "@/components/Post";
 import { ExtendedSession } from "@/types";
+import clsx from "clsx";
 
 const TabKinds = ["tweets", "media", "likes"] as const;
 type TabType = typeof TabKinds[number];
@@ -63,16 +64,20 @@ const getDominantColor = async (image: string): Promise<string> => {
 
 const ProfileHeader = ({ session }: { session: ExtendedSession }) => {
   const [bgColor, setBgColor] = useState("#64748b");
+  const [applyAnimation, setApplyAnimation] = useState(false);
 
   useEffect(() => {
     const image = session.user?.image ?? "/no_avatar_image_128x128.png";
-    getDominantColor(image).then(setBgColor);
+    getDominantColor(image).then((color) => {
+      setBgColor(color);
+      setApplyAnimation(true); 
+    });
   }, [session.user?.image]);
 
   return (
     <div>
       <div
-        className="h-16 w-full flex items-center justify-center"
+        className={clsx("h-16 w-full flex items-center justify-center ease-in-out duration-500", applyAnimation ? "animate-fade-in" : "")}
         style={{
           backgroundColor: bgColor,
         }}
