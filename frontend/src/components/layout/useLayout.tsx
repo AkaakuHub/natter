@@ -16,6 +16,7 @@ interface LayoutState {
 interface LayoutAction {
   pop: () => ComponentInfo | undefined;
   push: (componentInfo: ComponentInfo) => void;
+  clear: () => void;
 }
 
 export type LayoutStore = LayoutState & LayoutAction;
@@ -36,6 +37,7 @@ const createLayoutStore = (): StoreApi<LayoutStore> =>
       set((state) => ({
         componentNames: [...state.componentNames, componentInfo],
       })),
+    clear: () => set({ componentNames: [] }),
   }));
 
 const LayoutContext = createContext<ReturnType<typeof createLayoutStore> | null>(
