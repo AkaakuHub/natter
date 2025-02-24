@@ -8,10 +8,15 @@ dotenv.config();
 const app = express();
 const port = 3001;
 
+let FRONTEND_URLS = process.env.FRONTEND_URLS;
+if (!FRONTEND_URLS) {
+    FRONTEND_URLS = "http://localhost:3000";
+}
+
 // 特定のフロントURLのみ許可する
 app.use(
     cors({
-        origin: ["http://localhost:3000", "http://127.0.0.1:3000", "http://akua-server:3000"],
+        origin: FRONTEND_URLS.split(","),
     })
 );
 
