@@ -142,37 +142,37 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
       if (layoutStore.componentNames.length === 0 || layoutStore.componentNames.at(-1)?.name !== path) {
         // もしpath == ""ならばlayoutStoreを空にする
         if (path === "") {
-          console.log("pathが空文字列なので、componentNamesを空にします");
+          // console.log("pathが空文字列なので、componentNamesを空にします");
           layoutStore.clear();
+        }
+        // もし、リロードしたら、必ず1つ前をTimeLineにするようにする
+        if (layoutStore.componentNames.length === 0 && path !== "") {
+          // console.log("リロードしたので、prevをTimeLineにします");
+          layoutStore.push({ name: "" });
+          setPrevPath("");
+        }
+        // 現在のpathをpush
+        // console.log("pushします: ", path);
+        // もし、path=postならpostIdを取得してextraにセット
+        if (path === "post") {
+          // console.log("postIdも保存");
+          if (typeof postId === "string") {
+            // console.log("postId: ", postId);
+            // setPostIdFromHistory(postId);
+            layoutStore.push({ name: path, extra: postId });
+          }
         } else {
-          // path != ""
-          // もし、リロードしたら、必ず1つ前をTimeLineにするようにする
-          if (layoutStore.componentNames.length === 0) {
-            // console.log("リロードしたので、prevをTimeLineにします");
-            layoutStore.push({ name: "" });
-          }
-          // 現在のpathをpush
-          // console.log("pushします: ", path);
-          // もし、path=postならpostIdを取得してextraにセット
-          if (path === "post") {
-            // console.log("postIdも保存");
-            if (typeof postId === "string") {
-              // console.log("postId: ", postId);
-              // setPostIdFromHistory(postId);
-              layoutStore.push({ name: path, extra: postId });
-            }
-          } else {
-            layoutStore.push({ name: path });
-          }
-          // console.log("後のcomponentNames: ", layoutStore.componentNames);
+          layoutStore.push({ name: path });
+        }
+        // console.log("後のcomponentNames: ", layoutStore.componentNames);
 
-          // 最後の要素をprevPathにセット
-          const tempPath = layoutStore.componentNames.at(-1); // pushする前の最後の要素を取得
-          // console.log("tempPath at last: ", tempPath);
-          if (tempPath?.name != null) {
-            console.log("prevPathにセットしますtempPath: ", tempPath);
-            setPrevPath(tempPath.name);
-          } 
+        // 最後の要素をprevPathにセット
+        const tempPath = layoutStore.componentNames.at(-1); // pushする前の最後の要素を取得
+        // console.log("tempPath at last: ", tempPath);
+
+        if (tempPath?.name != null) {
+          // console.log("prevPathにセットしますtempPath: ", tempPath);
+          setPrevPath(tempPath.name);
         }
       } else {
         // 適切にprevPathをセット
