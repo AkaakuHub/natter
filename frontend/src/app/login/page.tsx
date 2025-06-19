@@ -12,8 +12,8 @@ import clsx from "clsx";
 
 const LoginPage = () => {
   const { data: session, status } = useSession();
-  const [serverName, setServerName] = useState("");
-  const [serverKey, setServerKey] = useState("");
+  const [serverName, setServerName] = useState(process.env.NEXT_PUBLIC_BACKEND_URL || "");
+  const [serverKey, setServerKey] = useState(process.env.NEXT_PUBLIC_BACKEND_KEY || "");
   const [isServerAvailable, setIsServerAvailable] = useState(true);
   const [isValidatingServer, setIsValidatingServer] = useState(false);
 
@@ -31,11 +31,12 @@ const LoginPage = () => {
     let responseStatus = false;
     try {
         const response = await axios.post(
-            `http://${serverName}/check-server`,
+            `${serverName}/check-server`,
             { key: serverKey },
             { timeout: 3000 }
         );
-        responseStatus = response.status === 200;
+        console.log("Server response:", response);
+        responseStatus = response.status === 201; // createdだから201をチェック
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
         responseStatus = false;
