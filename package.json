@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev:frontend": "cd frontend && pnpm run dev",
-    "dev:backend": "cd backend && npx tsx ./index.ts",
+    "dev:backend": "cd backend && pnpm run start:dev",
     "dev": "concurrently \"pnpm run dev:frontend\" \"pnpm run dev:backend\""
   },
   "devDependencies": {
