@@ -28,7 +28,7 @@ const LoginPage = () => {
         return new Promise(resolve => setTimeout(resolve, ms));
     };
 
-    let responseStatus = false;
+    let responseData = null;
     try {
         const response = await axios.post(
             `${serverName}/check-server`,
@@ -36,24 +36,27 @@ const LoginPage = () => {
             { timeout: 3000 }
         );
         console.log("Server response:", response);
-        responseStatus = response.status === 201; // createdだから201をチェック
+        if (response.status === 201 && response.data.token) {
+          localStorage.setItem('jwt_token', response.data.token);
+          responseData = response.data;
+        }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
-        responseStatus = false;
+        responseData = null;
     }
 
     await delay(3000);
 
-    return responseStatus;
+    return responseData;
 };
 
 
   const handleLogin = async () => {
     setIsValidatingServer(true);
-    const isOK = await getIsServerAvailable();
-    setIsServerAvailable(isOK);
+    const serverResponse = await getIsServerAvailable();
+    setIsServerAvailable(!!serverResponse);
     setIsValidatingServer(false);
-    if (!isOK) {
+    if (!serverResponse) {
       return;
     }
     const result = await signIn("twitter");

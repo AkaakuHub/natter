@@ -13,14 +13,14 @@ import {
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { AuthGuard } from '../auth/auth.guard';
+import { JwtAuthGuard } from '../auth/auth.guard';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   create(@Body() createPostDto: CreatePostDto) {
     return this.postsService.create(createPostDto);
   }
@@ -48,7 +48,7 @@ export class PostsController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updatePostDto: UpdatePostDto,
@@ -57,13 +57,13 @@ export class PostsController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.remove(id);
   }
 
   @Post(':id/like')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   likePost(
     @Param('id', ParseIntPipe) postId: number,
     @Body('userId', ParseIntPipe) userId: number,

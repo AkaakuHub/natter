@@ -9,9 +9,12 @@ export class ApiClient {
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     
+    const token = typeof window !== 'undefined' ? localStorage.getItem('jwt_token') : null;
+    
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
         ...options?.headers,
       },
       ...options,

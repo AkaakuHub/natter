@@ -3,22 +3,27 @@ import Image from "next/image";
 import clsx from "clsx";
 import { getDominantColor } from "@/utils/colorUtils";
 import { ExtendedSession } from "@/types";
+import { getUserById } from "@/data/mockData";
 
 interface ProfileHeaderProps {
   session: ExtendedSession;
+  userId?: number;
 }
 
-const ProfileHeader = ({ session }: ProfileHeaderProps) => {
+const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
   const [bgColor, setBgColor] = useState("#64748b");
   const [applyAnimation, setApplyAnimation] = useState(false);
 
+  const targetUser = userId ? getUserById(userId) : null;
+  const displayUser = targetUser || session.user;
+
   useEffect(() => {
-    const image = session.user?.image ?? "/no_avatar_image_128x128.png";
+    const image = displayUser?.image ?? "/no_avatar_image_128x128.png";
     getDominantColor(image).then((color) => {
       setBgColor(color);
       setApplyAnimation(true);
     });
-  }, [session.user?.image]);
+  }, [displayUser?.image]);
 
   return (
     <div>
@@ -30,15 +35,15 @@ const ProfileHeader = ({ session }: ProfileHeaderProps) => {
       />
       <div className="relative w-full flex flex-row items-center justify-center gap-2">
         <Image
-          src={session.user?.image ?? "/no_avatar_image_128x128.png"}
-          alt={session.user?.name ?? "no_avatar"}
+          src={displayUser?.image ?? "/no_avatar_image_128x128.png"}
+          alt={displayUser?.name ?? "no_avatar"}
           width={96}
           height={96}
           className="rounded-full border-4 border-white absolute -top-12"
         />
         <div className="mt-12 p-2">
-          <div className="text-2xl font-bold text-center">{session.user?.name ?? "No Name"}</div>
-          <div className="text-sm text-gray-500">@{session.user?.id ?? "no_id"}</div>
+          <div className="text-2xl font-bold text-center">{displayUser?.name ?? "No Name"}</div>
+          <div className="text-sm text-gray-500">@{displayUser?.id ?? "no_id"}</div>
         </div>
       </div>
     </div>

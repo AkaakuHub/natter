@@ -16,18 +16,18 @@ interface MockPost {
 const mockUsers: MockUser[] = [
   {
     id: 100001,
-    name: "test user 1",
-    image: "/no_avatar_image_128x128.png",
+    name: "Alice Johnson",
+    image: "https://images.unsplash.com/photo-1494790108755-2616b612b5fd?w=128&h=128&fit=crop&crop=face",
   },
   {
     id: 100002,
-    name: "test user 2",
-    image: "/no_avatar_image_128x128.png",
+    name: "Bob Smith",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=128&h=128&fit=crop&crop=face",
   },
   {
     id: 100003,
-    name: "test user 3",
-    image: "/no_avatar_image_128x128.png",
+    name: "Carol Williams",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=128&h=128&fit=crop&crop=face",
   },
 ];
 

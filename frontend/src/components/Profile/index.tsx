@@ -13,9 +13,10 @@ import TabsComponent, { TabType, TabKinds, TabNames } from "./TabsComponent";
 
 interface ProfileComponentProps {
   session: ExtendedSession;
+  userId?: number;
 }
 
-const ProfileComponent = ({ session }: ProfileComponentProps) => {
+const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
   const [activeTab, setActiveTab] = useState<TabType>("tweets");
   const [posts, setPosts] = useState<Post[]>([]);
   const [mediaPosts, setMediaPosts] = useState<Post[]>([]);
@@ -25,18 +26,19 @@ const ProfileComponent = ({ session }: ProfileComponentProps) => {
 
   useEffect(() => {
     const fetchUserPosts = async () => {
-      if (!session.user?.id) return;
+      const targetUserId = userId || (session.user?.id ? parseInt(session.user.id) : null);
+      if (!targetUserId) return;
       
       try {
         setLoading(true);
         const [userPosts, userMediaPosts, userLikedPosts] = await Promise.all([
-          PostsApi.getPostsByUser(parseInt(session.user.id)),
+          PostsApi.getPostsByUser(targetUserId),
           PostsApi.getMediaPosts(),
-          PostsApi.getLikedPosts(parseInt(session.user.id)),
+          PostsApi.getLikedPosts(targetUserId),
         ]);
         
         setPosts(userPosts);
-        setMediaPosts(userMediaPosts.filter(post => post.authorId === parseInt(session.user.id)));
+        setMediaPosts(userMediaPosts.filter(post => post.authorId === targetUserId));
         setLikedPosts(userLikedPosts);
       } catch (err) {
         console.error('Failed to fetch user posts:', err);
@@ -47,7 +49,7 @@ const ProfileComponent = ({ session }: ProfileComponentProps) => {
     };
 
     fetchUserPosts();
-  }, [session.user?.id]);
+  }, [session.user?.id, userId]);
 
   const getCurrentPosts = () => {
     switch (activeTab) {
@@ -67,7 +69,7 @@ const ProfileComponent = ({ session }: ProfileComponentProps) => {
   if (loading) {
     return (
       <div className="w-full h-full bg-white text-black">
-        <ProfileHeader session={session} />
+        <ProfileHeader session={session} userId={userId} />
         <TabsComponent activeTab={activeTab} onTabChange={handleTabChange} />
         <div className="flex justify-center py-8">
           <div className="text-gray-500">Loading posts...</div>
@@ -79,7 +81,7 @@ const ProfileComponent = ({ session }: ProfileComponentProps) => {
   if (error) {
     return (
       <div className="w-full h-full bg-white text-black">
-        <ProfileHeader session={session} />
+        <ProfileHeader session={session} userId={userId} />
         <TabsComponent activeTab={activeTab} onTabChange={handleTabChange} />
         <div className="flex justify-center py-8">
           <div className="text-red-500">{error}</div>
@@ -90,7 +92,7 @@ const ProfileComponent = ({ session }: ProfileComponentProps) => {
 
   return (
     <div className="w-full h-full bg-white text-black">
-      <ProfileHeader session={session} />
+      <ProfileHeader session={session} userId={userId} />
       <TabsComponent activeTab={activeTab} onTabChange={handleTabChange} />
       <Swiper
         onSlideChange={(swiper) => handleTabChange(TabKinds[swiper.activeIndex])}

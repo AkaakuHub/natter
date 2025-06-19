@@ -70,20 +70,24 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
 
   return (
     <div className="border-b border-gray-200 py-4 px-4 flex gap-4">
-      <Image
-        src={user?.image || "no_avatar_image_128x128.png"}
-        alt={user?.name || "User"}
-        className="w-12 h-12 rounded-full"
-        width={48}
-        height={48}
-      />
+      <Link href={`/profile?userId=${user?.id}`} className="flex-shrink-0">
+        <Image
+          src={user?.image || "no_avatar_image_128x128.png"}
+          alt={user?.name || "User"}
+          className="w-12 h-12 rounded-full hover:opacity-80 transition-opacity cursor-pointer"
+          width={48}
+          height={48}
+        />
+      </Link>
       <div className="flex-1">
         <Link href={`/post/${post?.id}`} className="block">
           <div className="flex items-center justify-between">
             <div>
-              <span className="font-bold">
-                {user?.name || "Unknown User"}
-              </span>
+              <Link href={`/profile?userId=${user?.id}`} className="hover:underline" onClick={(e) => e.stopPropagation()}>
+                <span className="font-bold">
+                  {user?.name || "Unknown User"}
+                </span>
+              </Link>
               <span className="text-sm text-gray-500 ml-2">
                 @{user?.id || "unknown"}
               </span>
