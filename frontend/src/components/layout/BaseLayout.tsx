@@ -14,10 +14,29 @@ import Header from "./Header";
 import { useSwiper } from "./hooks/useSwiper";
 import { useNavigation } from "./hooks/useNavigation";
 import { ExtendedSession } from "@/types";
+import { useSearchParams } from "next/navigation";
+import { UsersApi } from "@/api/users";
 
 const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | null; children: React.ReactNode }) => {
   const { setSwiperInstance, progress, profileOnClick, mainSlideOnClick, setupSlideChangeHandler } = useSwiper();
   const { path, prevPath, postIdFromHistory, handleBackNavigation } = useNavigation();
+  const searchParams = useSearchParams();
+  const [targetUser, setTargetUser] = React.useState<{ image?: string } | null>(null);
+  
+  // Get the userId from URL params to determine if viewing another user's profile
+  const viewingUserId = searchParams.get('userId');
+  
+  React.useEffect(() => {
+    if (viewingUserId) {
+      UsersApi.getUserById(parseInt(viewingUserId))
+        .then(user => setTargetUser(user))
+        .catch(() => setTargetUser(null));
+    } else {
+      setTargetUser(null);
+    }
+  }, [viewingUserId]);
+  
+  const headerProfileImage = (path === 'profile' && targetUser?.image) ? targetUser.image : (session?.user?.image ?? "no_avatar_image_128x128.png");
   
   React.useEffect(() => {
     setupSlideChangeHandler(handleBackNavigation);
@@ -49,7 +68,7 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
         >
           {prevPath !== "profile" && (
             <Header
-              profileImage={session.user?.image ?? "no_avatar_image_128x128.png"}
+              profileImage={headerProfileImage}
               profileOnClick={profileOnClick}
               progress={1 - progress}
             />
@@ -106,7 +125,7 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
             <div className="w-full h-screen">
               {path !== "profile" && (
                 <Header
-                  profileImage={session.user?.image ?? "no_avatar_image_128x128.png"}
+                  profileImage={headerProfileImage}
                   profileOnClick={profileOnClick}
                   progress={progress}
                 />

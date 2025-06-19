@@ -5,6 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## docs place
 please save docs in the `docs/` directory.
 
+# pnpm knip
+- `pnpm knip` is used to find unused dependencies and exports in the codebase, so use it every time you write something.
+
 # 絶対に、portが3000や8000でデバッグをし、もしそのポートが埋まっていたら、使用しないで。
 
 ## Project Overview

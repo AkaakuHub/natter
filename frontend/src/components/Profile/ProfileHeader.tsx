@@ -3,7 +3,8 @@ import Image from "next/image";
 import clsx from "clsx";
 import { getDominantColor } from "@/utils/colorUtils";
 import { ExtendedSession } from "@/types";
-import { getUserById } from "@/data/mockData";
+import { UsersApi } from "@/api/users";
+import { User } from "@/api/types";
 
 interface ProfileHeaderProps {
   session: ExtendedSession;
@@ -13,9 +14,23 @@ interface ProfileHeaderProps {
 const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
   const [bgColor, setBgColor] = useState("#64748b");
   const [applyAnimation, setApplyAnimation] = useState(false);
+  const [targetUser, setTargetUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const targetUser = userId ? getUserById(userId) : null;
   const displayUser = targetUser || session.user;
+
+  useEffect(() => {
+    if (userId) {
+      setLoading(true);
+      UsersApi.getUserById(userId)
+        .then(user => setTargetUser(user))
+        .catch(() => setTargetUser(null))
+        .finally(() => setLoading(false));
+    } else {
+      setTargetUser(null);
+      setLoading(false);
+    }
+  }, [userId]);
 
   useEffect(() => {
     const image = displayUser?.image ?? "/no_avatar_image_128x128.png";
@@ -24,6 +39,21 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
       setApplyAnimation(true);
     });
   }, [displayUser?.image]);
+
+  if (loading) {
+    return (
+      <div>
+        <div className="h-16 w-full bg-gray-200 animate-pulse" />
+        <div className="relative w-full flex flex-row items-center justify-center gap-2">
+          <div className="w-24 h-24 bg-gray-200 rounded-full animate-pulse absolute -top-12" />
+          <div className="mt-12 p-2">
+            <div className="h-8 w-32 bg-gray-200 animate-pulse rounded mb-2" />
+            <div className="h-4 w-20 bg-gray-200 animate-pulse rounded" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
