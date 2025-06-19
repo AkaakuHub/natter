@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import BaseLayout from "@/components/layout/BaseLayout";
 import { ExtendedSession } from "@/types";
 import Image from "next/image";
 import { IconHeart, IconMessageCircle, IconShare } from "@tabler/icons-react";
-import { mockPosts, getUserById } from "@/data/mockData";
+import { PostsApi, Post, User } from "@/api";
 
 interface DetailedPostComponentProps {
   session: ExtendedSession;
@@ -13,11 +13,48 @@ interface DetailedPostComponentProps {
 }
 
 const DetailedPostComponent = ({ session, postId }: DetailedPostComponentProps) => {
-  const post = mockPosts.find((p) => p.id === parseInt(postId));
-  if (!post) {
-    return <div>Post not found</div>;
+  const [post, setPost] = useState<Post | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        setLoading(true);
+        const fetchedPost = await PostsApi.getPostById(parseInt(postId));
+        setPost(fetchedPost);
+      } catch (err) {
+        console.error('Failed to fetch post:', err);
+        setError('Failed to load post');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [postId]);
+
+  if (loading) {
+    return (
+      <BaseLayout session={session}>
+        <div className="max-w-2xl mx-auto mt-10 px-4 flex justify-center">
+          <div className="text-gray-500">Loading post...</div>
+        </div>
+      </BaseLayout>
+    );
   }
-  const user = getUserById(post.userId);
+
+  if (error || !post) {
+    return (
+      <BaseLayout session={session}>
+        <div className="max-w-2xl mx-auto mt-10 px-4 flex justify-center">
+          <div className="text-red-500">{error || "Post not found"}</div>
+        </div>
+      </BaseLayout>
+    );
+  }
+
+  const user = post.author;
 
   return (
     <BaseLayout session={session}>
@@ -40,7 +77,7 @@ const DetailedPostComponent = ({ session, postId }: DetailedPostComponentProps) 
 
         <div className="mt-6">
           <p className="text-xl text-gray-800">{post.content}</p>
-          {post.images && (
+          {post.images && post.images.length > 0 && (
             <div className="mt-4 grid grid-cols-2 gap-4">
               {post.images.map((image, idx) => (
                 <Image
@@ -58,17 +95,17 @@ const DetailedPostComponent = ({ session, postId }: DetailedPostComponentProps) 
 
         <div className="mt-6 text-sm text-gray-500 border-b pb-4">
           <p>Posted on: {new Date(post.createdAt).toLocaleString()}</p>
-          <p>Likes: {post.liked?.length || 0}</p>
+          <p>Likes: {post._count?.likes || 0}</p>
         </div>
 
         <div className="flex items-center gap-8 mt-2 text-gray-500">
           <button className="flex items-center gap-1 hover:text-red-500 w-[calc(100% / 3)] justify-center">
             <IconHeart size={20} />
-            <span>10</span>
+            <span>{post._count?.likes || 0}</span>
           </button>
           <button className="flex items-center gap-1 hover:text-blue-500 w-[calc(100% / 3)] justify-center">
             <IconMessageCircle size={20} />
-            <span>20</span>
+            <span>0</span>
           </button>
           <button className="flex items-center gap-1 hover:text-green-500 w-[calc(100% / 3)] justify-center">
             <IconShare size={20} />

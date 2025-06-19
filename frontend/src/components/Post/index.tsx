@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
 
 import { IconHeart, IconMessageCircle, IconShare } from "@tabler/icons-react";
+import { PostsApi } from "@/api";
 
 interface PostComponentProps {
   user: {
@@ -36,22 +37,48 @@ const formatDate = (date: string | number | Date): string => {
 
 
 const PostComponent = ({ user, post }: PostComponentProps) => {
+  // 仮のユーザーID（実際のアプリでは認証されたユーザーIDを使用）
+  const currentUserId = 1;
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [isLiking, setIsLiking] = useState(false);
+
+  // propsが変更されたときに状態を同期
+  useEffect(() => {
+    setIsLiked(post.liked?.includes(currentUserId) || false);
+    setLikeCount(post.liked?.length || 0);
+  }, [post.liked, currentUserId]);
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (isLiking) return;
+    
+    try {
+      setIsLiking(true);
+      const response = await PostsApi.likePost(post.id, currentUserId);
+      
+      setIsLiked(response.liked);
+      setLikeCount(prev => response.liked ? prev + 1 : prev - 1);
+    } catch (error) {
+      console.error('Failed to like post:', error);
+    } finally {
+      setIsLiking(false);
+    }
+  };
+
   return (
-    <Link
-      href={`/post/${post?.id}`}
-      key={post.id}
-    >
-      <div
-        className="border-b border-gray-200 py-4 px-4 flex gap-4"
-      >
-        <Image
-          src={user?.image || "no_avatar_image_128x128.png"}
-          alt={user?.name || "User"}
-          className="w-12 h-12 rounded-full"
-          width={48}
-          height={48}
-        />
-        <div className="flex-1">
+    <div className="border-b border-gray-200 py-4 px-4 flex gap-4">
+      <Image
+        src={user?.image || "no_avatar_image_128x128.png"}
+        alt={user?.name || "User"}
+        className="w-12 h-12 rounded-full"
+        width={48}
+        height={48}
+      />
+      <div className="flex-1">
+        <Link href={`/post/${post?.id}`} className="block">
           <div className="flex items-center justify-between">
             <div>
               <span className="font-bold">
@@ -80,22 +107,28 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
               ))}
             </div>
           )}
-          <div className="flex items-center gap-8 mt-2 text-gray-500">
-            <button className="flex items-center gap-1 hover:text-red-500 w-[calc(100% / 3)] justify-center">
-              <IconHeart size={20} />
-              <span>10</span>
-            </button>
-            <button className="flex items-center gap-1 hover:text-blue-500 w-[calc(100% / 3)] justify-center">
-              <IconMessageCircle size={20} />
-              <span>20</span>
-            </button>
-            <button className="flex items-center gap-1 hover:text-green-500 w-[calc(100% / 3)] justify-center">
-              <IconShare size={20} />
-            </button>
-          </div>
+        </Link>
+        <div className="flex items-center gap-8 mt-2 text-gray-500">
+          <button 
+            onClick={handleLike}
+            disabled={isLiking}
+            className={`flex items-center gap-1 hover:text-red-500 w-[calc(100% / 3)] justify-center transition-colors ${
+              isLiked ? 'text-red-500' : ''
+            } ${isLiking ? 'opacity-50' : ''}`}
+          >
+            <IconHeart size={20} fill={isLiked ? 'currentColor' : 'none'} />
+            <span>{likeCount}</span>
+          </button>
+          <button className="flex items-center gap-1 hover:text-blue-500 w-[calc(100% / 3)] justify-center">
+            <IconMessageCircle size={20} />
+            <span>0</span>
+          </button>
+          <button className="flex items-center gap-1 hover:text-green-500 w-[calc(100% / 3)] justify-center">
+            <IconShare size={20} />
+          </button>
         </div>
       </div>
-    </Link>
+    </div>
   )
 };
 

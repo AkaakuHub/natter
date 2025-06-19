@@ -15,7 +15,7 @@ async function bootstrap() {
     origin: frontendUrls.split(','),
   }));
 
-  const port = process.env.PORT || 3001;
+  const port = process.env.PORT || 8000;
   await app.listen(port);
   console.log(`Server is running at http://localhost:${port}`);
 }

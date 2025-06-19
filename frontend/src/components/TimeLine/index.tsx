@@ -1,73 +1,88 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import PostComponent from "../Post";
+import CreatePost from "../CreatePost";
+import { PostsApi, Post, User } from "../../api";
 
-// 後ほど使うかも
 const TimeLine = () => {
-  // モックデータ
-  const mockData = {
-    posts: [
-      {
-        id: 5100001,
-        userId: 100001,
-        content: "this is a test post",
-        images: ["/web-app-manifest-512x512.png"],
-        createdAt: "2025-01-01T00:00:00",
-        liked: [100001, 100002],
-      },
-      {
-        id: 5100002,
-        userId: 100002,
-        content: "this is a test post 2",
-        createdAt: "2025-01-01T01:00:00",
-      },
-      {
-        id: 5100003,
-        userId: 100003,
-        content: "this is a test post 3",
-        createdAt: "2025-01-01T02:00:00",
-        liked: [100001, 100003],
-      },
-      {
-        id: 5100004,
-        userId: 100001,
-        content: "this is a test post 4",
-        images: [
-          "/web-app-manifest-512x512.png",
-          "/web-app-manifest-512x512.png",
-        ],
-        createdAt: "2025-01-01T04:00:00",
-      },
-    ],
-    users: [
-      {
-        id: 100001,
-        name: "test user 1",
-        image: "/no_avatar_image_128x128.png",
-      },
-      {
-        id: 100002,
-        name: "test user 2",
-        image: "/no_avatar_image_128x128.png",
-      },
-      {
-        id: 100003,
-        name: "test user 3",
-        image: "/no_avatar_image_128x128.png",
-      },
-    ],
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const fetchedPosts = await PostsApi.getAllPosts();
+      setPosts(fetchedPosts);
+    } catch (err) {
+      console.error('Failed to fetch posts:', err);
+      setError('Failed to load posts');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const getUserById = (userId: number) => mockData.users.find(user => user.id === userId);
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const handlePostCreated = () => {
+    // 新しい投稿が作成されたら投稿一覧を再取得
+    fetchPosts();
+  };
+
+  // 仮のユーザー情報（実際のアプリでは認証されたユーザー情報を使用）
+  const currentUser = {
+    id: 1,
+    name: "Alice",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full max-w-md mx-auto flex justify-center py-8">
+        <div className="text-gray-500">Loading posts...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full max-w-md mx-auto flex justify-center py-8">
+        <div className="text-red-500">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-md mx-auto">
-      {mockData.posts.map(post => {
-        const user = getUserById(post.userId);
-        return user && post ? (
-          <PostComponent key={post.id} user={user} post={post} />
-        ) : null;
+      {/* ポスト作成エリア */}
+      <CreatePost 
+        currentUser={currentUser}
+        onPostCreated={handlePostCreated}
+      />
+      
+      {/* 投稿一覧 */}
+      {posts.map(post => {
+        if (!post.author) {
+          return null;
+        }
+        
+        // Convert API data format to component format
+        const user: User = post.author;
+        const transformedPost = {
+          id: post.id,
+          userId: post.authorId || 0,
+          content: post.content || '',
+          images: post.images || [],
+          createdAt: post.createdAt,
+          liked: post.likes?.map(like => like.userId) || [],
+        };
+        
+        return (
+          <PostComponent key={post.id} user={user} post={transformedPost} />
+        );
       })}
     </div>
   );
