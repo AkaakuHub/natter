@@ -1,75 +1,26 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import BaseLayout from "@/components/layout/BaseLayout";
 import { ExtendedSession } from "@/types";
 import Image from "next/image";
-
 import { IconHeart, IconMessageCircle, IconShare } from "@tabler/icons-react";
+import { mockPosts, getUserById } from "@/data/mockData";
 
-const DetailedPostComponent = ({ session, postId }: { session: ExtendedSession, postId: string }) => {
-  // モックデータ
-  const mockData = {
-    posts: [
-      {
-        id: 5100001,
-        userId: 100001,
-        content: "this is a test post",
-        images: ["/web-app-manifest-512x512.png"],
-        createdAt: "2025-01-01T00:00:00",
-        liked: [100001, 100002],
-      },
-      {
-        id: 5100002,
-        userId: 100002,
-        content: "this is a test post 2",
-        createdAt: "2025-01-01T01:00:00",
-      },
-      {
-        id: 5100003,
-        userId: 100003,
-        content: "this is a test post 3",
-        createdAt: "2025-01-01T02:00:00",
-        liked: [100001, 100003],
-      },
-      {
-        id: 5100004,
-        userId: 100001,
-        content: "this is a test post 4",
-        images: [
-          "/web-app-manifest-512x512.png",
-          "/web-app-manifest-512x512.png",
-        ],
-        createdAt: "2025-01-01T04:00:00",
-      },
-    ],
-    users: [
-      {
-        id: 100001,
-        name: "test user 1",
-        image: "/no_avatar_image_128x128.png",
-      },
-      {
-        id: 100002,
-        name: "test user 2",
-        image: "/no_avatar_image_128x128.png",
-      },
-      {
-        id: 100003,
-        name: "test user 3",
-        image: "/no_avatar_image_128x128.png",
-      },
-    ],
-  };
+interface DetailedPostComponentProps {
+  session: ExtendedSession;
+  postId: string;
+}
 
-  const post = mockData.posts.find((p) => p.id === parseInt(postId));
+const DetailedPostComponent = ({ session, postId }: DetailedPostComponentProps) => {
+  const post = mockPosts.find((p) => p.id === parseInt(postId));
   if (!post) {
     return <div>Post not found</div>;
   }
-  const user = mockData.users.find((u) => u.id === post.userId);
+  const user = getUserById(post.userId);
 
   return (
-    <BaseLayout session={session as ExtendedSession}>
+    <BaseLayout session={session}>
       <div className="max-w-2xl mx-auto mt-10 px-4">
         <div className="flex items-start space-x-4 border-b pb-4">
           <Image
@@ -126,6 +77,6 @@ const DetailedPostComponent = ({ session, postId }: { session: ExtendedSession, 
       </div>
     </BaseLayout>
   );
-}
+};
 
 export default DetailedPostComponent;

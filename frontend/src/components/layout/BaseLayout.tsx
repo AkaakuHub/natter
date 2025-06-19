@@ -1,199 +1,27 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import React from "react";
+import { Swiper as SwiperComponent, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import clsx from "clsx";
+
 import SideBar from "@/components/SideBar";
 import { FooterMenu } from "../FooterMenu";
-import { usePathname } from "next/navigation";
-import Image from "next/image";
-import { Swiper as SwiperComponent, SwiperSlide } from "swiper/react";
-import type Swiper from "swiper";
-import "swiper/css";
-import { ExtendedSession } from "@/types";
 import TimeLine from "../TimeLine";
-import { LayoutProvider, useLayoutStore } from "./useLayout";
 import ProfileComponent from "../Profile";
-import clsx from "clsx";
 import DetailedPostComponent from "../DetailedPost";
-import { strict } from "assert";
-
-const Header = ({ profileImage, profileOnClick, progress }: { profileImage?: string, profileOnClick?: () => void, progress: number }) => {
-  return (
-    <header className="h-[64px] border-b border-gray-200 p-4 relative flex items-center">
-      {
-        profileImage ? (
-          <Image
-            src={profileImage}
-            alt={profileImage}
-            width={32}
-            height={32}
-            className="rounded-full"
-            onClick={profileOnClick}
-            style={{ opacity: progress }}
-          />
-        ) : (
-          <div className="rounded-full w-8 h-8 bg-gray-300" />
-        )
-      }
-      <Image
-        src="/web-app-manifest-192x192.png"
-        alt="logo"
-        width={32}
-        height={32}
-        className="absolute left-1/2 transform -translate-x-1/2"
-      />
-    </header>
-  );
-};
+import Header from "./Header";
+import { useSwiper } from "./hooks/useSwiper";
+import { useNavigation } from "./hooks/useNavigation";
+import { ExtendedSession } from "@/types";
 
 const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | null; children: React.ReactNode }) => {
-  const params = useParams<{ id: string }>();
-  const postId = params.id;
-
-  let path: string = usePathname();
-  path = path.split("/")[1];
-
-  const [swiperInstance, setSwiperInstance] = useState<Swiper | null>(null);
-  const [progress, setProgress] = useState(1);
-  const router = useRouter();
-  const layoutStore = useLayoutStore();
-
-  const [prevPath, setPrevPath] = useState<string | null>(null);
-  const prevPathRef = useRef<string | null>(null);
-  const [postIdFromHistory, setPostIdFromHistory] = useState<string>("");
-
-  useEffect(() => {
-    if (swiperInstance) {
-      const updateProgress = () => setProgress(swiperInstance.progress);
-      swiperInstance.on("progress", updateProgress);
-      return () => {
-        swiperInstance.off("progress", updateProgress);
-      };
-    }
-  }, [swiperInstance]);
-
-  const profileOnClick = () => {
-    if (swiperInstance) {
-      swiperInstance.slideTo(0);
-    }
-  };
-
-  const mainSlideOnClick = () => {
-    if (swiperInstance && progress === 0) {
-      swiperInstance.slideTo(1);
-    }
-  };
-
-  // profileからtimelineへの一方通行
-  useEffect(() => {
-    if (swiperInstance) {
-      swiperInstance.on("slideChange", () => {
-        // console.log("slideChangeイベントが発生しました");
-        if (swiperInstance.activeIndex === 0 && progress === 1) {
-          // console.log("layoutStore: ", layoutStore);
-          // もし、layoutStore.componentNamesが空ならpopしない
-          if (layoutStore.componentNames.length >= 1 && path !== "") {
-            // console.log("popします");
-            const tempPath = layoutStore.pop();
-            // console.log("poped tempPath: ", tempPath);
-          } else {
-            // console.log("layoutStore.componentNamesが空またはpathが空文字列なので、popしません");
-          }
-          // この状態での,layoutStoreの末尾を取得
-          const last = layoutStore.componentNames.at(-2);
-          if (last?.name != null) {
-            // setPrevPath(tempPath);
-            // console.log("router.pushします, last: ", last);
-            // もし、postIdがあればextraから取得
-            if (last.extra) {
-              // console.log("postIdを値に保存します: ", last.extra);
-              setPostIdFromHistory(last.extra);
-            }
-            //
-            // const lastLast = layoutStore.componentNames.at(-3);
-            // if (lastLast?.name != null) {
-            //   // console.log("lastLast巻き戻し用をセット: ", lastLast);
-            //   setPrevPath(lastLast.name);
-            // }
-            // 空文字列ならfalse
-            router.push("/" + last.name || "/");
-          } else {
-            // console.log("lastがnullなので、router.pushしません, last: ", last);
-          }
-        }
-        // if (swiperInstance.activeIndex === 0 && path === "profile" && progress === 1) {
-        //   // layoutStore.pop();
-        //   router.push("/");
-        // }
-      });
-    }
-    // progressは定数ではないため含めない
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [swiperInstance, router, path]);
-
-  // pathが変わったらlayoutStoreにpush
-  useEffect(() => {
-    // 現在のcomponentNamesを確認
-    // console.log("現在のcomponentNames: ", layoutStore.componentNames);
-
-    // pathが変更されたか確認
-    if (prevPathRef.current !== path) {
-      // layoutStoreが空でないことを確認し、最後の要素が現在のpathと異なる場合のみ処理を行う
-      if (layoutStore.componentNames.length === 0 || layoutStore.componentNames.at(-1)?.name !== path) {
-        // もしpath == ""ならばlayoutStoreを空にする
-        if (path === "") {
-          // console.log("pathが空文字列なので、componentNamesを空にします");
-          layoutStore.clear();
-        }
-        // もし、リロードしたら、必ず1つ前をTimeLineにするようにする
-        if (layoutStore.componentNames.length === 0 && path !== "") {
-          // console.log("リロードしたので、prevをTimeLineにします");
-          layoutStore.push({ name: "" });
-          setPrevPath("");
-        }
-        // 現在のpathをpush
-        // console.log("pushします: ", path);
-        // もし、path=postならpostIdを取得してextraにセット
-        if (path === "post") {
-          // console.log("postIdも保存");
-          if (typeof postId === "string") {
-            // console.log("postId: ", postId);
-            // setPostIdFromHistory(postId);
-            layoutStore.push({ name: path, extra: postId });
-          }
-        } else {
-          layoutStore.push({ name: path });
-        }
-        // console.log("後のcomponentNames: ", layoutStore.componentNames);
-
-        // 最後の要素をprevPathにセット
-        const tempPath = layoutStore.componentNames.at(-1); // pushする前の最後の要素を取得
-        // console.log("tempPath at last: ", tempPath);
-
-        if (tempPath?.name != null) {
-          // console.log("prevPathにセットしますtempPath: ", tempPath);
-          setPrevPath(tempPath.name);
-        }
-      } else {
-        // 適切にprevPathをセット
-        // console.log("2: pushしません: ", path);
-        const tempPath = layoutStore.componentNames.at(-2);
-        // console.log("2: tempPath at last: ", tempPath);
-        if (tempPath?.name != null) {
-          // console.log("2: prevPathにセットしますtempPath: ", tempPath);
-          setPrevPath(tempPath.name);
-          if (tempPath.extra) {
-            // console.log("2: postIdを値に保存します: ", tempPath.extra);
-            setPostIdFromHistory(tempPath.extra);
-          }
-        } else {
-          // console.log("2: tempPath.nameがnullなので、prevPathにセットしません");
-        }
-      }
-      // prevPathRefを更新
-      prevPathRef.current = path;
-    }
-  }, [path, layoutStore.componentNames, layoutStore]);
+  const { setSwiperInstance, progress, profileOnClick, mainSlideOnClick, setupSlideChangeHandler } = useSwiper();
+  const { path, prevPath, postIdFromHistory, handleBackNavigation } = useNavigation();
+  
+  React.useEffect(() => {
+    setupSlideChangeHandler(handleBackNavigation);
+  }, [setupSlideChangeHandler, handleBackNavigation]);
 
   if (!session) {
     return (
@@ -212,8 +40,6 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
   };
 
   if (prevPath !== null) {
-    // console.log("prevPathがnullじゃないです！: ", prevPath, "layoutStore: ", layoutStore);
-    // 0枚目: prevPathに該当するコンポーネント, 1枚目: children
     return (
       <div className="w-full h-full relative">
         <div className="fixed top-0 left-0 w-full h-screen z-0"
@@ -229,7 +55,6 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
             />
           )}
           <div className="overflow-y-auto h-[calc(100dvh-64px-60px)] w-full">
-            {/* <TimeLine /> */}
             {componentDict[prevPath]}
           </div>
           <div
@@ -250,7 +75,6 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
             </div>
           </SwiperSlide>
           <SwiperSlide>
-            {/* TODO: ダークモード */}
             <div className="w-full h-screen z-10 bg-white">
               <div className="overflow-y-auto h-[calc(100dvh-60px)] w-full">
                 {children}
@@ -262,8 +86,6 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
       </div>
     );
   } else {
-    // prevPathがないとき
-    // console.log("prevPathがnullです");
     return (
       <div className="w-full h-full relative">
         <SwiperComponent
@@ -307,8 +129,10 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
 
 const BaseLayout = ({ session, children }: { session: ExtendedSession | null; children: React.ReactNode }) => {
   return (
-    <BaseLayoutInner session={session} children={children} />
-  )
+    <BaseLayoutInner session={session}>
+      {children}
+    </BaseLayoutInner>
+  );
 };
 
 export default BaseLayout;

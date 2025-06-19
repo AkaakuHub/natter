@@ -19,7 +19,7 @@ interface LayoutAction {
   clear: () => void;
 }
 
-export type LayoutStore = LayoutState & LayoutAction;
+type LayoutStore = LayoutState & LayoutAction;
 
 const createLayoutStore = (): StoreApi<LayoutStore> =>
   createStore<LayoutStore>((set, get) => ({

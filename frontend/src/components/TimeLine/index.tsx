@@ -1,11 +1,9 @@
 "use client";
 
 import React from "react";
-import { ExtendedSession } from "@/types";
 import PostComponent from "../Post";
 
 // 後ほど使うかも
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TimeLine = () => {
   // モックデータ
   const mockData = {

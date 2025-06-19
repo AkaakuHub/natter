@@ -11,10 +11,6 @@ import DetailedPostComponent from "@/components/DetailedPost";
 const Post = () => {
   const params = useParams<{ id: string }>();
   const postId = params.id;
-  if (isNaN(parseInt(postId))) {
-    return <div>Invalid ID</div>;
-  }
-
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -23,6 +19,10 @@ const Post = () => {
       redirect("/login");
     }
   }, [status, router]);
+  
+  if (isNaN(parseInt(postId))) {
+    return <div>Invalid ID</div>;
+  }
 
   if (status === "loading") {
     return (
