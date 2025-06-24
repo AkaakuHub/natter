@@ -6,8 +6,7 @@ import "./globals.css";
 
 import NextAuthProvider from "@/app/providers";
 import { LayoutProvider } from "@/components/layout/useLayout";
-import { getServerSession } from "next-auth";
-import { nextAuthOptions } from "@/utils/next-auth-options";
+import { auth } from "@/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +30,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await getServerSession(nextAuthOptions);
+  await auth();
 
   return (
     <html lang="ja">
