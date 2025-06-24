@@ -19,6 +19,7 @@ model User {
   name      String
   tel       String?
   image     String?
+  twitterId String?  @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   posts     Post[]

@@ -87,7 +87,7 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
           speed={300}
           resistance={true}
           resistanceRatio={0}
-          onSwiper={(swiper) => setSwiperInstance(swiper)}
+          onSwiper={(swiper: any) => setSwiperInstance(swiper)}
         >
           <SwiperSlide onClick={profileOnClick}>
             <div className="fixed top-0 left-0 w-full h-screen">
@@ -114,7 +114,7 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
           speed={300}
           resistance={true}
           resistanceRatio={0}
-          onSwiper={(swiper) => setSwiperInstance(swiper)}
+          onSwiper={(swiper: any) => setSwiperInstance(swiper)}
         >
           <SwiperSlide>
             <div className="relative w-[calc(100vw-100px)] h-screen">
@@ -135,7 +135,7 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
               </div>
               <FooterMenu path={path} />
               <div
-                className={clsx("absolute inset-0 bg-slate-600 pointer-events-none w-full h-screen fixed z-10", progress < 1 && "pointer-events-auto")}
+                className={clsx("fixed inset-0 bg-slate-600 pointer-events-none w-full h-screen z-10", progress < 1 && "pointer-events-auto")}
                 style={{ opacity: 0.5 - progress * 0.5 }}
               />
             </div>
