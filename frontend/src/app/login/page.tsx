@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { redirect } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -12,16 +12,55 @@ import clsx from "clsx";
 
 const LoginPage = () => {
   const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error');
   const [serverName, setServerName] = useState(process.env.NEXT_PUBLIC_BACKEND_URL || "");
   const [serverKey, setServerKey] = useState(process.env.NEXT_PUBLIC_BACKEND_KEY || "");
   const [isServerAvailable, setIsServerAvailable] = useState(true);
   const [isValidatingServer, setIsValidatingServer] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "authenticated") {
       redirect("/");
     }
   }, [session, status]);
+
+  useEffect(() => {
+    if (error) {
+      switch (error) {
+        case 'OAuthSignin':
+          setAuthError('Twitter認証でエラーが発生しました。しばらく時間をあけて再度お試しください。');
+          break;
+        case 'OAuthCallback':
+          setAuthError('Twitter認証のコールバックでエラーが発生しました。');
+          break;
+        case 'OAuthCreateAccount':
+          setAuthError('アカウント作成でエラーが発生しました。');
+          break;
+        case 'EmailCreateAccount':
+          setAuthError('メールアドレスでのアカウント作成でエラーが発生しました。');
+          break;
+        case 'Callback':
+          setAuthError('認証コールバックでエラーが発生しました。');
+          break;
+        case 'OAuthAccountNotLinked':
+          setAuthError('このアカウントは既に別の方法でリンクされています。');
+          break;
+        case 'EmailSignin':
+          setAuthError('メールサインインでエラーが発生しました。');
+          break;
+        case 'CredentialsSignin':
+          setAuthError('認証情報が正しくありません。');
+          break;
+        case 'SessionRequired':
+          setAuthError('セッションが必要です。ログインしてください。');
+          break;
+        default:
+          setAuthError('認証エラーが発生しました。');
+      }
+    }
+  }, [error]);
 
   const getIsServerAvailable = async () => {
     const delay = async (ms: number) => {
@@ -52,6 +91,7 @@ const LoginPage = () => {
 
 
   const handleLogin = async () => {
+    setAuthError(null);
     setIsValidatingServer(true);
     const serverResponse = await getIsServerAvailable();
     setIsServerAvailable(!!serverResponse);
@@ -59,9 +99,21 @@ const LoginPage = () => {
     if (!serverResponse) {
       return;
     }
-    const result = await signIn("twitter");
-    if (result) {
-      redirect("/");
+    
+    try {
+      const result = await signIn("twitter", { 
+        callbackUrl: "/",
+        redirect: false 
+      });
+      
+      if (result?.error) {
+        setAuthError(`認証エラー: ${result.error}`);
+      } else if (result?.ok) {
+        redirect("/");
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setAuthError('認証処理中にエラーが発生しました。');
     }
   };
 
@@ -95,6 +147,11 @@ const LoginPage = () => {
         />
         {isServerAvailable === false && (
           <div className="text-red-500 text-sm">接続に失敗しました</div>
+        )}
+        {authError && (
+          <div className="text-red-500 text-sm bg-red-50 p-3 rounded-md border border-red-200">
+            {authError}
+          </div>
         )}
         <Button
           onClick={handleLogin}
