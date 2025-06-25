@@ -51,18 +51,7 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
     fetchUserPosts();
   }, [session.user?.id, userId]);
 
-  const getCurrentPosts = () => {
-    switch (activeTab) {
-      case "tweets":
-        return posts;
-      case "media":
-        return mediaPosts;
-      case "likes":
-        return likedPosts;
-      default:
-        return posts;
-    }
-  };
+  
 
   const handleTabChange = (tab: TabType) => setActiveTab(tab);
 
@@ -113,6 +102,10 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
                   if (!post.author) return null;
                   
                   const user: User = post.author;
+                  const transformedUser = {
+                    ...user,
+                    image: user.image || "no_avatar_image_128x128.png",
+                  };
                   const transformedPost = {
                     id: post.id,
                     userId: post.authorId || 0,
@@ -122,7 +115,7 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
                     liked: post.likes?.map(like => like.userId) || [],
                   };
                   
-                  return <PostComponent key={post.id} user={user} post={transformedPost} />;
+                  return <PostComponent key={post.id} user={transformedUser} post={transformedPost} />;
                 });
               })()}
             </div>

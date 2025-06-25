@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Swiper as SwiperComponent, SwiperSlide } from "swiper/react";
+import type { Swiper } from "swiper";
 import "swiper/css";
 import clsx from "clsx";
 
@@ -87,7 +88,7 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
           speed={300}
           resistance={true}
           resistanceRatio={0}
-          onSwiper={(swiper: any) => setSwiperInstance(swiper)}
+          onSwiper={(swiper: Swiper) => setSwiperInstance(swiper)}
         >
           <SwiperSlide onClick={profileOnClick}>
             <div className="fixed top-0 left-0 w-full h-screen">
@@ -114,7 +115,7 @@ const BaseLayoutInner = ({ session, children }: { session: ExtendedSession | nul
           speed={300}
           resistance={true}
           resistanceRatio={0}
-          onSwiper={(swiper: any) => setSwiperInstance(swiper)}
+          onSwiper={(swiper: Swiper) => setSwiperInstance(swiper)}
         >
           <SwiperSlide>
             <div className="relative w-[calc(100vw-100px)] h-screen">

@@ -71,6 +71,10 @@ const TimeLine = () => {
         
         // Convert API data format to component format
         const user: User = post.author;
+        const transformedUser = {
+          ...user,
+          image: user.image || "no_avatar_image_128x128.png",
+        };
         const transformedPost = {
           id: post.id,
           userId: post.authorId || 0,
@@ -81,7 +85,7 @@ const TimeLine = () => {
         };
         
         return (
-          <PostComponent key={post.id} user={user} post={transformedPost} />
+          <PostComponent key={post.id} user={transformedUser} post={transformedPost} />
         );
       })}
     </div>

@@ -5,7 +5,7 @@ import BaseLayout from "@/components/layout/BaseLayout";
 import { ExtendedSession } from "@/types";
 import Image from "next/image";
 import { IconHeart, IconMessageCircle, IconShare } from "@tabler/icons-react";
-import { PostsApi, Post, User } from "@/api";
+import { PostsApi, Post } from "@/api";
 
 interface DetailedPostComponentProps {
   session: ExtendedSession;

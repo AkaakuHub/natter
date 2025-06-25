@@ -1,7 +1,8 @@
-import { type Session } from "next-auth";
+import type { Session as NextAuthSession } from "next-auth";
 
-export type ExtendedSession = Session & {
+// next-authのSession型を拡張して、ユーザーIDを追加
+export interface ExtendedSession extends NextAuthSession {
   user: {
-    id: string | null | undefined;
-  };
+    id?: string;
+  } & NextAuthSession["user"];
 }
