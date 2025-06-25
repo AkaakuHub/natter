@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 
 import Image from "next/image";
@@ -5,6 +7,7 @@ import Link from "next/link";
 
 import { IconHeart, IconMessageCircle, IconShare } from "@tabler/icons-react";
 import { PostsApi } from "@/api";
+import { useRouter } from 'next/navigation';
 
 interface PostComponentProps {
   user: {
@@ -37,6 +40,7 @@ const formatDate = (date: string | number | Date): string => {
 
 
 const PostComponent = ({ user, post }: PostComponentProps) => {
+  const router = useRouter();
   // 仮のユーザーID（実際のアプリでは認証されたユーザーIDを使用）
   const currentUserId = 1;
   const [isLiked, setIsLiked] = useState(false);
@@ -79,8 +83,7 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
           height={48}
         />
       </Link>
-      <div className="flex-1">
-        <Link href={`/post/${post?.id}`} className="block">
+      <div className="flex-1" onClick={() => router.push(`/post/${post?.id}`)}>
           <div className="flex items-center justify-between">
             <div>
               <Link href={`/profile?userId=${user?.id}`} className="hover:underline" onClick={(e) => e.stopPropagation()}>
@@ -111,7 +114,6 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
               ))}
             </div>
           )}
-        </Link>
         <div className="flex items-center gap-8 mt-2 text-gray-500">
           <button 
             onClick={handleLike}
