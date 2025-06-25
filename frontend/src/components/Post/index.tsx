@@ -8,6 +8,7 @@ import Link from "next/link";
 import { IconHeart, IconMessageCircle, IconShare } from "@tabler/icons-react";
 import { PostsApi } from "@/api";
 import { useRouter } from 'next/navigation';
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 interface PostComponentProps {
   user: {
@@ -41,15 +42,15 @@ const formatDate = (date: string | number | Date): string => {
 
 const PostComponent = ({ user, post }: PostComponentProps) => {
   const router = useRouter();
-  // 仮のユーザーID（実際のアプリでは認証されたユーザーIDを使用）
-  const currentUserId = "1";
+  const { currentUser } = useCurrentUser();
+  const currentUserId = currentUser?.id;
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isLiking, setIsLiking] = useState(false);
 
   // propsが変更されたときに状態を同期
   useEffect(() => {
-    setIsLiked(post.liked?.includes(currentUserId) || false);
+    setIsLiked(currentUserId ? post.liked?.includes(currentUserId) || false : false);
     setLikeCount(post.liked?.length || 0);
   }, [post.liked, currentUserId]);
 
@@ -57,7 +58,7 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
     e.preventDefault();
     e.stopPropagation();
     
-    if (isLiking) return;
+    if (isLiking || !currentUserId) return;
     
     try {
       setIsLiking(true);
@@ -117,10 +118,10 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
         <div className="flex items-center gap-8 mt-2 text-gray-500">
           <button 
             onClick={handleLike}
-            disabled={isLiking}
+            disabled={isLiking || !currentUserId}
             className={`flex items-center gap-1 hover:text-red-500 w-[calc(100% / 3)] justify-center transition-colors ${
               isLiked ? 'text-red-500' : ''
-            } ${isLiking ? 'opacity-50' : ''}`}
+            } ${isLiking || !currentUserId ? 'opacity-50' : ''}`}
           >
             <IconHeart size={20} fill={isLiked ? 'currentColor' : 'none'} />
             <span>{likeCount}</span>
