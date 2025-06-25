@@ -84,7 +84,7 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
           height={48}
         />
       </Link>
-      <div className="flex-1" onClick={() => router.push(`/post/${post?.id}`)}>
+      <div className="flex-1" onClick={() => post?.id && router.push(`/post/${post.id}`)}>
           <div className="flex items-center justify-between">
             <div>
               <Link href={`/profile?userId=${user?.id}`} className="hover:underline" onClick={(e) => e.stopPropagation()}>

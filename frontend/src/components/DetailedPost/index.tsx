@@ -27,15 +27,29 @@ const DetailedPostComponent = ({ postId }: DetailedPostComponentProps) => {
 
   useEffect(() => {
     const fetchPost = async () => {
+      // postIdの妥当性をチェック
+      if (!postId || postId === 'undefined' || postId === 'null') {
+        setError('投稿IDが無効です');
+        setLoading(false);
+        return;
+      }
+
+      const numericPostId = parseInt(postId);
+      if (isNaN(numericPostId)) {
+        setError('投稿IDが無効です');
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        const fetchedPost = await PostsApi.getPostById(parseInt(postId));
+        const fetchedPost = await PostsApi.getPostById(numericPostId);
         setPost(fetchedPost);
         setIsLiked(currentUserId ? fetchedPost.likes?.some(like => like.userId === currentUserId) || false : false);
         setLikeCount(fetchedPost.likes?.length || 0);
       } catch (err) {
         console.error('Failed to fetch post:', err);
-        setError('Failed to load post');
+        setError('投稿の読み込みに失敗しました');
       } finally {
         setLoading(false);
       }
