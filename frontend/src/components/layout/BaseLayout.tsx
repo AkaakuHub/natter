@@ -15,20 +15,17 @@ import Header from "./Header";
 import { useSwiper } from "./hooks/useSwiper";
 import { useNavigation } from "./hooks/useNavigation";
 
-import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { UsersApi } from "@/api/users";
-import { ExtendedSession } from "@/types";
 import Welcome from "../Welcome";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const BaseLayoutInner = ({ children }: { children: React.ReactNode }) => {
-  const { data: session, status } = useSession();
+  const { session, userExists, isLoading, createUserAndRefresh } = useCurrentUser();
   const { setSwiperInstance, progress, profileOnClick, mainSlideOnClick, setupSlideChangeHandler } = useSwiper();
   const { path, prevPath, postIdFromHistory, handleBackNavigation } = useNavigation();
   const searchParams = useSearchParams();
   const [targetUser, setTargetUser] = React.useState<{ image?: string } | null>(null);
-  const [currentUser, setCurrentUser] = React.useState<any>(null);
-  const [userExists, setUserExists] = React.useState<boolean | null>(null);
 
   // Get the userId from URL params to determine if viewing another user's profile
   const viewingUserId = searchParams.get('userId');
@@ -45,31 +42,12 @@ const BaseLayoutInner = ({ children }: { children: React.ReactNode }) => {
 
   const headerProfileImage = (path === 'profile' && targetUser?.image) ? targetUser.image : (session?.user?.image ?? "no_avatar_image_128x128.png");
 
-  // ユーザーの存在をチェック
-  React.useEffect(() => {
-    const checkUserExists = async () => {
-      if (session?.user?.id) {
-        try {
-          const user = await UsersApi.getUserByTwitterId(session.user.id);
-          setCurrentUser(user);
-          setUserExists(!!user);
-        } catch (error) {
-          console.error('Error checking user:', error);
-          setUserExists(false);
-        }
-      }
-    };
-
-    if (status === 'authenticated' && session) {
-      checkUserExists();
-    }
-  }, [session, status]);
 
   React.useEffect(() => {
     setupSlideChangeHandler(handleBackNavigation);
   }, [setupSlideChangeHandler, handleBackNavigation]);
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <div>Loading...</div>
@@ -91,33 +69,16 @@ const BaseLayoutInner = ({ children }: { children: React.ReactNode }) => {
   if (userExists === false && session) {
     return (
       <Welcome 
-        session={session as ExtendedSession} 
-        onUserCreated={() => {
-          setUserExists(true);
-          // ユーザー作成後、再度ユーザー情報を取得
-          if (session.user.id) {
-            UsersApi.getUserByTwitterId(session.user.id).then(user => {
-              setCurrentUser(user);
-            });
-          }
-        }} 
+        session={session} 
+        onUserCreated={createUserAndRefresh} 
       />
     );
   }
 
-  // ユーザー存在チェック中
-  if (userExists === null) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center">
-        <div>ユーザー情報を確認中...</div>
-      </div>
-    );
-  }
-
   const componentDict: { [key: string]: React.ReactNode } = {
-    "profile": <ProfileComponent session={session as ExtendedSession} />,
+    "profile": <ProfileComponent session={session} />,
     "": <TimeLine />,
-    "post": <DetailedPostComponent session={session as ExtendedSession} postId={postIdFromHistory} />,
+    "post": <DetailedPostComponent postId={postIdFromHistory} />,
   };
 
   if (prevPath !== null) {
@@ -180,7 +141,7 @@ const BaseLayoutInner = ({ children }: { children: React.ReactNode }) => {
         >
           <SwiperSlide>
             <div className="relative w-[calc(100vw-100px)] h-screen">
-              <SideBar session={session as ExtendedSession} />
+              <SideBar session={session} />
             </div>
           </SwiperSlide>
           <SwiperSlide onClick={mainSlideOnClick}>

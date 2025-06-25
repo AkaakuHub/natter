@@ -29,7 +29,9 @@ export class UsersController {
 
   @Get('twitter/:twitterId')
   async findByTwitterId(@Param('twitterId') twitterId: string) {
+    console.log('Looking for user with Twitter ID:', twitterId);
     const user = await this.usersService.findByTwitterId(twitterId);
+    console.log('Found user:', user);
     if (!user) {
       throw new NotFoundException(`User with Twitter ID ${twitterId} not found`);
     }

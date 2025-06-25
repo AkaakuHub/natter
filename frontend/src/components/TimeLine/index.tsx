@@ -4,14 +4,19 @@ import React, { useState, useEffect } from "react";
 import PostComponent from "../Post";
 import CreatePost from "../CreatePost";
 import { PostsApi, Post, User } from "../../api";
-import { useSession } from "next-auth/react";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { ExtendedSession } from "@/types";
 
-const TimeLine = () => {
-  const { data: session } = useSession();
+interface TimeLineProps {
+  session?: ExtendedSession;
+}
+
+const TimeLine = (_props: TimeLineProps) => {
+  const { currentUser } = useCurrentUser();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
 
   const fetchPosts = async () => {
     try {
@@ -35,12 +40,7 @@ const TimeLine = () => {
     fetchPosts();
   };
 
-  // 認証されたユーザー情報を使用
-  const currentUser = session?.user?.id ? {
-    id: parseInt(session.user.id, 10),
-    name: session.user.name || "Unknown User",
-    image: session.user.image || "/no_avatar_image_128x128.png",
-  } : null;
+  // currentUserはpropsから受け取る
 
   if (loading) {
     return (

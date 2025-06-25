@@ -3,15 +3,11 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { IconPhoto, IconX } from "@tabler/icons-react";
-import { PostsApi } from "@/api";
+import { PostsApi, User } from "@/api";
 
 interface CreatePostProps {
   onPostCreated?: () => void;
-  currentUser?: {
-    id: number;
-    name: string;
-    image?: string;
-  };
+  currentUser?: User | null;
 }
 
 const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {

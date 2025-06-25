@@ -24,19 +24,22 @@ export class PostsController {
   }
 
   @Get()
-  async findAll(@Query('type') type?: string, @Query('userId') userId?: string) {
+  async findAll(
+    @Query('type') type?: string,
+    @Query('userId') userId?: string,
+  ) {
     if (type === 'media') {
       return this.postsService.findMediaPosts();
     }
-    
+
     if (type === 'liked' && userId) {
       return this.postsService.findLikedPosts(parseInt(userId));
     }
-    
+
     if (userId) {
       return this.postsService.findByUser(parseInt(userId));
     }
-    
+
     return this.postsService.findAll();
   }
 

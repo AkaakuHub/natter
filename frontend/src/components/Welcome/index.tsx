@@ -9,7 +9,7 @@ import { ExtendedSession } from "@/types";
 
 interface WelcomeProps {
   session: ExtendedSession;
-  onUserCreated: () => void;
+  onUserCreated: () => Promise<void>;
 }
 
 const Welcome = ({ session, onUserCreated }: WelcomeProps) => {
@@ -23,14 +23,19 @@ const Welcome = ({ session, onUserCreated }: WelcomeProps) => {
 
       console.log('Creating user with session:', session);
 
-      await UsersApi.createUser({
+      const userData = {
         twitterId: session.user.id,
         name: session.user.name || "Unknown User",
         email: session.user.email || undefined,
         image: session.user.image || undefined,
-      });
+      };
+      
+      console.log('User data to create:', userData);
+      
+      const createdUser = await UsersApi.createUser(userData);
+      console.log('Created user:', createdUser);
 
-      onUserCreated();
+      await onUserCreated();
     } catch (err) {
       console.error("Failed to create user:", err);
       setError("ユーザーの作成に失敗しました");

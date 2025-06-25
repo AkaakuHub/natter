@@ -7,15 +7,12 @@ import Image from "next/image";
 import { IconHeart, IconMessageCircle, IconShare } from "@tabler/icons-react";
 import { PostsApi, Post } from "@/api";
 
-import { ExtendedSession } from "@/types";
 
 interface DetailedPostComponentProps {
-  session: ExtendedSession;
   postId: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const DetailedPostComponent = ({ session, postId }: DetailedPostComponentProps) => {
+const DetailedPostComponent = ({ postId }: DetailedPostComponentProps) => {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
