@@ -11,17 +11,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, profile }) {
+    async jwt({ token, user, account, profile }) {
+      console.log("--- JWT User ---", user);
+      console.log("--- Twitter Account ---", account);
       console.log("--- Twitter Profile ---", profile);
-      if (profile) {
-        token.twitterId = profile.id;
+      // 最初のサインイン時
+      if (account) {
+        token.twitterId = account.providerAccountId;
       }
       console.log("--- JWT Token ---", token);
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.twitterId as string;
+        // twitterIdがあればそれを、なければsubをフォールバックとして使用
+        session.user.id = (token.twitterId || token.sub) as string;
       }
       return session;
     },
