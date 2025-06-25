@@ -4,8 +4,11 @@ import React, { useState, useEffect } from "react";
 import PostComponent from "../Post";
 import CreatePost from "../CreatePost";
 import { PostsApi, Post, User } from "../../api";
+import { useSession } from "next-auth/react";
+import { ExtendedSession } from "@/types";
 
 const TimeLine = () => {
+  const { data: session } = useSession();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,12 +35,12 @@ const TimeLine = () => {
     fetchPosts();
   };
 
-  // 仮のユーザー情報（実際のアプリでは認証されたユーザー情報を使用）
-  const currentUser = {
-    id: 1,
-    name: "Alice",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-  };
+  // 認証されたユーザー情報を使用
+  const currentUser = session?.user ? {
+    id: parseInt(session.user.id || "0"),
+    name: session.user.name || "Unknown User",
+    image: session.user.image || "/no_avatar_image_128x128.png",
+  } : null;
 
   if (loading) {
     return (
@@ -58,10 +61,12 @@ const TimeLine = () => {
   return (
     <div className="w-full max-w-md mx-auto">
       {/* ポスト作成エリア */}
-      <CreatePost 
-        currentUser={currentUser}
-        onPostCreated={handlePostCreated}
-      />
+      {currentUser && (
+        <CreatePost 
+          currentUser={currentUser}
+          onPostCreated={handlePostCreated}
+        />
+      )}
       
       {/* 投稿一覧 */}
       {posts.map(post => {
