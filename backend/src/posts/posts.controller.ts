@@ -33,11 +33,11 @@ export class PostsController {
     }
 
     if (type === 'liked' && userId) {
-      return this.postsService.findLikedPosts(parseInt(userId));
+      return this.postsService.findLikedPosts(userId);
     }
 
     if (userId) {
-      return this.postsService.findByUser(parseInt(userId));
+      return this.postsService.findByUser(userId);
     }
 
     return this.postsService.findAll();
@@ -64,7 +64,7 @@ export class PostsController {
   @Post(':id/like')
   likePost(
     @Param('id', ParseIntPipe) postId: number,
-    @Body('userId', ParseIntPipe) userId: number,
+    @Body('userId') userId: string,
   ) {
     return this.postsService.likePost(postId, userId);
   }

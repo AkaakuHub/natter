@@ -26,7 +26,6 @@ const Welcome = ({ session, onUserCreated }: WelcomeProps) => {
       const userData = {
         twitterId: session.user.id,
         name: session.user.name || "Unknown User",
-        email: session.user.email || undefined,
         image: session.user.image || undefined,
       };
       

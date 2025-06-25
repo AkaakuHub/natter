@@ -11,17 +11,17 @@ import { useRouter } from 'next/navigation';
 
 interface PostComponentProps {
   user: {
-    id: number;
+    id: string;
     name: string;
     image: string;
   },
   post: {
     id: number;
-    userId: number;
+    userId: string;
     content: string;
     images?: string[];
     createdAt: string;
-    liked?: number[];
+    liked?: string[];
   }
 }
 
@@ -42,7 +42,7 @@ const formatDate = (date: string | number | Date): string => {
 const PostComponent = ({ user, post }: PostComponentProps) => {
   const router = useRouter();
   // 仮のユーザーID（実際のアプリでは認証されたユーザーIDを使用）
-  const currentUserId = 1;
+  const currentUserId = "1";
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isLiking, setIsLiking] = useState(false);

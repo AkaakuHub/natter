@@ -1,9 +1,9 @@
 export interface User {
-  id: number;
+  id: string;
   name: string;
-  email: string;
   image?: string;
   tel?: string;
+  twitterId: string;
   createdAt: string;
   updatedAt: string;
   _count?: {
@@ -20,7 +20,7 @@ export interface Post {
   published: boolean;
   createdAt: string;
   updatedAt: string;
-  authorId?: number;
+  authorId?: string;
   author?: User;
   likes?: Like[];
   _count?: {
@@ -30,7 +30,7 @@ export interface Post {
 
 export interface Like {
   id: number;
-  userId: number;
+  userId: string;
   postId: number;
   createdAt: string;
   user?: User;
@@ -40,7 +40,7 @@ export interface CreatePostDto {
   title?: string;
   content?: string;
   images?: string[];
-  authorId?: number;
+  authorId?: string;
 }
 
 export interface UpdatePostDto {

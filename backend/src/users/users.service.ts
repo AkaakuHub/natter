@@ -4,7 +4,6 @@ import { PrismaService } from '../prisma/prisma.service';
 interface CreateUserData {
   twitterId: string;
   name: string;
-  email?: string;
   image?: string;
 }
 
@@ -15,8 +14,8 @@ export class UsersService {
   async create(userData: CreateUserData) {
     return this.prisma.user.create({
       data: {
+        id: userData.twitterId,
         name: userData.name,
-        email: userData.email,
         image: userData.image,
         twitterId: userData.twitterId,
       },
@@ -39,7 +38,7 @@ export class UsersService {
     return this.prisma.user.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.user.findUnique({
       where: { id },
       include: {

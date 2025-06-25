@@ -15,7 +15,7 @@ import { ExtendedSession } from "@/types";
 
 interface ProfileComponentProps {
   session: ExtendedSession;
-  userId?: number;
+  userId?: string;
 }
 
 const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
@@ -28,7 +28,7 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
 
   useEffect(() => {
     const fetchUserPosts = async () => {
-      const targetUserId = userId || (session.user?.id ? parseInt(session.user.id) : null);
+      const targetUserId = userId || session.user?.id;
       if (!targetUserId) return;
       
       try {
@@ -110,7 +110,7 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
                   };
                   const transformedPost = {
                     id: post.id,
-                    userId: post.authorId || 0,
+                    userId: post.authorId || "",
                     content: post.content || '',
                     images: post.images || [],
                     createdAt: post.createdAt,

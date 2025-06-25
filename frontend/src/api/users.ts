@@ -4,7 +4,6 @@ import { User } from './types';
 interface CreateUserData {
   twitterId: string;
   name: string;
-  email?: string;
   image?: string;
 }
 
@@ -13,7 +12,7 @@ export class UsersApi {
     return ApiClient.get<User[]>('/users');
   }
 
-  static async getUserById(id: number): Promise<User> {
+  static async getUserById(id: string): Promise<User> {
     return ApiClient.get<User>(`/users/${id}`);
   }
 

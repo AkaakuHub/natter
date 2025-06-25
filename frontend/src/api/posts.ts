@@ -10,7 +10,7 @@ export class PostsApi {
     return ApiClient.get<Post>(`/posts/${id}`);
   }
 
-  static async getPostsByUser(userId: number): Promise<Post[]> {
+  static async getPostsByUser(userId: string): Promise<Post[]> {
     return ApiClient.get<Post[]>(`/posts?userId=${userId}`);
   }
 
@@ -18,7 +18,7 @@ export class PostsApi {
     return ApiClient.get<Post[]>('/posts?type=media');
   }
 
-  static async getLikedPosts(userId: number): Promise<Post[]> {
+  static async getLikedPosts(userId: string): Promise<Post[]> {
     return ApiClient.get<Post[]>(`/posts?type=liked&userId=${userId}`);
   }
 
@@ -34,7 +34,7 @@ export class PostsApi {
     return ApiClient.delete<void>(`/posts/${id}`);
   }
 
-  static async likePost(postId: number, userId: number): Promise<LikeResponse> {
+  static async likePost(postId: number, userId: string): Promise<LikeResponse> {
     return ApiClient.post<LikeResponse>(`/posts/${postId}/like`, {
       userId,
     });

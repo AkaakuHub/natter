@@ -1,10 +1,9 @@
-import { Controller, Get, Post, Body, Param, ParseIntPipe, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, NotFoundException } from '@nestjs/common';
 import { UsersService } from './users.service';
 
 export class CreateUserDto {
   twitterId: string;
   name: string;
-  email?: string;
   image?: string;
 }
 
@@ -23,7 +22,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 

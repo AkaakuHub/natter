@@ -10,7 +10,7 @@ export class PostsService {
   async create(createPostDto: CreatePostDto) {
     const { images, authorId, ...postData } = createPostDto;
 
-    if (!authorId || isNaN(authorId)) {
+    if (!authorId) {
       throw new BadRequestException('Invalid authorId');
     }
 
@@ -99,7 +99,7 @@ export class PostsService {
     };
   }
 
-  async findByUser(userId: number) {
+  async findByUser(userId: string) {
     const posts = await this.prisma.post.findMany({
       where: { authorId: userId },
       include: {
@@ -159,7 +159,7 @@ export class PostsService {
       }));
   }
 
-  async findLikedPosts(userId: number) {
+  async findLikedPosts(userId: string) {
     const likedPosts = await this.prisma.like.findMany({
       where: { userId },
       include: {
@@ -220,7 +220,7 @@ export class PostsService {
     });
   }
 
-  async likePost(postId: number, userId: number) {
+  async likePost(postId: number, userId: string) {
     const existingLike = await this.prisma.like.findUnique({
       where: {
         userId_postId: {

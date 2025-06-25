@@ -14,12 +14,11 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String?  @unique
+  id        String   @id
   name      String
   tel       String?
   image     String?
-  twitterId String?  @unique
+  twitterId String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   posts     Post[]
@@ -35,14 +34,14 @@ model Post {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   author    User?    @relation(fields: [authorId], references: [id])
-  authorId  Int?
+  authorId  String?
   likes     Like[]
 }
 
 model Like {
   id     Int  @id @default(autoincrement())
   user   User @relation(fields: [userId], references: [id])
-  userId Int
+  userId String
   post   Post @relation(fields: [postId], references: [id])
   postId Int
   createdAt DateTime @default(now())

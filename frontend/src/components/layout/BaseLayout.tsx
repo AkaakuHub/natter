@@ -32,7 +32,7 @@ const BaseLayoutInner = ({ children }: { children: React.ReactNode }) => {
 
   React.useEffect(() => {
     if (viewingUserId) {
-      UsersApi.getUserById(parseInt(viewingUserId))
+      UsersApi.getUserById(viewingUserId)
         .then(user => setTargetUser(user))
         .catch(() => setTargetUser(null));
     } else {

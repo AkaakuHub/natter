@@ -82,7 +82,7 @@ const TimeLine = (_props: TimeLineProps) => {
         };
         const transformedPost = {
           id: post.id,
-          userId: post.authorId || 0,
+          userId: post.authorId || "",
           content: post.content || '',
           images: post.images || [],
           createdAt: post.createdAt,

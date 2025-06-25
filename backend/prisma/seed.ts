@@ -6,8 +6,8 @@ async function main() {
     // Create users with avatar images
     const alice = await prisma.user.create({
         data: {
+            id: 'alice_twitter',
             name: 'Alice',
-            email: 'alice@example.com',
             image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
             twitterId: 'alice_twitter'
         }
@@ -15,8 +15,8 @@ async function main() {
 
     const bob = await prisma.user.create({
         data: {
+            id: 'bob_twitter',
             name: 'Bob',
-            email: 'bob@example.com',
             image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
             twitterId: 'bob_twitter'
         }
@@ -24,8 +24,8 @@ async function main() {
 
     const charlie = await prisma.user.create({
         data: {
+            id: 'charlie_twitter',
             name: 'Charlie',
-            email: 'charlie@example.com',
             image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
             twitterId: 'charlie_twitter'
         }

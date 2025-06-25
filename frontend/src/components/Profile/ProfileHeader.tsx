@@ -8,7 +8,7 @@ import { User } from "@/api/types";
 
 interface ProfileHeaderProps {
   session: ExtendedSession;
-  userId?: number;
+  userId?: string;
 }
 
 const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
