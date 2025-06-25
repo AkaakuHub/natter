@@ -26,7 +26,7 @@ const Post = () => {
 
   if (status === "loading") {
     return (
-      <BaseLayout session={null}>
+      <BaseLayout>
         ここがスケルトン
       </BaseLayout>
     );

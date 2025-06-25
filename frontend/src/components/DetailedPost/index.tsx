@@ -2,16 +2,19 @@
 
 import React, { useState, useEffect } from "react";
 import BaseLayout from "@/components/layout/BaseLayout";
-import { ExtendedSession } from "@/types";
+
 import Image from "next/image";
 import { IconHeart, IconMessageCircle, IconShare } from "@tabler/icons-react";
 import { PostsApi, Post } from "@/api";
+
+import { ExtendedSession } from "@/types";
 
 interface DetailedPostComponentProps {
   session: ExtendedSession;
   postId: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DetailedPostComponent = ({ session, postId }: DetailedPostComponentProps) => {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,7 +39,7 @@ const DetailedPostComponent = ({ session, postId }: DetailedPostComponentProps) 
 
   if (loading) {
     return (
-      <BaseLayout session={session}>
+      <BaseLayout >
         <div className="max-w-2xl mx-auto mt-10 px-4 flex justify-center">
           <div className="text-gray-500">Loading post...</div>
         </div>
@@ -46,7 +49,7 @@ const DetailedPostComponent = ({ session, postId }: DetailedPostComponentProps) 
 
   if (error || !post) {
     return (
-      <BaseLayout session={session}>
+      <BaseLayout >
         <div className="max-w-2xl mx-auto mt-10 px-4 flex justify-center">
           <div className="text-red-500">{error || "Post not found"}</div>
         </div>
@@ -57,7 +60,7 @@ const DetailedPostComponent = ({ session, postId }: DetailedPostComponentProps) 
   const user = post.author;
 
   return (
-    <BaseLayout session={session}>
+    <BaseLayout >
       <div className="max-w-2xl mx-auto mt-10 px-4">
         <div className="flex items-start space-x-4 border-b pb-4">
           <Image

@@ -8,7 +8,6 @@ import BaseLayout from "@/components/layout/BaseLayout";
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { ExtendedSession } from "@/types";
 
 export default function SetList() {
   const { data: session, status } = useSession();
@@ -20,7 +19,7 @@ export default function SetList() {
   }, [status, router]);
   if (status === "loading") {
     return (
-      <BaseLayout session={null}>
+      <BaseLayout>
         ここがスケルトン
       </BaseLayout>
     )
@@ -30,7 +29,7 @@ export default function SetList() {
   }
 
   return (
-    <BaseLayout session={session as ExtendedSession}>
+    <BaseLayout>
       <div className="flex flex-col items-center justify-center h-screen gap-8">
         <div>
           このページは誠意開発中です。

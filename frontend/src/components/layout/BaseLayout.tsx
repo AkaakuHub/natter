@@ -14,13 +14,14 @@ import DetailedPostComponent from "../DetailedPost";
 import Header from "./Header";
 import { useSwiper } from "./hooks/useSwiper";
 import { useNavigation } from "./hooks/useNavigation";
-import { ExtendedSession } from "@/types";
+
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { UsersApi } from "@/api/users";
+import { ExtendedSession } from "@/types";
 
 const BaseLayoutInner = ({ children }: { children: React.ReactNode }) => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const { setSwiperInstance, progress, profileOnClick, mainSlideOnClick, setupSlideChangeHandler } = useSwiper();
   const { path, prevPath, postIdFromHistory, handleBackNavigation } = useNavigation();
   const searchParams = useSearchParams();
@@ -45,6 +46,14 @@ const BaseLayoutInner = ({ children }: { children: React.ReactNode }) => {
     setupSlideChangeHandler(handleBackNavigation);
   }, [setupSlideChangeHandler, handleBackNavigation]);
 
+  if (status === "loading") {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <div>Loading...</div>
+      </div>
+    );
+  }
+
   if (!session) {
     return (
       <div className="w-full h-screen">
@@ -56,9 +65,9 @@ const BaseLayoutInner = ({ children }: { children: React.ReactNode }) => {
   }
 
   const componentDict: { [key: string]: React.ReactNode } = {
-    "profile": <ProfileComponent session={session} />,
+    "profile": <ProfileComponent session={session as ExtendedSession} />,
     "": <TimeLine />,
-    "post": <DetailedPostComponent session={session} postId={postIdFromHistory} />,
+    "post": <DetailedPostComponent session={session as ExtendedSession} postId={postIdFromHistory} />,
   };
 
   if (prevPath !== null) {
@@ -121,7 +130,7 @@ const BaseLayoutInner = ({ children }: { children: React.ReactNode }) => {
         >
           <SwiperSlide>
             <div className="relative w-[calc(100vw-100px)] h-screen">
-              <SideBar session={session} />
+              <SideBar session={session as ExtendedSession} />
             </div>
           </SwiperSlide>
           <SwiperSlide onClick={mainSlideOnClick}>

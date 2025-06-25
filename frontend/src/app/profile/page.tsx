@@ -21,7 +21,7 @@ const Profile = () => {
   
   if (status === "loading") {
     return (
-      <BaseLayout session={null}>
+      <BaseLayout>
         ここがスケルトン
       </BaseLayout>
     )
@@ -30,7 +30,7 @@ const Profile = () => {
     return null;
   }
   return (
-    <BaseLayout session={session as ExtendedSession}>
+    <BaseLayout>
       <ProfileComponent session={session as ExtendedSession} userId={userId ? parseInt(userId) : undefined} />
     </BaseLayout>
   );

@@ -6,10 +6,12 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 import PostComponent from "@/components/Post";
-import { ExtendedSession } from "@/types";
+
 import { PostsApi, Post, User } from "@/api";
 import ProfileHeader from "./ProfileHeader";
 import TabsComponent, { TabType, TabKinds, TabNames } from "./TabsComponent";
+
+import { ExtendedSession } from "@/types";
 
 interface ProfileComponentProps {
   session: ExtendedSession;

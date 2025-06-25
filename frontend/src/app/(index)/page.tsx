@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import BaseLayout from "@/components/layout/BaseLayout";
 import { useRouter, redirect } from "next/navigation";
-import { ExtendedSession } from "@/types";
+
 import TimeLine from "@/components/TimeLine";
 
 const Home = () => {
@@ -17,7 +17,7 @@ const Home = () => {
   }, [status, router]);
   if (status === "loading") {
     return (
-      <BaseLayout session={null}>
+      <BaseLayout>
         ここがスケルトン
       </BaseLayout>
     )
@@ -26,7 +26,7 @@ const Home = () => {
     return null;
   }
   return (
-    <BaseLayout session={session as ExtendedSession}>
+    <BaseLayout>
       <TimeLine />
     </BaseLayout>
   );

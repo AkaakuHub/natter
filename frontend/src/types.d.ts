@@ -1,8 +1,23 @@
-import type { Session as NextAuthSession } from "next-auth";
+import type { DefaultSession, Session } from "next-auth";
 
-// next-authのSession型を拡張して、ユーザーIDを追加
-export interface ExtendedSession extends NextAuthSession {
+declare module "next-auth" {
+  /**
+   * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
+   */
+  interface Session {
+    user: {
+      /** The user's unique ID. */
+      id?: string;
+    } & DefaultSession["user"];
+  }
+}
+
+// ExtendedSession type for components
+export interface ExtendedSession extends Session {
   user: {
-    id?: string;
-  } & NextAuthSession["user"];
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  } & DefaultSession["user"];
 }
