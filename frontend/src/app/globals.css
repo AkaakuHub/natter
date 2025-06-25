@@ -30,5 +30,6 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  @apply bg-background text-foreground;
+  background-color: var(--background);
+  color: var(--foreground);
 }
