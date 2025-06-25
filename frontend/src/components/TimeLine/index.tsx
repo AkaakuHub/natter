@@ -36,8 +36,8 @@ const TimeLine = () => {
   };
 
   // 認証されたユーザー情報を使用
-  const currentUser = session?.user ? {
-    id: parseInt(session.user.id || "0"),
+  const currentUser = session?.user?.id ? {
+    id: parseInt(session.user.id, 10),
     name: session.user.name || "Unknown User",
     image: session.user.image || "/no_avatar_image_128x128.png",
   } : null;

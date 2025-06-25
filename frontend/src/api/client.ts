@@ -9,12 +9,9 @@ export class ApiClient {
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     
-    const token = typeof window !== 'undefined' ? localStorage.getItem('jwt_token') : null;
-    
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
         ...options?.headers,
       },
       ...options,
@@ -27,12 +24,24 @@ export class ApiClient {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      // レスポンスが空の場合の処理
+      const text = await response.text();
+      if (!text) {
+        return null;
+      }
+
+      try {
+        return JSON.parse(text);
+      } catch (jsonError) {
+        console.error('JSON parse error:', jsonError);
+        throw new Error('Invalid JSON response');
+      }
     } catch (error) {
       console.error('API request failed:', error);
       throw error;
     }
   }
+
 
   static async get<T>(endpoint: string): Promise<T> {
     return this.request<T>(endpoint, { method: 'GET' });

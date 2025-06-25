@@ -8,7 +8,8 @@ async function main() {
         data: {
             name: 'Alice',
             email: 'alice@example.com',
-            image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+            image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+            twitterId: 'alice_twitter'
         }
     })
 
@@ -16,7 +17,8 @@ async function main() {
         data: {
             name: 'Bob',
             email: 'bob@example.com',
-            image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+            image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+            twitterId: 'bob_twitter'
         }
     })
 
@@ -24,7 +26,8 @@ async function main() {
         data: {
             name: 'Charlie',
             email: 'charlie@example.com',
-            image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
+            image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+            twitterId: 'charlie_twitter'
         }
     })
 

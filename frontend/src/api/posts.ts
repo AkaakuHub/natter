@@ -23,33 +23,20 @@ export class PostsApi {
   }
 
   static async createPost(data: CreatePostDto): Promise<Post> {
-    const passkey = process.env.NEXT_PUBLIC_PASSKEY || '1234';
-    return ApiClient.post<Post>('/posts', {
-      ...data,
-      key: passkey,
-    });
+    return ApiClient.post<Post>('/posts', data);
   }
 
   static async updatePost(id: number, data: UpdatePostDto): Promise<Post> {
-    const passkey = process.env.NEXT_PUBLIC_PASSKEY || '1234';
-    return ApiClient.patch<Post>(`/posts/${id}`, {
-      ...data,
-      key: passkey,
-    });
+    return ApiClient.patch<Post>(`/posts/${id}`, data);
   }
 
   static async deletePost(id: number): Promise<void> {
-    const passkey = process.env.NEXT_PUBLIC_PASSKEY || '1234';
-    return ApiClient.delete<void>(`/posts/${id}`, {
-      key: passkey,
-    });
+    return ApiClient.delete<void>(`/posts/${id}`);
   }
 
   static async likePost(postId: number, userId: number): Promise<LikeResponse> {
-    const passkey = process.env.NEXT_PUBLIC_PASSKEY || '1234';
     return ApiClient.post<LikeResponse>(`/posts/${postId}/like`, {
       userId,
-      key: passkey,
     });
   }
 

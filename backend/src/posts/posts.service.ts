@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -8,7 +8,21 @@ export class PostsService {
   constructor(private prisma: PrismaService) {}
 
   async create(createPostDto: CreatePostDto) {
-    const { images, authorId, key, ...postData } = createPostDto;
+    const { images, authorId, ...postData } = createPostDto;
+
+    if (!authorId || isNaN(authorId)) {
+      throw new BadRequestException('Invalid authorId');
+    }
+
+    // ユーザーが存在するかチェック
+    const user = await this.prisma.user.findUnique({
+      where: { id: authorId }
+    });
+
+    if (!user) {
+      throw new BadRequestException(`User with id ${authorId} does not exist`);
+    }
+
     return this.prisma.post.create({
       data: {
         ...postData,

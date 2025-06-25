@@ -26,6 +26,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         // twitterIdがあればそれを、なければsubをフォールバックとして使用
         session.user.id = (token.twitterId || token.sub) as string;
+        // JWTトークンもセッションに含める
+        (session as any).accessToken = token;
       }
       return session;
     },

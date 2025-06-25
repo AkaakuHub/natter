@@ -19,6 +19,7 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { UsersApi } from "@/api/users";
 import { ExtendedSession } from "@/types";
+import Welcome from "../Welcome";
 
 const BaseLayoutInner = ({ children }: { children: React.ReactNode }) => {
   const { data: session, status } = useSession();
@@ -26,6 +27,8 @@ const BaseLayoutInner = ({ children }: { children: React.ReactNode }) => {
   const { path, prevPath, postIdFromHistory, handleBackNavigation } = useNavigation();
   const searchParams = useSearchParams();
   const [targetUser, setTargetUser] = React.useState<{ image?: string } | null>(null);
+  const [currentUser, setCurrentUser] = React.useState<any>(null);
+  const [userExists, setUserExists] = React.useState<boolean | null>(null);
 
   // Get the userId from URL params to determine if viewing another user's profile
   const viewingUserId = searchParams.get('userId');
@@ -41,6 +44,26 @@ const BaseLayoutInner = ({ children }: { children: React.ReactNode }) => {
   }, [viewingUserId]);
 
   const headerProfileImage = (path === 'profile' && targetUser?.image) ? targetUser.image : (session?.user?.image ?? "no_avatar_image_128x128.png");
+
+  // ユーザーの存在をチェック
+  React.useEffect(() => {
+    const checkUserExists = async () => {
+      if (session?.user?.id) {
+        try {
+          const user = await UsersApi.getUserByTwitterId(session.user.id);
+          setCurrentUser(user);
+          setUserExists(!!user);
+        } catch (error) {
+          console.error('Error checking user:', error);
+          setUserExists(false);
+        }
+      }
+    };
+
+    if (status === 'authenticated' && session) {
+      checkUserExists();
+    }
+  }, [session, status]);
 
   React.useEffect(() => {
     setupSlideChangeHandler(handleBackNavigation);
@@ -60,6 +83,33 @@ const BaseLayoutInner = ({ children }: { children: React.ReactNode }) => {
         <Header progress={1} />
         {children}
         <FooterMenu path={path} />
+      </div>
+    );
+  }
+
+  // 新規ユーザーの場合はWelcomeコンポーネントを表示
+  if (userExists === false && session) {
+    return (
+      <Welcome 
+        session={session as ExtendedSession} 
+        onUserCreated={() => {
+          setUserExists(true);
+          // ユーザー作成後、再度ユーザー情報を取得
+          if (session.user.id) {
+            UsersApi.getUserByTwitterId(session.user.id).then(user => {
+              setCurrentUser(user);
+            });
+          }
+        }} 
+      />
+    );
+  }
+
+  // ユーザー存在チェック中
+  if (userExists === null) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <div>ユーザー情報を確認中...</div>
       </div>
     );
   }

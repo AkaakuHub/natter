@@ -37,6 +37,8 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
       setIsSubmitting(true);
       setError(null);
 
+      console.log('Creating post with authorId:', currentUser.id, typeof currentUser.id);
+      
       await PostsApi.createPost({
         content: content.trim(),
         images: images.length > 0 ? images : undefined,
