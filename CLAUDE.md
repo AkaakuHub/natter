@@ -2,126 +2,144 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## docs place
-please save docs in the `docs/` directory.
+## ドキュメントの保存場所
+ドキュメントは `docs/` ディレクトリに保存してください。
 
-# pnpm knip
-- `pnpm knip` is used to find unused dependencies and exports in the codebase, so use it every time you write something.
+# 重要な開発ノート
+- **ポート使用**: デバッグで3000番や8000番ポートが既に使用されている場合は使用しないでください
+- **フロントエンド URL**: Twitter OAuth を正常に動作させるため、 http://127.0.0.1:3000 を使用してください（localhost ではなく）
+- **knip 使用**: コードを書いた後は必ず `pnpm knip` を実行して、未使用の依存関係とエクスポートを確認してください
 
-# 絶対に、portが3000や8000でデバッグをし、もしそのポートが埋まっていたら、使用しないで。
+## プロジェクト概要
 
-## Project Overview
+Natter は Next.js フロントエンドと NestJS バックエンドを持つフルスタックソーシャルメディアアプリケーションです。pnpm ワークスペースを使用したモノレポ構造になっています。
 
-Natter is a full-stack social media application with a Next.js frontend and NestJS backend. The project uses a monorepo structure with pnpm workspaces.
+## アーキテクチャ
 
-## Architecture
+### フロントエンド (Next.js + TypeScript)
+- **フレームワーク**: Next.js 15 with App Router
+- **認証**: NextAuth.js with Twitter OAuth
+- **UI**: Tailwind CSS with shadcn/ui パターンのカスタムコンポーネント
+- **状態管理**: レイアウトナビゲーション状態用の Zustand
+- **モバイル UX**: モバイルファーストナビゲーションパターンのための Swiper.js
 
-### Frontend (Next.js + TypeScript)
-- **Framework**: Next.js 15 with App Router
-- **Authentication**: NextAuth.js with Twitter OAuth
-- **UI**: Tailwind CSS with custom components using shadcn/ui patterns
-- **State Management**: Zustand for layout navigation state
-- **Mobile UX**: Swiper.js for mobile-first navigation patterns
+### バックエンド (NestJS + TypeScript)
+- **フレームワーク**: NestJS 11.x with モジュラーアーキテクチャ
+- **データベース**: SQLite with Prisma ORM
+- **認証**: カスタム PASSKEY ベース認証システム
+- **API**: DTO バリデーション付き RESTful エンドポイント
 
-### Backend (NestJS + TypeScript)
-- **Framework**: NestJS 11.x with modular architecture
-- **Database**: SQLite with Prisma ORM
-- **Authentication**: Custom PASSKEY-based authentication system
-- **API**: RESTful endpoints with DTO validation
+### 主要なアーキテクチャパターン
 
-### Key Architectural Patterns
+**フロントエンドナビゲーションシステム**: このアプリは Swiper.js と Zustand 状態管理で構築された洗練されたモバイルファーストナビゲーションを使用します。 `useLayout.tsx` ストアがナビゲーション履歴をスタックとして管理し、異なるビュー間での複雑な戻る/進む動作を可能にします。
 
-**Frontend Navigation System**: The app uses a sophisticated mobile-first navigation built with Swiper.js and Zustand state management. The `useLayout.tsx` store manages navigation history as a stack, enabling complex back/forward behaviors across different views.
+**バックエンドモジュール構造**: 各機能領域（auth、users、server）は、controller/service/module パターンで独自の NestJS モジュールにカプセル化されています。 `PrismaService` はデータベースアクセスのためにモジュール間で注入されます。
 
-**Backend Module Structure**: Each feature area (auth, users, server) is encapsulated in its own NestJS module with controller/service/module pattern. The `PrismaService` is injected across modules for database access.
+**認証フロー**: フロントエンドは Twitter OAuth 用に NextAuth.js を使用し、バックエンドは `/check-server` エンドポイント経由の API 認証用に別の PASSKEY システムを使用します。
 
-**Authentication Flow**: Frontend uses NextAuth.js for Twitter OAuth, while backend uses a separate PASSKEY system for API authentication via the `/check-server` endpoint.
+## よく使用するコマンド
 
-## Common Commands
-
-### Development
+### 開発
 ```bash
-# Run both frontend and backend
+# フロントエンドとバックエンドの両方を実行
 pnpm run dev
 
-# Run frontend only
+# フロントエンドのみ実行
 pnpm run dev:frontend
 
-# Run backend only  
+# バックエンドのみ実行
 cd backend && pnpm run start:dev
 ```
 
-### Backend Commands
+### バックエンドコマンド
 ```bash
-# From backend directory
-pnpm run build                    # Build NestJS application
-pnpm run start:dev               # Development server with hot reload
-pnpm run test                    # Run unit tests
-pnpm run test:e2e               # Run end-to-end tests
-pnpm run test:cov               # Test coverage
+# backend ディレクトリから実行
+pnpm run build                    # NestJS アプリケーションをビルド
+pnpm run start:dev               # ホットリロード付き開発サーバー
+pnpm run lint                    # ESLint チェックと修正
+pnpm run format                  # Prettier コード整形
+pnpm run test                    # ユニットテスト実行
+pnpm run test:watch              # ウォッチモードでテスト実行
+pnpm run test:e2e               # E2E テスト実行
+pnpm run test:cov               # テストカバレッジ
+pnpm run test:debug             # テストデバッグ
 
-# Database operations
-pnpm prisma generate            # Generate Prisma client
-pnpm prisma migrate deploy      # Apply migrations
-pnpm prisma db seed            # Seed database
-pnpm prisma studio             # Open database browser
+# データベース操作
+pnpm run prisma:generate        # Prisma クライアント生成
+pnpm run prisma:migrate:dev     # マイグレーション作成と適用
+pnpm run prisma:migrate:reset   # データベースを強制リセット
+pnpm run db:push               # マイグレーションなしでスキーマ変更をプッシュ
+pnpm run seed                  # テストデータでデータベースをシード
+pnpm run prisma:studio         # データベースブラウザを開く
 ```
 
-### Frontend Commands  
+### フロントエンドコマンド
 ```bash
-# From frontend directory
-pnpm run build                  # Build Next.js application
-pnpm run dev                   # Development server
-pnpm run lint                  # ESLint check
-pnpm run knip                  # Find unused dependencies/exports
+# frontend ディレクトリから実行
+pnpm run build                  # Next.js アプリケーションをビルド
+pnpm run dev                   # 開発サーバー
+pnpm run lint                  # ESLint チェック
+pnpm run knip                  # 未使用の依存関係/エクスポートを検索
 ```
 
-## Environment Setup
+## 環境設定
 
-### Backend Environment (.env in backend/)
+### バックエンド環境 (backend/ の .env)
 ```env
 PASSKEY=keyword string
 FRONTEND_URLS=http://localhost:3000,http://127.0.0.1:3000
 DATABASE_URL="file:./dev.db"
 ```
 
-### Frontend Environment (NextAuth.js)
-Requires Twitter OAuth credentials for authentication to work.
+### フロントエンド環境 (NextAuth.js)
+認証が正常に動作するために Twitter OAuth 認証情報が必要です。
 
-## Database Schema
+## データベーススキーマ
 
-The application uses a simple User/Post relationship:
-- **User**: id, email, name, tel (optional)  
-- **Post**: id, title, content, published, authorId
+アプリケーションはシンプルな User/Post 関係を使用します：
+- **User**: id、email、name、tel（オプション）
+- **Post**: id、title、content、published、authorId
 
-## Frontend Component Architecture
+## フロントエンドコンポーネントアーキテクチャ
 
-### Layout System
-- `BaseLayout.tsx`: Main responsive layout with Swiper navigation
-- `useLayout.tsx`: Zustand store for navigation state management
-- `useNavigation.ts` & `useSwiper.ts`: Custom hooks for navigation logic
+### レイアウトシステム
+- `BaseLayout.tsx`: Swiper ナビゲーション付きメインレスポンシブレイアウト
+- `useLayout.tsx`: ナビゲーション状態管理用 Zustand ストア
+- `useNavigation.ts` & `useSwiper.ts`: ナビゲーションロジック用カスタムフック
 
-### Key Components
-- `Profile/`: Tabbed profile view with posts/media/likes
-- `TimeLine/`: Main feed component
-- `DetailedPost/`: Single post view
-- `layout/hooks/`: Navigation and Swiper management
+### 主要コンポーネント
+- `Profile/`: 投稿/メディア/いいねタブ付きプロフィールビュー
+- `TimeLine/`: メインフィードコンポーネント
+- `DetailedPost/`: 単一投稿ビュー
+- `layout/hooks/`: ナビゲーションと Swiper 管理
 
-### Data Flow
-Frontend uses mock data from `src/data/mockData.ts` for development. The layout system maintains a navigation stack to enable iOS-like back navigation across different app sections.
+### データフロー
+フロントエンドは開発用に `src/data/mockData.ts` のモックデータを使用します。レイアウトシステムはナビゲーションスタックを維持して、異なるアプリセクション間で iOS ライクな戻るナビゲーションを可能にします。
 
-## Backend API Structure
+## バックエンド API 構造
 
-### Endpoints
-- `POST /check-server`: PASSKEY authentication
-- `GET /users`: Retrieve all users
+### エンドポイント
+- `POST /check-server`: PASSKEY 認証
+- `GET /users`: すべてのユーザーを取得
+- `POST /posts`: 新しい投稿を作成
+- `GET /posts`: 投稿を取得
+- `GET /posts/:id`: 特定の投稿を取得
+- `PATCH /posts/:id`: 投稿を更新
+- `DELETE /posts/:id`: 投稿を削除
 
-### Module Organization
-- **AuthModule**: PASSKEY authentication guard
-- **UsersModule**: User management with Prisma integration  
-- **ServerModule**: Server health/authentication checks
-- **PrismaModule**: Database service provider
+### モジュール構成
+- **AuthModule**: PASSKEY 認証ガード
+- **UsersModule**: Prisma 統合によるユーザー管理
+- **PostsModule**: Prisma による投稿 CRUD 操作
+- **ServerModule**: サーバーヘルス/認証チェック
+- **PrismaModule**: データベースサービスプロバイダー
 
-## Testing Strategy
+## テスト戦略
 
-Backend uses Jest for unit testing and Supertest for E2E API testing. Frontend testing setup is minimal - consider expanding test coverage for complex navigation logic and authentication flows.
+バックエンドはユニットテスト用に Jest、E2E API テスト用に Supertest を使用します。フロントエンドのテスト設定は最小限です - 複雑なナビゲーションロジックと認証フローのテストカバレッジの拡大を検討してください。
+
+## 重要な指示リマインダー
+要求されたことを実行してください。それ以上でも以下でもありません。
+目標達成に絶対に必要でない限り、ファイルを作成しないでください。
+新しいファイルを作成するよりも、既存のファイルを編集することを常に優先してください。
+ドキュメントファイル（*.md）や README ファイルを積極的に作成しないでください。ユーザーから明示的に要求された場合のみドキュメントファイルを作成してください。
