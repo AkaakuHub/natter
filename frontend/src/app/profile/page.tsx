@@ -34,7 +34,7 @@ const Profile = () => {
   
   return (
     <SimpleLayout>
-      <ProfileComponent session={session as ExtendedSession} userId={userId ? parseInt(userId) : undefined} />
+      <ProfileComponent session={session as ExtendedSession} userId={userId || undefined} />
     </SimpleLayout>
   );
 };

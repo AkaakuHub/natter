@@ -23,9 +23,10 @@ export class UsersApi {
   static async getUserByTwitterId(twitterId: string): Promise<User | null> {
     try {
       return await ApiClient.get<User>(`/users/twitter/${twitterId}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       // 404エラー（ユーザーが存在しない）の場合はnullを返す
-      if (error.message?.includes('404') || error.message?.includes('HTTP error! status: 404')) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('404') || errorMessage.includes('HTTP error! status: 404')) {
         return null;
       }
       console.error('Error fetching user by Twitter ID:', error);

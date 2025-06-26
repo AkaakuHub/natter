@@ -2,14 +2,12 @@
 
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
-import SimpleLayout from "@/components/layout/SimpleLayout";
+import TwitterLikeLayout from "@/components/layout/TwitterLikeLayout";
+import { NavigationStackProvider } from "@/components/providers/NavigationStackProvider";
 import { redirect } from "next/navigation";
-import TimeLine from "@/components/TimeLine";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const Home = () => {
-  const { data: session, status } = useSession();
-  const { currentUser } = useCurrentUser();
+  const { status } = useSession();
   
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -19,22 +17,16 @@ const Home = () => {
   
   if (status === "loading") {
     return (
-      <SimpleLayout>
-        <div className="flex items-center justify-center h-64">
-          <div>Loading...</div>
-        </div>
-      </SimpleLayout>
-    )
-  }
-  
-  if (!session) {
-    return null;
+      <div className="w-full h-screen flex items-center justify-center">
+        <div>Loading...</div>
+      </div>
+    );
   }
   
   return (
-    <SimpleLayout>
-      <TimeLine currentUser={currentUser} />
-    </SimpleLayout>
+    <NavigationStackProvider>
+      <TwitterLikeLayout />
+    </NavigationStackProvider>
   );
 };
 

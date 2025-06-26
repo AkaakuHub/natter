@@ -27,7 +27,7 @@ export class ApiClient {
       // レスポンスが空の場合の処理
       const text = await response.text();
       if (!text) {
-        return null;
+        return {} as T;
       }
 
       try {
@@ -47,21 +47,21 @@ export class ApiClient {
     return this.request<T>(endpoint, { method: 'GET' });
   }
 
-  static async post<T>(endpoint: string, data?: Record<string, unknown>): Promise<T> {
+  static async post<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  static async patch<T>(endpoint: string, data?: Record<string, unknown>): Promise<T> {
+  static async patch<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  static async delete<T>(endpoint: string, data?: Record<string, unknown>): Promise<T> {
+  static async delete<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'DELETE',
       body: data ? JSON.stringify(data) : undefined,

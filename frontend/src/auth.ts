@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Twitter from "next-auth/providers/twitter";
+import { ExtendedSession } from "./types";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   debug: true,
@@ -27,7 +28,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         // twitterIdがあればそれを、なければsubをフォールバックとして使用
         session.user.id = (token.twitterId || token.sub) as string;
         // JWTトークンもセッションに含める
-        (session as any).accessToken = token;
+        (session as ExtendedSession).accessToken = token;
       }
       return session;
     },
