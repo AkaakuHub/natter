@@ -110,7 +110,9 @@ export const useNavigationStack = () => {
   }, [router, stack.pages]);
 
   const navigateToProfile = useCallback((userId?: string) => {
-    const profilePath = userId ? `/profile?userId=${userId}` : '/profile';
+    // userIdが指定されていない場合は、直接自分のIDページに遷移するのではなく
+    // スタック内では 'me' として管理し、実際のルーティングは[id]ページで処理
+    const profilePath = userId ? `/profile/${userId}` : '/profile';
     const profilePage: NavigationPage = {
       id: `profile-${userId || 'me'}`,
       path: profilePath,

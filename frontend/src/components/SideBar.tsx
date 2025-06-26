@@ -30,7 +30,7 @@ const SideBar = ({ session }: { session: ExtendedSession }) => {
       <div className="flex flex-col gap-4">
         <Link
           className="w-full text-left px-4 py-2 text-lg font-semibold bg-white border rounded-md hover:bg-gray-50 flex items-center"
-          href="/profile"
+          href={`/profile/${session.user?.id}`}
         >
           <IconUser className="w-6 h-6 mr-2" />
           <span>

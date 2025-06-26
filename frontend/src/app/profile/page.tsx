@@ -2,41 +2,27 @@
 
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
-import SimpleLayout from "@/components/layout/SimpleLayout";
-import { redirect, useSearchParams } from "next/navigation";
-import { ExtendedSession } from "@/types";
-import ProfileComponent from "@/components/Profile";
+import { useRouter } from "next/navigation";
 
-const Profile = () => {
+const MyProfile = () => {
   const { data: session, status } = useSession();
-  const searchParams = useSearchParams();
-  const userId = searchParams.get('userId');
+  const router = useRouter();
   
   useEffect(() => {
     if (status === "unauthenticated") {
-      redirect("/login");
+      router.push("/login");
+    } else if (status === "authenticated" && session?.user?.id) {
+      // ログイン済みの場合は自分のIDを使って強制リダイレクト
+      router.replace(`/profile/${session.user.id}`);
     }
-  }, [status]);
+  }, [status, session?.user?.id, router]);
   
-  if (status === "loading") {
-    return (
-      <SimpleLayout>
-        <div className="flex items-center justify-center h-64">
-          <div>Loading...</div>
-        </div>
-      </SimpleLayout>
-    )
-  }
-  
-  if (!session) {
-    return null;
-  }
-  
+  // ローディング中またはリダイレクト待ち
   return (
-    <SimpleLayout>
-      <ProfileComponent session={session as ExtendedSession} userId={userId || undefined} />
-    </SimpleLayout>
+    <div className="w-full h-screen flex items-center justify-center">
+      <div>Loading...</div>
+    </div>
   );
 };
 
-export default Profile;
+export default MyProfile;

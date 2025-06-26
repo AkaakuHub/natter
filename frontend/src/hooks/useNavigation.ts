@@ -14,7 +14,7 @@ export const useNavigation = () => {
   }, [router]);
 
   const fallbackNavigateToProfile = useCallback((userId?: string) => {
-    const profilePath = userId ? `/profile?userId=${userId}` : '/profile';
+    const profilePath = userId ? `/profile/${userId}` : '/profile';
     router.push(profilePath);
   }, [router]);
 
