@@ -1,34 +1,41 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { redirect, useParams, useRouter } from 'next/navigation'
+import { redirect, useParams } from 'next/navigation'
 import { useSession } from "next-auth/react";
-import BaseLayout from "@/components/layout/BaseLayout";
-import { ExtendedSession } from "@/types";
-
+import SimpleLayout from "@/components/layout/SimpleLayout";
 import DetailedPostComponent from "@/components/DetailedPost";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const Post = () => {
   const params = useParams<{ id: string }>();
   const postId = params.id;
   const { data: session, status } = useSession();
-  const router = useRouter();
+  const { currentUser } = useCurrentUser();
 
   useEffect(() => {
     if (status === "unauthenticated") {
       redirect("/login");
     }
-  }, [status, router]);
+  }, [status]);
   
   if (isNaN(parseInt(postId))) {
-    return <div>Invalid ID</div>;
+    return (
+      <SimpleLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-red-500">Invalid Post ID</div>
+        </div>
+      </SimpleLayout>
+    );
   }
 
   if (status === "loading") {
     return (
-      <BaseLayout>
-        ここがスケルトン
-      </BaseLayout>
+      <SimpleLayout>
+        <div className="flex items-center justify-center h-64">
+          <div>Loading...</div>
+        </div>
+      </SimpleLayout>
     );
   }
 
@@ -37,7 +44,7 @@ const Post = () => {
   }
 
   return (
-    <DetailedPostComponent session={session as ExtendedSession} postId={postId} />
+    <DetailedPostComponent postId={postId} currentUser={currentUser} />
   )
 }
 

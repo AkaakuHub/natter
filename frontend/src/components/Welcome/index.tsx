@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { UsersApi } from "@/api/users";
-import { useSession } from "next-auth/react";
 import { ExtendedSession } from "@/types";
 
 interface WelcomeProps {

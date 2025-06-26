@@ -3,7 +3,7 @@
 import React from "react"
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
-import BaseLayout from "@/components/layout/BaseLayout";
+import SimpleLayout from "@/components/layout/SimpleLayout";
 
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -19,9 +19,11 @@ export default function Notification() {
   }, [status, router]);
   if (status === "loading") {
     return (
-      <BaseLayout>
-        ここがスケルトン
-      </BaseLayout>
+      <SimpleLayout>
+        <div className="flex items-center justify-center h-64">
+          <div>Loading...</div>
+        </div>
+      </SimpleLayout>
     )
   }
   if (!session) {
@@ -29,7 +31,7 @@ export default function Notification() {
   }
 
   return (
-    <BaseLayout>
+    <SimpleLayout>
       <div className="flex flex-col items-center justify-center h-screen gap-8">
         <div>
           このページは誠意開発中です。
@@ -44,7 +46,6 @@ export default function Notification() {
           トップに戻る
         </Button>
       </div>
-    </BaseLayout>
-
+    </SimpleLayout>
   )
 }

@@ -1,15 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import "swiper/css/navigation";
+import React, { useState, useEffect, useRef } from "react";
 
 import PostComponent from "@/components/Post";
 
 import { PostsApi, Post, User } from "@/api";
 import ProfileHeader from "./ProfileHeader";
-import TabsComponent, { TabType, TabKinds, TabNames } from "./TabsComponent";
+import TabsComponent, { TabType, TabNames } from "./TabsComponent";
 
 import { ExtendedSession } from "@/types";
 
@@ -25,14 +22,23 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
   const [likedPosts, setLikedPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const lastTargetUserIdRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     const fetchUserPosts = async () => {
       const targetUserId = userId || session.user?.id;
       if (!targetUserId) return;
       
+      // 同じユーザーIDの場合は再実行しない
+      if (lastTargetUserIdRef.current === targetUserId) {
+        return;
+      }
+      
+      lastTargetUserIdRef.current = targetUserId;
+      
       try {
         setLoading(true);
+        setError(null);
         const [userPosts, userMediaPosts, userLikedPosts] = await Promise.all([
           PostsApi.getPostsByUser(targetUserId),
           PostsApi.getMediaPosts(),
@@ -81,49 +87,49 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
     );
   }
 
+  const renderTabContent = () => {
+    const currentPosts = activeTab === "tweets" ? posts : activeTab === "media" ? mediaPosts : likedPosts;
+    
+    if (loading) {
+      return <div className="text-center py-8">Loading...</div>;
+    }
+    
+    if (error) {
+      return <div className="text-center py-8 text-red-500">{error}</div>;
+    }
+    
+    if (currentPosts.length === 0) {
+      return <div className="text-center py-8">まだ{TabNames[activeTab]}はありません</div>;
+    }
+    
+    return currentPosts.map((post) => {
+      if (!post.author) return null;
+      
+      const user: User = post.author;
+      const transformedUser = {
+        ...user,
+        image: user.image || "no_avatar_image_128x128.png",
+      };
+      const transformedPost = {
+        id: post.id,
+        userId: post.authorId || "",
+        content: post.content || '',
+        images: post.images || [],
+        createdAt: post.createdAt,
+        liked: post.likes?.map(like => like.userId) || [],
+      };
+      
+      return <PostComponent key={post.id} user={transformedUser} post={transformedPost} />;
+    });
+  };
+
   return (
     <div className="w-full h-full bg-white text-black">
       <ProfileHeader session={session} userId={userId} />
       <TabsComponent activeTab={activeTab} onTabChange={handleTabChange} />
-      <Swiper
-        onSlideChange={(swiper) => handleTabChange(TabKinds[swiper.activeIndex])}
-        onSwiper={(swiper) => swiper.slideTo(TabKinds.indexOf(activeTab))}
-        className="h-full"
-      >
-        {TabKinds.map((tab) => (
-          <SwiperSlide key={tab}>
-            <div className="overflow-y-auto h-[calc(100dvh-60px)] w-full">
-              {(() => {
-                const currentPosts = tab === "tweets" ? posts : tab === "media" ? mediaPosts : likedPosts;
-                
-                if (currentPosts.length === 0) {
-                  return <div className="text-center py-8">まだ{TabNames[tab]}はありません</div>;
-                }
-                
-                return currentPosts.map((post) => {
-                  if (!post.author) return null;
-                  
-                  const user: User = post.author;
-                  const transformedUser = {
-                    ...user,
-                    image: user.image || "no_avatar_image_128x128.png",
-                  };
-                  const transformedPost = {
-                    id: post.id,
-                    userId: post.authorId || "",
-                    content: post.content || '',
-                    images: post.images || [],
-                    createdAt: post.createdAt,
-                    liked: post.likes?.map(like => like.userId) || [],
-                  };
-                  
-                  return <PostComponent key={post.id} user={transformedUser} post={transformedPost} />;
-                });
-              })()}
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      <div className="overflow-y-auto h-[calc(100dvh-60px)] w-full">
+        {renderTabContent()}
+      </div>
     </div>
   );
 };

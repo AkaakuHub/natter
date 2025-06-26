@@ -2,14 +2,13 @@
 
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
-import BaseLayout from "@/components/layout/BaseLayout";
-import { useRouter, redirect, useSearchParams } from "next/navigation";
+import SimpleLayout from "@/components/layout/SimpleLayout";
+import { redirect, useSearchParams } from "next/navigation";
 import { ExtendedSession } from "@/types";
 import ProfileComponent from "@/components/Profile";
 
 const Profile = () => {
   const { data: session, status } = useSession();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const userId = searchParams.get('userId');
   
@@ -17,22 +16,26 @@ const Profile = () => {
     if (status === "unauthenticated") {
       redirect("/login");
     }
-  }, [status, router]);
+  }, [status]);
   
   if (status === "loading") {
     return (
-      <BaseLayout>
-        ここがスケルトン
-      </BaseLayout>
+      <SimpleLayout>
+        <div className="flex items-center justify-center h-64">
+          <div>Loading...</div>
+        </div>
+      </SimpleLayout>
     )
   }
+  
   if (!session) {
     return null;
   }
+  
   return (
-    <BaseLayout>
+    <SimpleLayout>
       <ProfileComponent session={session as ExtendedSession} userId={userId ? parseInt(userId) : undefined} />
-    </BaseLayout>
+    </SimpleLayout>
   );
 };
 

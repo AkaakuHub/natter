@@ -2,32 +2,39 @@
 
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
-import BaseLayout from "@/components/layout/BaseLayout";
-import { useRouter, redirect } from "next/navigation";
+import SimpleLayout from "@/components/layout/SimpleLayout";
+import { redirect } from "next/navigation";
 import TimeLine from "@/components/TimeLine";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const Home = () => {
   const { data: session, status } = useSession();
-  const router = useRouter();
+  const { currentUser } = useCurrentUser();
+  
   useEffect(() => {
     if (status === "unauthenticated") {
       redirect("/login");
     }
-  }, [status, router]);
+  }, [status]);
+  
   if (status === "loading") {
     return (
-      <BaseLayout>
-        ここがスケルトン
-      </BaseLayout>
+      <SimpleLayout>
+        <div className="flex items-center justify-center h-64">
+          <div>Loading...</div>
+        </div>
+      </SimpleLayout>
     )
   }
+  
   if (!session) {
     return null;
   }
+  
   return (
-    <BaseLayout>
-      <TimeLine />
-    </BaseLayout>
+    <SimpleLayout>
+      <TimeLine currentUser={currentUser} />
+    </SimpleLayout>
   );
 };
 

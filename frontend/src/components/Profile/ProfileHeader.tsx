@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import clsx from "clsx";
 import { getDominantColor } from "@/utils/colorUtils";
@@ -16,11 +16,19 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
   const [applyAnimation, setApplyAnimation] = useState(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  const lastUserIdRef = useRef<string | undefined>(undefined);
 
   const displayUser = targetUser || session.user;
 
   useEffect(() => {
-    if (userId) {
+    // 同じuserIdの場合は再実行しない
+    if (lastUserIdRef.current === userId) {
+      return;
+    }
+    
+    lastUserIdRef.current = userId;
+    
+    if (userId && userId !== session.user?.id) {
       setLoading(true);
       UsersApi.getUserById(userId)
         .then(user => setTargetUser(user))
@@ -30,7 +38,7 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
       setTargetUser(null);
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, session.user?.id]);
 
   useEffect(() => {
     const image = displayUser?.image ?? "/no_avatar_image_128x128.png";

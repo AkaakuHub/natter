@@ -3,11 +3,10 @@
 import React, { useState, useEffect } from "react";
 
 import Image from "next/image";
-import Link from "next/link";
 
 import { IconHeart, IconMessageCircle, IconShare } from "@tabler/icons-react";
 import { PostsApi } from "@/api";
-import { useRouter } from 'next/navigation';
+import { useNavigation } from '@/hooks/useNavigation';
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 interface PostComponentProps {
@@ -41,7 +40,7 @@ const formatDate = (date: string | number | Date): string => {
 
 
 const PostComponent = ({ user, post }: PostComponentProps) => {
-  const router = useRouter();
+  const { navigateToPost, navigateToProfile } = useNavigation();
   const { currentUser } = useCurrentUser();
   const currentUserId = currentUser?.id;
   const [isLiked, setIsLiked] = useState(false);
@@ -75,7 +74,10 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
 
   return (
     <div className="border-b border-gray-200 py-4 px-4 flex gap-4">
-      <Link href={`/profile?userId=${user?.id}`} className="flex-shrink-0">
+      <button 
+        onClick={() => navigateToProfile(user?.id)}
+        className="flex-shrink-0"
+      >
         <Image
           src={user?.image || "no_avatar_image_128x128.png"}
           alt={user?.name || "User"}
@@ -83,15 +85,21 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
           width={48}
           height={48}
         />
-      </Link>
-      <div className="flex-1" onClick={() => post?.id && router.push(`/post/${post.id}`)}>
+      </button>
+      <div className="flex-1" onClick={() => post?.id && navigateToPost(post.id)}>
           <div className="flex items-center justify-between">
             <div>
-              <Link href={`/profile?userId=${user?.id}`} className="hover:underline" onClick={(e) => e.stopPropagation()}>
+              <button 
+                className="hover:underline" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigateToProfile(user?.id);
+                }}
+              >
                 <span className="font-bold">
                   {user?.name || "Unknown User"}
                 </span>
-              </Link>
+              </button>
               <span className="text-sm text-gray-500 ml-2">
                 @{user?.id || "unknown"}
               </span>

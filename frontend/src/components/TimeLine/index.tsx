@@ -4,15 +4,14 @@ import React, { useState, useEffect } from "react";
 import PostComponent from "../Post";
 import CreatePost from "../CreatePost";
 import { PostsApi, Post, User } from "../../api";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { ExtendedSession } from "@/types";
 
 interface TimeLineProps {
   session?: ExtendedSession;
+  currentUser?: User | null;
 }
 
-const TimeLine = (_props: TimeLineProps) => {
-  const { currentUser } = useCurrentUser();
+const TimeLine = ({ currentUser }: TimeLineProps) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
