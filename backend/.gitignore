@@ -46,3 +46,6 @@ junit.xml
 package.copy.json
 
 *.tgz
+
+
+backend/uploads/*

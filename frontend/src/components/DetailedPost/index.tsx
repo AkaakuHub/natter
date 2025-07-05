@@ -223,7 +223,10 @@ const DetailedPostComponent = ({
               >
                 <div className="flex items-center space-x-3">
                   <Image
-                    src={post.replyTo.author?.image || "/no_avatar_image_128x128.png"}
+                    src={
+                      post.replyTo.author?.image ||
+                      "/no_avatar_image_128x128.png"
+                    }
                     alt={`${post.replyTo.author?.name}'s avatar`}
                     width={40}
                     height={40}
@@ -231,10 +234,17 @@ const DetailedPostComponent = ({
                   />
                   <div className="flex-1">
                     <p className="text-sm text-gray-600">返信先</p>
-                    <p className="font-semibold text-gray-900">{post.replyTo.author?.name}</p>
-                    <p className="text-gray-700 text-sm mt-1 line-clamp-2">{post.replyTo.content}</p>
+                    <p className="font-semibold text-gray-900">
+                      {post.replyTo.author?.name}
+                    </p>
+                    <p className="text-gray-700 text-sm mt-1 line-clamp-2">
+                      {post.replyTo.content}
+                    </p>
                   </div>
-                  <IconArrowLeft size={20} className="text-gray-400 rotate-180" />
+                  <IconArrowLeft
+                    size={20}
+                    className="text-gray-400 rotate-180"
+                  />
                 </div>
               </button>
             </div>
@@ -380,7 +390,16 @@ const DetailedPostComponent = ({
                     createdAt: reply.createdAt,
                     liked: reply.likes?.map((like) => like.userId) || [],
                     _count: reply._count,
-                    replyTo: reply.replyTo,
+                    replyTo: reply.replyTo
+                      ? {
+                          id: reply.replyTo.id,
+                          content: reply.replyTo.content || "",
+                          author: {
+                            id: reply.replyTo.author?.id || "",
+                            name: reply.replyTo.author?.name || "",
+                          },
+                        }
+                      : undefined,
                   };
 
                   return (

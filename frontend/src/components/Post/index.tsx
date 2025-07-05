@@ -137,7 +137,7 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
       <div className="border-b border-gray-200 py-4 px-4 flex gap-4">
         <button
           onClick={() => navigateToProfile(user?.id)}
-          className="flex-shrink-0"
+          className="flex-shrink-0 self-start"
         >
           <Image
             src={user?.image || "no_avatar_image_128x128.png"}

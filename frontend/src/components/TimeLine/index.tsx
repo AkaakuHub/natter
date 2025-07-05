@@ -86,6 +86,16 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
           createdAt: post.createdAt,
           liked: post.likes?.map((like) => like.userId) || [],
           _count: post._count,
+          replyTo: post.replyTo
+            ? {
+                id: post.replyTo.id,
+                content: post.replyTo.content || "",
+                author: {
+                  id: post.replyTo.author?.id || "",
+                  name: post.replyTo.author?.name || "",
+                },
+              }
+            : undefined,
         };
 
         return (
