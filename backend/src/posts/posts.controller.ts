@@ -37,7 +37,7 @@ export class PostsController {
         },
       }),
       fileFilter: (_req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp|avif)$/)) {
           return cb(new Error('Only image files are allowed!'), false);
         }
         cb(null, true);

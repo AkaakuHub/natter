@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { IconPhoto, IconX } from "@tabler/icons-react";
 import { User } from "@/api";
+import { useToast } from "@/hooks/useToast";
 
 interface CreatePostProps {
   onPostCreated?: () => void;
@@ -16,6 +17,7 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,6 +68,9 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
       setImages([]);
       setImagePreviewUrls([]);
       onPostCreated?.();
+
+      // トースト通知を表示
+      showToast("投稿を作成しました。", "success");
     } catch (err) {
       console.error("Failed to create post:", err);
       setError("投稿の作成に失敗しました");
