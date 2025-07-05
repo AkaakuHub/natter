@@ -48,4 +48,4 @@ package.copy.json
 *.tgz
 
 
-backend/uploads/*
+uploads/
