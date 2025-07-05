@@ -85,7 +85,7 @@ const ReplyModal = ({
   const remainingChars = characterLimit - content.length;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 p-4">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/20 p-4">
       <div className="bg-white rounded-lg max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto">
         {/* ヘッダー */}
         <div className="flex items-center justify-between p-4 border-b">
