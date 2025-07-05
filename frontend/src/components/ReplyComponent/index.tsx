@@ -220,14 +220,21 @@ const ReplyComponent = ({ user, post, replyTo }: ReplyComponentProps) => {
       {isModalOpen && post.images && post.images.length > 0 && (
         <ImageModal
           isOpen={isModalOpen}
-          images={post.images.map(image => {
-            const isFullUrl = image.startsWith("http://") || image.startsWith("https://");
-            return isFullUrl ? image : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
+          images={post.images.map((image) => {
+            const isFullUrl =
+              image.startsWith("http://") || image.startsWith("https://");
+            return isFullUrl
+              ? image
+              : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
           })}
           currentIndex={selectedImageIndex}
           onClose={closeImageModal}
           onPrevious={selectedImageIndex > 0 ? handlePreviousImage : undefined}
-          onNext={selectedImageIndex < post.images.length - 1 ? handleNextImage : undefined}
+          onNext={
+            selectedImageIndex < post.images.length - 1
+              ? handleNextImage
+              : undefined
+          }
         />
       )}
     </>

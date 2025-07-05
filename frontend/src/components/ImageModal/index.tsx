@@ -13,30 +13,30 @@ interface ImageModalProps {
   onNext?: () => void;
 }
 
-const ImageModal = ({ 
-  isOpen, 
-  images, 
-  currentIndex, 
-  onClose, 
-  onPrevious, 
-  onNext 
+const ImageModal = ({
+  isOpen,
+  images,
+  currentIndex,
+  onClose,
+  onPrevious,
+  onNext,
 }: ImageModalProps) => {
   // キーボードナビゲーション
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen) return;
-      
-      if (e.key === 'Escape') {
+
+      if (e.key === "Escape") {
         onClose();
-      } else if (e.key === 'ArrowLeft' && onPrevious) {
+      } else if (e.key === "ArrowLeft" && onPrevious) {
         onPrevious();
-      } else if (e.key === 'ArrowRight' && onNext) {
+      } else if (e.key === "ArrowRight" && onNext) {
         onNext();
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose, onPrevious, onNext]);
 
   if (!isOpen || images.length === 0) return null;
@@ -84,7 +84,7 @@ const ImageModal = ({
                 src={currentImage}
                 alt={`画像 ${currentIndex + 1}`}
                 className="max-w-full max-h-full object-contain rounded-2xl shadow-lg"
-                style={{ maxHeight: 'calc(70vh - 10rem)' }}
+                style={{ maxHeight: "calc(70vh - 10rem)" }}
               />
             </div>
           </div>
@@ -129,9 +129,9 @@ const ImageModal = ({
                       }
                     }}
                     className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 flex-shrink-0 ${
-                      index === currentIndex 
-                        ? 'border-blue-500 ring-2 ring-blue-200 scale-110' 
-                        : 'border-gray-200 hover:border-gray-300 hover:scale-105'
+                      index === currentIndex
+                        ? "border-blue-500 ring-2 ring-blue-200 scale-110"
+                        : "border-gray-200 hover:border-gray-300 hover:scale-105"
                     }`}
                   >
                     <Image

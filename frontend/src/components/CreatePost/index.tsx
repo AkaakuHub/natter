@@ -76,7 +76,7 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
 
   const handleImageAdd = () => {
     if (images.length >= 10) {
-      alert('画像は最大10枚までアップロードできます');
+      alert("画像は最大10枚までアップロードできます");
       return;
     }
 
@@ -91,15 +91,17 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
         const fileArray = Array.from(files);
         const remainingSlots = 10 - images.length;
         const filesToAdd = fileArray.slice(0, remainingSlots);
-        
+
         setImages((prev) => [...prev, ...filesToAdd]);
 
         // プレビュー用のURLを生成
         const previewUrls = filesToAdd.map((file) => URL.createObjectURL(file));
         setImagePreviewUrls((prev) => [...prev, ...previewUrls]);
-        
+
         if (fileArray.length > remainingSlots) {
-          alert(`画像は最大10枚までです。${remainingSlots}枚のみ追加されました。`);
+          alert(
+            `画像は最大10枚までです。${remainingSlots}枚のみ追加されました。`,
+          );
         }
       }
     };
@@ -183,7 +185,9 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
                   onClick={handleImageAdd}
                   disabled={isSubmitting || images.length >= 10}
                   className="text-blue-500 hover:text-blue-600 disabled:opacity-50 p-2 rounded-full hover:bg-blue-50 transition-all duration-300"
-                  title={images.length >= 10 ? "画像は最大10枚まで" : "画像を追加"}
+                  title={
+                    images.length >= 10 ? "画像は最大10枚まで" : "画像を追加"
+                  }
                 >
                   <IconPhoto size={20} />
                 </button>

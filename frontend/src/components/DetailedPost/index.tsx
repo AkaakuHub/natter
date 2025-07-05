@@ -318,9 +318,7 @@ const DetailedPostComponent = ({
                   return (
                     <button
                       key={idx}
-                      onClick={() =>
-                        handleImageClick(idx)
-                      }
+                      onClick={() => handleImageClick(idx)}
                       className="relative group overflow-hidden rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 shadow-soft hover:shadow-glow transition-all duration-300 hover:scale-[1.02]"
                     >
                       <Image
@@ -434,14 +432,21 @@ const DetailedPostComponent = ({
       {isModalOpen && post?.images && post.images.length > 0 && (
         <ImageModal
           isOpen={isModalOpen}
-          images={post.images.map(image => {
-            const isFullUrl = image.startsWith("http://") || image.startsWith("https://");
-            return isFullUrl ? image : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
+          images={post.images.map((image) => {
+            const isFullUrl =
+              image.startsWith("http://") || image.startsWith("https://");
+            return isFullUrl
+              ? image
+              : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
           })}
           currentIndex={selectedImageIndex}
           onClose={closeImageModal}
           onPrevious={selectedImageIndex > 0 ? handlePreviousImage : undefined}
-          onNext={selectedImageIndex < post.images.length - 1 ? handleNextImage : undefined}
+          onNext={
+            selectedImageIndex < post.images.length - 1
+              ? handleNextImage
+              : undefined
+          }
         />
       )}
 
