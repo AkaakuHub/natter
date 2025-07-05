@@ -191,7 +191,7 @@ const DetailedPostComponent = ({ postId, currentUser }: DetailedPostComponentPro
                 {post.images.map((image, idx) => (
                   <div key={idx} className="relative group overflow-hidden rounded-xl">
                     <Image
-                      src={image}
+                      src={`http://localhost:8000/uploads/${image}`}
                       alt={`Post image ${idx + 1}`}
                       width={512}
                       height={512}

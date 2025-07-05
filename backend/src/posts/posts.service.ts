@@ -16,7 +16,7 @@ export class PostsService {
 
     // ユーザーが存在するかチェック
     const user = await this.prisma.user.findUnique({
-      where: { id: authorId }
+      where: { id: authorId },
     });
 
     if (!user) {
@@ -65,7 +65,7 @@ export class PostsService {
       },
     });
 
-    return posts.map(post => ({
+    return posts.map((post) => ({
       ...post,
       images: post.images ? JSON.parse(post.images) : [],
     }));
@@ -120,7 +120,7 @@ export class PostsService {
       },
     });
 
-    return posts.map(post => ({
+    return posts.map((post) => ({
       ...post,
       images: post.images ? JSON.parse(post.images) : [],
     }));
@@ -152,8 +152,8 @@ export class PostsService {
     });
 
     return posts
-      .filter(post => post.images && JSON.parse(post.images).length > 0)
-      .map(post => ({
+      .filter((post) => post.images && JSON.parse(post.images).length > 0)
+      .map((post) => ({
         ...post,
         images: post.images ? JSON.parse(post.images) : [],
       }));
@@ -184,7 +184,7 @@ export class PostsService {
       },
     });
 
-    return likedPosts.map(like => ({
+    return likedPosts.map((like) => ({
       ...like.post,
       images: like.post.images ? JSON.parse(like.post.images) : [],
     }));
@@ -261,7 +261,7 @@ export class PostsService {
 
     return {
       count: likes.length,
-      users: likes.map(like => like.user),
+      users: likes.map((like) => like.user),
     };
   }
 }

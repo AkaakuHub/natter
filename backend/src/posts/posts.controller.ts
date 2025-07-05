@@ -8,7 +8,12 @@ import {
   Delete,
   ParseIntPipe,
   Query,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -18,9 +23,34 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-  create(@Body() createPostDto: CreatePostDto) {
+  @UseInterceptors(
+    FilesInterceptor('images', 10, {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (_req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(
+            null,
+            file.fieldname + '-' + uniqueSuffix + extname(file.originalname),
+          );
+        },
+      }),
+      fileFilter: (_req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+          return cb(new Error('Only image files are allowed!'), false);
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  create(
+    @Body() createPostDto: CreatePostDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
     // 一時的にJWT認証を無効化してauthorIdをフロントエンドから受け取る
-    return this.postsService.create(createPostDto);
+    const imagePaths = files ? files.map((file) => file.filename) : [];
+    return this.postsService.create({ ...createPostDto, images: imagePaths });
   }
 
   @Get()
@@ -72,5 +102,10 @@ export class PostsController {
   @Get(':id/likes')
   getPostLikes(@Param('id', ParseIntPipe) postId: number) {
     return this.postsService.getPostLikes(postId);
+  }
+
+  @Get('images/:filename')
+  getImage(@Param('filename') filename: string) {
+    return { url: `/uploads/${filename}` };
   }
 }

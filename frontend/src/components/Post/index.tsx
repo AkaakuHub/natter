@@ -109,12 +109,12 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
             </span>
           </div>
           <p className="mt-1 text-gray-800">{post.content}</p>
-          {post.images && (
+          {post.images && post.images.length > 0 && (
             <div className="mt-2 grid grid-cols-2 gap-2">
               {post.images.map((image, index) => (
                 <Image
                   key={index}
-                  src={image}
+                  src={`http://localhost:8000/uploads/${image}`}
                   alt="Post Image"
                   className="w-full h-auto rounded-md"
                   width={200}

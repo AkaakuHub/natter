@@ -26,11 +26,11 @@ export class UsersService {
     const user = await this.prisma.user.findUnique({
       where: { twitterId },
     });
-    
+
     if (!user) {
       return null;
     }
-    
+
     return user;
   }
 

@@ -12,7 +12,8 @@ interface CreatePostProps {
 
 const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
   const [content, setContent] = useState("");
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<File[]>([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,15 +36,31 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
 
       console.log('Creating post with authorId:', currentUser.id, typeof currentUser.id);
       
-      await PostsApi.createPost({
-        content: content.trim(),
-        images: images.length > 0 ? images : undefined,
-        authorId: currentUser.id,
+      // FormDataを使用してファイルを送信
+      const formData = new FormData();
+      if (content.trim()) {
+        formData.append('content', content.trim());
+      }
+      formData.append('authorId', currentUser.id);
+      
+      // 画像ファイルを追加
+      images.forEach((file) => {
+        formData.append('images', file);
       });
+
+      const response = await fetch('http://localhost:8000/posts', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('投稿の作成に失敗しました');
+      }
 
       // 成功時の処理
       setContent("");
       setImages([]);
+      setImagePreviewUrls([]);
       onPostCreated?.();
     } catch (err) {
       console.error("Failed to create post:", err);
@@ -54,15 +71,33 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
   };
 
   const handleImageAdd = () => {
-    // 簡易的な画像URL入力（実際のアプリではファイルアップロード機能を実装）
-    const imageUrl = prompt("画像URLを入力してください:");
-    if (imageUrl && imageUrl.trim()) {
-      setImages(prev => [...prev, imageUrl.trim()]);
-    }
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = true;
+    
+    input.onchange = (e) => {
+      const files = (e.target as HTMLInputElement).files;
+      if (files) {
+        const fileArray = Array.from(files);
+        setImages(prev => [...prev, ...fileArray]);
+        
+        // プレビュー用のURLを生成
+        const previewUrls = fileArray.map(file => URL.createObjectURL(file));
+        setImagePreviewUrls(prev => [...prev, ...previewUrls]);
+      }
+    };
+    
+    input.click();
   };
 
   const handleImageRemove = (index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index));
+    setImagePreviewUrls(prev => {
+      // メモリリークを避けるために古いURLを削除
+      URL.revokeObjectURL(prev[index]);
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
   const characterLimit = 280;
@@ -94,12 +129,12 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
             />
             
             {/* 添付画像プレビュー */}
-            {images.length > 0 && (
+            {imagePreviewUrls.length > 0 && (
               <div className="mt-3 grid grid-cols-2 gap-2">
-                {images.map((image, index) => (
+                {imagePreviewUrls.map((imageUrl, index) => (
                   <div key={index} className="relative">
                     <Image
-                      src={image}
+                      src={imageUrl}
                       alt={`添付画像 ${index + 1}`}
                       className="w-full h-32 object-cover rounded-lg"
                       width={200}

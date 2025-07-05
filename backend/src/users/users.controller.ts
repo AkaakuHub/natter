@@ -1,4 +1,11 @@
-import { Controller, Get, Post, Body, Param, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  NotFoundException,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 
 export class CreateUserDto {
@@ -32,7 +39,9 @@ export class UsersController {
     const user = await this.usersService.findByTwitterId(twitterId);
     console.log('Found user:', user);
     if (!user) {
-      throw new NotFoundException(`User with Twitter ID ${twitterId} not found`);
+      throw new NotFoundException(
+        `User with Twitter ID ${twitterId} not found`,
+      );
     }
     return user;
   }
