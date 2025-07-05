@@ -30,7 +30,10 @@ const DetailedPostComponent = ({
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isLiking, setIsLiking] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<{ src: string; alt: string } | null>(null);
+  const [selectedImage, setSelectedImage] = useState<{
+    src: string;
+    alt: string;
+  } | null>(null);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -217,13 +220,18 @@ const DetailedPostComponent = ({
               >
                 {post.images.map((image, idx) => {
                   // 完全URLか相対パスかを判定
-                  const isFullUrl = image.startsWith('http://') || image.startsWith('https://');
-                  const imageSrc = isFullUrl ? image : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
-                  
+                  const isFullUrl =
+                    image.startsWith("http://") || image.startsWith("https://");
+                  const imageSrc = isFullUrl
+                    ? image
+                    : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
+
                   return (
                     <button
                       key={idx}
-                      onClick={() => handleImageClick(imageSrc, `Post image ${idx + 1}`)}
+                      onClick={() =>
+                        handleImageClick(imageSrc, `Post image ${idx + 1}`)
+                      }
                       className="relative group overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                     >
                       <Image
