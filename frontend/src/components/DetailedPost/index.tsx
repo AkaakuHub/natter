@@ -14,6 +14,7 @@ import { useNavigation } from "@/hooks/useNavigation";
 import ImageModal from "@/components/ImageModal";
 import ReplyModal from "@/components/ReplyModal";
 import PostComponent from "@/components/Post";
+import { useToast } from "@/hooks/useToast";
 
 interface DetailedPostComponentProps {
   postId: string;
@@ -25,6 +26,7 @@ const DetailedPostComponent = ({
   currentUser,
 }: DetailedPostComponentProps) => {
   const { goBack, navigateToProfile, navigateToPost } = useNavigation();
+  const { showToast } = useToast();
   const currentUserId = currentUser?.id;
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
@@ -161,6 +163,9 @@ const DetailedPostComponent = ({
     // リプライリストを更新
     const newReply = await response.json();
     setReplies((prev) => [...prev, newReply]);
+
+    // トースト通知を表示
+    showToast("リプライをしました。", "success");
   };
 
   if (loading) {

@@ -9,6 +9,7 @@ import { PostsApi } from "@/api";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import ImageModal from "@/components/ImageModal";
+import { useToast } from "@/hooks/useToast";
 import ReplyModal from "@/components/ReplyModal";
 
 interface PostComponentProps {
@@ -55,6 +56,7 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
   const { navigateToPost, navigateToProfile } = useNavigation();
   const { currentUser } = useCurrentUser();
   const currentUserId = currentUser?.id;
+  const { showToast } = useToast();
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isLiking, setIsLiking] = useState(false);
@@ -142,6 +144,9 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
 
     // リプライカウントを増加
     setReplyCount((prev) => prev + 1);
+
+    // トースト通知を表示
+    showToast("リプライをしました。", "success");
   };
 
   return (

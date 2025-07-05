@@ -12,15 +12,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user, account, profile }) {
-      console.log("--- JWT User ---", user);
-      console.log("--- Twitter Account ---", account);
-      console.log("--- Twitter Profile ---", profile);
+    async jwt({ token, account }) {
       // 最初のサインイン時
       if (account) {
         token.twitterId = account.providerAccountId;
       }
-      console.log("--- JWT Token ---", token);
       return token;
     },
     async session({ session, token }) {
