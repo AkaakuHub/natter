@@ -75,6 +75,11 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
   };
 
   const handleImageAdd = () => {
+    if (images.length >= 10) {
+      alert('画像は最大10枚までアップロードできます');
+      return;
+    }
+
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
@@ -84,11 +89,18 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
       const files = (e.target as HTMLInputElement).files;
       if (files) {
         const fileArray = Array.from(files);
-        setImages((prev) => [...prev, ...fileArray]);
+        const remainingSlots = 10 - images.length;
+        const filesToAdd = fileArray.slice(0, remainingSlots);
+        
+        setImages((prev) => [...prev, ...filesToAdd]);
 
         // プレビュー用のURLを生成
-        const previewUrls = fileArray.map((file) => URL.createObjectURL(file));
+        const previewUrls = filesToAdd.map((file) => URL.createObjectURL(file));
         setImagePreviewUrls((prev) => [...prev, ...previewUrls]);
+        
+        if (fileArray.length > remainingSlots) {
+          alert(`画像は最大10枚までです。${remainingSlots}枚のみ追加されました。`);
+        }
       }
     };
 
@@ -108,17 +120,20 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
   const remainingChars = characterLimit - content.length;
 
   return (
-    <div className="border-b border-gray-200 p-4 bg-white">
+    <div className="border-b border-gray-100/60 p-6 bg-white/90 backdrop-blur-sm rounded-3xl mx-4 mb-6 shadow-soft hover:shadow-glow transition-all duration-300">
       <form onSubmit={handleSubmit}>
         <div className="flex gap-3">
           {/* ユーザーアバター */}
-          <Image
-            src={currentUser?.image || "/no_avatar_image_128x128.png"}
-            alt={currentUser?.name || "User"}
-            className="w-12 h-12 rounded-full"
-            width={48}
-            height={48}
-          />
+          <div className="relative">
+            <Image
+              src={currentUser?.image || "/no_avatar_image_128x128.png"}
+              alt={currentUser?.name || "User"}
+              className="w-12 h-12 rounded-full ring-2 ring-gray-100 hover:ring-primary/30 transition-all duration-300"
+              width={48}
+              height={48}
+            />
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full"></div>
+          </div>
 
           {/* 投稿作成エリア */}
           <div className="flex-1">
@@ -126,7 +141,7 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="今何してる？"
-              className="w-full resize-none border-none outline-none text-xl placeholder-gray-500 bg-transparent"
+              className="w-full resize-none border-none outline-none text-xl placeholder-gray-400 bg-transparent leading-relaxed font-medium focus:placeholder-gray-300 transition-all duration-300"
               rows={3}
               maxLength={characterLimit}
               disabled={isSubmitting}
@@ -134,20 +149,20 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
 
             {/* 添付画像プレビュー */}
             {imagePreviewUrls.length > 0 && (
-              <div className="mt-3 grid grid-cols-2 gap-2">
+              <div className="mt-4 grid grid-cols-2 gap-3">
                 {imagePreviewUrls.map((imageUrl, index) => (
                   <div key={index} className="relative">
                     <Image
                       src={imageUrl}
                       alt={`添付画像 ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-lg"
+                      className="w-full h-32 object-cover rounded-2xl shadow-soft hover:shadow-glow transition-all duration-300"
                       width={200}
                       height={128}
                     />
                     <button
                       type="button"
                       onClick={() => handleImageRemove(index)}
-                      className="absolute top-1 right-1 bg-black bg-opacity-60 text-white rounded-full p-1 hover:bg-opacity-80"
+                      className="absolute top-2 right-2 bg-red-500/90 backdrop-blur-sm text-white rounded-full p-2 hover:bg-red-600 transition-all duration-300 hover:scale-110"
                     >
                       <IconX size={16} />
                     </button>
@@ -160,22 +175,22 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
             {error && <div className="mt-2 text-red-500 text-sm">{error}</div>}
 
             {/* 投稿ボタンエリア */}
-            <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100/80">
               <div className="flex items-center gap-4">
                 {/* 画像追加ボタン */}
                 <button
                   type="button"
                   onClick={handleImageAdd}
-                  disabled={isSubmitting}
-                  className="text-blue-500 hover:text-blue-600 disabled:opacity-50"
-                  title="画像を追加"
+                  disabled={isSubmitting || images.length >= 10}
+                  className="text-blue-500 hover:text-blue-600 disabled:opacity-50 p-2 rounded-full hover:bg-blue-50 transition-all duration-300"
+                  title={images.length >= 10 ? "画像は最大10枚まで" : "画像を追加"}
                 >
                   <IconPhoto size={20} />
                 </button>
 
                 {/* 文字数カウンター */}
                 <span
-                  className={`text-sm ${
+                  className={`text-sm font-medium ${
                     remainingChars < 20
                       ? remainingChars < 0
                         ? "text-red-500"
@@ -195,11 +210,11 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
                   (!content.trim() && images.length === 0) ||
                   remainingChars < 0
                 }
-                className={`px-6 py-2 rounded-full font-bold text-sm transition-colors ${
+                className={`px-6 py-3 rounded-full font-bold text-sm transition-all duration-300 shadow-soft hover:shadow-glow hover:scale-105 ${
                   isSubmitting ||
                   (!content.trim() && images.length === 0) ||
                   remainingChars < 0
-                    ? "bg-blue-300 text-white cursor-not-allowed"
+                    ? "bg-gray-300 text-white cursor-not-allowed"
                     : "bg-blue-500 text-white hover:bg-blue-600"
                 }`}
               >

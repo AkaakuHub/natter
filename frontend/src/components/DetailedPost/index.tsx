@@ -32,10 +32,8 @@ const DetailedPostComponent = ({
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isLiking, setIsLiking] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<{
-    src: string;
-    alt: string;
-  } | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(-1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [showReplyModal, setShowReplyModal] = useState(false);
   const [replies, setReplies] = useState<Post[]>([]);
 
@@ -113,12 +111,26 @@ const DetailedPostComponent = ({
     return new Intl.DateTimeFormat("ja-JP", options).format(new Date(date));
   };
 
-  const handleImageClick = (imageSrc: string, imageAlt: string) => {
-    setSelectedImage({ src: imageSrc, alt: imageAlt });
+  const handleImageClick = (index: number) => {
+    setSelectedImageIndex(index);
+    setIsModalOpen(true);
   };
 
   const closeImageModal = () => {
-    setSelectedImage(null);
+    setIsModalOpen(false);
+    setSelectedImageIndex(-1);
+  };
+
+  const handlePreviousImage = () => {
+    if (post?.images && selectedImageIndex > 0) {
+      setSelectedImageIndex(selectedImageIndex - 1);
+    }
+  };
+
+  const handleNextImage = () => {
+    if (post?.images && selectedImageIndex < post.images.length - 1) {
+      setSelectedImageIndex(selectedImageIndex + 1);
+    }
   };
 
   const handleReplyClick = () => {
@@ -153,7 +165,7 @@ const DetailedPostComponent = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="max-w-2xl mx-auto px-4 py-8">
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
             <div className="animate-pulse">
@@ -177,7 +189,7 @@ const DetailedPostComponent = ({
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="max-w-2xl mx-auto px-4 py-8">
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
             <div className="text-red-500 text-lg font-medium">
@@ -198,12 +210,12 @@ const DetailedPostComponent = ({
   const user = post.author;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-2xl mx-auto px-4 py-8">
         {/* Back button */}
         <button
           onClick={goBack}
-          className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors group"
+          className="mb-6 flex items-center gap-2 text-gray-600 hover:text-blue-500 transition-all duration-300 group p-2 rounded-full hover:bg-blue-50"
         >
           <IconArrowLeft
             size={20}
@@ -213,13 +225,13 @@ const DetailedPostComponent = ({
         </button>
 
         {/* Main post card */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-soft hover:shadow-glow border border-gray-100/60 overflow-hidden transition-all duration-300">
           {/* Parent post section */}
           {post.replyTo && (
-            <div className="p-4 bg-gray-50 border-b border-gray-200">
+            <div className="p-6 bg-gray-50/50 border-b border-gray-100/60">
               <button
                 onClick={() => navigateToPost(post.replyTo!.id)}
-                className="w-full text-left hover:bg-gray-100 transition-colors p-3 rounded-lg"
+                className="w-full text-left hover:bg-gray-100 transition-all duration-300 p-4 rounded-2xl hover:scale-[1.02]"
               >
                 <div className="flex items-center space-x-3">
                   <Image
@@ -230,7 +242,7 @@ const DetailedPostComponent = ({
                     alt={`${post.replyTo.author?.name}'s avatar`}
                     width={40}
                     height={40}
-                    className="rounded-full"
+                    className="rounded-full ring-2 ring-gray-200 hover:ring-blue-200 transition-all duration-300"
                   />
                   <div className="flex-1">
                     <p className="text-sm text-gray-600">返信先</p>
@@ -251,8 +263,8 @@ const DetailedPostComponent = ({
           )}
 
           {/* User header */}
-          <div className="p-6 border-b border-gray-100">
-            <div className="flex items-center space-x-4">
+          <div className="p-6 border-b border-gray-100/60">
+            <div className="flex items-start space-x-4">
               <button
                 onClick={() => navigateToProfile(user?.id)}
                 className="flex-shrink-0"
@@ -262,19 +274,22 @@ const DetailedPostComponent = ({
                   alt={`${user?.name}'s avatar`}
                   width={56}
                   height={56}
-                  className="rounded-full ring-2 ring-gray-200 hover:ring-blue-300 transition-all duration-200"
+                  className="rounded-full ring-2 ring-gray-200 hover:ring-blue-200 transition-all duration-300 hover:scale-105"
                 />
               </button>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <button
                   onClick={() => navigateToProfile(user?.id)}
-                  className="hover:underline"
+                  className="hover:underline block mb-1"
                 >
-                  <h1 className="font-bold text-xl text-gray-900 hover:text-blue-600 transition-colors">
+                  <h1 className="font-bold text-xl text-gray-900 hover:text-blue-600 transition-colors duration-300">
                     {user?.name}
                   </h1>
                 </button>
-                <p className="text-gray-500 text-sm mt-1">@{user?.id}</p>
+                <p className="text-gray-500 text-sm mb-2">@{user?.id}</p>
+                <time className="text-xs text-gray-400">
+                  {formatDate(post.createdAt)}
+                </time>
               </div>
             </div>
           </div>
@@ -282,7 +297,7 @@ const DetailedPostComponent = ({
           {/* Post content */}
           <div className="p-6">
             <div className="prose prose-lg max-w-none">
-              <p className="text-gray-800 text-lg leading-relaxed whitespace-pre-wrap">
+              <p className="text-gray-900 text-lg leading-relaxed whitespace-pre-wrap font-medium">
                 {post.content}
               </p>
             </div>
@@ -290,7 +305,7 @@ const DetailedPostComponent = ({
             {/* Images */}
             {post.images && post.images.length > 0 && (
               <div
-                className={`mt-6 ${post.images.length === 1 ? "flex justify-center" : "grid grid-cols-2 gap-3"}`}
+                className={`mt-6 ${post.images.length === 1 ? "flex justify-center" : "grid grid-cols-2 gap-4"}`}
               >
                 {post.images.map((image, idx) => {
                   // 完全URLか相対パスかを判定
@@ -304,16 +319,16 @@ const DetailedPostComponent = ({
                     <button
                       key={idx}
                       onClick={() =>
-                        handleImageClick(imageSrc, `Post image ${idx + 1}`)
+                        handleImageClick(idx)
                       }
-                      className="relative group overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                      className="relative group overflow-hidden rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 shadow-soft hover:shadow-glow transition-all duration-300 hover:scale-[1.02]"
                     >
                       <Image
                         src={imageSrc}
                         alt={`Post image ${idx + 1}`}
                         width={512}
                         height={512}
-                        className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
+                        className="w-full h-auto object-cover transition-all duration-300 group-hover:scale-105 cursor-pointer rounded-3xl"
                       />
                     </button>
                   );
@@ -322,24 +337,19 @@ const DetailedPostComponent = ({
             )}
 
             {/* Timestamp */}
-            <div className="mt-6 pt-4 border-t border-gray-100">
-              <p className="text-gray-500 text-sm">
-                {formatDate(post.createdAt)}
-              </p>
-            </div>
           </div>
 
           {/* Action buttons */}
-          <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
+          <div className="px-6 py-4 border-t border-gray-100/60 bg-gray-50/30">
             <div className="flex items-center justify-around">
               <button
                 onClick={handleLike}
                 disabled={isLiking || !currentUserId}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
+                className={`flex items-center gap-2 px-4 py-3 rounded-full transition-all duration-300 hover:scale-105 ${
                   isLiked
                     ? "text-red-500 bg-red-50 hover:bg-red-100"
                     : "text-gray-600 hover:text-red-500 hover:bg-red-50"
-                } ${isLiking || !currentUserId ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}`}
+                } ${isLiking || !currentUserId ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 <IconHeart
                   size={20}
@@ -351,13 +361,13 @@ const DetailedPostComponent = ({
 
               <button
                 onClick={handleReplyClick}
-                className="flex items-center gap-2 px-4 py-2 rounded-full text-gray-600 hover:text-blue-500 hover:bg-blue-50 transition-all duration-200 hover:scale-105"
+                className="flex items-center gap-2 px-4 py-3 rounded-full text-gray-600 hover:text-blue-500 hover:bg-blue-50 transition-all duration-300 hover:scale-105"
               >
                 <IconMessageCircle size={20} />
                 <span className="font-medium">{replies.length}</span>
               </button>
 
-              <button className="flex items-center gap-2 px-4 py-2 rounded-full text-gray-600 hover:text-green-500 hover:bg-green-50 transition-all duration-200 hover:scale-105">
+              <button className="flex items-center gap-2 px-4 py-3 rounded-full text-gray-600 hover:text-green-500 hover:bg-green-50 transition-all duration-300 hover:scale-105">
                 <IconShare size={20} />
                 <span className="font-medium">シェア</span>
               </button>
@@ -421,12 +431,17 @@ const DetailedPostComponent = ({
       </div>
 
       {/* 画像モーダル */}
-      {selectedImage && (
+      {isModalOpen && post?.images && post.images.length > 0 && (
         <ImageModal
-          isOpen={!!selectedImage}
-          imageSrc={selectedImage.src}
-          imageAlt={selectedImage.alt}
+          isOpen={isModalOpen}
+          images={post.images.map(image => {
+            const isFullUrl = image.startsWith("http://") || image.startsWith("https://");
+            return isFullUrl ? image : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
+          })}
+          currentIndex={selectedImageIndex}
           onClose={closeImageModal}
+          onPrevious={selectedImageIndex > 0 ? handlePreviousImage : undefined}
+          onNext={selectedImageIndex < post.images.length - 1 ? handleNextImage : undefined}
         />
       )}
 

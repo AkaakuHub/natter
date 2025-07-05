@@ -58,10 +58,8 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isLiking, setIsLiking] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<{
-    src: string;
-    alt: string;
-  } | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(-1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [showReplyModal, setShowReplyModal] = useState(false);
   const [replyCount, setReplyCount] = useState(0);
 
@@ -93,12 +91,26 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
     }
   };
 
-  const handleImageClick = (imageSrc: string, imageAlt: string) => {
-    setSelectedImage({ src: imageSrc, alt: imageAlt });
+  const handleImageClick = (index: number) => {
+    setSelectedImageIndex(index);
+    setIsModalOpen(true);
   };
 
   const closeImageModal = () => {
-    setSelectedImage(null);
+    setIsModalOpen(false);
+    setSelectedImageIndex(-1);
+  };
+
+  const handlePreviousImage = () => {
+    if (post.images && selectedImageIndex > 0) {
+      setSelectedImageIndex(selectedImageIndex - 1);
+    }
+  };
+
+  const handleNextImage = () => {
+    if (post.images && selectedImageIndex < post.images.length - 1) {
+      setSelectedImageIndex(selectedImageIndex + 1);
+    }
   };
 
   const handleReplyClick = (e: React.MouseEvent) => {
@@ -134,61 +146,77 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
 
   return (
     <>
-      <div className="border-b border-gray-200 py-4 px-4 flex gap-4">
-        <button
-          onClick={() => navigateToProfile(user?.id)}
-          className="flex-shrink-0 self-start"
-        >
-          <Image
-            src={user?.image || "no_avatar_image_128x128.png"}
-            alt={user?.name || "User"}
-            className="w-12 h-12 rounded-full hover:opacity-80 transition-opacity cursor-pointer"
-            width={48}
-            height={48}
-          />
-        </button>
-        <div
-          className="flex-1"
-          onClick={() => post?.id && navigateToPost(post.id)}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <button
-                className="hover:underline"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigateToProfile(user?.id);
-                }}
-              >
-                <span className="font-bold">
+      <article className="bg-white hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 py-6 px-6 cursor-pointer"
+        onClick={() => post?.id && navigateToPost(post.id)}
+      >
+        <div className="flex gap-4">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigateToProfile(user?.id);
+            }}
+            className="flex-shrink-0 self-start"
+          >
+            <Image
+              src={user?.image || "no_avatar_image_128x128.png"}
+              alt={user?.name || "User"}
+              className="w-12 h-12 rounded-full border-2 border-gray-100 hover:border-blue-200 transition-colors duration-200 cursor-pointer"
+              width={48}
+              height={48}
+            />
+          </button>
+          <div className="flex-1 min-w-0">
+            <div className="mb-3">
+              <div className="flex items-center gap-2 mb-1">
+                <button
+                  className="font-bold text-gray-900 hover:text-blue-600 transition-colors text-base"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigateToProfile(user?.id);
+                  }}
+                >
                   {user?.name || "Unknown User"}
+                </button>
+                <span className="text-sm text-gray-500">
+                  @{user?.id || "unknown"}
                 </span>
-              </button>
-              <span className="text-sm text-gray-500 ml-2">
-                @{user?.id || "unknown"}
-              </span>
+              </div>
+              <time className="text-xs text-gray-400 block">
+                {formatDate(post.createdAt)}
+              </time>
             </div>
-            <span className="text-xs text-gray-400">
-              {formatDate(post.createdAt)}
-            </span>
-          </div>
-          {post.replyTo && (
-            <p className="text-[#71767b] text-sm mt-1">
-              返信先:{" "}
-              <span
-                className="text-[#1d9bf0] hover:underline cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigateToPost(post.replyTo!.id);
-                }}
-              >
-                @{post.replyTo.author.name}
-              </span>
-            </p>
-          )}
-          <p className="mt-1 text-gray-800">{post.content}</p>
-          {post.images && post.images.length > 0 && (
-            <div className="mt-2 grid grid-cols-2 gap-2">
+            {post.replyTo && (
+              <div className="mb-3 p-3 bg-blue-50 border-l-4 border-blue-200 rounded-r-lg">
+                <p className="text-blue-700 text-sm">
+                  <span className="font-medium">返信先:</span>{" "}
+                  <button
+                    className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigateToPost(post.replyTo!.id);
+                    }}
+                  >
+                    @{post.replyTo.author.name}
+                  </button>
+                </p>
+              </div>
+            )}
+            
+            <div className="prose prose-lg max-w-none">
+              <p className="text-gray-800 leading-relaxed text-lg whitespace-pre-wrap mb-4">
+                {post.content}
+              </p>
+            </div>
+            {post.images && post.images.length > 0 && (
+              <div className={`mt-4 gap-3 ${
+                post.images.length === 1 
+                  ? "flex justify-center" 
+                  : post.images.length === 2 
+                  ? "grid grid-cols-2" 
+                  : post.images.length === 3 
+                  ? "grid grid-cols-2 grid-rows-2" 
+                  : "grid grid-cols-2"
+              }`}>
               {post.images.map((image, index) => {
                 // 完全URLか相対パスかを判定
                 const isFullUrl =
@@ -202,14 +230,26 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
                     key={index}
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleImageClick(imageSrc, `Post Image ${index + 1}`);
+                      handleImageClick(index);
                     }}
-                    className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
+                    className={`relative focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200 ${
+                      post.images?.length === 1 
+                        ? "max-w-lg mx-auto" 
+                        : post.images?.length === 3 && index === 0 
+                        ? "row-span-2" 
+                        : ""
+                    }`}
                   >
                     <Image
                       src={imageSrc}
                       alt="Post Image"
-                      className="w-full h-auto rounded-md hover:opacity-90 transition-opacity cursor-pointer"
+                      className={`rounded-2xl ${
+                        post.images?.length === 1 
+                          ? "w-full h-auto max-h-96 object-cover" 
+                          : post.images?.length === 3 && index === 0 
+                          ? "w-full h-full object-cover" 
+                          : "w-full h-auto aspect-square object-cover"
+                      }`}
                       width={200}
                       height={200}
                     />
@@ -218,38 +258,64 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
               })}
             </div>
           )}
-          <div className="flex items-center gap-8 mt-2 text-gray-500">
-            <button
-              onClick={handleLike}
-              disabled={isLiking || !currentUserId}
-              className={`flex items-center gap-1 hover:text-red-500 w-[calc(100% / 3)] justify-center transition-colors ${
-                isLiked ? "text-red-500" : ""
-              } ${isLiking || !currentUserId ? "opacity-50" : ""}`}
-            >
-              <IconHeart size={20} fill={isLiked ? "currentColor" : "none"} />
-              <span>{likeCount}</span>
-            </button>
-            <button
-              onClick={handleReplyClick}
-              className="flex items-center gap-1 hover:text-blue-500 w-[calc(100% / 3)] justify-center transition-colors"
-            >
-              <IconMessageCircle size={20} />
-              <span>{replyCount}</span>
-            </button>
-            <button className="flex items-center gap-1 hover:text-green-500 w-[calc(100% / 3)] justify-center">
-              <IconShare size={20} />
-            </button>
+            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+              <div className="flex items-center gap-6">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleLike(e);
+                  }}
+                  disabled={isLiking || !currentUserId}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors duration-200 ${
+                    isLiked 
+                      ? "text-red-500 bg-red-50 hover:bg-red-100" 
+                      : "text-gray-600 hover:text-red-500 hover:bg-red-50"
+                  } ${isLiking || !currentUserId ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  <IconHeart 
+                    size={18} 
+                    fill={isLiked ? "currentColor" : "none"} 
+                    className="transition-colors duration-200"
+                  />
+                  <span className="font-medium text-sm">{likeCount}</span>
+                </button>
+                
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleReplyClick(e);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full text-gray-600 hover:text-blue-500 hover:bg-blue-50 transition-colors duration-200"
+                >
+                  <IconMessageCircle size={18} />
+                  <span className="font-medium text-sm">{replyCount}</span>
+                </button>
+                
+                <button 
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full text-gray-600 hover:text-green-500 hover:bg-green-50 transition-colors duration-200"
+                >
+                  <IconShare size={18} />
+                  <span className="font-medium text-sm">共有</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </article>
 
       {/* 画像モーダル */}
-      {selectedImage && (
+      {isModalOpen && post.images && post.images.length > 0 && (
         <ImageModal
-          isOpen={!!selectedImage}
-          imageSrc={selectedImage.src}
-          imageAlt={selectedImage.alt}
+          isOpen={isModalOpen}
+          images={post.images.map(image => {
+            const isFullUrl = image.startsWith("http://") || image.startsWith("https://");
+            return isFullUrl ? image : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
+          })}
+          currentIndex={selectedImageIndex}
           onClose={closeImageModal}
+          onPrevious={selectedImageIndex > 0 ? handlePreviousImage : undefined}
+          onNext={selectedImageIndex < post.images.length - 1 ? handleNextImage : undefined}
         />
       )}
 

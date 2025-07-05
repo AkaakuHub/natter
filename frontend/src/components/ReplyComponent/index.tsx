@@ -52,10 +52,8 @@ const ReplyComponent = ({ user, post, replyTo }: ReplyComponentProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isLiking, setIsLiking] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<{
-    src: string;
-    alt: string;
-  } | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(-1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     setIsLiked(
@@ -83,12 +81,26 @@ const ReplyComponent = ({ user, post, replyTo }: ReplyComponentProps) => {
     }
   };
 
-  const handleImageClick = (imageSrc: string, imageAlt: string) => {
-    setSelectedImage({ src: imageSrc, alt: imageAlt });
+  const handleImageClick = (index: number) => {
+    setSelectedImageIndex(index);
+    setIsModalOpen(true);
   };
 
   const closeImageModal = () => {
-    setSelectedImage(null);
+    setIsModalOpen(false);
+    setSelectedImageIndex(-1);
+  };
+
+  const handlePreviousImage = () => {
+    if (post.images && selectedImageIndex > 0) {
+      setSelectedImageIndex(selectedImageIndex - 1);
+    }
+  };
+
+  const handleNextImage = () => {
+    if (post.images && selectedImageIndex < post.images.length - 1) {
+      setSelectedImageIndex(selectedImageIndex + 1);
+    }
   };
 
   return (
@@ -164,7 +176,7 @@ const ReplyComponent = ({ user, post, replyTo }: ReplyComponentProps) => {
                     key={index}
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleImageClick(imageSrc, `Reply Image ${index + 1}`);
+                      handleImageClick(index);
                     }}
                     className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
                   >
@@ -205,12 +217,17 @@ const ReplyComponent = ({ user, post, replyTo }: ReplyComponentProps) => {
       </div>
 
       {/* 画像モーダル */}
-      {selectedImage && (
+      {isModalOpen && post.images && post.images.length > 0 && (
         <ImageModal
-          isOpen={!!selectedImage}
-          imageSrc={selectedImage.src}
-          imageAlt={selectedImage.alt}
+          isOpen={isModalOpen}
+          images={post.images.map(image => {
+            const isFullUrl = image.startsWith("http://") || image.startsWith("https://");
+            return isFullUrl ? image : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
+          })}
+          currentIndex={selectedImageIndex}
           onClose={closeImageModal}
+          onPrevious={selectedImageIndex > 0 ? handlePreviousImage : undefined}
+          onNext={selectedImageIndex < post.images.length - 1 ? handleNextImage : undefined}
         />
       )}
     </>
