@@ -3,4 +3,5 @@ export class CreatePostDto {
   content?: string;
   images?: string[];
   authorId?: string;
+  replyToId?: number;
 }

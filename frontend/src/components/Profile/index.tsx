@@ -126,6 +126,7 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
         images: post.images || [],
         createdAt: post.createdAt,
         liked: post.likes?.map((like) => like.userId) || [],
+        _count: post._count,
       };
 
       return (

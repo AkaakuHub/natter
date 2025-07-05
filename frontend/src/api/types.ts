@@ -23,8 +23,12 @@ export interface Post {
   authorId?: string;
   author?: User;
   likes?: Like[];
+  replyToId?: number;
+  replyTo?: Post;
+  replies?: Post[];
   _count?: {
     likes: number;
+    replies: number;
   };
 }
 
@@ -41,6 +45,7 @@ export interface CreatePostDto {
   content?: string;
   images?: string[];
   authorId?: string;
+  replyToId?: number;
 }
 
 export interface UpdatePostDto {

@@ -1,17 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-
 import Image from "next/image";
-
 import { IconHeart, IconMessageCircle, IconShare } from "@tabler/icons-react";
 import { PostsApi } from "@/api";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import ImageModal from "@/components/ImageModal";
-import ReplyModal from "@/components/ReplyModal";
 
-interface PostComponentProps {
+interface ReplyComponentProps {
   user: {
     id: string;
     name: string;
@@ -27,13 +24,10 @@ interface PostComponentProps {
     _count?: {
       replies: number;
     };
-    replyTo?: {
-      id: number;
-      content: string;
-      author: {
-        id: string;
-        name: string;
-      };
+  };
+  replyTo?: {
+    author: {
+      name: string;
     };
   };
 }
@@ -51,7 +45,7 @@ const formatDate = (date: string | number | Date): string => {
   return new Intl.DateTimeFormat("ja-JP", options).format(new Date(date));
 };
 
-const PostComponent = ({ user, post }: PostComponentProps) => {
+const ReplyComponent = ({ user, post, replyTo }: ReplyComponentProps) => {
   const { navigateToPost, navigateToProfile } = useNavigation();
   const { currentUser } = useCurrentUser();
   const currentUserId = currentUser?.id;
@@ -62,17 +56,13 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
     src: string;
     alt: string;
   } | null>(null);
-  const [showReplyModal, setShowReplyModal] = useState(false);
-  const [replyCount, setReplyCount] = useState(0);
 
-  // propsが変更されたときに状態を同期
   useEffect(() => {
     setIsLiked(
       currentUserId ? post.liked?.includes(currentUserId) || false : false,
     );
     setLikeCount(post.liked?.length || 0);
-    setReplyCount(post._count?.replies || 0);
-  }, [post.liked, post._count?.replies, currentUserId]);
+  }, [post.liked, currentUserId]);
 
   const handleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -101,40 +91,18 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
     setSelectedImage(null);
   };
 
-  const handleReplyClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowReplyModal(true);
-  };
-
-  const handleReplySubmit = async (content: string, images: File[]) => {
-    if (!currentUser) return;
-
-    const formData = new FormData();
-    formData.append("content", content);
-    formData.append("authorId", currentUser.id);
-    formData.append("replyToId", post.id.toString());
-
-    images.forEach((file) => {
-      formData.append("images", file);
-    });
-
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts`, {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to create reply");
-    }
-
-    // リプライカウントを増加
-    setReplyCount((prev) => prev + 1);
-  };
-
   return (
     <>
-      <div className="border-b border-gray-200 py-4 px-4 flex gap-4">
+      <div className="py-3 px-4 flex gap-3">
+        {/* リプライアイコンと線 */}
+        <div className="flex flex-col items-center mr-1">
+          <div className="w-8 h-8 flex items-center justify-center">
+            <div className="w-4 h-4 border-l-2 border-b-2 border-gray-300 rounded-bl-lg"></div>
+          </div>
+          <div className="w-0.5 bg-gray-300 flex-1 min-h-4"></div>
+        </div>
+
+        {/* ユーザーアバター */}
         <button
           onClick={() => navigateToProfile(user?.id)}
           className="flex-shrink-0"
@@ -142,17 +110,18 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
           <Image
             src={user?.image || "no_avatar_image_128x128.png"}
             alt={user?.name || "User"}
-            className="w-12 h-12 rounded-full hover:opacity-80 transition-opacity cursor-pointer"
-            width={48}
-            height={48}
+            className="w-10 h-10 rounded-full hover:opacity-80 transition-opacity cursor-pointer"
+            width={40}
+            height={40}
           />
         </button>
+
         <div
           className="flex-1"
           onClick={() => post?.id && navigateToPost(post.id)}
         >
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex items-center">
               <button
                 className="hover:underline"
                 onClick={(e) => {
@@ -160,37 +129,30 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
                   navigateToProfile(user?.id);
                 }}
               >
-                <span className="font-bold">
+                <span className="font-bold text-sm">
                   {user?.name || "Unknown User"}
                 </span>
               </button>
-              <span className="text-sm text-gray-500 ml-2">
+              <span className="text-xs text-gray-500 ml-2">
                 @{user?.id || "unknown"}
               </span>
+              {replyTo && (
+                <span className="text-xs text-gray-500 ml-2">
+                  • 返信先: @{replyTo.author.name}
+                </span>
+              )}
             </div>
             <span className="text-xs text-gray-400">
               {formatDate(post.createdAt)}
             </span>
           </div>
-          {post.replyTo && (
-            <p className="text-[#71767b] text-sm mt-1">
-              返信先:{" "}
-              <span
-                className="text-[#1d9bf0] hover:underline cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigateToPost(post.replyTo!.id);
-                }}
-              >
-                @{post.replyTo.author.name}
-              </span>
-            </p>
-          )}
-          <p className="mt-1 text-gray-800">{post.content}</p>
+
+          <p className="mt-1 text-gray-800 text-sm">{post.content}</p>
+
+          {/* 画像表示 */}
           {post.images && post.images.length > 0 && (
             <div className="mt-2 grid grid-cols-2 gap-2">
               {post.images.map((image, index) => {
-                // 完全URLか相対パスかを判定
                 const isFullUrl =
                   image.startsWith("http://") || image.startsWith("https://");
                 const imageSrc = isFullUrl
@@ -202,42 +164,41 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
                     key={index}
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleImageClick(imageSrc, `Post Image ${index + 1}`);
+                      handleImageClick(imageSrc, `Reply Image ${index + 1}`);
                     }}
                     className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
                   >
                     <Image
                       src={imageSrc}
-                      alt="Post Image"
+                      alt="Reply Image"
                       className="w-full h-auto rounded-md hover:opacity-90 transition-opacity cursor-pointer"
-                      width={200}
-                      height={200}
+                      width={150}
+                      height={150}
                     />
                   </button>
                 );
               })}
             </div>
           )}
-          <div className="flex items-center gap-8 mt-2 text-gray-500">
+
+          {/* アクションボタン */}
+          <div className="flex items-center gap-6 mt-2 text-gray-500 text-sm">
             <button
               onClick={handleLike}
               disabled={isLiking || !currentUserId}
-              className={`flex items-center gap-1 hover:text-red-500 w-[calc(100% / 3)] justify-center transition-colors ${
+              className={`flex items-center gap-1 hover:text-red-500 transition-colors ${
                 isLiked ? "text-red-500" : ""
               } ${isLiking || !currentUserId ? "opacity-50" : ""}`}
             >
-              <IconHeart size={20} fill={isLiked ? "currentColor" : "none"} />
+              <IconHeart size={16} fill={isLiked ? "currentColor" : "none"} />
               <span>{likeCount}</span>
             </button>
-            <button
-              onClick={handleReplyClick}
-              className="flex items-center gap-1 hover:text-blue-500 w-[calc(100% / 3)] justify-center transition-colors"
-            >
-              <IconMessageCircle size={20} />
-              <span>{replyCount}</span>
+            <button className="flex items-center gap-1 hover:text-blue-500 transition-colors">
+              <IconMessageCircle size={16} />
+              <span>{post._count?.replies || 0}</span>
             </button>
-            <button className="flex items-center gap-1 hover:text-green-500 w-[calc(100% / 3)] justify-center">
-              <IconShare size={20} />
+            <button className="flex items-center gap-1 hover:text-green-500 transition-colors">
+              <IconShare size={16} />
             </button>
           </div>
         </div>
@@ -252,26 +213,8 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
           onClose={closeImageModal}
         />
       )}
-
-      {/* リプライモーダル */}
-      {showReplyModal && (
-        <ReplyModal
-          isOpen={showReplyModal}
-          onClose={() => setShowReplyModal(false)}
-          replyToPost={{
-            id: post.id,
-            content: post.content,
-            author: {
-              name: user.name,
-              image: user.image,
-            },
-          }}
-          currentUser={currentUser}
-          onReplySubmit={handleReplySubmit}
-        />
-      )}
     </>
   );
 };
 
-export default PostComponent;
+export default ReplyComponent;

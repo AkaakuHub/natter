@@ -85,6 +85,7 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
           images: post.images || [],
           createdAt: post.createdAt,
           liked: post.likes?.map((like) => like.userId) || [],
+          _count: post._count,
         };
 
         return (

@@ -12,6 +12,8 @@ import {
 import { PostsApi, Post, User } from "@/api";
 import { useNavigation } from "@/hooks/useNavigation";
 import ImageModal from "@/components/ImageModal";
+import ReplyModal from "@/components/ReplyModal";
+import PostComponent from "@/components/Post";
 
 interface DetailedPostComponentProps {
   postId: string;
@@ -22,7 +24,7 @@ const DetailedPostComponent = ({
   postId,
   currentUser,
 }: DetailedPostComponentProps) => {
-  const { goBack, navigateToProfile } = useNavigation();
+  const { goBack, navigateToProfile, navigateToPost } = useNavigation();
   const currentUserId = currentUser?.id;
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,6 +36,8 @@ const DetailedPostComponent = ({
     src: string;
     alt: string;
   } | null>(null);
+  const [showReplyModal, setShowReplyModal] = useState(false);
+  const [replies, setReplies] = useState<Post[]>([]);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -53,8 +57,12 @@ const DetailedPostComponent = ({
 
       try {
         setLoading(true);
-        const fetchedPost = await PostsApi.getPostById(numericPostId);
+        const [fetchedPost, fetchedReplies] = await Promise.all([
+          PostsApi.getPostById(numericPostId),
+          PostsApi.getReplies(numericPostId),
+        ]);
         setPost(fetchedPost);
+        setReplies(fetchedReplies);
         setIsLiked(
           currentUserId
             ? fetchedPost.likes?.some(
@@ -111,6 +119,36 @@ const DetailedPostComponent = ({
 
   const closeImageModal = () => {
     setSelectedImage(null);
+  };
+
+  const handleReplyClick = () => {
+    setShowReplyModal(true);
+  };
+
+  const handleReplySubmit = async (content: string, images: File[]) => {
+    if (!currentUser || !post) return;
+
+    const formData = new FormData();
+    formData.append("content", content);
+    formData.append("authorId", currentUser.id);
+    formData.append("replyToId", post.id.toString());
+
+    images.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create reply");
+    }
+
+    // リプライリストを更新
+    const newReply = await response.json();
+    setReplies((prev) => [...prev, newReply]);
   };
 
   if (loading) {
@@ -176,6 +214,32 @@ const DetailedPostComponent = ({
 
         {/* Main post card */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          {/* Parent post section */}
+          {post.replyTo && (
+            <div className="p-4 bg-gray-50 border-b border-gray-200">
+              <button
+                onClick={() => navigateToPost(post.replyTo!.id)}
+                className="w-full text-left hover:bg-gray-100 transition-colors p-3 rounded-lg"
+              >
+                <div className="flex items-center space-x-3">
+                  <Image
+                    src={post.replyTo.author?.image || "/no_avatar_image_128x128.png"}
+                    alt={`${post.replyTo.author?.name}'s avatar`}
+                    width={40}
+                    height={40}
+                    className="rounded-full"
+                  />
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-600">返信先</p>
+                    <p className="font-semibold text-gray-900">{post.replyTo.author?.name}</p>
+                    <p className="text-gray-700 text-sm mt-1 line-clamp-2">{post.replyTo.content}</p>
+                  </div>
+                  <IconArrowLeft size={20} className="text-gray-400 rotate-180" />
+                </div>
+              </button>
+            </div>
+          )}
+
           {/* User header */}
           <div className="p-6 border-b border-gray-100">
             <div className="flex items-center space-x-4">
@@ -275,9 +339,12 @@ const DetailedPostComponent = ({
                 <span className="font-medium">{likeCount}</span>
               </button>
 
-              <button className="flex items-center gap-2 px-4 py-2 rounded-full text-gray-600 hover:text-blue-500 hover:bg-blue-50 transition-all duration-200 hover:scale-105">
+              <button
+                onClick={handleReplyClick}
+                className="flex items-center gap-2 px-4 py-2 rounded-full text-gray-600 hover:text-blue-500 hover:bg-blue-50 transition-all duration-200 hover:scale-105"
+              >
                 <IconMessageCircle size={20} />
-                <span className="font-medium">0</span>
+                <span className="font-medium">{replies.length}</span>
               </button>
 
               <button className="flex items-center gap-2 px-4 py-2 rounded-full text-gray-600 hover:text-green-500 hover:bg-green-50 transition-all duration-200 hover:scale-105">
@@ -287,6 +354,51 @@ const DetailedPostComponent = ({
             </div>
           </div>
         </div>
+
+        {/* リプライセクション */}
+        {replies.length > 0 && (
+          <div className="border-t border-gray-100">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                リプライ ({replies.length})
+              </h3>
+              <div className="space-y-4">
+                {replies.map((reply) => {
+                  if (!reply.author) return null;
+
+                  const transformedUser = {
+                    id: reply.author.id,
+                    name: reply.author.name,
+                    image: reply.author.image || "/no_avatar_image_128x128.png",
+                  };
+
+                  const transformedPost = {
+                    id: reply.id,
+                    userId: reply.authorId || "",
+                    content: reply.content || "",
+                    images: reply.images || [],
+                    createdAt: reply.createdAt,
+                    liked: reply.likes?.map((like) => like.userId) || [],
+                    _count: reply._count,
+                    replyTo: reply.replyTo,
+                  };
+
+                  return (
+                    <div
+                      key={reply.id}
+                      className="border border-gray-100 rounded-lg"
+                    >
+                      <PostComponent
+                        user={transformedUser}
+                        post={transformedPost}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 画像モーダル */}
@@ -296,6 +408,24 @@ const DetailedPostComponent = ({
           imageSrc={selectedImage.src}
           imageAlt={selectedImage.alt}
           onClose={closeImageModal}
+        />
+      )}
+
+      {/* リプライモーダル */}
+      {showReplyModal && post && (
+        <ReplyModal
+          isOpen={showReplyModal}
+          onClose={() => setShowReplyModal(false)}
+          replyToPost={{
+            id: post.id,
+            content: post.content || "",
+            author: {
+              name: post.author?.name || "Unknown User",
+              image: post.author?.image,
+            },
+          }}
+          currentUser={currentUser}
+          onReplySubmit={handleReplySubmit}
         />
       )}
     </div>

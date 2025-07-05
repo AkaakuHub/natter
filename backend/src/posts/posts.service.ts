@@ -8,7 +8,7 @@ export class PostsService {
   constructor(private prisma: PrismaService) {}
 
   async create(createPostDto: CreatePostDto) {
-    const { images, authorId, ...postData } = createPostDto;
+    const { images, authorId, replyToId, ...postData } = createPostDto;
 
     if (!authorId) {
       throw new BadRequestException('Invalid authorId');
@@ -23,10 +23,24 @@ export class PostsService {
       throw new BadRequestException(`User with id ${authorId} does not exist`);
     }
 
+    // リプライ先の投稿が存在するかチェック
+    if (replyToId) {
+      const replyToPost = await this.prisma.post.findUnique({
+        where: { id: replyToId },
+      });
+
+      if (!replyToPost) {
+        throw new BadRequestException(
+          `Post with id ${replyToId} does not exist`,
+        );
+      }
+    }
+
     return this.prisma.post.create({
       data: {
         ...postData,
         authorId,
+        replyToId,
         images: images ? JSON.stringify(images) : null,
       },
       include: {
@@ -36,9 +50,15 @@ export class PostsService {
             user: true,
           },
         },
+        replyTo: {
+          include: {
+            author: true,
+          },
+        },
         _count: {
           select: {
             likes: true,
+            replies: true,
           },
         },
       },
@@ -54,9 +74,15 @@ export class PostsService {
             user: true,
           },
         },
+        replyTo: {
+          include: {
+            author: true,
+          },
+        },
         _count: {
           select: {
             likes: true,
+            replies: true,
           },
         },
       },
@@ -67,7 +93,7 @@ export class PostsService {
 
     return posts.map((post) => ({
       ...post,
-      images: post.images ? JSON.parse(post.images) : [],
+      images: post.images ? (JSON.parse(post.images) as string[]) : [],
     }));
   }
 
@@ -81,9 +107,15 @@ export class PostsService {
             user: true,
           },
         },
+        replyTo: {
+          include: {
+            author: true,
+          },
+        },
         _count: {
           select: {
             likes: true,
+            replies: true,
           },
         },
       },
@@ -95,7 +127,7 @@ export class PostsService {
 
     return {
       ...post,
-      images: post.images ? JSON.parse(post.images) : [],
+      images: post.images ? (JSON.parse(post.images) as string[]) : [],
     };
   }
 
@@ -109,9 +141,15 @@ export class PostsService {
             user: true,
           },
         },
+        replyTo: {
+          include: {
+            author: true,
+          },
+        },
         _count: {
           select: {
             likes: true,
+            replies: true,
           },
         },
       },
@@ -122,7 +160,7 @@ export class PostsService {
 
     return posts.map((post) => ({
       ...post,
-      images: post.images ? JSON.parse(post.images) : [],
+      images: post.images ? (JSON.parse(post.images) as string[]) : [],
     }));
   }
 
@@ -140,9 +178,15 @@ export class PostsService {
             user: true,
           },
         },
+        replyTo: {
+          include: {
+            author: true,
+          },
+        },
         _count: {
           select: {
             likes: true,
+            replies: true,
           },
         },
       },
@@ -152,10 +196,13 @@ export class PostsService {
     });
 
     return posts
-      .filter((post) => post.images && JSON.parse(post.images).length > 0)
+      .filter(
+        (post) =>
+          post.images && (JSON.parse(post.images) as string[]).length > 0,
+      )
       .map((post) => ({
         ...post,
-        images: post.images ? JSON.parse(post.images) : [],
+        images: post.images ? (JSON.parse(post.images) as string[]) : [],
       }));
   }
 
@@ -186,7 +233,9 @@ export class PostsService {
 
     return likedPosts.map((like) => ({
       ...like.post,
-      images: like.post.images ? JSON.parse(like.post.images) : [],
+      images: like.post.images
+        ? (JSON.parse(like.post.images) as string[])
+        : [],
     }));
   }
 
@@ -205,9 +254,15 @@ export class PostsService {
             user: true,
           },
         },
+        replyTo: {
+          include: {
+            author: true,
+          },
+        },
         _count: {
           select: {
             likes: true,
+            replies: true,
           },
         },
       },
@@ -263,5 +318,38 @@ export class PostsService {
       count: likes.length,
       users: likes.map((like) => like.user),
     };
+  }
+
+  async getReplies(postId: number) {
+    const replies = await this.prisma.post.findMany({
+      where: { replyToId: postId },
+      include: {
+        author: true,
+        likes: {
+          include: {
+            user: true,
+          },
+        },
+        replyTo: {
+          include: {
+            author: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+            replies: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+
+    return replies.map((reply) => ({
+      ...reply,
+      images: reply.images ? (JSON.parse(reply.images) as string[]) : [],
+    }));
   }
 }

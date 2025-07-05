@@ -36,6 +36,11 @@ model Post {
   author    User?    @relation(fields: [authorId], references: [id])
   authorId  String?
   likes     Like[]
+  
+  // リプライ関係
+  replyToId Int?     // リプライ先のPost ID
+  replyTo   Post?    @relation("PostReplies", fields: [replyToId], references: [id])
+  replies   Post[]   @relation("PostReplies")
 }
 
 model Like {

@@ -49,4 +49,8 @@ export class PostsApi {
   static async getPostLikes(postId: number): Promise<PostLikesResponse> {
     return ApiClient.get<PostLikesResponse>(`/posts/${postId}/likes`);
   }
+
+  static async getReplies(postId: number): Promise<Post[]> {
+    return ApiClient.get<Post[]>(`/posts/${postId}/replies`);
+  }
 }

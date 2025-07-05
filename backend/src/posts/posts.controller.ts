@@ -50,7 +50,14 @@ export class PostsController {
   ) {
     // 一時的にJWT認証を無効化してauthorIdをフロントエンドから受け取る
     const imagePaths = files ? files.map((file) => file.filename) : [];
-    return this.postsService.create({ ...createPostDto, images: imagePaths });
+    const replyToId = createPostDto.replyToId
+      ? parseInt(createPostDto.replyToId.toString())
+      : undefined;
+    return this.postsService.create({
+      ...createPostDto,
+      images: imagePaths,
+      replyToId,
+    });
   }
 
   @Get()
@@ -107,5 +114,10 @@ export class PostsController {
   @Get('images/:filename')
   getImage(@Param('filename') filename: string) {
     return { url: `/uploads/${filename}` };
+  }
+
+  @Get(':id/replies')
+  getReplies(@Param('id', ParseIntPipe) postId: number) {
+    return this.postsService.getReplies(postId);
   }
 }
