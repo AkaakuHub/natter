@@ -1,0 +1,24 @@
+pre-commit:
+  parallel: true
+  commands:
+    frontend-lint:
+      glob: "frontend/{src,app}/**/*.{ts,tsx}"
+      run: cd frontend && pnpm run lint
+    frontend-format:
+      glob: "frontend/{src,app}/**/*.{ts,tsx,js,jsx,json,css}"
+      run: cd frontend && pnpm run format
+    backend-lint:
+      glob: "backend/src/**/*.ts"
+      run: cd backend && pnpm run lint
+    backend-format:
+      glob: "backend/src/**/*.ts"
+      run: cd backend && pnpm run format
+
+pre-push:
+  commands:
+    backend-test:
+      run: cd backend && pnpm run test
+    backend-build:
+      run: cd backend && pnpm run build
+    frontend-build:
+      run: cd frontend && pnpm run build

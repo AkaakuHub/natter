@@ -1,9 +1,15 @@
-import { ApiClient } from './client';
-import { Post, CreatePostDto, UpdatePostDto, LikeResponse, PostLikesResponse } from './types';
+import { ApiClient } from "./client";
+import {
+  Post,
+  CreatePostDto,
+  UpdatePostDto,
+  LikeResponse,
+  PostLikesResponse,
+} from "./types";
 
 export class PostsApi {
   static async getAllPosts(): Promise<Post[]> {
-    return ApiClient.get<Post[]>('/posts');
+    return ApiClient.get<Post[]>("/posts");
   }
 
   static async getPostById(id: number): Promise<Post> {
@@ -15,7 +21,7 @@ export class PostsApi {
   }
 
   static async getMediaPosts(): Promise<Post[]> {
-    return ApiClient.get<Post[]>('/posts?type=media');
+    return ApiClient.get<Post[]>("/posts?type=media");
   }
 
   static async getLikedPosts(userId: string): Promise<Post[]> {
@@ -23,7 +29,7 @@ export class PostsApi {
   }
 
   static async createPost(data: CreatePostDto): Promise<Post> {
-    return ApiClient.post<Post>('/posts', data);
+    return ApiClient.post<Post>("/posts", data);
   }
 
   static async updatePost(id: number, data: UpdatePostDto): Promise<Post> {

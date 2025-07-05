@@ -1,6 +1,6 @@
-import { useRouter, usePathname } from 'next/navigation';
-import { useCallback } from 'react';
-import { useNavigationStackContext } from '@/components/providers/NavigationStackProvider';
+import { useRouter, usePathname } from "next/navigation";
+import { useCallback } from "react";
+import { useNavigationStackContext } from "@/components/providers/NavigationStackProvider";
 
 // useNavigationフックをNavigationStackに対応
 export const useNavigation = () => {
@@ -10,25 +10,31 @@ export const useNavigation = () => {
 
   // フォールバック用のコールバック（常に定義する）
   const fallbackNavigateToTimeline = useCallback(() => {
-    router.push('/');
+    router.push("/");
   }, [router]);
 
-  const fallbackNavigateToProfile = useCallback((userId?: string) => {
-    const profilePath = userId ? `/profile/${userId}` : '/profile';
-    router.push(profilePath);
-  }, [router]);
+  const fallbackNavigateToProfile = useCallback(
+    (userId?: string) => {
+      const profilePath = userId ? `/profile/${userId}` : "/profile";
+      router.push(profilePath);
+    },
+    [router],
+  );
 
-  const fallbackNavigateToPost = useCallback((postId: number) => {
-    const postPath = `/post/${postId}`;
-    router.push(postPath);
-  }, [router]);
+  const fallbackNavigateToPost = useCallback(
+    (postId: number) => {
+      const postPath = `/post/${postId}`;
+      router.push(postPath);
+    },
+    [router],
+  );
 
   const fallbackGoBack = useCallback(() => {
     router.back();
   }, [router]);
 
   const fallbackGetCurrentPath = useCallback(() => {
-    return pathname.slice(1) || '';
+    return pathname.slice(1) || "";
   }, [pathname]);
 
   // NavigationStackContextが利用可能な場合はそれを使用
@@ -38,7 +44,8 @@ export const useNavigation = () => {
       navigateToProfile: navigationStack.navigateToProfile,
       navigateToPost: navigationStack.navigateToPost,
       goBack: navigationStack.popPage,
-      getCurrentPath: () => navigationStack.currentPage?.component.toLowerCase() || '',
+      getCurrentPath: () =>
+        navigationStack.currentPage?.component.toLowerCase() || "",
       currentPath: navigationStack.currentPage?.path || pathname,
       canGoBack: navigationStack.canGoBack,
       isAtRoot: navigationStack.isAtRoot,
@@ -55,7 +62,7 @@ export const useNavigation = () => {
     getCurrentPath: fallbackGetCurrentPath,
     currentPath: pathname,
     canGoBack: false, // フォールバックでは不明
-    isAtRoot: pathname === '/',
+    isAtRoot: pathname === "/",
     stack: null,
   };
 };

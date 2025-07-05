@@ -1,6 +1,6 @@
-import { useSpring, config } from '@react-spring/web';
-import { useDrag } from '@use-gesture/react';
-import { useCallback, useRef } from 'react';
+import { useSpring, config } from "@react-spring/web";
+import { useDrag } from "@use-gesture/react";
+import { useCallback, useRef } from "react";
 
 interface SwipeNavigationConfig {
   onSwipeBack?: () => void;
@@ -53,7 +53,7 @@ export const useSwipeNavigation = ({
             // サイドバー表示
             const progress = Math.min(mx / 300, 1);
             newX = mx * 0.3; // メイン画面を少し右に移動
-            newSidebarX = -300 + (300 * progress);
+            newSidebarX = -300 + 300 * progress;
           }
         }
         // 左スワイプ（次のページまたはサイドバー隠す）
@@ -70,19 +70,20 @@ export const useSwipeNavigation = ({
 
       if (last) {
         isSwipingRef.current = false;
-        const shouldTriggerAction = Math.abs(mx) > threshold || Math.abs(vx) > 0.5;
+        const shouldTriggerAction =
+          Math.abs(mx) > threshold || Math.abs(vx) > 0.5;
 
         if (shouldTriggerAction) {
           if (mx > 0) {
             if (canSwipeBack && mx > threshold) {
               // 戻る操作を実行
-              api.start({ 
-                x: window.innerWidth, 
+              api.start({
+                x: window.innerWidth,
                 sidebarX: -300,
                 onRest: () => {
                   onSwipeBack?.();
                   api.set({ x: 0, sidebarX: -300 });
-                }
+                },
               });
               return;
             } else if (canSwipeToSidebar && mx > threshold) {
@@ -99,10 +100,10 @@ export const useSwipeNavigation = ({
       }
     },
     {
-      axis: 'x',
+      axis: "x",
       filterTaps: true,
       threshold: 10,
-    }
+    },
   );
 
   // サイドバーのドラッグハンドラー
@@ -112,13 +113,13 @@ export const useSwipeNavigation = ({
         const newSidebarX = Math.max(-300, Math.min(0, mx - 300));
         const progress = (newSidebarX + 300) / 300;
         const newX = 300 * progress;
-        
+
         api.start({ x: newX, sidebarX: newSidebarX, immediate: true });
       }
 
       if (last) {
         const shouldClose = mx < -threshold || vx < -0.5;
-        
+
         if (shouldClose) {
           api.start({ x: 0, sidebarX: -300 });
         } else {
@@ -127,9 +128,9 @@ export const useSwipeNavigation = ({
       }
     },
     {
-      axis: 'x',
+      axis: "x",
       filterTaps: true,
-    }
+    },
   );
 
   const closeSidebar = useCallback(() => {

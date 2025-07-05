@@ -26,10 +26,10 @@ export const getDominantColor = async (image: string): Promise<string> => {
 
       const colorArrayRGBSum = colorArrayRGB.reduce(
         (acc, [r, g, b]) => [acc[0] + r, acc[1] + g, acc[2] + b],
-        [0, 0, 0]
+        [0, 0, 0],
       );
       const colorArrayRGBAvg = colorArrayRGBSum.map((value) =>
-        Math.floor(value / colorArrayRGB.length)
+        Math.floor(value / colorArrayRGB.length),
       );
       const [r, g, b] = colorArrayRGBAvg;
       const color = `rgb(${r}, ${g}, ${b})`;

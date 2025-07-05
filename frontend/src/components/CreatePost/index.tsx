@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { IconPhoto, IconX } from "@tabler/icons-react";
-import { PostsApi, User } from "@/api";
+import { User } from "@/api";
 
 interface CreatePostProps {
   onPostCreated?: () => void;
@@ -19,7 +19,7 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!content.trim() && images.length === 0) {
       setError("投稿内容または画像を入力してください");
       return;
@@ -34,27 +34,31 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
       setIsSubmitting(true);
       setError(null);
 
-      console.log('Creating post with authorId:', currentUser.id, typeof currentUser.id);
-      
+      console.log(
+        "Creating post with authorId:",
+        currentUser.id,
+        typeof currentUser.id,
+      );
+
       // FormDataを使用してファイルを送信
       const formData = new FormData();
       if (content.trim()) {
-        formData.append('content', content.trim());
+        formData.append("content", content.trim());
       }
-      formData.append('authorId', currentUser.id);
-      
+      formData.append("authorId", currentUser.id);
+
       // 画像ファイルを追加
       images.forEach((file) => {
-        formData.append('images', file);
+        formData.append("images", file);
       });
 
-      const response = await fetch('http://localhost:8000/posts', {
-        method: 'POST',
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts`, {
+        method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('投稿の作成に失敗しました');
+        throw new Error("投稿の作成に失敗しました");
       }
 
       // 成功時の処理
@@ -71,29 +75,29 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
   };
 
   const handleImageAdd = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
     input.multiple = true;
-    
+
     input.onchange = (e) => {
       const files = (e.target as HTMLInputElement).files;
       if (files) {
         const fileArray = Array.from(files);
-        setImages(prev => [...prev, ...fileArray]);
-        
+        setImages((prev) => [...prev, ...fileArray]);
+
         // プレビュー用のURLを生成
-        const previewUrls = fileArray.map(file => URL.createObjectURL(file));
-        setImagePreviewUrls(prev => [...prev, ...previewUrls]);
+        const previewUrls = fileArray.map((file) => URL.createObjectURL(file));
+        setImagePreviewUrls((prev) => [...prev, ...previewUrls]);
       }
     };
-    
+
     input.click();
   };
 
   const handleImageRemove = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-    setImagePreviewUrls(prev => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviewUrls((prev) => {
       // メモリリークを避けるために古いURLを削除
       URL.revokeObjectURL(prev[index]);
       return prev.filter((_, i) => i !== index);
@@ -115,7 +119,7 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
             width={48}
             height={48}
           />
-          
+
           {/* 投稿作成エリア */}
           <div className="flex-1">
             <textarea
@@ -127,7 +131,7 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
               maxLength={characterLimit}
               disabled={isSubmitting}
             />
-            
+
             {/* 添付画像プレビュー */}
             {imagePreviewUrls.length > 0 && (
               <div className="mt-3 grid grid-cols-2 gap-2">
@@ -151,14 +155,10 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
                 ))}
               </div>
             )}
-            
+
             {/* エラーメッセージ */}
-            {error && (
-              <div className="mt-2 text-red-500 text-sm">
-                {error}
-              </div>
-            )}
-            
+            {error && <div className="mt-2 text-red-500 text-sm">{error}</div>}
+
             {/* 投稿ボタンエリア */}
             <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
               <div className="flex items-center gap-4">
@@ -172,34 +172,38 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
                 >
                   <IconPhoto size={20} />
                 </button>
-                
+
                 {/* 文字数カウンター */}
-                <span className={`text-sm ${
-                  remainingChars < 20 
-                    ? remainingChars < 0 
-                      ? 'text-red-500' 
-                      : 'text-orange-500'
-                    : 'text-gray-500'
-                }`}>
+                <span
+                  className={`text-sm ${
+                    remainingChars < 20
+                      ? remainingChars < 0
+                        ? "text-red-500"
+                        : "text-orange-500"
+                      : "text-gray-500"
+                  }`}
+                >
                   {remainingChars}
                 </span>
               </div>
-              
+
               {/* 投稿ボタン */}
               <button
                 type="submit"
                 disabled={
-                  isSubmitting || 
-                  (!content.trim() && images.length === 0) || 
+                  isSubmitting ||
+                  (!content.trim() && images.length === 0) ||
                   remainingChars < 0
                 }
                 className={`px-6 py-2 rounded-full font-bold text-sm transition-colors ${
-                  isSubmitting || (!content.trim() && images.length === 0) || remainingChars < 0
-                    ? 'bg-blue-300 text-white cursor-not-allowed'
-                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                  isSubmitting ||
+                  (!content.trim() && images.length === 0) ||
+                  remainingChars < 0
+                    ? "bg-blue-300 text-white cursor-not-allowed"
+                    : "bg-blue-500 text-white hover:bg-blue-600"
                 }`}
               >
-                {isSubmitting ? '投稿中...' : '投稿'}
+                {isSubmitting ? "投稿中..." : "投稿"}
               </button>
             </div>
           </div>

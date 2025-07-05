@@ -8,6 +8,7 @@
     "dev": "concurrently \"pnpm run dev:frontend\" \"pnpm run dev:backend\""
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "lefthook": "^1.11.16"
   }
 }

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 const MyProfile = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
-  
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
@@ -16,7 +16,7 @@ const MyProfile = () => {
       router.replace(`/profile/${session.user.id}`);
     }
   }, [status, session?.user?.id, router]);
-  
+
   // ローディング中またはリダイレクト待ち
   return (
     <div className="w-full h-screen flex items-center justify-center">

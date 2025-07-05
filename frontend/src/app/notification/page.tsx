@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react"
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 import SimpleLayout from "@/components/layout/SimpleLayout";
@@ -24,7 +24,7 @@ export default function Notification() {
           <div>Loading...</div>
         </div>
       </SimpleLayout>
-    )
+    );
   }
   if (!session) {
     return null;
@@ -33,12 +33,10 @@ export default function Notification() {
   return (
     <SimpleLayout>
       <div className="flex flex-col items-center justify-center h-screen gap-8">
-        <div>
-          このページは誠意開発中です。
-        </div>
+        <div>このページは誠意開発中です。</div>
         <Button
           onClick={() => {
-            redirect("/")
+            redirect("/");
           }}
           type="button"
           className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600"
@@ -47,5 +45,5 @@ export default function Notification() {
         </Button>
       </div>
     </SimpleLayout>
-  )
+  );
 }

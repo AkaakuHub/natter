@@ -8,13 +8,13 @@ import { redirect } from "next/navigation";
 
 const Home = () => {
   const { status } = useSession();
-  
+
   useEffect(() => {
     if (status === "unauthenticated") {
       redirect("/login");
     }
   }, [status]);
-  
+
   if (status === "loading") {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -22,7 +22,7 @@ const Home = () => {
       </div>
     );
   }
-  
+
   return (
     <NavigationStackProvider>
       <TwitterLikeLayout />

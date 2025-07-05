@@ -1,2 +1,2 @@
-export { PostsApi } from './posts';
-export * from './types';
+export { PostsApi } from "./posts";
+export * from "./types";

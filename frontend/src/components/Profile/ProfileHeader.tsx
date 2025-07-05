@@ -25,13 +25,13 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
     if (lastUserIdRef.current === userId) {
       return;
     }
-    
+
     lastUserIdRef.current = userId;
-    
+
     if (userId && userId !== session.user?.id) {
       setLoading(true);
       UsersApi.getUserById(userId)
-        .then(user => setTargetUser(user))
+        .then((user) => setTargetUser(user))
         .catch(() => setTargetUser(null))
         .finally(() => setLoading(false));
     } else {
@@ -66,7 +66,10 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
   return (
     <div>
       <div
-        className={clsx("h-16 w-full flex items-center justify-center ease-in-out duration-500", applyAnimation ? "animate-fade-in" : "")}
+        className={clsx(
+          "h-16 w-full flex items-center justify-center ease-in-out duration-500",
+          applyAnimation ? "animate-fade-in" : "",
+        )}
         style={{
           backgroundColor: bgColor,
         }}
@@ -80,8 +83,12 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
           className="rounded-full border-4 border-white absolute -top-12"
         />
         <div className="mt-12 p-2">
-          <div className="text-2xl font-bold text-center">{displayUser?.name ?? "No Name"}</div>
-          <div className="text-sm text-gray-500">@{displayUser?.id ?? "no_id"}</div>
+          <div className="text-2xl font-bold text-center">
+            {displayUser?.name ?? "No Name"}
+          </div>
+          <div className="text-sm text-gray-500">
+            @{displayUser?.id ?? "no_id"}
+          </div>
         </div>
       </div>
     </div>

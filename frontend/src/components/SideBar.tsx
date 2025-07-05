@@ -33,18 +33,14 @@ const SideBar = ({ session }: { session: ExtendedSession }) => {
           href={`/profile/${session.user?.id}`}
         >
           <IconUser className="w-6 h-6 mr-2" />
-          <span>
-          プロフィール
-          </span>
+          <span>プロフィール</span>
         </Link>
         <button
           className="w-full text-left px-4 py-2 text-lg font-semibold bg-red-500 text-white rounded-md hover:bg-red-600 flex items-center"
           onClick={() => signOut()}
         >
           <IconLogout className="w-6 h-6 mr-2" />
-          <span>
-          ログアウト
-          </span>
+          <span>ログアウト</span>
         </button>
       </div>
     </div>

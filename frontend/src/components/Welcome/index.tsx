@@ -20,18 +20,18 @@ const Welcome = ({ session, onUserCreated }: WelcomeProps) => {
       setIsCreating(true);
       setError(null);
 
-      console.log('Creating user with session:', session);
+      console.log("Creating user with session:", session);
 
       const userData = {
         twitterId: session.user.id,
         name: session.user.name || "Unknown User",
         image: session.user.image || undefined,
       };
-      
-      console.log('User data to create:', userData);
-      
+
+      console.log("User data to create:", userData);
+
       const createdUser = await UsersApi.createUser(userData);
-      console.log('Created user:', createdUser);
+      console.log("Created user:", createdUser);
 
       await onUserCreated();
     } catch (err) {
@@ -49,9 +49,7 @@ const Welcome = ({ session, onUserCreated }: WelcomeProps) => {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
             初めまして！
           </h1>
-          <p className="text-gray-600">
-            Natterへようこそ🎉
-          </p>
+          <p className="text-gray-600">Natterへようこそ🎉</p>
         </div>
 
         <div className="mb-6">
@@ -72,16 +70,13 @@ const Welcome = ({ session, onUserCreated }: WelcomeProps) => {
 
         <div className="mb-6">
           <p className="text-gray-600 text-sm">
-            Twitterアカウントでログインが完了しました。<br />
+            Twitterアカウントでログインが完了しました。
+            <br />
             アカウントを作成して今すぐ始めましょう！
           </p>
         </div>
 
-        {error && (
-          <div className="mb-4 text-red-500 text-sm">
-            {error}
-          </div>
-        )}
+        {error && <div className="mb-4 text-red-500 text-sm">{error}</div>}
 
         <Button
           onClick={handleCreateUser}

@@ -1,7 +1,7 @@
 import React from "react";
 
 const TabKinds = ["tweets", "media", "likes"] as const;
-export type TabType = typeof TabKinds[number];
+export type TabType = (typeof TabKinds)[number];
 
 const TabNames: Record<TabType, string> = {
   tweets: "ポスト",
@@ -27,10 +27,11 @@ const TabsComponent = ({ activeTab, onTabChange }: TabsComponentProps) => {
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id as TabType)}
-            className={`py-2 w-full ${activeTab === tab.id
-              ? "border-b-2 border-blue-500 font-bold"
-              : "text-gray-500"
-              }`}
+            className={`py-2 w-full ${
+              activeTab === tab.id
+                ? "border-b-2 border-blue-500 font-bold"
+                : "text-gray-500"
+            }`}
           >
             {tab.label}
           </button>

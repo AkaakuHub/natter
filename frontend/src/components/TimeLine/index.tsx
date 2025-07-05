@@ -16,15 +16,14 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-
   const fetchPosts = async () => {
     try {
       setLoading(true);
       const fetchedPosts = await PostsApi.getAllPosts();
       setPosts(fetchedPosts);
     } catch (err) {
-      console.error('Failed to fetch posts:', err);
-      setError('Failed to load posts');
+      console.error("Failed to fetch posts:", err);
+      setError("Failed to load posts");
     } finally {
       setLoading(false);
     }
@@ -61,18 +60,18 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
     <div className="w-full max-w-md mx-auto">
       {/* ポスト作成エリア */}
       {currentUser && (
-        <CreatePost 
+        <CreatePost
           currentUser={currentUser}
           onPostCreated={handlePostCreated}
         />
       )}
-      
+
       {/* 投稿一覧 */}
-      {posts.map(post => {
+      {posts.map((post) => {
         if (!post.author) {
           return null;
         }
-        
+
         // Convert API data format to component format
         const user: User = post.author;
         const transformedUser = {
@@ -82,14 +81,18 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
         const transformedPost = {
           id: post.id,
           userId: post.authorId || "",
-          content: post.content || '',
+          content: post.content || "",
           images: post.images || [],
           createdAt: post.createdAt,
-          liked: post.likes?.map(like => like.userId) || [],
+          liked: post.likes?.map((like) => like.userId) || [],
         };
-        
+
         return (
-          <PostComponent key={post.id} user={transformedUser} post={transformedPost} />
+          <PostComponent
+            key={post.id}
+            user={transformedUser}
+            post={transformedPost}
+          />
         );
       })}
     </div>

@@ -9,7 +9,12 @@ interface HeaderProps {
   onMenuClick?: () => void;
 }
 
-const Header = ({ profileImage, profileOnClick, progress, onMenuClick }: HeaderProps) => {
+const Header = ({
+  profileImage,
+  profileOnClick,
+  progress,
+  onMenuClick,
+}: HeaderProps) => {
   return (
     <header className="h-[64px] border-b border-gray-200 p-4 relative flex items-center justify-between">
       {/* Left side - Menu button (mobile) or Profile image */}

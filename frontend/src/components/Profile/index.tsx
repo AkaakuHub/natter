@@ -28,14 +28,14 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
     const fetchUserPosts = async () => {
       const targetUserId = userId || session.user?.id;
       if (!targetUserId) return;
-      
+
       // 同じユーザーIDの場合は再実行しない
       if (lastTargetUserIdRef.current === targetUserId) {
         return;
       }
-      
+
       lastTargetUserIdRef.current = targetUserId;
-      
+
       try {
         setLoading(true);
         setError(null);
@@ -44,13 +44,15 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
           PostsApi.getMediaPosts(),
           PostsApi.getLikedPosts(targetUserId),
         ]);
-        
+
         setPosts(userPosts);
-        setMediaPosts(userMediaPosts.filter(post => post.authorId === targetUserId));
+        setMediaPosts(
+          userMediaPosts.filter((post) => post.authorId === targetUserId),
+        );
         setLikedPosts(userLikedPosts);
       } catch (err) {
-        console.error('Failed to fetch user posts:', err);
-        setError('Failed to load posts');
+        console.error("Failed to fetch user posts:", err);
+        setError("Failed to load posts");
       } finally {
         setLoading(false);
       }
@@ -58,8 +60,6 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
 
     fetchUserPosts();
   }, [session.user?.id, userId]);
-
-  
 
   const handleTabChange = (tab: TabType) => setActiveTab(tab);
 
@@ -88,23 +88,32 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
   }
 
   const renderTabContent = () => {
-    const currentPosts = activeTab === "tweets" ? posts : activeTab === "media" ? mediaPosts : likedPosts;
-    
+    const currentPosts =
+      activeTab === "tweets"
+        ? posts
+        : activeTab === "media"
+          ? mediaPosts
+          : likedPosts;
+
     if (loading) {
       return <div className="text-center py-8">Loading...</div>;
     }
-    
+
     if (error) {
       return <div className="text-center py-8 text-red-500">{error}</div>;
     }
-    
+
     if (currentPosts.length === 0) {
-      return <div className="text-center py-8">まだ{TabNames[activeTab]}はありません</div>;
+      return (
+        <div className="text-center py-8">
+          まだ{TabNames[activeTab]}はありません
+        </div>
+      );
     }
-    
+
     return currentPosts.map((post) => {
       if (!post.author) return null;
-      
+
       const user: User = post.author;
       const transformedUser = {
         ...user,
@@ -113,13 +122,19 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
       const transformedPost = {
         id: post.id,
         userId: post.authorId || "",
-        content: post.content || '',
+        content: post.content || "",
         images: post.images || [],
         createdAt: post.createdAt,
-        liked: post.likes?.map(like => like.userId) || [],
+        liked: post.likes?.map((like) => like.userId) || [],
       };
-      
-      return <PostComponent key={post.id} user={transformedUser} post={transformedPost} />;
+
+      return (
+        <PostComponent
+          key={post.id}
+          user={transformedUser}
+          post={transformedPost}
+        />
+      );
     });
   };
 

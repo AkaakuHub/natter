@@ -3,16 +3,25 @@
 import React, { useState, useEffect } from "react";
 
 import Image from "next/image";
-import { IconHeart, IconMessageCircle, IconShare, IconArrowLeft } from "@tabler/icons-react";
+import {
+  IconHeart,
+  IconMessageCircle,
+  IconShare,
+  IconArrowLeft,
+} from "@tabler/icons-react";
 import { PostsApi, Post, User } from "@/api";
-import { useNavigation } from '@/hooks/useNavigation';
+import { useNavigation } from "@/hooks/useNavigation";
+import ImageModal from "@/components/ImageModal";
 
 interface DetailedPostComponentProps {
   postId: string;
   currentUser?: User | null;
 }
 
-const DetailedPostComponent = ({ postId, currentUser }: DetailedPostComponentProps) => {
+const DetailedPostComponent = ({
+  postId,
+  currentUser,
+}: DetailedPostComponentProps) => {
   const { goBack, navigateToProfile } = useNavigation();
   const currentUserId = currentUser?.id;
   const [post, setPost] = useState<Post | null>(null);
@@ -21,19 +30,20 @@ const DetailedPostComponent = ({ postId, currentUser }: DetailedPostComponentPro
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isLiking, setIsLiking] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<{ src: string; alt: string } | null>(null);
 
   useEffect(() => {
     const fetchPost = async () => {
       // postIdの妥当性をチェック
-      if (!postId || postId === 'undefined' || postId === 'null') {
-        setError('投稿IDが無効です');
+      if (!postId || postId === "undefined" || postId === "null") {
+        setError("投稿IDが無効です");
         setLoading(false);
         return;
       }
 
       const numericPostId = parseInt(postId);
       if (isNaN(numericPostId)) {
-        setError('投稿IDが無効です');
+        setError("投稿IDが無効です");
         setLoading(false);
         return;
       }
@@ -42,11 +52,17 @@ const DetailedPostComponent = ({ postId, currentUser }: DetailedPostComponentPro
         setLoading(true);
         const fetchedPost = await PostsApi.getPostById(numericPostId);
         setPost(fetchedPost);
-        setIsLiked(currentUserId ? fetchedPost.likes?.some(like => like.userId === currentUserId) || false : false);
+        setIsLiked(
+          currentUserId
+            ? fetchedPost.likes?.some(
+                (like) => like.userId === currentUserId,
+              ) || false
+            : false,
+        );
         setLikeCount(fetchedPost.likes?.length || 0);
       } catch (err) {
-        console.error('Failed to fetch post:', err);
-        setError('投稿の読み込みに失敗しました');
+        console.error("Failed to fetch post:", err);
+        setError("投稿の読み込みに失敗しました");
       } finally {
         setLoading(false);
       }
@@ -58,17 +74,17 @@ const DetailedPostComponent = ({ postId, currentUser }: DetailedPostComponentPro
   const handleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (isLiking || !currentUserId || !post) return;
-    
+
     try {
       setIsLiking(true);
       const response = await PostsApi.likePost(post.id, currentUserId);
-      
+
       setIsLiked(response.liked);
-      setLikeCount(prev => response.liked ? prev + 1 : prev - 1);
+      setLikeCount((prev) => (response.liked ? prev + 1 : prev - 1));
     } catch (error) {
-      console.error('Failed to like post:', error);
+      console.error("Failed to like post:", error);
     } finally {
       setIsLiking(false);
     }
@@ -84,6 +100,14 @@ const DetailedPostComponent = ({ postId, currentUser }: DetailedPostComponentPro
       hour12: false,
     };
     return new Intl.DateTimeFormat("ja-JP", options).format(new Date(date));
+  };
+
+  const handleImageClick = (imageSrc: string, imageAlt: string) => {
+    setSelectedImage({ src: imageSrc, alt: imageAlt });
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
   };
 
   if (loading) {
@@ -118,7 +142,7 @@ const DetailedPostComponent = ({ postId, currentUser }: DetailedPostComponentPro
             <div className="text-red-500 text-lg font-medium">
               {error || "ポストが見つかりませんでした"}
             </div>
-            <button 
+            <button
               onClick={goBack}
               className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
             >
@@ -136,11 +160,14 @@ const DetailedPostComponent = ({ postId, currentUser }: DetailedPostComponentPro
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
       <div className="max-w-2xl mx-auto px-4 py-8">
         {/* Back button */}
-        <button 
+        <button
           onClick={goBack}
           className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors group"
         >
-          <IconArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+          <IconArrowLeft
+            size={20}
+            className="group-hover:-translate-x-1 transition-transform"
+          />
           <span className="font-medium">戻る</span>
         </button>
 
@@ -149,7 +176,7 @@ const DetailedPostComponent = ({ postId, currentUser }: DetailedPostComponentPro
           {/* User header */}
           <div className="p-6 border-b border-gray-100">
             <div className="flex items-center space-x-4">
-              <button 
+              <button
                 onClick={() => navigateToProfile(user?.id)}
                 className="flex-shrink-0"
               >
@@ -162,7 +189,7 @@ const DetailedPostComponent = ({ postId, currentUser }: DetailedPostComponentPro
                 />
               </button>
               <div className="flex-1">
-                <button 
+                <button
                   onClick={() => navigateToProfile(user?.id)}
                   className="hover:underline"
                 >
@@ -170,9 +197,7 @@ const DetailedPostComponent = ({ postId, currentUser }: DetailedPostComponentPro
                     {user?.name}
                   </h1>
                 </button>
-                <p className="text-gray-500 text-sm mt-1">
-                  @{user?.id}
-                </p>
+                <p className="text-gray-500 text-sm mt-1">@{user?.id}</p>
               </div>
             </div>
           </div>
@@ -187,18 +212,30 @@ const DetailedPostComponent = ({ postId, currentUser }: DetailedPostComponentPro
 
             {/* Images */}
             {post.images && post.images.length > 0 && (
-              <div className={`mt-6 ${post.images.length === 1 ? 'flex justify-center' : 'grid grid-cols-2 gap-3'}`}>
-                {post.images.map((image, idx) => (
-                  <div key={idx} className="relative group overflow-hidden rounded-xl">
-                    <Image
-                      src={`http://localhost:8000/uploads/${image}`}
-                      alt={`Post image ${idx + 1}`}
-                      width={512}
-                      height={512}
-                      className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                ))}
+              <div
+                className={`mt-6 ${post.images.length === 1 ? "flex justify-center" : "grid grid-cols-2 gap-3"}`}
+              >
+                {post.images.map((image, idx) => {
+                  // 完全URLか相対パスかを判定
+                  const isFullUrl = image.startsWith('http://') || image.startsWith('https://');
+                  const imageSrc = isFullUrl ? image : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
+                  
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => handleImageClick(imageSrc, `Post image ${idx + 1}`)}
+                      className="relative group overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    >
+                      <Image
+                        src={imageSrc}
+                        alt={`Post image ${idx + 1}`}
+                        width={512}
+                        height={512}
+                        className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
+                      />
+                    </button>
+                  );
+                })}
               </div>
             )}
 
@@ -213,28 +250,28 @@ const DetailedPostComponent = ({ postId, currentUser }: DetailedPostComponentPro
           {/* Action buttons */}
           <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
             <div className="flex items-center justify-around">
-              <button 
+              <button
                 onClick={handleLike}
                 disabled={isLiking || !currentUserId}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
-                  isLiked 
-                    ? 'text-red-500 bg-red-50 hover:bg-red-100' 
-                    : 'text-gray-600 hover:text-red-500 hover:bg-red-50'
-                } ${isLiking || !currentUserId ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
+                  isLiked
+                    ? "text-red-500 bg-red-50 hover:bg-red-100"
+                    : "text-gray-600 hover:text-red-500 hover:bg-red-50"
+                } ${isLiking || !currentUserId ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}`}
               >
-                <IconHeart 
-                  size={20} 
-                  fill={isLiked ? 'currentColor' : 'none'} 
-                  className={isLiked ? 'animate-pulse' : ''}
+                <IconHeart
+                  size={20}
+                  fill={isLiked ? "currentColor" : "none"}
+                  className={isLiked ? "animate-pulse" : ""}
                 />
                 <span className="font-medium">{likeCount}</span>
               </button>
-              
+
               <button className="flex items-center gap-2 px-4 py-2 rounded-full text-gray-600 hover:text-blue-500 hover:bg-blue-50 transition-all duration-200 hover:scale-105">
                 <IconMessageCircle size={20} />
                 <span className="font-medium">0</span>
               </button>
-              
+
               <button className="flex items-center gap-2 px-4 py-2 rounded-full text-gray-600 hover:text-green-500 hover:bg-green-50 transition-all duration-200 hover:scale-105">
                 <IconShare size={20} />
                 <span className="font-medium">シェア</span>
@@ -243,6 +280,16 @@ const DetailedPostComponent = ({ postId, currentUser }: DetailedPostComponentPro
           </div>
         </div>
       </div>
+
+      {/* 画像モーダル */}
+      {selectedImage && (
+        <ImageModal
+          isOpen={!!selectedImage}
+          imageSrc={selectedImage.src}
+          imageAlt={selectedImage.alt}
+          onClose={closeImageModal}
+        />
+      )}
     </div>
   );
 };

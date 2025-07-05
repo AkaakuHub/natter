@@ -11,13 +11,13 @@ const ProfileById = () => {
   const { data: session, status } = useSession();
   const params = useParams<{ id: string }>();
   const userId = params.id;
-  
+
   useEffect(() => {
     if (status === "unauthenticated") {
       redirect("/login");
     }
   }, [status]);
-  
+
   if (status === "loading") {
     return (
       <SimpleLayout>
@@ -25,13 +25,13 @@ const ProfileById = () => {
           <div>Loading...</div>
         </div>
       </SimpleLayout>
-    )
+    );
   }
-  
+
   if (!session) {
     return null;
   }
-  
+
   return (
     <SimpleLayout>
       <ProfileComponent session={session as ExtendedSession} userId={userId} />

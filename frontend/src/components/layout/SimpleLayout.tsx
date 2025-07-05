@@ -1,24 +1,25 @@
 "use client";
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigation } from '@/hooks/useNavigation';
-import { useSwipeGestures } from '@/hooks/useSwipeGestures';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
-import SideBar from '@/components/SideBar';
-import Header from './Header';
-import { FooterMenu } from '../FooterMenu';
-import Welcome from '../Welcome';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigation } from "@/hooks/useNavigation";
+import { useSwipeGestures } from "@/hooks/useSwipeGestures";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import SideBar from "@/components/SideBar";
+import Header from "./Header";
+import { FooterMenu } from "../FooterMenu";
+import Welcome from "../Welcome";
 
 interface SimpleLayoutProps {
   children: React.ReactNode;
 }
 
 const SimpleLayout = ({ children }: SimpleLayoutProps) => {
-  const { session, userExists, isLoading, createUserAndRefresh } = useCurrentUser();
+  const { session, userExists, isLoading, createUserAndRefresh } =
+    useCurrentUser();
   const { getCurrentPath, navigateToProfile } = useNavigation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+
   const path = getCurrentPath();
 
   // Swipe gestures for mobile
@@ -39,21 +40,14 @@ const SimpleLayout = ({ children }: SimpleLayoutProps) => {
     return (
       <div className="w-full h-screen">
         <Header progress={1} />
-        <div className="pt-16 pb-16 h-full overflow-y-auto">
-          {children}
-        </div>
+        <div className="pt-16 pb-16 h-full overflow-y-auto">{children}</div>
         <FooterMenu path={path} />
       </div>
     );
   }
 
   if (userExists === false && session) {
-    return (
-      <Welcome 
-        session={session} 
-        onUserCreated={createUserAndRefresh} 
-      />
-    );
+    return <Welcome session={session} onUserCreated={createUserAndRefresh} />;
   }
 
   return (
@@ -78,7 +72,7 @@ const SimpleLayout = ({ children }: SimpleLayoutProps) => {
               initial={{ x: -300 }}
               animate={{ x: 0 }}
               exit={{ x: -300 }}
-              transition={{ type: 'tween', duration: 0.3 }}
+              transition={{ type: "tween", duration: 0.3 }}
               className="fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-50 md:hidden"
             >
               <SideBar session={session} />
@@ -97,7 +91,7 @@ const SimpleLayout = ({ children }: SimpleLayoutProps) => {
             onMenuClick={() => setSidebarOpen(true)}
           />
         )}
-        
+
         <div className="flex-1 overflow-y-auto bg-gray-50">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -48,7 +48,7 @@ export function FooterMenu({ path }: BottomMenuProps) {
               onClick={() => handleNavigation(item.href)}
               className={clsx(
                 "flex flex-col items-center justify-center w-full text-center transition-all duration-300",
-                availableColor(path, item.href)
+                availableColor(path, item.href),
               )}
             >
               <IconComponent className="h-6 w-6" />

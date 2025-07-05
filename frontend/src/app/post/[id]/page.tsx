@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { redirect, useParams } from 'next/navigation'
+import { redirect, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import SimpleLayout from "@/components/layout/SimpleLayout";
 import DetailedPostComponent from "@/components/DetailedPost";
@@ -18,7 +18,7 @@ const Post = () => {
       redirect("/login");
     }
   }, [status]);
-  
+
   if (isNaN(parseInt(postId))) {
     return (
       <SimpleLayout>
@@ -43,9 +43,7 @@ const Post = () => {
     return null;
   }
 
-  return (
-    <DetailedPostComponent postId={postId} currentUser={currentUser} />
-  )
-}
+  return <DetailedPostComponent postId={postId} currentUser={currentUser} />;
+};
 
 export default Post;
