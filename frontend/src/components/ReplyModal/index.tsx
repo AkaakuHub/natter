@@ -86,20 +86,20 @@ const ReplyModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/20 p-4">
-      <div className="bg-white rounded-lg max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto">
+      <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto">
         {/* ヘッダー */}
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <h2 className="text-lg font-semibold">リプライを投稿</h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 rounded-full p-2 transition-colors duration-200"
           >
-            <IconX size={24} />
+            <IconX size={20} />
           </button>
         </div>
 
         {/* 元の投稿 */}
-        <div className="p-4 border-b bg-gray-50">
+        <div className="p-4 border-b border-gray-100">
           <div className="flex gap-3">
             <Image
               src={replyToPost.author.image || "/no_avatar_image_128x128.png"}
@@ -109,10 +109,10 @@ const ReplyModal = ({
               height={40}
             />
             <div className="flex-1">
-              <div className="font-medium text-sm">
+              <div className="font-medium text-sm text-gray-900">
                 {replyToPost.author.name}
               </div>
-              <div className="text-gray-700 text-sm mt-1">
+              <div className="text-gray-600 text-sm mt-1">
                 {replyToPost.content}
               </div>
             </div>
@@ -167,13 +167,13 @@ const ReplyModal = ({
           </div>
 
           {/* ボタンエリア */}
-          <div className="flex items-center justify-between mt-4 pt-4 border-t">
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
             <div className="flex items-center gap-4">
               <button
                 type="button"
                 onClick={handleImageAdd}
                 disabled={isSubmitting}
-                className="text-blue-500 hover:text-blue-600 disabled:opacity-50"
+                className="text-blue-500 hover:text-blue-600 disabled:opacity-50 transition-colors duration-200"
               >
                 <IconPhoto size={20} />
               </button>
@@ -197,12 +197,12 @@ const ReplyModal = ({
                 (!content.trim() && images.length === 0) ||
                 remainingChars < 0
               }
-              className={`px-6 py-2 rounded-full font-bold text-sm transition-colors ${
+              className={`px-6 py-2 rounded-full font-semibold text-sm transition-all duration-200 ${
                 isSubmitting ||
                 (!content.trim() && images.length === 0) ||
                 remainingChars < 0
-                  ? "bg-blue-300 text-white cursor-not-allowed"
-                  : "bg-blue-500 text-white hover:bg-blue-600"
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  : "bg-blue-500 text-white hover:bg-blue-600 hover:shadow-lg"
               }`}
             >
               {isSubmitting ? "送信中..." : "リプライ"}
