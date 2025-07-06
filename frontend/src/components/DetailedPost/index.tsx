@@ -164,8 +164,10 @@ const DetailedPostComponent = ({
     const newReply = await response.json();
     setReplies((prev) => [...prev, newReply]);
 
-    // トースト通知を表示
-    showToast("リプライをしました。", "success");
+    // トースト通知を表示（クリックで作成したリプライへ遷移）
+    showToast("リプライをしました。", "success", 3000, () => {
+      navigateToPost(newReply.id);
+    });
   };
 
   if (loading) {

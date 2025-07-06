@@ -142,11 +142,16 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
       throw new Error("Failed to create reply");
     }
 
+    // 作成されたリプライの情報を取得
+    const newReply = await response.json();
+
     // リプライカウントを増加
     setReplyCount((prev) => prev + 1);
 
-    // トースト通知を表示
-    showToast("リプライをしました。", "success");
+    // トースト通知を表示（クリックで作成したリプライへ遷移）
+    showToast("リプライをしました。", "success", 3000, () => {
+      navigateToPost(newReply.id);
+    });
   };
 
   return (

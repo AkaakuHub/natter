@@ -5,6 +5,7 @@ import Image from "next/image";
 import { IconPhoto, IconX } from "@tabler/icons-react";
 import { User } from "@/api";
 import { useToast } from "@/hooks/useToast";
+import { useNavigation } from "@/hooks/useNavigation";
 
 interface CreatePostProps {
   onPostCreated?: () => void;
@@ -18,6 +19,7 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { showToast } = useToast();
+  const { navigateToPost } = useNavigation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,14 +65,19 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
         throw new Error("投稿の作成に失敗しました");
       }
 
+      // 作成されたポストの情報を取得
+      const newPost = await response.json();
+
       // 成功時の処理
       setContent("");
       setImages([]);
       setImagePreviewUrls([]);
       onPostCreated?.();
 
-      // トースト通知を表示
-      showToast("投稿を作成しました。", "success");
+      // トースト通知を表示（クリックで作成したポストへ遷移）
+      showToast("投稿を作成しました。", "success", 3000, () => {
+        navigateToPost(newPost.id);
+      });
     } catch (err) {
       console.error("Failed to create post:", err);
       setError("投稿の作成に失敗しました");

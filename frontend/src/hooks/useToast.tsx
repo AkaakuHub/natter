@@ -8,10 +8,11 @@ interface ToastData {
   message: string;
   type: ToastType;
   duration?: number;
+  onClick?: () => void;
 }
 
 interface ToastContextType {
-  showToast: (message: string, type?: ToastType, duration?: number) => void;
+  showToast: (message: string, type?: ToastType, duration?: number, onClick?: () => void) => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -20,9 +21,9 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
   const showToast = useCallback(
-    (message: string, type: ToastType = "info", duration: number = 3000) => {
+    (message: string, type: ToastType = "info", duration: number = 3000, onClick?: () => void) => {
       const id = Math.random().toString(36).substr(2, 9);
-      setToasts((prev) => [...prev, { id, message, type, duration }]);
+      setToasts((prev) => [...prev, { id, message, type, duration, onClick }]);
     },
     [],
   );
@@ -41,6 +42,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
           type={toast.type}
           duration={toast.duration}
           onClose={() => removeToast(toast.id)}
+          onClick={toast.onClick}
         />
       ))}
     </ToastContext.Provider>

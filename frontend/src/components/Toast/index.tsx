@@ -16,6 +16,7 @@ interface ToastProps {
   type?: ToastType;
   duration?: number;
   onClose: () => void;
+  onClick?: () => void;
 }
 
 const Toast = ({
@@ -23,6 +24,7 @@ const Toast = ({
   type = "info",
   duration = 3000,
   onClose,
+  onClick,
 }: ToastProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
@@ -69,9 +71,12 @@ const Toast = ({
       className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ${
         isLeaving ? "opacity-0 -translate-y-4" : "opacity-100 translate-y-0"
       }`}
+      onClick={onClick}
     >
       <div
-        className={`flex items-center gap-4 px-6 py-4 rounded-2xl shadow-2xl ${colors[type]} min-w-[350px] max-w-[600px] backdrop-blur-lg transform transition-all duration-300 hover:scale-105`}
+        className={`flex items-center gap-4 px-6 py-4 rounded-2xl shadow-2xl ${colors[type]} min-w-[350px] max-w-[600px] backdrop-blur-lg transform transition-all duration-300 hover:scale-105 ${
+          onClick ? "cursor-pointer" : ""
+        }`}
       >
         <div className="flex-shrink-0 bg-white/20 rounded-full p-2">
           {icons[type]}
