@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
-    "knip": "knip"
+    "knip": "knip",
+    "clean": "rm -rf .next node_modules pnpm-lock.yaml && pnpm install",
+    "clean:cache": "rm -rf .next node_modules/.cache"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
