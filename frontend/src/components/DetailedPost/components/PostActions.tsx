@@ -34,11 +34,7 @@ const PostActions = ({
               : "text-text-muted hover:text-error hover:bg-error-bg"
           } ${isLiking || !canInteract ? "opacity-50 cursor-not-allowed" : ""}`}
         >
-          <IconHeart
-            size={20}
-            fill={isLiked ? "currentColor" : "none"}
-            className={isLiked ? "animate-pulse" : ""}
-          />
+          <IconHeart size={20} fill={isLiked ? "currentColor" : "none"} />
           <span className="font-medium">{likeCount}</span>
         </button>
 
