@@ -53,7 +53,7 @@ const DropdownMenu = ({
     <div className="absolute top-full left-0 mt-2 w-56 bg-surface-elevated rounded-xl shadow-lg border border-border overflow-hidden z-50">
       <button
         onClick={onProfileClick}
-        className="w-full px-4 py-3 text-left hover:bg-surface-variant flex items-center gap-3 transition-colors"
+        className="w-full px-4 py-3 text-left hover:bg-surface-secondary flex items-center gap-3 transition-colors"
       >
         <IconUser size={20} className="text-text-secondary" />
         <span className="text-text font-medium">プロフィール</span>
@@ -72,7 +72,7 @@ const DropdownMenu = ({
               className={`flex items-center gap-2 w-full px-2 py-1 text-left text-sm rounded transition-colors ${
                 theme === themeType
                   ? "bg-interactive/10 text-interactive"
-                  : "text-text-secondary hover:bg-surface-variant"
+                  : "text-text-secondary hover:bg-surface-secondary"
               }`}
             >
               {getThemeIcon(themeType)}

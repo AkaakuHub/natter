@@ -5,7 +5,7 @@
   --color-surface: #ffffff;
   --color-surface-variant: #f8fafc;
   --color-surface-secondary: #f1f5f9;
-  --color-surface-elevated: #ffffff;
+  --color-surface-elevated: #e2e8f0;
 
   --color-text: #0f172a;
   --color-text-secondary: #475569;
@@ -76,7 +76,7 @@ body {
   --color-surface: #1e293b;
   --color-surface-variant: #334155;
   --color-surface-secondary: #475569;
-  --color-surface-elevated: #334155;
+  --color-surface-elevated: #3e4c6e;
 
   --color-text: #f8fafc;
   --color-text-secondary: #cbd5e1;
