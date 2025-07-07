@@ -49,10 +49,7 @@ const ReplyForm = ({
             disabled={isSubmitting}
           />
 
-          <ImagePreview
-            imageUrls={imagePreviewUrls}
-            onRemove={onImageRemove}
-          />
+          <ImagePreview imageUrls={imagePreviewUrls} onRemove={onImageRemove} />
         </div>
       </div>
 
