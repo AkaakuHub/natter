@@ -57,9 +57,9 @@ const PostActions = ({
         type="button"
         onClick={onSubmit}
         disabled={isSubmitting || !isValid}
-        className={`px-6 py-3 rounded-full font-bold text-sm transition-all duration-300 shadow-soft hover:shadow-glow hover:scale-105 ${
+        className={`px-6 py-2 rounded-full font-semibold text-sm transition-colors duration-200 ${
           isSubmitting || !isValid
-            ? "bg-gray-300 text-white cursor-not-allowed"
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
             : "bg-blue-500 text-white hover:bg-blue-600"
         }`}
       >

@@ -15,17 +15,17 @@ const ModalHeader = ({
   onClose,
 }: ModalHeaderProps) => {
   return (
-    <div className="absolute top-0 left-0 right-0 z-20 bg-white p-6">
+    <div className="flex-shrink-0 px-6 py-4">
       <div className="flex items-center justify-between">
         {hasMultiple && (
-          <div className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium">
+          <div className="text-gray-600 text-sm font-medium">
             {currentIndex + 1} / {totalImages}
           </div>
         )}
         <div className="flex-1"></div>
         <button
           onClick={onClose}
-          className="bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 rounded-full p-3 transition-colors duration-200"
+          className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-2 transition-colors duration-200"
         >
           <IconX size={20} />
         </button>

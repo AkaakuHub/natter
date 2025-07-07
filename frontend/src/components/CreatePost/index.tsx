@@ -82,9 +82,9 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
   };
 
   return (
-    <div className="border-b border-gray-100/60 p-6 bg-white/90 backdrop-blur-sm rounded-3xl mx-4 mb-6 shadow-soft hover:shadow-glow transition-all duration-300">
+    <div className="bg-white border-b border-gray-100 py-6 px-6">
       <form onSubmit={handleSubmit}>
-        <div className="flex gap-3">
+        <div className="flex gap-4">
           <UserAvatar user={currentUser} />
 
           <div className="flex-1">

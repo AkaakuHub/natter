@@ -8,19 +8,22 @@ interface ImageDisplayProps {
 
 const ImageDisplay = ({ currentImage, currentIndex }: ImageDisplayProps) => {
   return (
-    <div className="relative flex-1 flex items-center justify-center bg-gray-50 p-8 mt-20">
-      <div className="relative w-full h-full flex items-center justify-center">
-        <Image
-          src={currentImage}
-          alt={`画像 ${currentIndex + 1}`}
-          width={1200}
-          height={800}
-          className="max-w-full max-h-full object-contain rounded-2xl shadow-lg"
-          style={{ maxHeight: "calc(70vh - 10rem)" }}
-          quality={100}
-          priority
-        />
-      </div>
+    <div className="relative flex items-center justify-center w-full h-full">
+      <Image
+        src={currentImage}
+        alt={`画像 ${currentIndex + 1}`}
+        width={1200}
+        height={800}
+        className="max-w-[90vw] max-h-[90vh] object-contain"
+        style={{
+          maxWidth: "90vw",
+          maxHeight: "90vh",
+          width: "auto",
+          height: "auto",
+        }}
+        quality={100}
+        priority
+      />
     </div>
   );
 };
