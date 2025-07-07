@@ -36,7 +36,7 @@ export default function SetList() {
   return (
     <BaseLayout>
       <div className="flex flex-col items-center justify-center h-full gap-8 p-8">
-        <div className="text-lg text-gray-600">
+        <div className="text-lg text-text-secondary">
           このページは誠意開発中です。
         </div>
         <Button
@@ -44,7 +44,7 @@ export default function SetList() {
             router.push("/");
           }}
           type="button"
-          className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600"
+          className="bg-interactive text-text-inverse rounded-lg px-4 py-2 hover:bg-interactive-hover"
         >
           トップに戻る
         </Button>

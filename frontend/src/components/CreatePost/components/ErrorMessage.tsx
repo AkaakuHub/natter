@@ -7,7 +7,7 @@ interface ErrorMessageProps {
 const ErrorMessage = ({ error }: ErrorMessageProps) => {
   if (!error) return null;
 
-  return <div className="mt-2 text-red-500 text-sm">{error}</div>;
+  return <div className="mt-2 text-error text-sm">{error}</div>;
 };
 
 export default ErrorMessage;

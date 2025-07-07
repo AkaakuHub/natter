@@ -43,13 +43,11 @@ const Welcome = ({ session, onUserCreated }: WelcomeProps) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4">
-      <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full text-center">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-interactive-bg to-surface-variant p-4">
+      <div className="bg-surface rounded-lg shadow-lg p-8 max-w-md w-full text-center border border-border">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            初めまして！
-          </h1>
-          <p className="text-gray-600">Natterへようこそ🎉</p>
+          <h1 className="text-3xl font-bold text-text mb-2">初めまして！</h1>
+          <p className="text-text-secondary">Natterへようこそ🎉</p>
         </div>
 
         <div className="mb-6">
@@ -58,30 +56,30 @@ const Welcome = ({ session, onUserCreated }: WelcomeProps) => {
             alt={session.user.name || "User"}
             width={96}
             height={96}
-            className="rounded-full mx-auto border-4 border-blue-500"
+            className="rounded-full mx-auto border-4 border-interactive"
           />
-          <h2 className="text-xl font-semibold mt-4 text-gray-800">
+          <h2 className="text-xl font-semibold mt-4 text-text">
             {session.user.name}
           </h2>
           {session.user.email && (
-            <p className="text-gray-500">{session.user.email}</p>
+            <p className="text-text-muted">{session.user.email}</p>
           )}
         </div>
 
         <div className="mb-6">
-          <p className="text-gray-600 text-sm">
+          <p className="text-text-secondary text-sm">
             Twitterアカウントでログインが完了しました。
             <br />
             アカウントを作成して今すぐ始めましょう！
           </p>
         </div>
 
-        {error && <div className="mb-4 text-red-500 text-sm">{error}</div>}
+        {error && <div className="mb-4 text-error text-sm">{error}</div>}
 
         <Button
           onClick={handleCreateUser}
           disabled={isCreating}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+          className="w-full bg-interactive hover:bg-interactive-hover text-text-inverse font-bold py-3 px-6 rounded-lg transition-colors"
         >
           {isCreating ? "作成中..." : "アカウントを作成"}
         </Button>

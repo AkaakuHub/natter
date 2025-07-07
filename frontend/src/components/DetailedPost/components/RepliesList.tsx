@@ -13,9 +13,9 @@ const RepliesList = ({ replies }: RepliesListProps) => {
   }
 
   return (
-    <div className="border-t border-gray-100">
+    <div className="border-t border-border-muted">
       <div className="p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <h3 className="text-lg font-semibold text-text mb-4">
           リプライ ({replies.length})
         </h3>
         <div className="space-y-4">
@@ -26,7 +26,7 @@ const RepliesList = ({ replies }: RepliesListProps) => {
             const { transformedUser, transformedPost } = transformed;
 
             return (
-              <div key={reply.id} className="border border-gray-100 rounded-lg">
+              <div key={reply.id} className="border border-border rounded-lg">
                 <PostComponent user={transformedUser} post={transformedPost} />
               </div>
             );

@@ -18,7 +18,7 @@ const ProfileDropdown = ({
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-2 hover:bg-gray-100 rounded-full p-1 pr-3 transition-colors"
+      className="flex items-center gap-2 hover:bg-surface-variant rounded-full p-1 pr-3 transition-colors"
     >
       {profileImage ? (
         <Image
@@ -30,11 +30,11 @@ const ProfileDropdown = ({
           style={{ opacity: progress }}
         />
       ) : (
-        <div className="rounded-full w-8 h-8 bg-gray-300" />
+        <div className="rounded-full w-8 h-8 bg-surface-variant" />
       )}
       <IconChevronDown
         size={16}
-        className={`text-gray-600 transition-transform ${
+        className={`text-text-muted transition-transform ${
           isOpen ? "rotate-180" : ""
         }`}
       />

@@ -21,7 +21,7 @@ const TabsComponent = ({ activeTab, onTabChange }: TabsComponentProps) => {
   }));
 
   return (
-    <div className="border-b border-gray-300">
+    <div className="border-b border-border">
       <div className="flex justify-around">
         {tabs.map((tab) => (
           <button
@@ -29,8 +29,8 @@ const TabsComponent = ({ activeTab, onTabChange }: TabsComponentProps) => {
             onClick={() => onTabChange(tab.id as TabType)}
             className={`py-2 w-full ${
               activeTab === tab.id
-                ? "border-b-2 border-blue-500 font-bold"
-                : "text-gray-500"
+                ? "border-b-2 border-interactive font-bold text-text"
+                : "text-text-muted"
             }`}
           >
             {tab.label}

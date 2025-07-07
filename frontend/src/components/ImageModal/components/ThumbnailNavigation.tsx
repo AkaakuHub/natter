@@ -33,7 +33,7 @@ const ThumbnailNavigation = ({
   };
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 z-20 bg-white p-6">
+    <div className="absolute bottom-0 left-0 right-0 z-20 bg-surface p-6">
       <div className="flex items-center justify-center space-x-3 max-w-full overflow-x-auto pb-2">
         {images.slice(0, 8).map((image, index) => (
           <button
@@ -41,8 +41,8 @@ const ThumbnailNavigation = ({
             onClick={() => handleThumbnailClick(index)}
             className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 flex-shrink-0 ${
               index === currentIndex
-                ? "border-blue-500 ring-2 ring-blue-200 scale-110"
-                : "border-gray-200 hover:border-gray-300 hover:scale-105"
+                ? "border-interactive ring-2 ring-interactive-bg scale-110"
+                : "border-border hover:border-border-muted hover:scale-105"
             }`}
           >
             <Image
@@ -53,12 +53,14 @@ const ThumbnailNavigation = ({
               sizes="64px"
             />
             {index === currentIndex && (
-              <div className="absolute inset-0 bg-blue-500/20"></div>
+              <div className="absolute inset-0 bg-interactive/20"></div>
             )}
           </button>
         ))}
         {images.length > 8 && (
-          <div className="text-gray-500 text-sm px-2">+{images.length - 8}</div>
+          <div className="text-text-muted text-sm px-2">
+            +{images.length - 8}
+          </div>
         )}
       </div>
     </div>

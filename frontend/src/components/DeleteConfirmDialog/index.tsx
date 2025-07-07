@@ -38,22 +38,22 @@ const DeleteConfirmDialog = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/20"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-4">
+      <div className="bg-surface rounded-3xl shadow-2xl max-w-md w-full mx-4 border border-border">
         {/* ヘッダー */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+        <div className="flex items-center justify-between p-6 border-b border-border-muted">
           <div className="flex items-center gap-3">
-            <div className="bg-red-100 rounded-full p-2">
-              <IconTrash size={20} className="text-red-500" />
+            <div className="bg-error-bg rounded-full p-2">
+              <IconTrash size={20} className="text-error" />
             </div>
-            <h2 className="text-lg font-semibold text-gray-900">投稿を削除</h2>
+            <h2 className="text-lg font-semibold text-text">投稿を削除</h2>
           </div>
           <button
             onClick={onClose}
             disabled={isDeleting}
-            className="bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 rounded-full p-2 transition-colors duration-200 disabled:opacity-50"
+            className="bg-surface-variant hover:bg-surface-hover text-text-muted hover:text-text rounded-full p-2 transition-colors duration-200 disabled:opacity-50"
           >
             <IconX size={20} />
           </button>
@@ -61,15 +61,15 @@ const DeleteConfirmDialog = ({
 
         {/* コンテンツ */}
         <div className="p-6">
-          <p className="text-gray-600 mb-4">
+          <p className="text-text-secondary mb-4">
             この投稿を削除してもよろしいですか？この操作は取り消すことができません。
           </p>
 
           {/* 投稿のプレビュー */}
-          <div className="bg-gray-50 rounded-2xl p-4 mb-6">
-            <p className="text-gray-700 text-sm line-clamp-3">{post.content}</p>
+          <div className="bg-surface-variant rounded-2xl p-4 mb-6">
+            <p className="text-text text-sm line-clamp-3">{post.content}</p>
             {post.images && post.images.length > 0 && (
-              <div className="mt-2 text-xs text-gray-500">
+              <div className="mt-2 text-xs text-text-muted">
                 画像 {post.images.length} 枚が添付されています
               </div>
             )}
@@ -80,14 +80,14 @@ const DeleteConfirmDialog = ({
             <button
               onClick={onClose}
               disabled={isDeleting}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-full hover:bg-gray-50 transition-colors duration-200 font-medium disabled:opacity-50"
+              className="flex-1 px-4 py-2 border border-border text-text-secondary rounded-full hover:bg-surface-variant transition-colors duration-200 font-medium disabled:opacity-50"
             >
               キャンセル
             </button>
             <button
               onClick={handleDelete}
               disabled={isDeleting}
-              className="flex-1 px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 bg-error text-text-inverse rounded-full hover:bg-error-hover transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isDeleting ? "削除中..." : "削除"}
             </button>

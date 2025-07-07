@@ -15,7 +15,7 @@ const PostContent = ({ content, images, onImageClick }: PostContentProps) => {
   return (
     <>
       <div className="prose prose-lg max-w-none">
-        <p className="text-gray-800 leading-relaxed text-lg whitespace-pre-wrap mb-4">
+        <p className="text-text leading-relaxed text-lg whitespace-pre-wrap mb-4">
           {content}
         </p>
       </div>
@@ -41,7 +41,7 @@ const PostContent = ({ content, images, onImageClick }: PostContentProps) => {
                   e.stopPropagation();
                   onImageClick(index);
                 }}
-                className={`relative focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200 ${
+                className={`relative focus:outline-none focus:ring-2 focus:ring-interactive/30 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200 ${
                   imageArray.length === 1
                     ? "max-w-lg mx-auto"
                     : imageArray.length === 3 && index === 0

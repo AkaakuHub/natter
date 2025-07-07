@@ -12,7 +12,7 @@ const PostContent = ({ content, images, onImageClick }: PostContentProps) => {
   return (
     <div className="p-6">
       <div className="prose prose-lg max-w-none">
-        <p className="text-gray-900 text-lg leading-relaxed whitespace-pre-wrap font-medium">
+        <p className="text-text text-lg leading-relaxed whitespace-pre-wrap font-medium">
           {content}
         </p>
       </div>
@@ -33,7 +33,7 @@ const PostContent = ({ content, images, onImageClick }: PostContentProps) => {
               <button
                 key={idx}
                 onClick={() => onImageClick(idx)}
-                className="relative group overflow-hidden rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 shadow-soft hover:shadow-glow transition-all duration-300 hover:scale-[1.02]"
+                className="relative group overflow-hidden rounded-3xl focus:outline-none focus:ring-2 focus:ring-interactive/50 focus:ring-offset-2 shadow-soft hover:shadow-glow transition-all duration-300 hover:scale-[1.02]"
               >
                 <Image
                   src={imageSrc}

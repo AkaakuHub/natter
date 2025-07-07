@@ -37,7 +37,7 @@ const EditForm = ({
           value={content}
           onChange={(e) => onContentChange(e.target.value)}
           placeholder="投稿内容を編集"
-          className="w-full resize-none border-none outline-none text-lg placeholder-gray-500 bg-transparent min-h-[120px]"
+          className="w-full resize-none border-none outline-none text-lg placeholder-text-muted bg-transparent min-h-[120px]"
           maxLength={characterLimit}
           disabled={isSubmitting}
         />
@@ -46,10 +46,10 @@ const EditForm = ({
         <ImagePreview imageUrls={imagePreviewUrls} onRemove={onImageRemove} />
 
         {/* ボタンエリア */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="flex items-center justify-between pt-4 border-t border-border-muted">
           <div className="flex items-center gap-4">
             <label
-              className="text-blue-500 hover:text-blue-600 disabled:opacity-50 p-2 rounded-full hover:bg-blue-50 transition-all duration-300 cursor-pointer"
+              className="text-interactive hover:text-interactive-hover disabled:opacity-50 p-2 rounded-full hover:bg-interactive-bg transition-all duration-300 cursor-pointer"
               title={
                 imagePreviewUrls.length >= 10
                   ? "画像は最大10枚まで"
@@ -70,9 +70,9 @@ const EditForm = ({
               className={`text-sm ${
                 remainingChars < 20
                   ? remainingChars < 0
-                    ? "text-red-500"
+                    ? "text-error"
                     : "text-orange-500"
-                  : "text-gray-500"
+                  : "text-text-muted"
               }`}
             >
               {remainingChars}
@@ -84,8 +84,8 @@ const EditForm = ({
             disabled={isSubmitting || !isValid || !hasChanges}
             className={`px-6 py-2 rounded-full font-semibold text-sm transition-all duration-200 ${
               isSubmitting || !isValid || !hasChanges
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-blue-500 text-white hover:bg-blue-600 hover:shadow-lg"
+                ? "bg-surface-variant text-text-muted cursor-not-allowed"
+                : "bg-interactive text-text-inverse hover:bg-interactive-hover hover:shadow-lg"
             }`}
           >
             {isSubmitting ? "更新中..." : "更新"}

@@ -21,15 +21,15 @@ const PostActions = ({
   canInteract,
 }: PostActionsProps) => {
   return (
-    <div className="px-6 py-4 border-t border-gray-100/60 bg-gray-50/30">
+    <div className="px-6 py-4 border-t border-border/60 bg-surface-variant/30">
       <div className="flex items-center justify-around">
         <button
           onClick={onLike}
           disabled={isLiking || !canInteract}
           className={`flex items-center gap-2 px-4 py-3 rounded-full transition-all duration-300 hover:scale-105 ${
             isLiked
-              ? "text-red-500 bg-red-50 hover:bg-red-100"
-              : "text-gray-600 hover:text-red-500 hover:bg-red-50"
+              ? "text-error bg-error-bg hover:bg-error-hover"
+              : "text-text-muted hover:text-error hover:bg-error-bg"
           } ${isLiking || !canInteract ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           <IconHeart
@@ -42,13 +42,13 @@ const PostActions = ({
 
         <button
           onClick={onReply}
-          className="flex items-center gap-2 px-4 py-3 rounded-full text-gray-600 hover:text-blue-500 hover:bg-blue-50 transition-all duration-300 hover:scale-105"
+          className="flex items-center gap-2 px-4 py-3 rounded-full text-text-muted hover:text-interactive hover:bg-interactive-bg transition-all duration-300 hover:scale-105"
         >
           <IconMessageCircle size={20} />
           <span className="font-medium">{repliesCount}</span>
         </button>
 
-        <button className="flex items-center gap-2 px-4 py-3 rounded-full text-gray-600 hover:text-green-500 hover:bg-green-50 transition-all duration-300 hover:scale-105">
+        <button className="flex items-center gap-2 px-4 py-3 rounded-full text-text-muted hover:text-success hover:bg-success-bg transition-all duration-300 hover:scale-105">
           <IconShare size={20} />
           <span className="font-medium">シェア</span>
         </button>

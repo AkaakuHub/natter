@@ -16,10 +16,10 @@ export const toastIcons = {
 
 export const toastColors = {
   success:
-    "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-green-500/30",
+    "bg-gradient-to-r from-success to-success-hover text-text-inverse shadow-success/30",
   error:
-    "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-red-500/30",
+    "bg-gradient-to-r from-error to-error-hover text-text-inverse shadow-error/30",
   warning:
-    "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-yellow-500/30",
-  info: "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-blue-500/30",
+    "bg-gradient-to-r from-warning to-warning-hover text-text-inverse shadow-warning/30",
+  info: "bg-gradient-to-r from-interactive to-interactive-hover text-text-inverse shadow-interactive/30",
 };

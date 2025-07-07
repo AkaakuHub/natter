@@ -54,13 +54,13 @@ const ReplyForm = ({
       </div>
 
       {/* ボタンエリア */}
-      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+      <div className="flex items-center justify-between mt-4 pt-4 border-t border-border-muted">
         <div className="flex items-center gap-4">
           <button
             type="button"
             onClick={onImageAdd}
             disabled={isSubmitting}
-            className="text-blue-500 hover:text-blue-600 disabled:opacity-50 transition-colors duration-200"
+            className="text-interactive hover:text-interactive-hover disabled:text-interactive-disabled transition-colors duration-200"
           >
             <IconPhoto size={20} />
           </button>
@@ -68,9 +68,9 @@ const ReplyForm = ({
             className={`text-sm ${
               remainingChars < 20
                 ? remainingChars < 0
-                  ? "text-red-500"
-                  : "text-orange-500"
-                : "text-gray-500"
+                  ? "text-error"
+                  : "text-warning"
+                : "text-text-muted"
             }`}
           >
             {remainingChars}
@@ -82,8 +82,8 @@ const ReplyForm = ({
           disabled={isSubmitting || !isValid}
           className={`px-6 py-2 rounded-full font-semibold text-sm transition-all duration-200 ${
             isSubmitting || !isValid
-              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-              : "bg-blue-500 text-white hover:bg-blue-600 hover:shadow-lg"
+              ? "bg-interactive-disabled text-text-inverse cursor-not-allowed"
+              : "bg-interactive text-text-inverse hover:bg-interactive-hover"
           }`}
         >
           {isSubmitting ? "送信中..." : "リプライ"}

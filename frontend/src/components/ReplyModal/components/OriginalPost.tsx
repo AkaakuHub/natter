@@ -14,7 +14,7 @@ interface OriginalPostProps {
 
 const OriginalPost = ({ replyToPost }: OriginalPostProps) => {
   return (
-    <div className="p-4 border-b border-gray-100">
+    <div className="p-4 border-b border-border-muted">
       <div className="flex gap-3">
         <Image
           src={replyToPost.author.image || "/no_avatar_image_128x128.png"}
@@ -24,10 +24,10 @@ const OriginalPost = ({ replyToPost }: OriginalPostProps) => {
           height={40}
         />
         <div className="flex-1">
-          <div className="font-medium text-sm text-gray-900">
+          <div className="font-medium text-sm text-text">
             {replyToPost.author.name}
           </div>
-          <div className="text-gray-600 text-sm mt-1">
+          <div className="text-text-secondary text-sm mt-1">
             {replyToPost.content}
           </div>
         </div>

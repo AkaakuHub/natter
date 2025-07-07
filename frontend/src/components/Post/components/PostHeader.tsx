@@ -33,7 +33,7 @@ const PostHeader = ({
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           <button
-            className="font-bold text-gray-900 hover:text-blue-600 transition-colors text-base"
+            className="font-bold text-text hover:text-interactive transition-colors text-base"
             onClick={(e) => {
               e.stopPropagation();
               onUserClick();
@@ -41,7 +41,7 @@ const PostHeader = ({
           >
             {user?.name || "Unknown User"}
           </button>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-text-muted">
             @{user?.id || "unknown"}
           </span>
         </div>
@@ -55,7 +55,7 @@ const PostHeader = ({
           />
         )}
       </div>
-      <time className="text-xs text-gray-400 block">
+      <time className="text-xs text-text-muted block">
         {formatDate(createdAt)}
       </time>
     </div>

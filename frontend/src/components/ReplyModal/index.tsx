@@ -47,13 +47,17 @@ const ReplyModal = ({
   // 認証されていない場合は返信モーダルを表示しない
   if (!currentUser) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
-        <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 text-center">
-          <h2 className="text-lg font-semibold mb-4">認証が必要です</h2>
-          <p className="text-gray-600 mb-4">返信するにはログインが必要です。</p>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4">
+        <div className="bg-surface rounded-3xl shadow-2xl max-w-lg w-full p-6 text-center border border-border">
+          <h2 className="text-lg font-semibold mb-4 text-text">
+            認証が必要です
+          </h2>
+          <p className="text-text-secondary mb-4">
+            返信するにはログインが必要です。
+          </p>
           <button
             onClick={onClose}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+            className="bg-interactive text-text-inverse px-4 py-2 rounded-lg hover:bg-interactive-hover"
           >
             閉じる
           </button>
@@ -67,8 +71,8 @@ const ReplyModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/20 p-4">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-overlay p-4">
+      <div className="bg-surface rounded-3xl shadow-2xl max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto border border-border">
         <ModalHeader onClose={onClose} />
         <OriginalPost replyToPost={replyToPost} />
         <ReplyForm

@@ -43,7 +43,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-gray-900 text-gray-900 dark:text-white`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-surface text-text`}
       >
         <NextAuthProvider>
           <ToastProvider>{children}</ToastProvider>

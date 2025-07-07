@@ -38,7 +38,7 @@ const ImageModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 dark:bg-black/90"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay"
       onClick={handleBackdropClick}
     >
       <div className="relative w-full h-full flex items-center justify-center">
@@ -53,7 +53,7 @@ const ImageModal = ({
         {/* バツボタン */}
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 z-30 text-white hover:text-gray-300 bg-black/50 hover:bg-black/70 rounded-full p-3 transition-all duration-200"
+          className="absolute top-6 right-6 z-30 text-text-inverse hover:text-text-inverse/80 bg-overlay hover:bg-overlay/90 rounded-full p-3 transition-all duration-200"
         >
           <svg
             width="24"

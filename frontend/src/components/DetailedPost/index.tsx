@@ -95,11 +95,11 @@ const DetailedPostComponent = ({
   const canInteract = !!currentUser?.id;
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-full">
+    <div className="bg-gradient-to-br from-surface-variant to-surface-variant/60 min-h-full">
       <div className="max-w-2xl mx-auto px-4 py-8">
         <BackButton onBack={goBack} />
 
-        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-soft hover:shadow-glow border border-gray-100/60 overflow-hidden transition-all duration-300">
+        <div className="bg-surface/90 backdrop-blur-sm rounded-3xl shadow-soft hover:shadow-glow border border-border/60 overflow-hidden transition-all duration-300">
           {post.replyTo && (
             <ParentPostCard
               parentPost={{

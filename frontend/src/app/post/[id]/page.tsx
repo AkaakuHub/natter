@@ -23,7 +23,7 @@ const Post = () => {
     return (
       <BaseLayout>
         <div className="flex items-center justify-center h-64">
-          <div className="text-red-500">Invalid Post ID</div>
+          <div className="text-error">Invalid Post ID</div>
         </div>
       </BaseLayout>
     );

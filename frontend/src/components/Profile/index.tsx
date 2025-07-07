@@ -66,11 +66,11 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
 
   if (loading) {
     return (
-      <div className="w-full h-full bg-white text-black">
+      <div className="w-full h-full bg-surface text-text">
         <ProfileHeader session={session} userId={userId} />
         <TabsComponent activeTab={activeTab} onTabChange={handleTabChange} />
         <div className="flex justify-center py-8">
-          <div className="text-gray-500">Loading posts...</div>
+          <div className="text-text-muted">Loading posts...</div>
         </div>
       </div>
     );
@@ -78,11 +78,11 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
 
   if (error) {
     return (
-      <div className="w-full h-full bg-white text-black">
+      <div className="w-full h-full bg-surface text-text">
         <ProfileHeader session={session} userId={userId} />
         <TabsComponent activeTab={activeTab} onTabChange={handleTabChange} />
         <div className="flex justify-center py-8">
-          <div className="text-red-500">{error}</div>
+          <div className="text-error">{error}</div>
         </div>
       </div>
     );
@@ -101,7 +101,7 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
     }
 
     if (error) {
-      return <div className="text-center py-8 text-red-500">{error}</div>;
+      return <div className="text-center py-8 text-error">{error}</div>;
     }
 
     if (currentPosts.length === 0) {
@@ -129,7 +129,7 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
   };
 
   return (
-    <div className="w-full h-full bg-white text-black">
+    <div className="w-full h-full bg-surface text-text">
       <ProfileHeader session={session} userId={userId} />
       <TabsComponent activeTab={activeTab} onTabChange={handleTabChange} />
       <div className="overflow-y-auto h-[calc(100dvh-60px)] w-full">

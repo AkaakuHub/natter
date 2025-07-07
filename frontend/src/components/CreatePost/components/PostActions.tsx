@@ -21,14 +21,14 @@ const PostActions = ({
   maxImages,
 }: PostActionsProps) => {
   return (
-    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100/80">
+    <div className="flex items-center justify-between mt-4 pt-4 border-t border-border-muted">
       <div className="flex items-center gap-4">
         {/* 画像追加ボタン */}
         <button
           type="button"
           onClick={onImageAdd}
           disabled={isSubmitting || imageCount >= maxImages}
-          className="text-blue-500 hover:text-blue-600 disabled:opacity-50 p-2 rounded-full hover:bg-blue-50 transition-all duration-300"
+          className="text-interactive hover:text-interactive-hover disabled:text-interactive-disabled p-2 rounded-full hover:bg-interactive/10 transition-all duration-200"
           title={
             imageCount >= maxImages
               ? `画像は最大${maxImages}枚まで`
@@ -43,9 +43,9 @@ const PostActions = ({
           className={`text-sm font-medium ${
             remainingChars < 20
               ? remainingChars < 0
-                ? "text-red-500"
-                : "text-orange-500"
-              : "text-gray-500"
+                ? "text-error"
+                : "text-warning"
+              : "text-text-muted"
           }`}
         >
           {remainingChars}
@@ -59,8 +59,8 @@ const PostActions = ({
         disabled={isSubmitting || !isValid}
         className={`px-6 py-2 rounded-full font-semibold text-sm transition-colors duration-200 ${
           isSubmitting || !isValid
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-blue-500 text-white hover:bg-blue-600"
+            ? "bg-interactive-disabled text-text-inverse cursor-not-allowed"
+            : "bg-interactive text-text-inverse hover:bg-interactive-hover"
         }`}
       >
         {isSubmitting ? "投稿中..." : "投稿"}

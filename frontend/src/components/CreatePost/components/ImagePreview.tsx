@@ -24,7 +24,7 @@ const ImagePreview = ({ imageUrls, onRemove }: ImagePreviewProps) => {
           <button
             type="button"
             onClick={() => onRemove(index)}
-            className="absolute top-2 right-2 bg-red-500/90 backdrop-blur-sm text-white rounded-full p-2 hover:bg-red-600 transition-all duration-300 hover:scale-110"
+            className="absolute top-2 right-2 bg-error/90 backdrop-blur-sm text-text-inverse rounded-full p-2 hover:bg-error-hover transition-all duration-300 hover:scale-110"
           >
             <IconX size={16} />
           </button>

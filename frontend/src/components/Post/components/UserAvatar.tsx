@@ -22,7 +22,7 @@ const UserAvatar = ({ user, onUserClick }: UserAvatarProps) => {
       <Image
         src={user?.image || "no_avatar_image_128x128.png"}
         alt={user?.name || "User"}
-        className="w-12 h-12 rounded-full border-2 border-gray-100 hover:border-blue-200 transition-colors duration-200 cursor-pointer"
+        className="w-12 h-12 rounded-full border-2 border-border-muted hover:border-interactive-bg transition-colors duration-200 cursor-pointer"
         width={48}
         height={48}
       />

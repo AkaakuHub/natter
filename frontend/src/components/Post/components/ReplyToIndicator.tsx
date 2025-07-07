@@ -17,11 +17,11 @@ const ReplyToIndicator = ({
   onReplyToClick,
 }: ReplyToIndicatorProps) => {
   return (
-    <div className="mb-3 p-3 bg-blue-50 border-l-4 border-blue-200 rounded-r-lg">
-      <p className="text-blue-700 text-sm">
+    <div className="mb-3 p-3 bg-interactive-bg border-l-4 border-interactive/30 rounded-r-lg">
+      <p className="text-interactive text-sm">
         <span className="font-medium">返信先:</span>{" "}
         <button
-          className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+          className="text-interactive hover:text-interactive-hover hover:underline font-medium"
           onClick={(e) => {
             e.stopPropagation();
             onReplyToClick();

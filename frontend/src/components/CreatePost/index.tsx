@@ -54,7 +54,7 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
           <p className="text-sm text-text-muted mb-4">認証状態を確認中...</p>
           <a
             href="/login"
-            className="bg-interactive text-white px-4 py-2 rounded-lg hover:bg-interactive-hover inline-block"
+            className="bg-interactive text-text-inverse px-4 py-2 rounded-lg hover:bg-interactive-hover inline-block"
           >
             ログイン
           </a>

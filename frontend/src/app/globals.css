@@ -27,6 +27,14 @@
   --color-warning-bg: #fef3c7;
   --color-error: #ef4444;
   --color-error-bg: #fee2e2;
+  --color-error-hover: #fecaca;
+
+  --color-interactive-bg: #dbeafe;
+  --color-success-hover: #a7f3d0;
+  --color-warning-hover: #fed7aa;
+
+  --color-overlay: rgba(0, 0, 0, 0.5);
+  --color-surface-hover: #f1f5f9;
 
   /* Design System Tokens */
   --radius-sm: 0.375rem;
@@ -90,6 +98,14 @@ body {
   --color-warning-bg: #451a03;
   --color-error: #f87171;
   --color-error-bg: #7f1d1d;
+  --color-error-hover: #991b1b;
+
+  --color-interactive-bg: #1e3a8a;
+  --color-success-hover: #047857;
+  --color-warning-hover: #92400e;
+
+  --color-overlay: rgba(0, 0, 0, 0.7);
+  --color-surface-hover: #475569;
 }
 
 @supports (font-variation-settings: normal) {

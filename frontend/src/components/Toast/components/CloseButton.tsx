@@ -9,7 +9,7 @@ const CloseButton = ({ onClose }: CloseButtonProps) => {
   return (
     <button
       onClick={onClose}
-      className="flex-shrink-0 ml-2 bg-white/20 hover:bg-white/30 rounded-full p-1.5 transition-all duration-200"
+      className="flex-shrink-0 ml-2 bg-surface/20 hover:bg-surface/30 rounded-full p-1.5 transition-all duration-200"
     >
       <IconX size={18} />
     </button>

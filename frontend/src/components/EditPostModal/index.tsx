@@ -70,8 +70,8 @@ const EditPostModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/20 p-4">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-overlay p-4">
+      <div className="bg-surface rounded-3xl shadow-2xl max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto border border-border">
         <ModalHeader onClose={handleClose} />
 
         <EditForm

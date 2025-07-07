@@ -12,7 +12,10 @@ const ToastMessage = ({ message, type }: ToastMessageProps) => {
     <>
       <p className="flex-1 text-base font-semibold tracking-wide">{message}</p>
       {type === "success" && (
-        <IconSparkles size={20} className="text-white/60 animate-pulse" />
+        <IconSparkles
+          size={20}
+          className="text-text-inverse/60 animate-pulse"
+        />
       )}
     </>
   );

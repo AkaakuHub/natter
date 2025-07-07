@@ -10,7 +10,7 @@ const ToastIcon = ({ type }: ToastIconProps) => {
   const iconProps = type === "success" ? { className: "animate-scale-in" } : {};
 
   return (
-    <div className="flex-shrink-0 bg-white/20 rounded-full p-2">
+    <div className="flex-shrink-0 bg-surface/20 rounded-full p-2">
       <IconComponent size={24} {...iconProps} />
     </div>
   );

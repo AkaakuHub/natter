@@ -44,7 +44,7 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
   if (loading) {
     return (
       <div className="w-full max-w-md mx-auto flex justify-center py-8">
-        <div className="text-gray-500">Loading posts...</div>
+        <div className="text-text-muted">Loading posts...</div>
       </div>
     );
   }
@@ -52,7 +52,7 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
   if (error) {
     return (
       <div className="w-full max-w-md mx-auto flex justify-center py-8">
-        <div className="text-red-500">{error}</div>
+        <div className="text-error">{error}</div>
       </div>
     );
   }

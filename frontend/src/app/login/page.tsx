@@ -78,18 +78,18 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100">
-      <div className="flex flex-col items-center space-y-6 bg-white p-8 rounded-lg shadow-md">
+    <div className="flex min-h-screen items-center justify-center bg-surface-variant">
+      <div className="flex flex-col items-center space-y-6 bg-surface p-8 rounded-lg shadow-md border border-border">
         <Image src="/images/logo.png" alt="logo" width={128} height={128} />
         {authError && (
-          <div className="text-red-500 text-sm bg-red-50 p-3 rounded-md border border-red-200">
+          <div className="text-error text-sm bg-error-bg p-3 rounded-md border border-error">
             {authError}
           </div>
         )}
         <Button
           onClick={handleLogin}
           type="button"
-          className="w-full bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600"
+          className="w-full bg-interactive text-text-inverse rounded-lg px-4 py-2 hover:bg-interactive-hover"
         >
           Twitterでログイン
         </Button>
