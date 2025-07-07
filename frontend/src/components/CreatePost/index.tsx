@@ -20,25 +20,39 @@ interface CreatePostProps {
 const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
   const [content, setContent] = useState("");
   const characterLimit = 280;
-  
-  const { images, imagePreviewUrls, handleImageAdd, handleImageRemove, clearImages } = useImageUpload(10);
-  const { isSubmitting, error, handleSubmit: submitPost } = usePostSubmit(currentUser, onPostCreated);
-  const { remainingChars, isValid } = useFormValidation(content, images.length, characterLimit);
-  
+
+  const {
+    images,
+    imagePreviewUrls,
+    handleImageAdd,
+    handleImageRemove,
+    clearImages,
+  } = useImageUpload(10);
+  const {
+    isSubmitting,
+    error,
+    handleSubmit: submitPost,
+  } = usePostSubmit(currentUser, onPostCreated);
+  const { remainingChars, isValid } = useFormValidation(
+    content,
+    images.length,
+    characterLimit,
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await submitPost(content, images);
-    
+
     // 成功時にフォームをクリア
     if (!error) {
       setContent("");
       clearImages();
     }
   };
-  
+
   const handlePostSubmit = async () => {
     await submitPost(content, images);
-    
+
     if (!error) {
       setContent("");
       clearImages();
@@ -50,7 +64,7 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
       <form onSubmit={handleSubmit}>
         <div className="flex gap-3">
           <UserAvatar user={currentUser} />
-          
+
           <div className="flex-1">
             <PostTextArea
               value={content}
@@ -58,14 +72,14 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
               characterLimit={characterLimit}
               disabled={isSubmitting}
             />
-            
+
             <ImagePreview
               imageUrls={imagePreviewUrls}
               onRemove={handleImageRemove}
             />
-            
+
             <ErrorMessage error={error} />
-            
+
             <PostActions
               onImageAdd={handleImageAdd}
               onSubmit={handlePostSubmit}

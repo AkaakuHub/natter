@@ -30,7 +30,9 @@ const PostActions = ({
           disabled={isSubmitting || imageCount >= maxImages}
           className="text-blue-500 hover:text-blue-600 disabled:opacity-50 p-2 rounded-full hover:bg-blue-50 transition-all duration-300"
           title={
-            imageCount >= maxImages ? `画像は最大${maxImages}枚まで` : "画像を追加"
+            imageCount >= maxImages
+              ? `画像は最大${maxImages}枚まで`
+              : "画像を追加"
           }
         >
           <IconPhoto size={20} />

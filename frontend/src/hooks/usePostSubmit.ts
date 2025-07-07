@@ -6,7 +6,11 @@ import { useNavigation } from "@/hooks/useNavigation";
 interface UsePostSubmitResult {
   isSubmitting: boolean;
   error: string | null;
-  handleSubmit: (content: string, images: File[], replyToId?: number) => Promise<void>;
+  handleSubmit: (
+    content: string,
+    images: File[],
+    replyToId?: number,
+  ) => Promise<void>;
   clearError: () => void;
 }
 
@@ -19,7 +23,11 @@ export const usePostSubmit = (
   const { showToast } = useToast();
   const { navigateToPost } = useNavigation();
 
-  const handleSubmit = async (content: string, images: File[], replyToId?: number) => {
+  const handleSubmit = async (
+    content: string,
+    images: File[],
+    replyToId?: number,
+  ) => {
     if (!content.trim() && images.length === 0) {
       setError("投稿内容または画像を入力してください");
       return;
@@ -39,7 +47,7 @@ export const usePostSubmit = (
         formData.append("content", content.trim());
       }
       formData.append("authorId", currentUser.id);
-      
+
       if (replyToId) {
         formData.append("replyToId", replyToId.toString());
       }
@@ -60,7 +68,9 @@ export const usePostSubmit = (
       const newPost = await response.json();
       onPostCreated?.();
 
-      const message = replyToId ? "リプライをしました。" : "投稿を作成しました。";
+      const message = replyToId
+        ? "リプライをしました。"
+        : "投稿を作成しました。";
       showToast(message, "success", 3000, () => {
         navigateToPost(newPost.id);
       });

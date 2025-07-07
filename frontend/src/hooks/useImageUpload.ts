@@ -8,7 +8,9 @@ interface UseImageUploadResult {
   clearImages: () => void;
 }
 
-export const useImageUpload = (maxImages: number = 10): UseImageUploadResult => {
+export const useImageUpload = (
+  maxImages: number = 10,
+): UseImageUploadResult => {
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 
@@ -55,7 +57,7 @@ export const useImageUpload = (maxImages: number = 10): UseImageUploadResult => 
   };
 
   const clearImages = () => {
-    imagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
+    imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
     setImages([]);
     setImagePreviewUrls([]);
   };
