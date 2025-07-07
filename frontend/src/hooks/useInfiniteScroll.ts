@@ -19,10 +19,10 @@ export const useInfiniteScroll = ({
   threshold = 1.0,
 }: UseInfiniteScrollProps): UseInfiniteScrollResult => {
   const [isLoading, setIsLoading] = useState(false);
-  const observer = useRef<IntersectionObserver>();
+  const observer = useRef<IntersectionObserver | null>(null);
 
   const sentryRef = useCallback(
-    (node: Element | null) => {
+    (node?: Element | null) => {
       if (isFetching) return;
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver(

@@ -32,8 +32,18 @@ export class PostsApi {
     return ApiClient.post<Post>("/posts", data);
   }
 
+  // FormDataを使った投稿作成（画像付き）
+  static async createPostWithImages(formData: FormData): Promise<Post> {
+    return ApiClient.postFormData<Post>("/posts", formData);
+  }
+
   static async updatePost(id: number, data: UpdatePostDto): Promise<Post> {
     return ApiClient.patch<Post>(`/posts/${id}`, data);
+  }
+
+  // FormDataを使った投稿編集（画像付き）
+  static async updatePostWithImages(id: number, formData: FormData): Promise<Post> {
+    return ApiClient.patchFormData<Post>(`/posts/${id}`, formData);
   }
 
   static async deletePost(id: number): Promise<void> {

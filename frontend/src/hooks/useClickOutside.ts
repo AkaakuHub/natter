@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 interface UseClickOutsideResult<T extends HTMLElement> {
-  ref: React.RefObject<T>;
+  ref: React.RefObject<T | null>;
 }
 
 export const useClickOutside = <T extends HTMLElement>(

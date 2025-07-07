@@ -1,12 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { usePostLike } from "@/hooks/usePostLike";
 import { usePostReply } from "@/hooks/usePostReply";
 import { useImageModal } from "@/hooks/useImageModal";
 import { getImageUrl } from "@/utils/postUtils";
+import { Post } from "@/api/types";
 
 import ImageModal from "@/components/ImageModal";
 import ReplyModal from "@/components/ReplyModal";
@@ -23,35 +24,20 @@ interface PostComponentProps {
     name: string;
     image: string;
   };
-  post: {
-    id: number;
-    userId: string;
-    content: string;
-    images?: string[];
-    createdAt: string;
-    liked?: string[];
-    _count?: {
-      replies: number;
-    };
-    replyTo?: {
-      id: number;
-      content: string;
-      author: {
-        id: string;
-        name: string;
-      };
-    };
-  };
+  post: Post;
+  onPostUpdate?: (updatedPost: Post) => void;
+  onPostDelete?: () => void;
 }
 
-const PostComponent = ({ user, post }: PostComponentProps) => {
+const PostComponent = ({ user, post, onPostUpdate, onPostDelete }: PostComponentProps) => {
+  const [currentPost, setCurrentPost] = useState<Post>(post);
   const { navigateToPost, navigateToProfile } = useNavigation();
   const { currentUser } = useCurrentUser();
   const currentUserId = currentUser?.id;
 
   const { isLiked, likeCount, isLiking, handleLike } = usePostLike(
-    post.id,
-    post.liked,
+    currentPost.id,
+    currentPost.liked,
     currentUserId,
   );
 
@@ -61,7 +47,7 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
     setShowReplyModal,
     handleReplyClick,
     handleReplySubmit,
-  } = usePostReply(post.id, post._count?.replies, currentUser);
+  } = usePostReply(currentPost.id, currentPost._count?.replies, currentUser);
 
   const {
     isModalOpen,
@@ -74,11 +60,20 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
 
   const canInteract = !!currentUserId;
 
+  const handlePostUpdate = (updatedPost: Post) => {
+    setCurrentPost(updatedPost);
+    onPostUpdate?.(updatedPost);
+  };
+
+  const handlePostDelete = () => {
+    onPostDelete?.();
+  };
+
   return (
     <>
       <article
         className="bg-white hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 py-6 px-6 cursor-pointer"
-        onClick={() => post?.id && navigateToPost(post.id)}
+        onClick={() => currentPost?.id && navigateToPost(currentPost.id)}
       >
         <div className="flex gap-4">
           <UserAvatar
@@ -88,18 +83,21 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
           <div className="flex-1 min-w-0">
             <PostHeader
               user={user}
-              createdAt={post.createdAt}
+              post={currentPost}
+              createdAt={currentPost.createdAt}
               onUserClick={() => navigateToProfile(user?.id)}
+              onPostUpdate={handlePostUpdate}
+              onPostDelete={handlePostDelete}
             />
-            {post.replyTo && (
+            {currentPost.replyTo && (
               <ReplyToIndicator
-                replyTo={post.replyTo}
-                onReplyToClick={() => navigateToPost(post.replyTo!.id)}
+                replyTo={currentPost.replyTo}
+                onReplyToClick={() => navigateToPost(currentPost.replyTo!.id)}
               />
             )}
             <PostContent
-              content={post.content}
-              images={post.images}
+              content={currentPost.content}
+              images={currentPost.images}
               onImageClick={handleImageClick}
             />
             <PostActions
@@ -115,15 +113,15 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
         </div>
       </article>
 
-      {isModalOpen && post.images && post.images.length > 0 && (
+      {isModalOpen && currentPost.images && currentPost.images.length > 0 && (
         <ImageModal
           isOpen={isModalOpen}
-          images={post.images.map((image) => getImageUrl(image))}
+          images={currentPost.images.map((image) => getImageUrl(image))}
           currentIndex={selectedImageIndex}
           onClose={closeImageModal}
           onPrevious={selectedImageIndex > 0 ? handlePreviousImage : undefined}
           onNext={
-            selectedImageIndex < post.images.length - 1
+            selectedImageIndex < currentPost.images.length - 1
               ? handleNextImage
               : undefined
           }
@@ -135,8 +133,8 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
           isOpen={showReplyModal}
           onClose={() => setShowReplyModal(false)}
           replyToPost={{
-            id: post.id,
-            content: post.content,
+            id: currentPost.id,
+            content: currentPost.content,
             author: {
               name: user.name,
               image: user.image,
