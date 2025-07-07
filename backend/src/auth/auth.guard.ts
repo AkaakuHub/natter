@@ -7,6 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
+import '../types/auth.types';
 
 // JWTペイロードの型定義
 export interface JwtPayload {
@@ -14,6 +15,8 @@ export interface JwtPayload {
   twitterId: string;
   name: string;
   image?: string;
+  validated?: boolean;
+  timestamp?: string;
 }
 
 // ExpressのRequestインターフェースを拡張
@@ -38,19 +41,56 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const payload = this.jwtService.verify(token, {
+      const rawPayload = this.jwtService.verify(token, {
         secret: this.configService.get<string>('JWT_SECRET'),
-      });
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      request.user = payload;
-      return true;
+      }) as unknown;
+
+      if (this.isValidJwtPayload(rawPayload)) {
+        const payload: JwtPayload = {
+          id: rawPayload.id as string,
+          twitterId: rawPayload.twitterId as string,
+          name: rawPayload.name as string,
+          image: rawPayload.image as string | undefined,
+          validated: rawPayload.validated as boolean | undefined,
+          timestamp: rawPayload.timestamp as string | undefined,
+        };
+
+        request.user = payload;
+        return true;
+      }
+
+      throw new UnauthorizedException('Invalid token payload');
     } catch {
       throw new UnauthorizedException('Invalid token');
     }
   }
+
+  private isValidJwtPayload(payload: unknown): payload is Record<string, any> {
+    if (typeof payload !== 'object' || payload === null) {
+      return false;
+    }
+
+    const obj = payload as Record<string, unknown>;
+    return (
+      typeof obj.id === 'string' &&
+      typeof obj.twitterId === 'string' &&
+      typeof obj.name === 'string'
+    );
+  }
+
   private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    // 型安全にヘッダーにアクセス
+    const headers = request.headers as Record<
+      string,
+      string | string[] | undefined
+    >;
+    const authHeader = headers.authorization;
+
+    if (typeof authHeader !== 'string') {
+      return undefined;
+    }
+
+    const [type, token] = authHeader.split(' ');
     return type === 'Bearer' ? token : undefined;
   }
 }
