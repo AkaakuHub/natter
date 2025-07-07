@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { User } from "@/api";
+import { User, Post } from "@/api";
 import { ApiClient } from "@/api/client";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useDetailedPost } from "@/hooks/useDetailedPost";
@@ -67,7 +67,7 @@ const DetailedPostComponent = ({
         formData.append("images", file);
       });
 
-      const newReply = await ApiClient.postFormData("/posts", formData);
+      const newReply = await ApiClient.postFormData<Post>("/posts", formData);
       setReplies((prev) => [...prev, newReply]);
 
       showToast("リプライをしました。", "success", 3000, () => {
@@ -90,7 +90,7 @@ const DetailedPostComponent = ({
   const user = post.author;
 
   if (!user) {
-    return <ErrorState message="投稿者の情報が見つかりません" />;
+    return <ErrorState error="投稿者の情報が見つかりません" onBack={goBack} />;
   }
   const canInteract = !!currentUser?.id;
 

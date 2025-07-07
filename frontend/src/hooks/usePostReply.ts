@@ -58,7 +58,10 @@ export const usePostReply = (
       console.log("Submitting reply with session user:", session.user.id);
 
       // ApiClient を使用して認証ヘッダー付きでリクエスト
-      const newReply = await ApiClient.postFormData("/posts", formData);
+      const newReply = await ApiClient.postFormData<{ id: number }>(
+        "/posts",
+        formData,
+      );
 
       setReplyCount((prev) => prev + 1);
 

@@ -68,7 +68,10 @@ export const usePostSubmit = (
       });
 
       // ApiClient を使用して認証ヘッダー付きでリクエスト
-      const newPost = await ApiClient.postFormData("/posts", formData);
+      const newPost = await ApiClient.postFormData<{ id: number }>(
+        "/posts",
+        formData,
+      );
       onPostCreated?.();
 
       const message = replyToId
