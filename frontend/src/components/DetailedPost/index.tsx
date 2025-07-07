@@ -117,17 +117,14 @@ const DetailedPostComponent = ({
 
         <div className="bg-surface/90 backdrop-blur-sm rounded-3xl shadow-soft hover:shadow-glow border border-border/60 transition-all duration-300">
           {post.replyTo ? (
-            <>
-              {/* デバッグ用の一時的なログ */}
-              {console.log("🚨 DETAILED POST IMAGES DEBUG:", {
-                postId: post.replyTo.id,
-                originalImages: post.replyTo.images,
-                imageType: typeof post.replyTo.images,
-                isArray: Array.isArray(post.replyTo.images),
-                imageLength: post.replyTo.images?.length || 0,
-                stringifiedImages: JSON.stringify(post.replyTo.images),
-                fullReplyTo: post.replyTo,
-              })}
+            post.replyTo.deletedAt ? (
+              <div className="p-6 bg-surface-variant/50 border-b border-border/60">
+                <div className="flex items-center gap-2 text-text-muted">
+                  <div className="w-4 h-4 bg-error rounded-full"></div>
+                  <span className="text-sm">元の投稿は削除されました</span>
+                </div>
+              </div>
+            ) : (
               <ParentPostCard
                 parentPost={{
                   id: post.replyTo.id,
@@ -140,7 +137,7 @@ const DetailedPostComponent = ({
                 }}
                 onParentPostClick={() => navigateToPost(post.replyTo!.id)}
               />
-            </>
+            )
           ) : post.replyToId ? (
             <div className="p-6 bg-surface-variant/50 border-b border-border/60">
               <div className="flex items-center gap-2 text-text-muted">

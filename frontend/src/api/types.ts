@@ -20,6 +20,7 @@ export interface Post {
   published: boolean;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string;
   authorId?: string;
   author?: User;
   likes?: Like[];

@@ -116,10 +116,21 @@ const PostComponent = ({
               onPostDelete={handlePostDelete}
             />
             {currentPost.replyTo ? (
-              <ReplyToIndicator
-                replyTo={currentPost.replyTo}
-                onReplyToClick={() => navigateToPost(currentPost.replyTo!.id)}
-              />
+              currentPost.replyTo.deletedAt ? (
+                <div className="mb-3 p-3 bg-error-bg border-l-4 border-error/30 rounded-r-lg">
+                  <div className="flex items-center gap-2 text-error">
+                    <div className="w-4 h-4 bg-error rounded-full"></div>
+                    <span className="text-sm font-medium">
+                      元の投稿は削除されました
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <ReplyToIndicator
+                  replyTo={currentPost.replyTo}
+                  onReplyToClick={() => navigateToPost(currentPost.replyTo!.id)}
+                />
+              )
             ) : currentPost.replyToId ? (
               <div className="mb-3 p-3 bg-error-bg border-l-4 border-error/30 rounded-r-lg">
                 <div className="flex items-center gap-2 text-error">

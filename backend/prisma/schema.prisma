@@ -26,21 +26,22 @@ model User {
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   title     String?
   content   String?
   images    String? // JSON string of image URLs array
-  published Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  author    User?    @relation(fields: [authorId], references: [id])
+  published Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // 論理削除用
+  author    User?     @relation(fields: [authorId], references: [id])
   authorId  String?
   likes     Like[]
   
   // リプライ関係
-  replyToId Int?     // リプライ先のPost ID
-  replyTo   Post?    @relation("PostReplies", fields: [replyToId], references: [id])
-  replies   Post[]   @relation("PostReplies")
+  replyToId Int?      // リプライ先のPost ID
+  replyTo   Post?     @relation("PostReplies", fields: [replyToId], references: [id])
+  replies   Post[]    @relation("PostReplies")
 }
 
 model Like {

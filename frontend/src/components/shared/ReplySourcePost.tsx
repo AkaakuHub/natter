@@ -7,12 +7,10 @@ interface PostImage {
   url: string;
 }
 
-type ImageData = PostImage[] | string[];
-
 interface ReplySourcePost {
   id: number;
   content?: string;
-  images?: ImageData;
+  images?: string[];
   author?: {
     name?: string;
     image?: string;
@@ -66,17 +64,13 @@ const ReplySourcePost = ({
   // 画像データを統一形式に変換
   const normalizedImages: PostImage[] = normalizedImageArray.map(
     (image, index) => {
-      if (typeof image === "string") {
-        const imageUrl = image.startsWith("http")
-          ? image
-          : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
-        return {
-          id: index,
-          url: imageUrl,
-        };
-      } else {
-        return image;
-      }
+      const imageUrl = image.startsWith("http")
+        ? image
+        : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
+      return {
+        id: index,
+        url: imageUrl,
+      };
     },
   );
 

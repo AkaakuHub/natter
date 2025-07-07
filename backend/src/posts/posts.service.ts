@@ -71,6 +71,9 @@ export class PostsService {
 
   async findAll() {
     const posts = await this.prisma.post.findMany({
+      where: {
+        deletedAt: null, // 削除されていない投稿のみ
+      },
       include: {
         author: true,
         likes: {
@@ -95,10 +98,31 @@ export class PostsService {
       },
     });
 
-    return posts.map((post) => ({
-      ...post,
-      images: post.images ? (JSON.parse(post.images) as string[]) : [],
-    }));
+    // replyToが削除されている場合の処理
+    const postsWithReplyTo = await Promise.all(
+      posts.map(async (post) => {
+        let replyTo = post.replyTo;
+
+        // replyToIdがあるが replyTo が null の場合、削除された投稿を取得
+        if (post.replyToId && !post.replyTo) {
+          const deletedReplyTo = await this.prisma.post.findUnique({
+            where: { id: post.replyToId },
+            include: {
+              author: true,
+            },
+          });
+          replyTo = deletedReplyTo;
+        }
+
+        return {
+          ...post,
+          replyTo,
+          images: post.images ? (JSON.parse(post.images) as string[]) : [],
+        };
+      }),
+    );
+
+    return postsWithReplyTo;
   }
 
   async findOne(id: number) {
@@ -129,15 +153,31 @@ export class PostsService {
       return null;
     }
 
+    // replyToが削除されている場合の処理
+    let replyTo = post.replyTo;
+    if (post.replyToId && !post.replyTo) {
+      const deletedReplyTo = await this.prisma.post.findUnique({
+        where: { id: post.replyToId },
+        include: {
+          author: true,
+        },
+      });
+      replyTo = deletedReplyTo;
+    }
+
     return {
       ...post,
+      replyTo,
       images: post.images ? (JSON.parse(post.images) as string[]) : [],
     };
   }
 
   async findByUser(userId: string) {
     const posts = await this.prisma.post.findMany({
-      where: { authorId: userId },
+      where: {
+        authorId: userId,
+        deletedAt: null, // 削除されていない投稿のみ
+      },
       include: {
         author: true,
         likes: {
@@ -174,6 +214,7 @@ export class PostsService {
         images: {
           not: null,
         },
+        deletedAt: null, // 削除されていない投稿のみ
       },
       include: {
         author: true,
@@ -340,8 +381,15 @@ export class PostsService {
       throw new ForbiddenException('You can only delete your own posts');
     }
 
-    return this.prisma.post.delete({
+    // 論理削除：削除時刻を設定し、内容を空にする
+    return this.prisma.post.update({
       where: { id },
+      data: {
+        deletedAt: new Date(),
+        content: null,
+        title: null,
+        images: null,
+      },
     });
   }
 
@@ -392,7 +440,10 @@ export class PostsService {
 
   async getReplies(postId: number) {
     const replies = await this.prisma.post.findMany({
-      where: { replyToId: postId },
+      where: {
+        replyToId: postId,
+        deletedAt: null, // 削除されていない投稿のみ
+      },
       include: {
         author: true,
         likes: {
