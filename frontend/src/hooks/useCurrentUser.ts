@@ -52,6 +52,14 @@ export const useCurrentUser = (): UseCurrentUserReturn => {
     validatedUserExists !== null ? validatedUserExists : internalUserExists;
   const isLoading = sessionLoading || userExists === null;
 
+  console.log("👤 useCurrentUser state:", {
+    currentUser: currentUser?.id || null,
+    userExists,
+    isLoading,
+    isAuthenticated,
+    session: session?.user?.id || null,
+  });
+
   return {
     currentUser,
     session,

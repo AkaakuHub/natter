@@ -1,28 +1,13 @@
-"use client";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 
-import React, { useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+export default async function MyProfile() {
+  const session = await auth();
 
-const MyProfile = () => {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    } else if (status === "authenticated" && session?.user?.id) {
-      // ログイン済みの場合は自分のIDを使って強制リダイレクト
-      router.replace(`/profile/${session.user.id}`);
-    }
-  }, [status, session?.user?.id, router]);
-
-  // ローディング中またはリダイレクト待ち
-  return (
-    <div className="w-full h-screen flex items-center justify-center">
-      <div>Loading...</div>
-    </div>
-  );
-};
-
-export default MyProfile;
+  // ログイン済みの場合は自分のIDを使って強制リダイレクト
+  redirect(`/profile/${session.user.id}`);
+}

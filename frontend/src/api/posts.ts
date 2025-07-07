@@ -54,7 +54,13 @@ export class PostsApi {
   }
 
   static async likePost(postId: number): Promise<LikeResponse> {
-    return ApiClient.post<LikeResponse>(`/posts/${postId}/like`, {});
+    console.log("🔗 PostsApi.likePost called:", { postId });
+    const response = await ApiClient.post<LikeResponse>(
+      `/posts/${postId}/like`,
+      {},
+    );
+    console.log("🔗 PostsApi.likePost response:", response);
+    return response;
   }
 
   static async getPostLikes(postId: number): Promise<PostLikesResponse> {

@@ -7,7 +7,7 @@ interface EditFormProps {
   onContentChange: (content: string) => void;
   imagePreviewUrls: string[];
   onImageRemove: (index: number) => void;
-  onImageAdd: (files: FileList) => void;
+  onImageAdd: () => void;
   onSubmit: (e: React.FormEvent) => void;
   remainingChars: number;
   isSubmitting: boolean;
@@ -48,7 +48,10 @@ const EditForm = ({
         {/* ボタンエリア */}
         <div className="flex items-center justify-between pt-4 border-t border-border-muted">
           <div className="flex items-center gap-4">
-            <label
+            <button
+              type="button"
+              onClick={onImageAdd}
+              disabled={isSubmitting || imagePreviewUrls.length >= 10}
               className="text-interactive hover:text-interactive-hover disabled:opacity-50 p-2 rounded-full hover:bg-interactive-bg transition-all duration-300 cursor-pointer"
               title={
                 imagePreviewUrls.length >= 10
@@ -56,16 +59,8 @@ const EditForm = ({
                   : "画像を追加"
               }
             >
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={(e) => e.target.files && onImageAdd(e.target.files)}
-                disabled={isSubmitting || imagePreviewUrls.length >= 10}
-                className="hidden"
-              />
               <IconPhoto size={20} />
-            </label>
+            </button>
             <span
               className={`text-sm ${
                 remainingChars < 20

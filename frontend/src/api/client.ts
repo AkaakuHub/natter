@@ -85,10 +85,13 @@ export class ApiClient {
   }
 
   static async post<T>(endpoint: string, data?: unknown): Promise<T> {
-    return this.request<T>(endpoint, {
+    console.log("🌐 ApiClient.post called:", { endpoint, data });
+    const response = await this.request<T>(endpoint, {
       method: "POST",
       body: data ? JSON.stringify(data) : undefined,
     });
+    console.log("🌐 ApiClient.post response:", response);
+    return response;
   }
 
   static async patch<T>(endpoint: string, data?: unknown): Promise<T> {

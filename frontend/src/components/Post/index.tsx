@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { usePostLike } from "@/hooks/usePostLike";
+import { usePostActions } from "@/hooks/usePostActions";
 import { usePostReply } from "@/hooks/usePostReply";
 import { useImageModal } from "@/hooks/useImageModal";
 import { getImageUrl } from "@/utils/postUtils";
@@ -26,7 +26,7 @@ interface PostComponentProps {
     image: string;
   };
   post: Post;
-  onPostUpdate?: (updatedPost: Post) => void;
+  onPostUpdate?: () => void;
   onPostDelete?: () => void;
 }
 
@@ -42,10 +42,16 @@ const PostComponent = ({
   const currentUserId = currentUser?.id;
   const { sharePost } = usePostShare();
 
-  const { isLiked, likeCount, isLiking, handleLike } = usePostLike(
-    currentPost.id,
-    currentPost.likes?.map((like) => like.userId) || [],
+  const handlePostUpdateCallback = () => {
+    if (onPostUpdate) {
+      onPostUpdate();
+    }
+  };
+
+  const { isLiked, likeCount, isLiking, handleLike } = usePostActions(
+    currentPost,
     currentUserId,
+    handlePostUpdateCallback,
   );
 
   const {
@@ -69,7 +75,7 @@ const PostComponent = ({
 
   const handlePostUpdate = (updatedPost: Post) => {
     setCurrentPost(updatedPost);
-    onPostUpdate?.(updatedPost);
+    onPostUpdate?.();
   };
 
   const handlePostDelete = () => {
@@ -106,12 +112,21 @@ const PostComponent = ({
               onPostUpdate={handlePostUpdate}
               onPostDelete={handlePostDelete}
             />
-            {currentPost.replyTo && (
+            {currentPost.replyTo ? (
               <ReplyToIndicator
                 replyTo={currentPost.replyTo}
                 onReplyToClick={() => navigateToPost(currentPost.replyTo!.id)}
               />
-            )}
+            ) : currentPost.replyToId ? (
+              <div className="mb-3 p-3 bg-error-bg border-l-4 border-error/30 rounded-r-lg">
+                <div className="flex items-center gap-2 text-error">
+                  <div className="w-4 h-4 bg-error rounded-full"></div>
+                  <span className="text-sm font-medium">
+                    元の投稿は削除されました
+                  </span>
+                </div>
+              </div>
+            ) : null}
             <PostContent
               content={currentPost.content || ""}
               images={currentPost.images}
@@ -153,6 +168,7 @@ const PostComponent = ({
           replyToPost={{
             id: currentPost.id,
             content: currentPost.content || "",
+            images: currentPost.images || [],
             author: {
               name: user.name,
               image: user.image,

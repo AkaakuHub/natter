@@ -45,7 +45,7 @@ const EditPostModal = ({
       setContent(post.content || "");
       clearImages();
     }
-  }, [isOpen, post.content, clearImages]);
+  }, [isOpen, post.id, post.content, clearImages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,8 +70,19 @@ const EditPostModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-overlay p-4">
-      <div className="bg-surface rounded-3xl shadow-2xl max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto border border-border">
+    <div
+      className="fixed inset-0 z-[9999] flex items-start justify-center bg-overlay p-4"
+      onClick={(e) => {
+        e.stopPropagation();
+        if (e.target === e.currentTarget) {
+          handleClose();
+        }
+      }}
+    >
+      <div
+        className="bg-surface rounded-3xl shadow-2xl max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto border border-border"
+        onClick={(e) => e.stopPropagation()}
+      >
         <ModalHeader onClose={handleClose} />
 
         <EditForm

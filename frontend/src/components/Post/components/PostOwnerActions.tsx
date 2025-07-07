@@ -49,7 +49,7 @@ const PostOwnerActions = ({
 
       {/* ドロップダウンメニュー */}
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-48 bg-surface rounded-2xl shadow-2xl border border-border overflow-hidden z-50">
+        <div className="absolute top-full right-0 mt-2 w-48 bg-surface rounded-2xl shadow-2xl border border-border overflow-hidden z-[100]">
           <button
             onClick={handleEdit}
             className="w-full px-4 py-3 text-left hover:bg-surface-variant flex items-center gap-3 transition-colors"

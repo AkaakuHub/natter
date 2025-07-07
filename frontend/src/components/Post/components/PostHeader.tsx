@@ -1,7 +1,7 @@
 import React from "react";
 import { formatDate } from "@/utils/postUtils";
 import { Post } from "@/api/types";
-import { useAuthStore } from "@/stores/authStore";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import PostOwnerActions from "./PostOwnerActions";
 
 interface PostHeaderProps {
@@ -25,8 +25,8 @@ const PostHeader = ({
   onPostUpdate,
   onPostDelete,
 }: PostHeaderProps) => {
-  const { user: currentUser } = useAuthStore();
-  const isOwner = currentUser?.id === post.authorId;
+  const { currentUser } = useCurrentUser();
+  const isOwner = currentUser?.id === (post.authorId || post.author?.id);
 
   return (
     <div className="mb-3">
@@ -56,7 +56,14 @@ const PostHeader = ({
         )}
       </div>
       <time className="text-xs text-text-muted block">
-        {formatDate(createdAt)}
+        {formatDate(
+          post.updatedAt && post.updatedAt !== post.createdAt
+            ? post.updatedAt
+            : createdAt,
+        )}
+        {post.updatedAt && post.updatedAt !== post.createdAt && (
+          <span className="ml-1 text-text-muted">(編集済み)</span>
+        )}
       </time>
     </div>
   );

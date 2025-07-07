@@ -35,10 +35,14 @@ const DetailedPostComponent = ({
   const { showToast } = useToast();
   const { sharePost } = usePostShare();
 
-  const { post, loading, error, replies, setReplies } = useDetailedPost(
-    postId,
-    currentUser?.id,
-  );
+  const { post, loading, error, replies, setReplies, refreshPost } =
+    useDetailedPost(postId, currentUser?.id);
+
+  const handlePostUpdate = () => {
+    // 投稿データを更新するコールバック
+    refreshPost();
+  };
+
   const {
     isLiked,
     likeCount,
@@ -47,7 +51,7 @@ const DetailedPostComponent = ({
     showReplyModal,
     setShowReplyModal,
     handleReplyClick,
-  } = usePostActions(post, currentUser?.id);
+  } = usePostActions(post, currentUser?.id, handlePostUpdate);
   const {
     isModalOpen,
     selectedImageIndex,
@@ -112,11 +116,14 @@ const DetailedPostComponent = ({
         <BackButton onBack={goBack} />
 
         <div className="bg-surface/90 backdrop-blur-sm rounded-3xl shadow-soft hover:shadow-glow border border-border/60 overflow-hidden transition-all duration-300">
-          {post.replyTo && (
+          {post.replyTo ? (
             <ParentPostCard
               parentPost={{
                 id: post.replyTo.id,
                 content: post.replyTo.content,
+                images: Array.isArray(post.replyTo.images)
+                  ? post.replyTo.images
+                  : [],
                 author: {
                   name: post.replyTo.author?.name,
                   image: post.replyTo.author?.image,
@@ -124,12 +131,28 @@ const DetailedPostComponent = ({
               }}
               onParentPostClick={() => navigateToPost(post.replyTo!.id)}
             />
-          )}
+          ) : post.replyToId ? (
+            <div className="p-6 bg-surface-variant/50 border-b border-border/60">
+              <div className="flex items-center gap-2 text-text-muted">
+                <div className="w-4 h-4 bg-error rounded-full"></div>
+                <span className="text-sm">元の投稿は削除されました</span>
+              </div>
+            </div>
+          ) : null}
 
           <PostHeader
             user={user}
             createdAt={post.createdAt}
             onUserClick={() => navigateToProfile(user?.id)}
+            post={post}
+            onPostUpdate={() => {
+              // 投稿が更新された場合は再取得
+              refreshPost();
+            }}
+            onPostDelete={() => {
+              // 削除された場合は戻る
+              goBack();
+            }}
           />
 
           <PostContent
@@ -181,6 +204,7 @@ const DetailedPostComponent = ({
           replyToPost={{
             id: post.id,
             content: post.content || "",
+            images: post.images || [],
             author: {
               name: post.author?.name || "Unknown User",
               image: post.author?.image,

@@ -12,24 +12,27 @@ export const transformPostToPostComponent = (post: Post) => {
   const transformedPost = {
     id: post.id,
     userId: post.authorId || "",
+    authorId: post.authorId || post.author.id,
     content: post.content || "",
     images: post.images || [],
     createdAt: post.createdAt,
     updatedAt: post.updatedAt || post.createdAt,
     published: post.published ?? true,
-    liked: post.likes?.map((like) => like.userId) || [],
+    likes: post.likes || [],
+    author: post.author,
     _count: post._count,
     replyTo: post.replyTo
       ? {
           id: post.replyTo.id,
           userId: post.replyTo.author?.id || "",
           content: post.replyTo.content || "",
-          images: [],
+          images: post.replyTo.images || [],
           createdAt: post.replyTo.createdAt || post.createdAt,
           updatedAt:
             post.replyTo.updatedAt || post.replyTo.createdAt || post.createdAt,
           published: true,
-          liked: [],
+          likes: [],
+          authorId: post.replyTo.authorId || post.replyTo.author?.id || "",
           _count: { likes: 0, replies: 0 },
           replyTo: undefined,
           author: {
@@ -45,6 +48,7 @@ export const transformPostToPostComponent = (post: Post) => {
           },
         }
       : undefined,
+    replyToId: post.replyToId,
   };
 
   return { transformedUser, transformedPost };

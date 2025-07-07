@@ -14,6 +14,7 @@ interface ReplyModalProps {
   replyToPost: {
     id: number;
     content: string;
+    images?: string[];
     author: {
       name: string;
       image?: string;

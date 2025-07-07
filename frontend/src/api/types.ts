@@ -56,7 +56,7 @@ export interface PostLikesResponse {
   users: User[];
 }
 
-interface Like {
+export interface Like {
   id: number;
   userId: string;
   postId: number;

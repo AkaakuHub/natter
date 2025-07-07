@@ -29,6 +29,7 @@ const DeleteConfirmDialog = ({
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (e.target === e.currentTarget) {
       onClose();
     }
@@ -41,7 +42,10 @@ const DeleteConfirmDialog = ({
       className="fixed inset-0 z-50 flex items-center justify-center bg-overlay"
       onClick={handleBackdropClick}
     >
-      <div className="bg-surface rounded-3xl shadow-2xl max-w-md w-full mx-4 border border-border">
+      <div
+        className="bg-surface rounded-3xl shadow-2xl max-w-md w-full mx-4 border border-border"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* ヘッダー */}
         <div className="flex items-center justify-between p-6 border-b border-border-muted">
           <div className="flex items-center gap-3">

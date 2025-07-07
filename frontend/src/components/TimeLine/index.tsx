@@ -39,6 +39,15 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
     fetchPosts();
   };
 
+  const handlePostUpdate = () => {
+    // いいね更新の場合は投稿一覧を再取得
+    fetchPosts();
+  };
+
+  const handlePostDelete = (postId: number) => {
+    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+  };
+
   // currentUserはpropsから受け取る
 
   if (loading) {
@@ -74,6 +83,8 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
             key={post.id}
             user={transformedUser}
             post={transformedPost}
+            onPostUpdate={handlePostUpdate}
+            onPostDelete={() => handlePostDelete(post.id)}
           />
         );
       })}

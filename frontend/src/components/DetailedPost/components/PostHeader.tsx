@@ -1,6 +1,9 @@
 import React from "react";
 import Image from "next/image";
 import { formatDate } from "@/utils/postUtils";
+import { Post } from "@/api/types";
+import PostOwnerActions from "@/components/Post/components/PostOwnerActions";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 interface PostHeaderProps {
   user?: {
@@ -10,9 +13,22 @@ interface PostHeaderProps {
   };
   createdAt: string | number | Date;
   onUserClick: () => void;
+  post?: Post;
+  onPostUpdate?: (updatedPost: Post) => void;
+  onPostDelete?: () => void;
 }
 
-const PostHeader = ({ user, createdAt, onUserClick }: PostHeaderProps) => {
+const PostHeader = ({
+  user,
+  createdAt,
+  onUserClick,
+  post,
+  onPostUpdate,
+  onPostDelete,
+}: PostHeaderProps) => {
+  const { currentUser } = useCurrentUser();
+  const canShowActions = post && currentUser?.id === post.authorId;
+
   return (
     <div className="p-6 border-b border-border/60">
       <div className="flex items-start space-x-4">
@@ -33,9 +49,23 @@ const PostHeader = ({ user, createdAt, onUserClick }: PostHeaderProps) => {
           </button>
           <p className="text-text-muted text-sm mb-2">@{user?.id}</p>
           <time className="text-xs text-text-muted">
-            {formatDate(createdAt)}
+            {formatDate(
+              post?.updatedAt && post.updatedAt !== post.createdAt
+                ? post.updatedAt
+                : createdAt,
+            )}
+            {post?.updatedAt && post.updatedAt !== post.createdAt && (
+              <span className="ml-1 text-text-muted">(編集済み)</span>
+            )}
           </time>
         </div>
+        {canShowActions && post && (
+          <PostOwnerActions
+            post={post}
+            onPostUpdate={onPostUpdate}
+            onPostDelete={onPostDelete}
+          />
+        )}
       </div>
     </div>
   );

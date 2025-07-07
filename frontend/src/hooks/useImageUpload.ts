@@ -57,10 +57,12 @@ export const useImageUpload = (
   }, []);
 
   const clearImages = useCallback(() => {
-    imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+    setImagePreviewUrls((prev) => {
+      prev.forEach((url) => URL.revokeObjectURL(url));
+      return [];
+    });
     setImages([]);
-    setImagePreviewUrls([]);
-  }, [imagePreviewUrls]);
+  }, []);
 
   return {
     images,

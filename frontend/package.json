@@ -4,13 +4,18 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:stable": "next dev --experimental-https",
+    "dev:legacy": "NODE_OPTIONS='--max-old-space-size=4096' next dev",
+    "dev:fresh": "./clear-cache.sh",
+    "dev:safe": "NODE_ENV=development next dev --port 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
     "knip": "knip",
     "clean": "rm -rf .next node_modules pnpm-lock.yaml && pnpm install",
-    "clean:cache": "rm -rf .next node_modules/.cache"
+    "clean:cache": "rm -rf .next node_modules/.cache",
+    "dev:clean": "rm -rf .next && pnpm dev"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
@@ -20,7 +25,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "jsonwebtoken": "^9.0.2",
-    "next": "15.3.4",
+    "next": "15.3.5",
     "next-auth": "5.0.0-beta.25",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -28,20 +33,20 @@
     "zustand": "^5.0.6"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.10",
-    "@types/node": "^24.0.3",
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "^24.0.10",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "@typescript-eslint/eslint-plugin": "^8.35.0",
-    "@typescript-eslint/parser": "^8.35.0",
+    "@typescript-eslint/eslint-plugin": "^8.35.1",
+    "@typescript-eslint/parser": "^8.35.1",
     "autoprefixer": "^10.4.21",
-    "eslint": "^9.29.0",
-    "eslint-config-next": "^15.3.4",
-    "knip": "^5.61.2",
+    "eslint": "^9.30.1",
+    "eslint-config-next": "^15.3.5",
+    "knip": "^5.61.3",
     "postcss": "^8.5.6",
     "postcss-load-config": "^6.0.1",
     "prettier": "^3.6.2",
-    "tailwindcss": "^4.1.10",
+    "tailwindcss": "^4.1.11",
     "typescript": "^5.8.3"
   }
 }
