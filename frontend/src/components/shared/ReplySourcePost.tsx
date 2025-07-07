@@ -32,26 +32,55 @@ const ReplySourcePost = ({
   onPostClick,
   showReplyLabel = false,
 }: ReplySourcePostProps) => {
-  const hasImages =
-    post.images && Array.isArray(post.images) && post.images.length > 0;
+  // 一時的なデバッグログ
+  console.log("🚨 REPLY SOURCE POST DEBUG:", {
+    variant,
+    postId: post.id,
+    receivedImages: post.images,
+    imageType: typeof post.images,
+    isArray: Array.isArray(post.images),
+    imageLength: post.images?.length || 0,
+    stringifiedImages: JSON.stringify(post.images),
+  });
+
+  // 画像データを正規化（文字列化されたJSONを配列に変換）
+  let normalizedImageArray: string[] = [];
+  if (post.images) {
+    if (Array.isArray(post.images)) {
+      normalizedImageArray = post.images;
+    } else if (typeof post.images === "string") {
+      try {
+        const parsed = JSON.parse(post.images);
+        normalizedImageArray = Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        console.error("Failed to parse images JSON:", e);
+        normalizedImageArray = [];
+      }
+    }
+  }
+
+  console.log("🔧 NORMALIZED IMAGES:", normalizedImageArray);
+
+  const hasImages = normalizedImageArray && normalizedImageArray.length > 0;
 
   // 画像データを統一形式に変換
-  const normalizedImages: PostImage[] =
-    post.images && Array.isArray(post.images)
-      ? post.images.map((image, index) => {
-          if (typeof image === "string") {
-            const imageUrl = image.startsWith("http")
-              ? image
-              : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
-            return {
-              id: index,
-              url: imageUrl,
-            };
-          } else {
-            return image;
-          }
-        })
-      : [];
+  const normalizedImages: PostImage[] = normalizedImageArray.map(
+    (image, index) => {
+      if (typeof image === "string") {
+        const imageUrl = image.startsWith("http")
+          ? image
+          : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
+        return {
+          id: index,
+          url: imageUrl,
+        };
+      } else {
+        return image;
+      }
+    },
+  );
+
+  console.log("🔧 FINAL NORMALIZED IMAGES:", normalizedImages);
 
   const isClickable = !!onPostClick;
 
