@@ -8,6 +8,7 @@ import { useDetailedPost } from "@/hooks/useDetailedPost";
 import { usePostActions } from "@/hooks/usePostActions";
 import { useImageModal } from "@/hooks/useImageModal";
 import { useToast } from "@/hooks/useToast";
+import { usePostShare } from "@/hooks/usePostShare";
 
 import BackButton from "./components/BackButton";
 import LoadingState from "./components/LoadingState";
@@ -32,6 +33,7 @@ const DetailedPostComponent = ({
 }: DetailedPostComponentProps) => {
   const { goBack, navigateToProfile, navigateToPost } = useNavigation();
   const { showToast } = useToast();
+  const { sharePost } = usePostShare();
 
   const { post, loading, error, replies, setReplies } = useDetailedPost(
     postId,
@@ -77,6 +79,16 @@ const DetailedPostComponent = ({
       console.error("Failed to create reply:", error);
       throw new Error("Failed to create reply");
     }
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!post) return;
+
+    const authorName = post.author?.name || "Unknown User";
+    const postContent = post.content || "";
+
+    await sharePost(post.id.toString(), postContent, authorName);
   };
 
   if (loading) {
@@ -133,6 +145,7 @@ const DetailedPostComponent = ({
             repliesCount={replies.length}
             onLike={handleLike}
             onReply={handleReplyClick}
+            onShare={handleShare}
             canInteract={canInteract}
           />
         </div>

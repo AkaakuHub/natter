@@ -8,6 +8,7 @@ interface PostActionsProps {
   repliesCount: number;
   onLike: (e: React.MouseEvent) => void;
   onReply: () => void;
+  onShare: (e: React.MouseEvent) => void;
   canInteract: boolean;
 }
 
@@ -18,6 +19,7 @@ const PostActions = ({
   repliesCount,
   onLike,
   onReply,
+  onShare,
   canInteract,
 }: PostActionsProps) => {
   return (
@@ -48,7 +50,10 @@ const PostActions = ({
           <span className="font-medium">{repliesCount}</span>
         </button>
 
-        <button className="flex items-center gap-2 px-4 py-3 rounded-full text-text-muted hover:text-success hover:bg-success-bg transition-all duration-300 hover:scale-105">
+        <button
+          onClick={onShare}
+          className="flex items-center gap-2 px-4 py-3 rounded-full text-text-muted hover:text-success hover:bg-success-bg transition-all duration-300 hover:scale-105"
+        >
           <IconShare size={20} />
           <span className="font-medium">シェア</span>
         </button>

@@ -7,6 +7,7 @@ import { usePostLike } from "@/hooks/usePostLike";
 import { usePostReply } from "@/hooks/usePostReply";
 import { useImageModal } from "@/hooks/useImageModal";
 import { getImageUrl } from "@/utils/postUtils";
+import { usePostShare } from "@/hooks/usePostShare";
 import { Post } from "@/api/types";
 
 import ImageModal from "@/components/ImageModal";
@@ -39,6 +40,7 @@ const PostComponent = ({
   const { navigateToPost, navigateToProfile } = useNavigation();
   const { currentUser } = useCurrentUser();
   const currentUserId = currentUser?.id;
+  const { sharePost } = usePostShare();
 
   const { isLiked, likeCount, isLiking, handleLike } = usePostLike(
     currentPost.id,
@@ -72,6 +74,16 @@ const PostComponent = ({
 
   const handlePostDelete = () => {
     onPostDelete?.();
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!currentPost) return;
+
+    const authorName = user?.name || "Unknown User";
+    const postContent = currentPost.content || "";
+
+    await sharePost(currentPost.id.toString(), postContent, authorName);
   };
 
   return (
@@ -112,6 +124,7 @@ const PostComponent = ({
               replyCount={replyCount}
               onLike={handleLike}
               onReply={handleReplyClick}
+              onShare={handleShare}
               canInteract={canInteract}
             />
           </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 interface UseImageUploadResult {
   images: File[];
@@ -14,7 +14,7 @@ export const useImageUpload = (
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 
-  const handleImageAdd = () => {
+  const handleImageAdd = useCallback(() => {
     if (images.length >= maxImages) {
       alert(`画像は最大${maxImages}枚までアップロードできます`);
       return;
@@ -46,21 +46,21 @@ export const useImageUpload = (
     };
 
     input.click();
-  };
+  }, [images.length, maxImages]);
 
-  const handleImageRemove = (index: number) => {
+  const handleImageRemove = useCallback((index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
     setImagePreviewUrls((prev) => {
       URL.revokeObjectURL(prev[index]);
       return prev.filter((_, i) => i !== index);
     });
-  };
+  }, []);
 
-  const clearImages = () => {
+  const clearImages = useCallback(() => {
     imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
     setImages([]);
     setImagePreviewUrls([]);
-  };
+  }, [imagePreviewUrls]);
 
   return {
     images,
