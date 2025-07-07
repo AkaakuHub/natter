@@ -1,6 +1,9 @@
 pre-commit:
   parallel: true
   commands:
+    frontend-tailwind-colors-check:
+      glob: "frontend/src/**/*.{ts,tsx,js,jsx}"
+      run: cd frontend && ./scripts/check-tailwind-colors.sh
     frontend-lint:
       glob: "frontend/{src,app}/**/*.{ts,tsx}"
       run: cd frontend && pnpm run lint

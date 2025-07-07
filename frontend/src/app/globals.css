@@ -3,7 +3,7 @@
 @theme {
   /* Semantic Color System - Light Mode (Default) */
   --color-surface: #ffffff;
-  --color-surface-variant: #f8fafc;
+  --color-surface-variant: #f1f5f9;
   --color-surface-secondary: #f1f5f9;
   --color-surface-elevated: #e2e8f0;
 
@@ -104,7 +104,7 @@ body {
   --color-success-hover: #047857;
   --color-warning-hover: #92400e;
 
-  --color-overlay: rgba(0, 0, 0, 0.7);
+  --color-overlay: rgba(0, 0, 0, 0.8);
   --color-surface-hover: #475569;
 }
 
