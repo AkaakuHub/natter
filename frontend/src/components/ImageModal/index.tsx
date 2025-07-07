@@ -37,11 +37,11 @@ const ImageModal = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay"
-      onClick={handleBackdropClick}
-    >
-      <div className="relative w-full h-full flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay">
+      <div
+        className="relative w-full h-full flex items-center justify-center"
+        onClick={handleBackdropClick}
+      >
         {/* 画像表示 */}
         <ImageDisplay currentImage={currentImage} currentIndex={currentIndex} />
 
