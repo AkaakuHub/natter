@@ -33,14 +33,14 @@ const PostContent = ({ content, images, onImageClick }: PostContentProps) => {
               <button
                 key={idx}
                 onClick={() => onImageClick(idx)}
-                className="relative group overflow-hidden rounded-3xl focus:outline-none focus:ring-2 focus:ring-interactive/50 focus:ring-offset-2 shadow-soft hover:shadow-glow transition-all duration-300 hover:scale-[1.02]"
+                className="relative overflow-hidden rounded-3xl focus:outline-none focus:ring-2 focus:ring-interactive/50 focus:ring-offset-2 shadow-soft hover:shadow-glow"
               >
                 <Image
                   src={imageSrc}
                   alt={`Post image ${idx + 1}`}
                   width={512}
                   height={512}
-                  className="w-full h-auto object-cover transition-all duration-300 group-hover:scale-105 cursor-pointer rounded-3xl"
+                  className="w-full h-auto object-cover cursor-pointer rounded-3xl"
                 />
               </button>
             );
