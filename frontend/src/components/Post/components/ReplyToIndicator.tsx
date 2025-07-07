@@ -3,8 +3,8 @@ import React from "react";
 interface ReplyToIndicatorProps {
   replyTo: {
     id: number;
-    content: string;
-    author: {
+    content?: string;
+    author?: {
       id: string;
       name: string;
     };
@@ -27,7 +27,7 @@ const ReplyToIndicator = ({
             onReplyToClick();
           }}
         >
-          @{replyTo.author.name}
+          @{replyTo.author?.name || "Unknown User"}
         </button>
       </p>
     </div>

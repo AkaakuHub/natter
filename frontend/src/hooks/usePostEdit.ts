@@ -7,7 +7,11 @@ import { useToast } from "@/hooks/useToast";
 interface UsePostEditResult {
   isEditing: boolean;
   error: string | null;
-  editPost: (id: number, content: string, images?: File[]) => Promise<Post | null>;
+  editPost: (
+    id: number,
+    content: string,
+    images?: File[],
+  ) => Promise<Post | null>;
   canEdit: (post: Post) => boolean;
 }
 
@@ -41,8 +45,7 @@ export const usePostEdit = (): UsePostEditResult => {
         // 画像がある場合はFormDataを使用
         const formData = new FormData();
         formData.append("content", content);
-        formData.append("authorId", user.id);
-        
+
         images.forEach((image) => {
           formData.append("images", image);
         });
@@ -52,14 +55,14 @@ export const usePostEdit = (): UsePostEditResult => {
         // テキストのみの場合は通常のAPIを使用
         updatedPost = await PostsApi.updatePost(id, {
           content,
-          authorId: user.id,
         });
       }
 
       showToast("投稿を編集しました", "success");
       return updatedPost;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "投稿の編集に失敗しました";
+      const errorMessage =
+        err instanceof Error ? err.message : "投稿の編集に失敗しました";
       setError(errorMessage);
       showToast(errorMessage, "error");
       return null;

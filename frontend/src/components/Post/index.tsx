@@ -29,7 +29,12 @@ interface PostComponentProps {
   onPostDelete?: () => void;
 }
 
-const PostComponent = ({ user, post, onPostUpdate, onPostDelete }: PostComponentProps) => {
+const PostComponent = ({
+  user,
+  post,
+  onPostUpdate,
+  onPostDelete,
+}: PostComponentProps) => {
   const [currentPost, setCurrentPost] = useState<Post>(post);
   const { navigateToPost, navigateToProfile } = useNavigation();
   const { currentUser } = useCurrentUser();
@@ -37,7 +42,7 @@ const PostComponent = ({ user, post, onPostUpdate, onPostDelete }: PostComponent
 
   const { isLiked, likeCount, isLiking, handleLike } = usePostLike(
     currentPost.id,
-    currentPost.liked,
+    currentPost.likes?.map((like) => like.userId) || [],
     currentUserId,
   );
 
@@ -96,7 +101,7 @@ const PostComponent = ({ user, post, onPostUpdate, onPostDelete }: PostComponent
               />
             )}
             <PostContent
-              content={currentPost.content}
+              content={currentPost.content || ""}
               images={currentPost.images}
               onImageClick={handleImageClick}
             />
@@ -134,7 +139,7 @@ const PostComponent = ({ user, post, onPostUpdate, onPostDelete }: PostComponent
           onClose={() => setShowReplyModal(false)}
           replyToPost={{
             id: currentPost.id,
-            content: currentPost.content,
+            content: currentPost.content || "",
             author: {
               name: user.name,
               image: user.image,

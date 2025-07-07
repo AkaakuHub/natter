@@ -17,13 +17,13 @@ interface PostHeaderProps {
   onPostDelete?: () => void;
 }
 
-const PostHeader = ({ 
-  user, 
-  post, 
-  createdAt, 
-  onUserClick, 
-  onPostUpdate, 
-  onPostDelete 
+const PostHeader = ({
+  user,
+  post,
+  createdAt,
+  onUserClick,
+  onPostUpdate,
+  onPostDelete,
 }: PostHeaderProps) => {
   const { user: currentUser } = useAuthStore();
   const isOwner = currentUser?.id === post.authorId;
@@ -41,9 +41,11 @@ const PostHeader = ({
           >
             {user?.name || "Unknown User"}
           </button>
-          <span className="text-sm text-gray-500">@{user?.id || "unknown"}</span>
+          <span className="text-sm text-gray-500">
+            @{user?.id || "unknown"}
+          </span>
         </div>
-        
+
         {/* 所有者の場合のみアクションメニューを表示 */}
         {isOwner && (
           <PostOwnerActions

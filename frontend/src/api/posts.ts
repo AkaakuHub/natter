@@ -42,7 +42,10 @@ export class PostsApi {
   }
 
   // FormDataを使った投稿編集（画像付き）
-  static async updatePostWithImages(id: number, formData: FormData): Promise<Post> {
+  static async updatePostWithImages(
+    id: number,
+    formData: FormData,
+  ): Promise<Post> {
     return ApiClient.patchFormData<Post>(`/posts/${id}`, formData);
   }
 

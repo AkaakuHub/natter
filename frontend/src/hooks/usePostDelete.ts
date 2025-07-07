@@ -35,7 +35,8 @@ export const usePostDelete = (): UsePostDeleteResult => {
       showToast("投稿を削除しました", "success");
       return true;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "投稿の削除に失敗しました";
+      const errorMessage =
+        err instanceof Error ? err.message : "投稿の削除に失敗しました";
       setError(errorMessage);
       showToast(errorMessage, "error");
       return false;

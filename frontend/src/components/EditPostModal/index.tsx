@@ -73,7 +73,7 @@ const EditPostModal = ({
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/20 p-4">
       <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto">
         <ModalHeader onClose={handleClose} />
-        
+
         <EditForm
           content={content}
           onContentChange={setContent}
@@ -84,7 +84,9 @@ const EditPostModal = ({
           remainingChars={remainingChars}
           isSubmitting={isEditing}
           isValid={isValid}
-          hasChanges={content.trim() !== (post.content || "").trim() || images.length > 0}
+          hasChanges={
+            content.trim() !== (post.content || "").trim() || images.length > 0
+          }
           characterLimit={characterLimit}
         />
       </div>

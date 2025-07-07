@@ -67,9 +67,7 @@ const DeleteConfirmDialog = ({
 
           {/* 投稿のプレビュー */}
           <div className="bg-gray-50 rounded-2xl p-4 mb-6">
-            <p className="text-gray-700 text-sm line-clamp-3">
-              {post.content}
-            </p>
+            <p className="text-gray-700 text-sm line-clamp-3">{post.content}</p>
             {post.images && post.images.length > 0 && (
               <div className="mt-2 text-xs text-gray-500">
                 画像 {post.images.length} 枚が添付されています

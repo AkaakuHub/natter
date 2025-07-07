@@ -5,7 +5,7 @@ export class ApiClient {
 
   private static getAuthToken(): string | null {
     if (typeof window === "undefined") return null;
-    
+
     try {
       const authStorage = localStorage.getItem("auth-storage");
       if (authStorage) {
@@ -91,7 +91,10 @@ export class ApiClient {
   }
 
   // FormData用のメソッド（画像アップロード等）
-  static async postFormData<T>(endpoint: string, formData: FormData): Promise<T> {
+  static async postFormData<T>(
+    endpoint: string,
+    formData: FormData,
+  ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     const token = this.getAuthToken();
 
@@ -132,7 +135,10 @@ export class ApiClient {
     }
   }
 
-  static async patchFormData<T>(endpoint: string, formData: FormData): Promise<T> {
+  static async patchFormData<T>(
+    endpoint: string,
+    formData: FormData,
+  ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     const token = this.getAuthToken();
 
