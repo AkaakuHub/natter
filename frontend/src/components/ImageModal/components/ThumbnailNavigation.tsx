@@ -58,9 +58,7 @@ const ThumbnailNavigation = ({
           </button>
         ))}
         {images.length > 8 && (
-          <div className="text-gray-500 text-sm px-2">
-            +{images.length - 8}
-          </div>
+          <div className="text-gray-500 text-sm px-2">+{images.length - 8}</div>
         )}
       </div>
     </div>

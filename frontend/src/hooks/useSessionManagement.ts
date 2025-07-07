@@ -57,10 +57,7 @@ export const useSessionManagement = ({
           return; // 処理中
         }
 
-        if (
-          !isInitializedRef.current ||
-          lastSessionIdRef.current !== userId
-        ) {
+        if (!isInitializedRef.current || lastSessionIdRef.current !== userId) {
           isInitializedRef.current = true;
           lastSessionIdRef.current = userId;
           checkUserExists(userId);
@@ -73,7 +70,13 @@ export const useSessionManagement = ({
       }
     };
     run();
-  }, [session?.user?.id, status, checkUserExists, setCurrentUser, setUserExists]);
+  }, [
+    session?.user?.id,
+    status,
+    checkUserExists,
+    setCurrentUser,
+    setUserExists,
+  ]);
 
   return {
     session: session as ExtendedSession | null,

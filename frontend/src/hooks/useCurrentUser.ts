@@ -15,8 +15,12 @@ interface UseCurrentUserReturn {
 }
 
 export const useCurrentUser = (): UseCurrentUserReturn => {
-  const [internalCurrentUser, setInternalCurrentUser] = useState<User | null>(null);
-  const [internalUserExists, setInternalUserExists] = useState<boolean | null>(null);
+  const [internalCurrentUser, setInternalCurrentUser] = useState<User | null>(
+    null,
+  );
+  const [internalUserExists, setInternalUserExists] = useState<boolean | null>(
+    null,
+  );
 
   const {
     currentUser: validatedUser,
@@ -42,8 +46,10 @@ export const useCurrentUser = (): UseCurrentUserReturn => {
   });
 
   // Use validated user state if available, otherwise use internal state
-  const currentUser = validatedUser !== null ? validatedUser : internalCurrentUser;
-  const userExists = validatedUserExists !== null ? validatedUserExists : internalUserExists;
+  const currentUser =
+    validatedUser !== null ? validatedUser : internalCurrentUser;
+  const userExists =
+    validatedUserExists !== null ? validatedUserExists : internalUserExists;
   const isLoading = sessionLoading || userExists === null;
 
   return {

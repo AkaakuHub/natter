@@ -19,7 +19,7 @@ export const useModal = (initialState: boolean = false): UseModalResult => {
   }, []);
 
   const toggle = useCallback(() => {
-    setIsOpen(prev => !prev);
+    setIsOpen((prev) => !prev);
   }, []);
 
   return {

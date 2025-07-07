@@ -26,7 +26,7 @@ export const useInfiniteScroll = ({
       if (isFetching) return;
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver(
-        entries => {
+        (entries) => {
           if (entries[0].isIntersecting && hasNextPage) {
             setIsLoading(true);
             onLoadMore();

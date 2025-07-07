@@ -24,7 +24,8 @@ export const useApiCall = <T = unknown, TArgs extends unknown[] = unknown[]>(
         setData(result);
         return result;
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error occurred";
         setError(errorMessage);
         console.error("API call failed:", err);
         return undefined;

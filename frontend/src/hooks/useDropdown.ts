@@ -16,7 +16,7 @@ export const useDropdown = (): UseDropdownResult => {
   }, []);
 
   const toggle = useCallback(() => {
-    setIsOpen(prev => !prev);
+    setIsOpen((prev) => !prev);
   }, []);
 
   const { ref } = useClickOutside<HTMLDivElement>(close);
