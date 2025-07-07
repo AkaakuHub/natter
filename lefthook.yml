@@ -4,15 +4,19 @@ pre-commit:
     frontend-lint:
       glob: "frontend/{src,app}/**/*.{ts,tsx}"
       run: cd frontend && pnpm run lint
+      stage_fixed: true
     frontend-format:
       glob: "frontend/{src,app}/**/*.{ts,tsx,js,jsx,json,css}"
       run: cd frontend && pnpm run format
+      stage_fixed: true
     backend-lint:
       glob: "backend/src/**/*.ts"
       run: cd backend && pnpm run lint
+      stage_fixed: true
     backend-format:
       glob: "backend/src/**/*.ts"
       run: cd backend && pnpm run format
+      stage_fixed: true
 
 pre-push:
   commands:
