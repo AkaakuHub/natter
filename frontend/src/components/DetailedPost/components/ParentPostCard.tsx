@@ -28,9 +28,7 @@ const ParentPostCard = ({
       >
         <div className="flex items-center space-x-3">
           <Image
-            src={
-              parentPost.author?.image || "/no_avatar_image_128x128.png"
-            }
+            src={parentPost.author?.image || "/no_avatar_image_128x128.png"}
             alt={`${parentPost.author?.name}'s avatar`}
             width={40}
             height={40}

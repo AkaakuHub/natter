@@ -30,9 +30,7 @@ const PostActions = ({
             isLiked
               ? "text-red-500 bg-red-50 hover:bg-red-100"
               : "text-gray-600 hover:text-red-500 hover:bg-red-50"
-          } ${
-            isLiking || !canInteract ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          } ${isLiking || !canInteract ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           <IconHeart
             size={20}

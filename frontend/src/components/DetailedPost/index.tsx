@@ -31,11 +31,29 @@ const DetailedPostComponent = ({
 }: DetailedPostComponentProps) => {
   const { goBack, navigateToProfile, navigateToPost } = useNavigation();
   const { showToast } = useToast();
-  
-  const { post, loading, error, replies, setReplies } = useDetailedPost(postId, currentUser?.id);
-  const { isLiked, likeCount, isLiking, handleLike, showReplyModal, setShowReplyModal, handleReplyClick } = usePostActions(post, currentUser?.id);
-  const { isModalOpen, selectedImageIndex, handleImageClick, closeImageModal, handlePreviousImage, handleNextImage } = useImageModal();
-  
+
+  const { post, loading, error, replies, setReplies } = useDetailedPost(
+    postId,
+    currentUser?.id,
+  );
+  const {
+    isLiked,
+    likeCount,
+    isLiking,
+    handleLike,
+    showReplyModal,
+    setShowReplyModal,
+    handleReplyClick,
+  } = usePostActions(post, currentUser?.id);
+  const {
+    isModalOpen,
+    selectedImageIndex,
+    handleImageClick,
+    closeImageModal,
+    handlePreviousImage,
+    handleNextImage,
+  } = useImageModal();
+
   const handleReplySubmit = async (content: string, images: File[]) => {
     if (!currentUser || !post) return;
 

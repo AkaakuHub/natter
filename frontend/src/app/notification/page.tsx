@@ -12,13 +12,13 @@ import { useRouter } from "next/navigation";
 export default function Notification() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  
+
   useEffect(() => {
     if (status === "unauthenticated") {
       redirect("/login");
     }
   }, [status, router]);
-  
+
   if (status === "loading") {
     return (
       <BaseLayout>
@@ -28,7 +28,7 @@ export default function Notification() {
       </BaseLayout>
     );
   }
-  
+
   if (!session) {
     return null;
   }
@@ -36,7 +36,9 @@ export default function Notification() {
   return (
     <BaseLayout>
       <div className="flex flex-col items-center justify-center h-full gap-8 p-8">
-        <div className="text-lg text-gray-600">このページは誠意開発中です。</div>
+        <div className="text-lg text-gray-600">
+          このページは誠意開発中です。
+        </div>
         <Button
           onClick={() => {
             router.push("/");

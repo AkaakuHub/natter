@@ -26,14 +26,8 @@ const RepliesList = ({ replies }: RepliesListProps) => {
             const { transformedUser, transformedPost } = transformed;
 
             return (
-              <div
-                key={reply.id}
-                className="border border-gray-100 rounded-lg"
-              >
-                <PostComponent
-                  user={transformedUser}
-                  post={transformedPost}
-                />
+              <div key={reply.id} className="border border-gray-100 rounded-lg">
+                <PostComponent user={transformedUser} post={transformedPost} />
               </div>
             );
           })}

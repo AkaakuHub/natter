@@ -32,9 +32,7 @@ const PostHeader = ({ user, createdAt, onUserClick }: PostHeaderProps) => {
             </h1>
           </button>
           <p className="text-gray-500 text-sm mb-2">@{user?.id}</p>
-          <time className="text-xs text-gray-400">
-            {formatDate(createdAt)}
-          </time>
+          <time className="text-xs text-gray-400">{formatDate(createdAt)}</time>
         </div>
       </div>
     </div>

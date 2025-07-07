@@ -38,12 +38,12 @@ export const useDetailedPost = (
     try {
       setLoading(true);
       setError(null);
-      
+
       const [fetchedPost, fetchedReplies] = await Promise.all([
         PostsApi.getPostById(numericPostId),
         PostsApi.getReplies(numericPostId),
       ]);
-      
+
       setPost(fetchedPost);
       setReplies(fetchedReplies);
     } catch (err) {

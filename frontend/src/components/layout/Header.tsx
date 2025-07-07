@@ -93,8 +93,13 @@ const Header = ({
               onClick={handleLogout}
               className="w-full px-4 py-3 text-left hover:bg-red-50 flex items-center gap-3 transition-colors group"
             >
-              <IconLogout size={20} className="text-gray-600 group-hover:text-red-500" />
-              <span className="text-gray-700 font-medium group-hover:text-red-500">ログアウト</span>
+              <IconLogout
+                size={20}
+                className="text-gray-600 group-hover:text-red-500"
+              />
+              <span className="text-gray-700 font-medium group-hover:text-red-500">
+                ログアウト
+              </span>
             </button>
           </div>
         )}
