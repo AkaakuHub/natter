@@ -18,9 +18,7 @@ export const usePostLike = (
   const [isLiking, setIsLiking] = useState(false);
 
   useEffect(() => {
-    setIsLiked(
-      currentUserId ? liked?.includes(currentUserId) || false : false,
-    );
+    setIsLiked(currentUserId ? liked?.includes(currentUserId) || false : false);
     setLikeCount(liked?.length || 0);
   }, [liked, currentUserId]);
 

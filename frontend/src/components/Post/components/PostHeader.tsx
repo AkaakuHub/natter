@@ -24,9 +24,7 @@ const PostHeader = ({ user, createdAt, onUserClick }: PostHeaderProps) => {
         >
           {user?.name || "Unknown User"}
         </button>
-        <span className="text-sm text-gray-500">
-          @{user?.id || "unknown"}
-        </span>
+        <span className="text-sm text-gray-500">@{user?.id || "unknown"}</span>
       </div>
       <time className="text-xs text-gray-400 block">
         {formatDate(createdAt)}

@@ -48,13 +48,13 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
   const { navigateToPost, navigateToProfile } = useNavigation();
   const { currentUser } = useCurrentUser();
   const currentUserId = currentUser?.id;
-  
+
   const { isLiked, likeCount, isLiking, handleLike } = usePostLike(
     post.id,
     post.liked,
     currentUserId,
   );
-  
+
   const {
     replyCount,
     showReplyModal,
@@ -62,7 +62,7 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
     handleReplyClick,
     handleReplySubmit,
   } = usePostReply(post.id, post._count?.replies, currentUser);
-  
+
   const {
     isModalOpen,
     selectedImageIndex,
@@ -71,7 +71,7 @@ const PostComponent = ({ user, post }: PostComponentProps) => {
     handlePreviousImage,
     handleNextImage,
   } = useImageModal();
-  
+
   const canInteract = !!currentUserId;
 
   return (

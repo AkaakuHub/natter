@@ -12,7 +12,10 @@ interface ReplyToIndicatorProps {
   onReplyToClick: () => void;
 }
 
-const ReplyToIndicator = ({ replyTo, onReplyToClick }: ReplyToIndicatorProps) => {
+const ReplyToIndicator = ({
+  replyTo,
+  onReplyToClick,
+}: ReplyToIndicatorProps) => {
   return (
     <div className="mb-3 p-3 bg-blue-50 border-l-4 border-blue-200 rounded-r-lg">
       <p className="text-blue-700 text-sm">
