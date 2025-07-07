@@ -43,17 +43,12 @@ const ImageModal = ({
     >
       <div className="relative w-full h-full flex items-center justify-center">
         {/* 画像表示 */}
-        <div onClick={(e) => e.stopPropagation()}>
-          <ImageDisplay
-            currentImage={currentImage}
-            currentIndex={currentIndex}
-          />
-        </div>
+        <ImageDisplay currentImage={currentImage} currentIndex={currentIndex} />
 
         {/* バツボタン */}
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 z-30 text-text-inverse hover:text-text-inverse/80 bg-overlay hover:bg-overlay/90 rounded-full p-3 transition-all duration-200"
+          className="absolute top-6 right-6 z-30 text-text-inverse hover:text-text-inverse/80 bg-special-white/80 hover:bg-special-white/50 backdrop-blur-sm rounded-full p-3 transition-all duration-200"
         >
           <svg
             width="24"

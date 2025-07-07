@@ -34,6 +34,7 @@
   --color-warning-hover: #fed7aa;
 
   --color-overlay: rgba(0, 0, 0, 0.5);
+  --color-special-white: #dddddd;
   --color-surface-hover: #f1f5f9;
 
   /* Design System Tokens */
@@ -105,6 +106,7 @@ body {
   --color-warning-hover: #92400e;
 
   --color-overlay: rgba(0, 0, 0, 0.8);
+  --color-special-white: #dddddd;
   --color-surface-hover: #475569;
 }
 

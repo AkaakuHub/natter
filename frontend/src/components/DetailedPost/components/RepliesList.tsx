@@ -18,7 +18,7 @@ const RepliesList = ({ replies }: RepliesListProps) => {
         <h3 className="text-lg font-semibold text-text mb-4">
           リプライ ({replies.length})
         </h3>
-        <div className="space-y-4">
+        <div>
           {replies.map((reply) => {
             const transformed = transformReplyToPostComponent(reply);
             if (!transformed) return null;

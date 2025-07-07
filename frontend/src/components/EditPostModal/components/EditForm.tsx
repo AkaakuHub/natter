@@ -71,7 +71,7 @@ const EditForm = ({
                 remainingChars < 20
                   ? remainingChars < 0
                     ? "text-error"
-                    : "text-orange-500"
+                    : "text-warning"
                   : "text-text-muted"
               }`}
             >
