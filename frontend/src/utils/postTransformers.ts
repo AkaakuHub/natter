@@ -1,29 +1,29 @@
 import { Post } from "@/api";
 
-export const transformReplyToPostComponent = (reply: Post) => {
-  if (!reply.author) return null;
+export const transformPostToPostComponent = (post: Post) => {
+  if (!post.author) return null;
 
   const transformedUser = {
-    id: reply.author.id,
-    name: reply.author.name,
-    image: reply.author.image || "/no_avatar_image_128x128.png",
+    id: post.author.id,
+    name: post.author.name,
+    image: post.author.image || "/no_avatar_image_128x128.png",
   };
 
   const transformedPost = {
-    id: reply.id,
-    userId: reply.authorId || "",
-    content: reply.content || "",
-    images: reply.images || [],
-    createdAt: reply.createdAt,
-    liked: reply.likes?.map((like) => like.userId) || [],
-    _count: reply._count,
-    replyTo: reply.replyTo
+    id: post.id,
+    userId: post.authorId || "",
+    content: post.content || "",
+    images: post.images || [],
+    createdAt: post.createdAt,
+    liked: post.likes?.map((like) => like.userId) || [],
+    _count: post._count,
+    replyTo: post.replyTo
       ? {
-          id: reply.replyTo.id,
-          content: reply.replyTo.content || "",
+          id: post.replyTo.id,
+          content: post.replyTo.content || "",
           author: {
-            id: reply.replyTo.author?.id || "",
-            name: reply.replyTo.author?.name || "",
+            id: post.replyTo.author?.id || "",
+            name: post.replyTo.author?.name || "",
           },
         }
       : undefined,
@@ -31,3 +31,6 @@ export const transformReplyToPostComponent = (reply: Post) => {
 
   return { transformedUser, transformedPost };
 };
+
+// Backward compatibility
+export const transformReplyToPostComponent = transformPostToPostComponent;

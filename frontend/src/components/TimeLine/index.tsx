@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import PostComponent from "../Post";
 import CreatePost from "../CreatePost";
 import { PostsApi, Post, User } from "../../api";
+import { transformPostToPostComponent } from "@/utils/postTransformers";
 import { ExtendedSession } from "@/types";
 
 interface TimeLineProps {
@@ -68,35 +69,10 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
 
       {/* 投稿一覧 */}
       {posts.map((post) => {
-        if (!post.author) {
-          return null;
-        }
+        const transformed = transformPostToPostComponent(post);
+        if (!transformed) return null;
 
-        // Convert API data format to component format
-        const user: User = post.author;
-        const transformedUser = {
-          ...user,
-          image: user.image || "no_avatar_image_128x128.png",
-        };
-        const transformedPost = {
-          id: post.id,
-          userId: post.authorId || "",
-          content: post.content || "",
-          images: post.images || [],
-          createdAt: post.createdAt,
-          liked: post.likes?.map((like) => like.userId) || [],
-          _count: post._count,
-          replyTo: post.replyTo
-            ? {
-                id: post.replyTo.id,
-                content: post.replyTo.content || "",
-                author: {
-                  id: post.replyTo.author?.id || "",
-                  name: post.replyTo.author?.name || "",
-                },
-              }
-            : undefined,
-        };
+        const { transformedUser, transformedPost } = transformed;
 
         return (
           <PostComponent

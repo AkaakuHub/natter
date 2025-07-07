@@ -4,9 +4,10 @@ import React, { useState, useEffect, useRef } from "react";
 
 import PostComponent from "@/components/Post";
 
-import { PostsApi, Post, User } from "@/api";
+import { PostsApi, Post } from "@/api";
 import ProfileHeader from "./ProfileHeader";
 import TabsComponent, { TabType, TabNames } from "./TabsComponent";
+import { transformPostToPostComponent } from "@/utils/postTransformers";
 
 import { ExtendedSession } from "@/types";
 
@@ -112,22 +113,10 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
     }
 
     return currentPosts.map((post) => {
-      if (!post.author) return null;
+      const transformed = transformPostToPostComponent(post);
+      if (!transformed) return null;
 
-      const user: User = post.author;
-      const transformedUser = {
-        ...user,
-        image: user.image || "no_avatar_image_128x128.png",
-      };
-      const transformedPost = {
-        id: post.id,
-        userId: post.authorId || "",
-        content: post.content || "",
-        images: post.images || [],
-        createdAt: post.createdAt,
-        liked: post.likes?.map((like) => like.userId) || [],
-        _count: post._count,
-      };
+      const { transformedUser, transformedPost } = transformed;
 
       return (
         <PostComponent
