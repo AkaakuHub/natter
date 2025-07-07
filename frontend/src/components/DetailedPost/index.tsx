@@ -115,15 +115,13 @@ const DetailedPostComponent = ({
       <div className="max-w-2xl mx-auto px-4 py-8">
         <BackButton onBack={goBack} />
 
-        <div className="bg-surface/90 backdrop-blur-sm rounded-3xl shadow-soft hover:shadow-glow border border-border/60 overflow-hidden transition-all duration-300">
+        <div className="bg-surface/90 backdrop-blur-sm rounded-3xl shadow-soft hover:shadow-glow border border-border/60 transition-all duration-300">
           {post.replyTo ? (
             <ParentPostCard
               parentPost={{
                 id: post.replyTo.id,
                 content: post.replyTo.content,
-                images: Array.isArray(post.replyTo.images)
-                  ? post.replyTo.images
-                  : [],
+                images: post.replyTo.images || [],
                 author: {
                   name: post.replyTo.author?.name,
                   image: post.replyTo.author?.image,

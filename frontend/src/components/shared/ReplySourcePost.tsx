@@ -32,14 +32,6 @@ const ReplySourcePost = ({
   onPostClick,
   showReplyLabel = false,
 }: ReplySourcePostProps) => {
-  console.log("🖼️ ReplySourcePost images data:", {
-    postId: post.id,
-    images: post.images,
-    isArray: Array.isArray(post.images),
-    length: post.images?.length || 0,
-    type: typeof post.images,
-  });
-
   const hasImages =
     post.images && Array.isArray(post.images) && post.images.length > 0;
 
@@ -51,37 +43,24 @@ const ReplySourcePost = ({
             const imageUrl = image.startsWith("http")
               ? image
               : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
-            console.log("🖼️ Converting string image:", {
-              original: image,
-              converted: imageUrl,
-            });
             return {
               id: index,
               url: imageUrl,
             };
           } else {
-            console.log("🖼️ Using PostImage object:", image);
             return image;
           }
         })
       : [];
 
-  console.log("🖼️ Final normalized images:", normalizedImages);
   const isClickable = !!onPostClick;
 
   const renderImages = () => {
-    console.log("🖼️ renderImages called:", {
-      hasImages,
-      normalizedImagesLength: normalizedImages.length,
-    });
-
     if (!hasImages) {
-      console.log("🖼️ No images to render");
       return null;
     }
 
     const imagesToShow = normalizedImages.slice(0, 3); // 最大3枚まで表示
-    console.log("🖼️ Images to show:", imagesToShow);
 
     return (
       <div className="mt-2 flex gap-2">
@@ -97,13 +76,7 @@ const ReplySourcePost = ({
               height={60}
               className="w-16 h-16 object-cover"
               onError={(e) => {
-                console.error("🖼️ Image load error:", {
-                  url: image.url,
-                  error: e,
-                });
-              }}
-              onLoad={() => {
-                console.log("🖼️ Image loaded successfully:", image.url);
+                console.error("Image load error:", image.url, e);
               }}
             />
           </div>

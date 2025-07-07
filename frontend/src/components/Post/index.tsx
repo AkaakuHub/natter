@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { usePostActions } from "@/hooks/usePostActions";
-import { usePostReply } from "@/hooks/usePostReply";
 import { useImageModal } from "@/hooks/useImageModal";
 import { getImageUrl } from "@/utils/postUtils";
 import { usePostShare } from "@/hooks/usePostShare";
@@ -48,19 +47,15 @@ const PostComponent = ({
     }
   };
 
-  const { isLiked, likeCount, isLiking, handleLike } = usePostActions(
-    currentPost,
-    currentUserId,
-    handlePostUpdateCallback,
-  );
-
   const {
-    replyCount,
+    isLiked,
+    likeCount,
+    isLiking,
+    handleLike,
     showReplyModal,
     setShowReplyModal,
     handleReplyClick,
-    handleReplySubmit,
-  } = usePostReply(currentPost.id, currentPost._count?.replies, currentUser);
+  } = usePostActions(currentPost, currentUserId, handlePostUpdateCallback);
 
   const {
     isModalOpen,
@@ -80,6 +75,14 @@ const PostComponent = ({
 
   const handlePostDelete = () => {
     onPostDelete?.();
+  };
+
+  const handleReplySubmit = async () => {
+    // リプライ後にタイムラインを更新
+    if (onPostUpdate) {
+      onPostUpdate();
+    }
+    setShowReplyModal(false);
   };
 
   const handleShare = async (e: React.MouseEvent) => {
@@ -136,7 +139,7 @@ const PostComponent = ({
               isLiked={isLiked}
               likeCount={likeCount}
               isLiking={isLiking}
-              replyCount={replyCount}
+              replyCount={currentPost._count?.replies || 0}
               onLike={handleLike}
               onReply={handleReplyClick}
               onShare={handleShare}

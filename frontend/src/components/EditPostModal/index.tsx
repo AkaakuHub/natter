@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Post } from "@/api/types";
 import { usePostEdit } from "@/hooks/usePostEdit";
 import { useImageUpload } from "@/hooks/useImageUpload";
@@ -69,7 +70,7 @@ const EditPostModal = ({
 
   if (!isOpen) return null;
 
-  return (
+  const modalContent = (
     <div
       className="fixed inset-0 z-[9999] flex items-start justify-center bg-overlay p-4"
       onClick={(e) => {
@@ -103,6 +104,10 @@ const EditPostModal = ({
       </div>
     </div>
   );
+
+  return typeof window !== "undefined"
+    ? createPortal(modalContent, document.body)
+    : null;
 };
 
 export default EditPostModal;
