@@ -39,6 +39,28 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
     characterLimit,
   );
 
+  // デバッグ用ログ
+  console.log("CreatePost - currentUser:", currentUser);
+  console.log("CreatePost - currentUser type:", typeof currentUser);
+
+  // 認証されていない場合は投稿作成コンポーネントを表示しない
+  if (!currentUser) {
+    return (
+      <div className="bg-white border-b border-gray-200 p-4">
+        <div className="text-center py-8">
+          <p className="text-gray-600 mb-4">投稿するにはログインが必要です。</p>
+          <p className="text-sm text-gray-500 mb-4">認証状態を確認中...</p>
+          <a
+            href="/login"
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 inline-block"
+          >
+            ログイン
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await submitPost(content, images);

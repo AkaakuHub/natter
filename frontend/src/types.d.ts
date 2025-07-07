@@ -21,4 +21,5 @@ export interface ExtendedSession extends Session {
     image?: string | null;
   } & DefaultSession["user"];
   accessToken?: unknown;
+  jwtToken?: unknown;
 }

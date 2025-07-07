@@ -2,6 +2,7 @@
 
 import React from "react";
 import { User } from "@/api";
+import { ApiClient } from "@/api/client";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useDetailedPost } from "@/hooks/useDetailedPost";
 import { usePostActions } from "@/hooks/usePostActions";
@@ -57,30 +58,25 @@ const DetailedPostComponent = ({
   const handleReplySubmit = async (content: string, images: File[]) => {
     if (!currentUser || !post) return;
 
-    const formData = new FormData();
-    formData.append("content", content);
-    formData.append("authorId", currentUser.id);
-    formData.append("replyToId", post.id.toString());
+    try {
+      const formData = new FormData();
+      formData.append("content", content);
+      formData.append("replyToId", post.id.toString());
 
-    images.forEach((file) => {
-      formData.append("images", file);
-    });
+      images.forEach((file) => {
+        formData.append("images", file);
+      });
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts`, {
-      method: "POST",
-      body: formData,
-    });
+      const newReply = await ApiClient.postFormData("/posts", formData);
+      setReplies((prev) => [...prev, newReply]);
 
-    if (!response.ok) {
+      showToast("リプライをしました。", "success", 3000, () => {
+        navigateToPost(newReply.id);
+      });
+    } catch (error) {
+      console.error("Failed to create reply:", error);
       throw new Error("Failed to create reply");
     }
-
-    const newReply = await response.json();
-    setReplies((prev) => [...prev, newReply]);
-
-    showToast("リプライをしました。", "success", 3000, () => {
-      navigateToPost(newReply.id);
-    });
   };
 
   if (loading) {
@@ -92,6 +88,10 @@ const DetailedPostComponent = ({
   }
 
   const user = post.author;
+
+  if (!user) {
+    return <ErrorState message="投稿者の情報が見つかりません" />;
+  }
   const canInteract = !!currentUser?.id;
 
   return (

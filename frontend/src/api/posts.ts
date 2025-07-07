@@ -53,10 +53,8 @@ export class PostsApi {
     return ApiClient.delete<void>(`/posts/${id}`);
   }
 
-  static async likePost(postId: number, userId: string): Promise<LikeResponse> {
-    return ApiClient.post<LikeResponse>(`/posts/${postId}/like`, {
-      userId,
-    });
+  static async likePost(postId: number): Promise<LikeResponse> {
+    return ApiClient.post<LikeResponse>(`/posts/${postId}/like`, {});
   }
 
   static async getPostLikes(postId: number): Promise<PostLikesResponse> {

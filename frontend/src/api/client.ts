@@ -1,16 +1,27 @@
+import { getSession } from "next-auth/react";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export class ApiClient {
   private static baseURL = API_BASE_URL;
 
-  private static getAuthToken(): string | null {
+  private static async getAuthToken(): Promise<string | null> {
     if (typeof window === "undefined") return null;
 
     try {
-      const authStorage = localStorage.getItem("auth-storage");
-      if (authStorage) {
-        const parsed = JSON.parse(authStorage);
-        return parsed.state?.token || null;
+      const session = await getSession();
+      if (session?.user?.id) {
+        // セッションが存在する場合は、そのまま Twitter ID を返す
+        console.log("Session found, returning user ID:", session.user.id);
+        return session.user.id;
+      } else {
+        console.warn("No session found - user may need to log in");
+        // ログイン済みなのにセッションがない場合の警告
+        if (window.location.pathname !== "/login") {
+          console.warn(
+            "Warning: User appears to be logged in but no valid session found",
+          );
+        }
       }
     } catch (error) {
       console.error("Failed to get auth token:", error);
@@ -23,7 +34,7 @@ export class ApiClient {
     options?: RequestInit,
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
-    const token = this.getAuthToken();
+    const token = await this.getAuthToken();
 
     const config: RequestInit = {
       headers: {
@@ -38,11 +49,15 @@ export class ApiClient {
       const response = await fetch(url, config);
 
       if (!response.ok) {
-        // 401エラーの場合、認証状態をクリア
-        if (response.status === 401 && typeof window !== "undefined") {
-          localStorage.removeItem("auth-storage");
-          // ページをリロードして認証状態をリセット
-          window.location.reload();
+        // 認証エラーの場合の適切なハンドリング
+        if (response.status === 401) {
+          console.warn("Authentication failed for API request");
+          // 認証が必要なエンドポイントでは、ユーザーに適切なメッセージを表示
+          throw new Error("Authentication required");
+        }
+        if (response.status === 403) {
+          console.warn("Access forbidden - insufficient permissions");
+          throw new Error("Access forbidden");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -96,7 +111,7 @@ export class ApiClient {
     formData: FormData,
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
-    const token = this.getAuthToken();
+    const token = await this.getAuthToken();
 
     const config: RequestInit = {
       method: "POST",
@@ -111,9 +126,13 @@ export class ApiClient {
       const response = await fetch(url, config);
 
       if (!response.ok) {
-        if (response.status === 401 && typeof window !== "undefined") {
-          localStorage.removeItem("auth-storage");
-          window.location.reload();
+        if (response.status === 401) {
+          console.warn("Authentication failed for FormData request");
+          throw new Error("Authentication required");
+        }
+        if (response.status === 403) {
+          console.warn("Access forbidden for FormData request");
+          throw new Error("Access forbidden");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -140,7 +159,7 @@ export class ApiClient {
     formData: FormData,
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
-    const token = this.getAuthToken();
+    const token = await this.getAuthToken();
 
     const config: RequestInit = {
       method: "PATCH",
@@ -154,9 +173,13 @@ export class ApiClient {
       const response = await fetch(url, config);
 
       if (!response.ok) {
-        if (response.status === 401 && typeof window !== "undefined") {
-          localStorage.removeItem("auth-storage");
-          window.location.reload();
+        if (response.status === 401) {
+          console.warn("Authentication failed for FormData request");
+          throw new Error("Authentication required");
+        }
+        if (response.status === 403) {
+          console.warn("Access forbidden for FormData request");
+          throw new Error("Access forbidden");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }

@@ -5,8 +5,12 @@ import {
   Body,
   Param,
   NotFoundException,
+  Headers,
+  UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { UsersService } from './users.service';
+import * as jwt from 'jsonwebtoken';
 
 export class CreateUserDto {
   twitterId: string;
@@ -16,11 +20,18 @@ export class CreateUserDto {
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+    return this.usersService.findOrCreateByTwitterId(
+      createUserDto.twitterId,
+      createUserDto.name,
+      createUserDto.image,
+    );
   }
 
   @Get()
@@ -42,5 +53,70 @@ export class UsersController {
       );
     }
     return user;
+  }
+
+  @Post('verify-session')
+  async verifySession(
+    @Body() body: { twitterId: string },
+    @Headers('authorization') authHeader?: string,
+  ) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new UnauthorizedException('Bearer token required');
+    }
+
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    const jwtSecret = this.configService.get<string>('NEXTAUTH_SECRET');
+
+    if (!jwtSecret) {
+      throw new UnauthorizedException('JWT secret not configured');
+    }
+
+    try {
+      // NextAuth.jsのJWTトークンを検証
+      const decoded = jwt.verify(token, jwtSecret) as {
+        exp?: number;
+        iat?: number;
+        twitterId?: string;
+        name?: string;
+      };
+
+      // トークンの有効期限をチェック
+      const now = Math.floor(Date.now() / 1000);
+      if (decoded.exp && decoded.exp < now) {
+        throw new UnauthorizedException('Token expired');
+      }
+
+      // TwitterIDが一致するかチェック
+      if (decoded.twitterId !== body.twitterId) {
+        throw new UnauthorizedException('Token TwitterID mismatch');
+      }
+
+      // ユーザー情報を取得
+      const user = await this.usersService.findByTwitterId(body.twitterId);
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      return {
+        id: user.id,
+        twitterId: user.twitterId,
+        name: user.name,
+        verified: true,
+        tokenValid: true,
+      };
+    } catch (error) {
+      if (error instanceof jwt.JsonWebTokenError) {
+        throw new UnauthorizedException('Invalid JWT token');
+      }
+      if (error instanceof jwt.TokenExpiredError) {
+        throw new UnauthorizedException('JWT token expired');
+      }
+      if (error instanceof jwt.NotBeforeError) {
+        throw new UnauthorizedException('JWT token not active');
+      }
+
+      console.error('JWT verification error:', error);
+      throw new UnauthorizedException('Session verification failed');
+    }
   }
 }

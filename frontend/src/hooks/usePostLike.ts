@@ -30,7 +30,7 @@ export const usePostLike = (
 
     try {
       setIsLiking(true);
-      const response = await PostsApi.likePost(postId, currentUserId);
+      const response = await PostsApi.likePost(postId);
 
       setIsLiked(response.liked);
       setLikeCount((prev) => (response.liked ? prev + 1 : prev - 1));

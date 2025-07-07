@@ -44,6 +44,24 @@ const ReplyModal = ({
 
   if (!isOpen) return null;
 
+  // 認証されていない場合は返信モーダルを表示しない
+  if (!currentUser) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+        <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 text-center">
+          <h2 className="text-lg font-semibold mb-4">認証が必要です</h2>
+          <p className="text-gray-600 mb-4">返信するにはログインが必要です。</p>
+          <button
+            onClick={onClose}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+          >
+            閉じる
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const onFormSubmit = (e: React.FormEvent) => {
     handleSubmit(e, onReplySubmit, onClose);
   };

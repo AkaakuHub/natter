@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -269,7 +273,73 @@ export class PostsService {
     });
   }
 
+  async updateWithOwnerCheck(
+    id: number,
+    userId: string,
+    updatePostDto: UpdatePostDto,
+  ) {
+    // 投稿の存在確認と所有者チェック
+    const post = await this.prisma.post.findUnique({
+      where: { id },
+    });
+
+    if (!post) {
+      throw new BadRequestException('Post not found');
+    }
+
+    if (post.authorId !== userId) {
+      throw new ForbiddenException('You can only edit your own posts');
+    }
+
+    const { images, ...postData } = updatePostDto;
+    return this.prisma.post.update({
+      where: { id },
+      data: {
+        ...postData,
+        images: images ? JSON.stringify(images) : undefined,
+      },
+      include: {
+        author: true,
+        likes: {
+          include: {
+            user: true,
+          },
+        },
+        replyTo: {
+          include: {
+            author: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+            replies: true,
+          },
+        },
+      },
+    });
+  }
+
   async remove(id: number) {
+    return this.prisma.post.delete({
+      where: { id },
+    });
+  }
+
+  async removeWithOwnerCheck(id: number, userId: string) {
+    // 投稿の存在確認と所有者チェック
+    const post = await this.prisma.post.findUnique({
+      where: { id },
+    });
+
+    if (!post) {
+      throw new BadRequestException('Post not found');
+    }
+
+    if (post.authorId !== userId) {
+      throw new ForbiddenException('You can only delete your own posts');
+    }
+
     return this.prisma.post.delete({
       where: { id },
     });

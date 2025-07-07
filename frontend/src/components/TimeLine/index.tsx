@@ -60,12 +60,7 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
   return (
     <div className="w-full max-w-md mx-auto">
       {/* ポスト作成エリア */}
-      {currentUser && (
-        <CreatePost
-          currentUser={currentUser}
-          onPostCreated={handlePostCreated}
-        />
-      )}
+      <CreatePost currentUser={currentUser} onPostCreated={handlePostCreated} />
 
       {/* 投稿一覧 */}
       {posts.map((post) => {

@@ -9,6 +9,9 @@ interface PostContentProps {
 }
 
 const PostContent = ({ content, images, onImageClick }: PostContentProps) => {
+  // imagesが配列でない場合のチェック
+  const imageArray = Array.isArray(images) ? images : [];
+
   return (
     <>
       <div className="prose prose-lg max-w-none">
@@ -16,19 +19,19 @@ const PostContent = ({ content, images, onImageClick }: PostContentProps) => {
           {content}
         </p>
       </div>
-      {images && images.length > 0 && (
+      {imageArray && imageArray.length > 0 && (
         <div
           className={`mt-4 gap-3 ${
-            images.length === 1
+            imageArray.length === 1
               ? "flex justify-center"
-              : images.length === 2
+              : imageArray.length === 2
                 ? "grid grid-cols-2"
-                : images.length === 3
+                : imageArray.length === 3
                   ? "grid grid-cols-2 grid-rows-2"
                   : "grid grid-cols-2"
           }`}
         >
-          {images.map((image, index) => {
+          {imageArray.map((image, index) => {
             const imageSrc = getImageUrl(image);
 
             return (
@@ -39,9 +42,9 @@ const PostContent = ({ content, images, onImageClick }: PostContentProps) => {
                   onImageClick(index);
                 }}
                 className={`relative focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200 ${
-                  images.length === 1
+                  imageArray.length === 1
                     ? "max-w-lg mx-auto"
-                    : images.length === 3 && index === 0
+                    : imageArray.length === 3 && index === 0
                       ? "row-span-2"
                       : ""
                 }`}
@@ -50,9 +53,9 @@ const PostContent = ({ content, images, onImageClick }: PostContentProps) => {
                   src={imageSrc}
                   alt="Post Image"
                   className={`rounded-2xl ${
-                    images.length === 1
+                    imageArray.length === 1
                       ? "w-full h-auto max-h-96 object-cover"
-                      : images.length === 3 && index === 0
+                      : imageArray.length === 3 && index === 0
                         ? "w-full h-full object-cover"
                         : "w-full h-auto aspect-square object-cover"
                   }`}

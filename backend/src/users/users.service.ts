@@ -34,6 +34,24 @@ export class UsersService {
     return user;
   }
 
+  async findOrCreateByTwitterId(
+    twitterId: string,
+    name: string,
+    image?: string,
+  ) {
+    let user = await this.findByTwitterId(twitterId);
+
+    if (!user) {
+      user = await this.create({
+        twitterId,
+        name,
+        image,
+      });
+    }
+
+    return user;
+  }
+
   async findAll() {
     return this.prisma.user.findMany();
   }

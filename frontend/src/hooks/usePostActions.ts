@@ -28,22 +28,38 @@ export const usePostActions = (
     e.preventDefault();
     e.stopPropagation();
 
-    if (isLiking || !currentUserId || !post) return;
+    // 認証されていない場合はアラートを表示
+    if (!currentUserId) {
+      alert("いいねするにはログインが必要です。");
+      return;
+    }
+
+    if (isLiking || !post) return;
 
     try {
       setIsLiking(true);
-      const response = await PostsApi.likePost(post.id, currentUserId);
+      const response = await PostsApi.likePost(post.id);
 
       setIsLiked(response.liked);
       setLikeCount((prev) => (response.liked ? prev + 1 : prev - 1));
     } catch (error) {
       console.error("Failed to like post:", error);
+      if (error instanceof Error && error.message.includes("Authentication")) {
+        alert("認証エラー: ログインし直してください。");
+      } else {
+        alert("いいねに失敗しました。");
+      }
     } finally {
       setIsLiking(false);
     }
   };
 
   const handleReplyClick = () => {
+    // 認証されていない場合はアラートを表示
+    if (!currentUserId) {
+      alert("返信するにはログインが必要です。");
+      return;
+    }
     setShowReplyModal(true);
   };
 

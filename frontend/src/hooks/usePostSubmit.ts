@@ -2,6 +2,8 @@ import { useState } from "react";
 import { User } from "@/api";
 import { useToast } from "@/hooks/useToast";
 import { useNavigation } from "@/hooks/useNavigation";
+import { ApiClient } from "@/api/client";
+import { getSession } from "next-auth/react";
 
 interface UsePostSubmitResult {
   isSubmitting: boolean;
@@ -42,11 +44,20 @@ export const usePostSubmit = (
       setIsSubmitting(true);
       setError(null);
 
+      // セッション確認
+      const session = await getSession();
+      if (!session || !session.user) {
+        setError("ログインが必要です");
+        showToast("ログインが必要です。", "error");
+        return;
+      }
+
+      console.log("Submitting post with session user:", session.user.id);
+
       const formData = new FormData();
       if (content.trim()) {
         formData.append("content", content.trim());
       }
-      formData.append("authorId", currentUser.id);
 
       if (replyToId) {
         formData.append("replyToId", replyToId.toString());
@@ -56,16 +67,8 @@ export const usePostSubmit = (
         formData.append("images", file);
       });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("投稿の作成に失敗しました");
-      }
-
-      const newPost = await response.json();
+      // ApiClient を使用して認証ヘッダー付きでリクエスト
+      const newPost = await ApiClient.postFormData("/posts", formData);
       onPostCreated?.();
 
       const message = replyToId
@@ -76,7 +79,18 @@ export const usePostSubmit = (
       });
     } catch (err) {
       console.error("Failed to create post:", err);
-      setError("投稿の作成に失敗しました");
+      if (err instanceof Error) {
+        if (err.message.includes("Authentication")) {
+          setError("認証エラー: ログインし直してください");
+          showToast("認証エラー: ログインし直してください。", "error");
+        } else {
+          setError(`投稿の作成に失敗しました: ${err.message}`);
+          showToast(`投稿の作成に失敗しました: ${err.message}`, "error");
+        }
+      } else {
+        setError("投稿の作成に失敗しました");
+        showToast("投稿の作成に失敗しました。", "error");
+      }
     } finally {
       setIsSubmitting(false);
     }
