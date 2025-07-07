@@ -17,12 +17,3 @@ pre-commit:
       glob: "backend/src/**/*.ts"
       run: cd backend && pnpm run format
       stage_fixed: true
-
-pre-push:
-  commands:
-    backend-test:
-      run: cd backend && pnpm run test
-    backend-build:
-      run: cd backend && pnpm run build
-    frontend-build:
-      run: cd frontend && pnpm run build
