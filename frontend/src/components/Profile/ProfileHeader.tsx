@@ -72,12 +72,12 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
   if (loading) {
     return (
       <div>
-        <div className="h-16 w-full bg-gray-200 animate-pulse" />
+        <div className="h-16 w-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
         <div className="relative w-full flex flex-row items-center justify-center gap-2">
-          <div className="w-24 h-24 bg-gray-200 rounded-full animate-pulse absolute -top-12" />
+          <div className="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse absolute -top-12" />
           <div className="mt-12 p-2">
-            <div className="h-8 w-32 bg-gray-200 animate-pulse rounded mb-2" />
-            <div className="h-4 w-20 bg-gray-200 animate-pulse rounded" />
+            <div className="h-8 w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded mb-2" />
+            <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
           </div>
         </div>
       </div>
@@ -104,10 +104,10 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
           className="rounded-full border-4 border-white absolute -top-12"
         />
         <div className="mt-12 p-2">
-          <div className="text-2xl font-bold text-center">
+          <div className="text-2xl font-bold text-center text-gray-900 dark:text-white">
             {displayUser?.name ?? "No Name"}
           </div>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
             @{displayUser?.id ?? "no_id"}
           </div>
         </div>
