@@ -15,11 +15,32 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
   const [bgColor, setBgColor] = useState("#64748b");
   const [applyAnimation, setApplyAnimation] = useState(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const lastUserIdRef = useRef<string | undefined>(undefined);
 
-  const displayUser = targetUser || session.user;
+  const displayUser = targetUser || currentUser;
 
+  // 自分のユーザー情報を取得
+  useEffect(() => {
+    if (session.user?.id) {
+      UsersApi.getUserById(session.user.id)
+        .then((user) => setCurrentUser(user))
+        .catch(() => {
+          // APIからユーザーが取得できない場合はセッション情報をフォールバック
+          setCurrentUser({
+            id: session.user.id,
+            name: session.user.name || "Unknown User",
+            image: session.user.image || undefined,
+            twitterId: session.user.id,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          });
+        });
+    }
+  }, [session.user?.id, session.user?.name, session.user?.image]);
+
+  // 他のユーザー情報を取得
   useEffect(() => {
     // 同じuserIdの場合は再実行しない
     if (lastUserIdRef.current === userId) {
