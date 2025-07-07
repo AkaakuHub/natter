@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Twitter from "next-auth/providers/twitter";
 import { ExtendedSession } from "./types";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const { handlers, auth } = NextAuth({
   debug: true,
   trustHost: true,
   providers: [

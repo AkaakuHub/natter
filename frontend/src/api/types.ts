@@ -32,14 +32,6 @@ export interface Post {
   };
 }
 
-export interface Like {
-  id: number;
-  userId: string;
-  postId: number;
-  createdAt: string;
-  user?: User;
-}
-
 export interface CreatePostDto {
   title?: string;
   content?: string;
@@ -62,4 +54,12 @@ export interface LikeResponse {
 export interface PostLikesResponse {
   count: number;
   users: User[];
+}
+
+interface Like {
+  id: number;
+  userId: string;
+  postId: number;
+  createdAt: string;
+  user?: User;
 }

@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { redirect, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import SimpleLayout from "@/components/layout/SimpleLayout";
+import BaseLayout from "@/components/layout/BaseLayout";
 import DetailedPostComponent from "@/components/DetailedPost";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
@@ -21,21 +21,21 @@ const Post = () => {
 
   if (isNaN(parseInt(postId))) {
     return (
-      <SimpleLayout>
+      <BaseLayout>
         <div className="flex items-center justify-center h-64">
           <div className="text-red-500">Invalid Post ID</div>
         </div>
-      </SimpleLayout>
+      </BaseLayout>
     );
   }
 
   if (status === "loading") {
     return (
-      <SimpleLayout>
+      <BaseLayout>
         <div className="flex items-center justify-center h-64">
           <div>Loading...</div>
         </div>
-      </SimpleLayout>
+      </BaseLayout>
     );
   }
 
@@ -43,7 +43,11 @@ const Post = () => {
     return null;
   }
 
-  return <DetailedPostComponent postId={postId} currentUser={currentUser} />;
+  return (
+    <BaseLayout>
+      <DetailedPostComponent postId={postId} currentUser={currentUser} />
+    </BaseLayout>
+  );
 };
 
 export default Post;

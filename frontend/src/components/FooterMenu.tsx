@@ -2,7 +2,7 @@
 
 import { IconHome, IconVinyl, IconBell } from "@tabler/icons-react";
 import clsx from "clsx";
-import { useNavigation } from "@/hooks/useNavigation";
+import { useRouter } from "next/navigation";
 
 const items = [
   { label: "ホーム", icon: IconHome, href: "/" },
@@ -25,16 +25,10 @@ interface BottomMenuProps {
 }
 
 export function FooterMenu({ path }: BottomMenuProps) {
-  const { navigateToTimeline } = useNavigation();
+  const router = useRouter();
 
   const handleNavigation = (href: string) => {
-    if (href === "/") {
-      navigateToTimeline();
-    } else {
-      // For now, only handle home navigation
-      // Other routes can be implemented as needed
-      window.location.href = href;
-    }
+    router.push(href);
   };
 
   return (

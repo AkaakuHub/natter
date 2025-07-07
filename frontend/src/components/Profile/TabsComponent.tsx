@@ -41,5 +41,5 @@ const TabsComponent = ({ activeTab, onTabChange }: TabsComponentProps) => {
   );
 };
 
-export { TabKinds, TabNames };
+export { TabNames };
 export default TabsComponent;
