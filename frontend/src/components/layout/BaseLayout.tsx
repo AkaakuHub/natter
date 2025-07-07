@@ -59,7 +59,9 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
       />
 
       {/* メインコンテンツ */}
-      <div className="flex-1 overflow-y-auto bg-white">{children}</div>
+      <div className="flex-1 overflow-y-auto bg-surface-variant">
+        {children}
+      </div>
 
       {/* フッターメニュー */}
       <FooterMenu path={getCurrentPageType()} />

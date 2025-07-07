@@ -40,7 +40,7 @@ const Header = ({
   };
 
   return (
-    <header className="h-[64px] border-b border-gray-200 p-4 relative flex items-center justify-between bg-white">
+    <header className="h-[64px] border-b border-border p-4 relative flex items-center justify-between bg-surface">
       <div className="relative" ref={ref}>
         <ProfileDropdown
           profileImage={profileImage}

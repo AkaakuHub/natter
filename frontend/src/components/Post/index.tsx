@@ -77,7 +77,7 @@ const PostComponent = ({
   return (
     <>
       <article
-        className="bg-white hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 py-6 px-6 cursor-pointer"
+        className="bg-surface hover:bg-surface-variant transition-colors duration-200 border-b border-border py-6 px-6 cursor-pointer"
         onClick={() => currentPost?.id && navigateToPost(currentPost.id)}
       >
         <div className="flex gap-4">

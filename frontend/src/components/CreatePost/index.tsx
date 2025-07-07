@@ -46,13 +46,15 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
   // 認証されていない場合は投稿作成コンポーネントを表示しない
   if (!currentUser) {
     return (
-      <div className="bg-white border-b border-gray-200 p-4">
+      <div className="bg-surface border-b border-border p-4">
         <div className="text-center py-8">
-          <p className="text-gray-600 mb-4">投稿するにはログインが必要です。</p>
-          <p className="text-sm text-gray-500 mb-4">認証状態を確認中...</p>
+          <p className="text-text-secondary mb-4">
+            投稿するにはログインが必要です。
+          </p>
+          <p className="text-sm text-text-muted mb-4">認証状態を確認中...</p>
           <a
             href="/login"
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 inline-block"
+            className="bg-interactive text-white px-4 py-2 rounded-lg hover:bg-interactive-hover inline-block"
           >
             ログイン
           </a>
@@ -82,7 +84,7 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
   };
 
   return (
-    <div className="bg-white border-b border-gray-100 py-6 px-6">
+    <div className="bg-surface border-b border-border py-6 px-6">
       <form onSubmit={handleSubmit}>
         <div className="flex gap-4">
           <UserAvatar user={currentUser} />
