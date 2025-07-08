@@ -18,6 +18,19 @@ interface ProfileComponentProps {
 
 const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
   const [activeTab, setActiveTab] = useState<TabType>("tweets");
+
+  // セッションから currentUser を作成（タイムラインと同じ方式）
+  const currentUser =
+    session?.user && session.user.id
+      ? {
+          id: session.user.id,
+          name: session.user.name || "",
+          image: session.user.image || undefined,
+          twitterId: session.user.id,
+          createdAt: "",
+          updatedAt: "",
+        }
+      : null;
   const [posts, setPosts] = useState<Post[]>([]);
   const [mediaPosts, setMediaPosts] = useState<Post[]>([]);
   const [likedPosts, setLikedPosts] = useState<Post[]>([]);
@@ -63,6 +76,22 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
   }, [session.user?.id, userId]);
 
   const handleTabChange = (tab: TabType) => setActiveTab(tab);
+
+  // 投稿更新用のコールバック
+  const handlePostUpdate = () => {
+    // プロフィールページでは楽観的更新済みのため、再取得は不要
+    // 必要に応じて個別タブの再取得を実装可能
+  };
+
+  const handlePostDelete = (postId: number) => {
+    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+    setMediaPosts((prevPosts) =>
+      prevPosts.filter((post) => post.id !== postId),
+    );
+    setLikedPosts((prevPosts) =>
+      prevPosts.filter((post) => post.id !== postId),
+    );
+  };
 
   if (loading) {
     return (
@@ -123,6 +152,9 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
           key={post.id}
           user={transformedUser}
           post={transformedPost}
+          currentUser={currentUser}
+          onPostUpdate={handlePostUpdate}
+          onPostDelete={() => handlePostDelete(post.id)}
         />
       );
     });
