@@ -44,9 +44,6 @@ export const useDetailedPost = (
         PostsApi.getReplies(numericPostId),
       ]);
 
-      console.log("Fetched post:", fetchedPost);
-      console.log("Fetched replies:", fetchedReplies);
-
       setPost(fetchedPost);
       setReplies(fetchedReplies);
     } catch (err) {
