@@ -12,16 +12,17 @@ const Post = () => {
   const { data: session, status } = useSession();
 
   // セッションから直接ユーザー情報を取得（タイムラインと同じ方式）
-  const currentUser = session?.user
-    ? {
-        id: session.user.id,
-        name: session.user.name || "",
-        image: session.user.image || "",
-        twitterId: session.user.id,
-        createdAt: "",
-        updatedAt: "",
-      }
-    : null;
+  const currentUser =
+    session?.user && session.user.id
+      ? {
+          id: session.user.id,
+          name: session.user.name || "",
+          image: session.user.image || undefined,
+          twitterId: session.user.id,
+          createdAt: "",
+          updatedAt: "",
+        }
+      : null;
 
   useEffect(() => {
     if (status === "unauthenticated") {

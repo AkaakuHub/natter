@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import { useNavigation } from "@/hooks/useNavigation";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { usePostActions } from "@/hooks/usePostActions";
 import { useImageModal } from "@/hooks/useImageModal";
 import { getImageUrl } from "@/utils/postUtils";
 import { usePostShare } from "@/hooks/usePostShare";
-import { Post } from "@/api/types";
+import { useToast } from "@/hooks/useToast";
+import { Post, PostsApi } from "@/api";
 
 import ImageModal from "@/components/ImageModal";
 import ReplyModal from "@/components/ReplyModal";
@@ -25,6 +25,14 @@ interface PostComponentProps {
     image: string;
   };
   post: Post;
+  currentUser?: {
+    id: string;
+    name: string;
+    image?: string;
+    twitterId: string;
+    createdAt: string;
+    updatedAt: string;
+  } | null;
   onPostUpdate?: () => void;
   onPostDelete?: () => void;
 }
@@ -32,14 +40,19 @@ interface PostComponentProps {
 const PostComponent = ({
   user,
   post,
+  currentUser,
   onPostUpdate,
   onPostDelete,
 }: PostComponentProps) => {
   const [currentPost, setCurrentPost] = useState<Post>(post);
   const { navigateToPost, navigateToProfile } = useNavigation();
-  const { currentUser } = useCurrentUser();
   const currentUserId = currentUser?.id;
   const { sharePost } = usePostShare();
+  const { showToast } = useToast();
+
+  // デバッグ: currentUserの状態を確認
+  console.log("🔍 PostComponent - currentUser:", currentUser);
+  console.log("🔍 PostComponent - currentUserId:", currentUserId);
 
   const handlePostUpdateCallback = () => {
     if (onPostUpdate) {
@@ -77,12 +90,46 @@ const PostComponent = ({
     onPostDelete?.();
   };
 
-  const handleReplySubmit = async () => {
-    // リプライ後にタイムラインを更新
-    if (onPostUpdate) {
-      onPostUpdate();
+  const handleReplySubmit = async (content: string, images: File[]) => {
+    if (!currentUserId || !currentPost) {
+      console.error("❌ Cannot reply: missing user or post");
+      return;
     }
-    setShowReplyModal(false);
+
+    try {
+      console.log("🚀 Submitting reply:", {
+        content,
+        postId: currentPost.id,
+        authorId: currentUserId,
+      });
+
+      const formData = new FormData();
+      formData.append("content", content);
+      formData.append("authorId", currentUserId);
+      formData.append("replyToId", currentPost.id.toString());
+
+      // 画像を追加
+      images.forEach((image) => {
+        formData.append("images", image);
+      });
+
+      const newReply = await PostsApi.createPostWithImages(formData);
+      console.log("✅ Reply submitted successfully:", newReply);
+
+      // 成功トースト通知を表示（クリックで新しい返信ポストに遷移）
+      showToast("返信を投稿しました", "success", 3000, () => {
+        navigateToPost(newReply.id);
+      });
+
+      // リプライ後にタイムラインを更新
+      if (onPostUpdate) {
+        onPostUpdate();
+      }
+      setShowReplyModal(false);
+    } catch (error) {
+      console.error("❌ Failed to submit reply:", error);
+      showToast("返信の送信に失敗しました", "error");
+    }
   };
 
   const handleShare = async (e: React.MouseEvent) => {

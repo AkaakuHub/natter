@@ -28,8 +28,11 @@ const Home = () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      console.log("Setting currentUser from session:", user);
+      console.log("🔍 Home: Setting currentUser from session:", user);
       setCurrentUser(user);
+    } else {
+      console.log("🔍 Home: No session user available:", session?.user);
+      setCurrentUser(null);
     }
   }, [session]);
 
@@ -40,6 +43,8 @@ const Home = () => {
       </div>
     );
   }
+
+  console.log("🔍 Home: Rendering with currentUser:", currentUser);
 
   return (
     <BaseLayout>

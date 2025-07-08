@@ -45,11 +45,23 @@ const ReplyModal = ({
 
   if (!isOpen) return null;
 
-  // 認証されていない場合は返信モーダルを閉じる
+  // デバッグ: ReplyModalの状態確認
+  console.log("🔍 ReplyModal - isOpen:", isOpen);
+  console.log("🔍 ReplyModal - currentUser:", currentUser);
+
+  // 認証されていない場合はログインメッセージを表示
   if (!currentUser) {
-    console.log("❌ ReplyModal: No current user, closing modal");
-    onClose();
-    return null;
+    console.log("❌ ReplyModal: No current user, showing login message");
+    return (
+      <div className="fixed inset-0 z-50 flex items-start justify-center bg-overlay p-4">
+        <div className="bg-surface rounded-3xl shadow-2xl max-w-lg w-full mt-16 border border-border p-6">
+          <ModalHeader onClose={onClose} />
+          <div className="text-center py-8">
+            <p className="text-text-muted">返信するにはログインが必要です</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const onFormSubmit = (e: React.FormEvent) => {
