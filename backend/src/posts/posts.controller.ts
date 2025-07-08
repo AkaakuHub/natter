@@ -90,7 +90,8 @@ export class PostsController {
 
   @Get('trending')
   getTrendingPosts(@Query('limit') limit?: string) {
-    const numLimit = limit ? parseInt(limit, 10) : 5;
+    const numLimit =
+      limit && typeof limit === 'string' ? parseInt(limit, 10) : 5;
     return this.postsService.getTrendingPosts(numLimit);
   }
 
