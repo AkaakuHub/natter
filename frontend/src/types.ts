@@ -12,6 +12,15 @@ declare module "next-auth" {
   }
 }
 
+// Token types
+interface TokenData {
+  name?: string | null;
+  username?: string | null;
+  image?: string | null;
+  twitterId?: string | null;
+  [key: string]: unknown;
+}
+
 // ExtendedSession type for components
 export interface ExtendedSession extends Session {
   user: {
@@ -20,6 +29,6 @@ export interface ExtendedSession extends Session {
     email?: string | null;
     image?: string | null;
   } & DefaultSession["user"];
-  accessToken?: unknown;
-  jwtToken?: unknown;
+  accessToken?: TokenData;
+  jwtToken?: TokenData;
 }

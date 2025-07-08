@@ -2,6 +2,27 @@ import NextAuth from "next-auth";
 import Twitter from "next-auth/providers/twitter";
 import { ExtendedSession } from "./types";
 
+// Twitter profile data types
+interface TwitterProfileData {
+  id?: string;
+  id_str?: string;
+  name?: string;
+  username?: string;
+  screen_name?: string;
+  profile_image_url?: string;
+  profile_image_url_https?: string;
+  email?: string;
+}
+
+interface TwitterProfile {
+  data?: TwitterProfileData;
+  id?: string;
+  name?: string;
+  username?: string;
+  image?: string;
+  email?: string;
+}
+
 export const { handlers, auth } = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   trustHost: true,
@@ -9,6 +30,27 @@ export const { handlers, auth } = NextAuth({
     Twitter({
       clientId: process.env.AUTH_TWITTER_ID || "",
       clientSecret: process.env.AUTH_TWITTER_SECRET || "",
+      profile(profile: TwitterProfile) {
+        // console.log("🔍 Raw Twitter profile data:", profile);
+        // データが { data: { ... } } 形式で来ている場合の対応
+        const userData: TwitterProfileData = profile.data || profile;
+        return {
+          id: String(userData.id || userData.id_str || ""),
+          name: String(
+            userData.name ||
+              userData.screen_name ||
+              userData.username ||
+              "Unknown User",
+          ),
+          username: String(userData.username || userData.screen_name || ""),
+          image: String(
+            userData.profile_image_url ||
+              userData.profile_image_url_https ||
+              "",
+          ),
+          email: userData.email ? String(userData.email) : null,
+        };
+      },
     }),
   ],
   session: {
@@ -19,32 +61,34 @@ export const { handlers, auth } = NextAuth({
     async jwt({ token, account, profile }) {
       // 最初のサインイン時
       if (account && profile) {
-        console.log("🔍 Twitter OAuth profile received:", profile);
-        console.log("🔍 Twitter OAuth account received:", account);
-        
+        // プロフィール関数で処理されたデータをトークンに保存
+        const twitterProfile = profile as TwitterProfile;
+        const profileData: TwitterProfileData =
+          twitterProfile.data || twitterProfile;
         token.twitterId = account.providerAccountId;
-        token.name = profile.name;
-        token.image = profile.image;
+        token.name = profileData.name || profileData.username;
+        token.username = profileData.username;
+        token.image = profileData.profile_image_url || twitterProfile.image;
 
         // バックエンドにユーザー情報を送信して作成/更新
         try {
+          // プロフィール関数で処理されたデータを使用
+          const profileData: TwitterProfileData =
+            twitterProfile.data || twitterProfile;
+          const userName =
+            profileData.name ||
+            profileData.username ||
+            profileData.screen_name ||
+            `User_${account.providerAccountId}`;
+          const userImage =
+            profileData.profile_image_url || twitterProfile.image;
+
           const userData = {
             twitterId: account.providerAccountId,
-            name: 
-              profile.name || 
-              profile.username || 
-              profile.login || 
-              (profile as Record<string, unknown>).screen_name as string ||
-              (profile as Record<string, unknown>).display_name as string ||
-              ((profile as Record<string, unknown>).data as Record<string, unknown>)?.name as string ||
-              ((profile as Record<string, unknown>).data as Record<string, unknown>)?.username as string ||
-              `User_${account.providerAccountId}`,
-            image: profile.image || (profile as Record<string, unknown>).picture as string || 
-              ((profile as Record<string, unknown>).data as Record<string, unknown>)?.profile_image_url as string,
+            name: userName,
+            image: userImage,
           };
-          
-          console.log("🔍 Sending user data to backend:", userData);
-          
+
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/users`,
             {
@@ -69,6 +113,12 @@ export const { handlers, auth } = NextAuth({
     async session({ session, token }) {
       if (session.user) {
         session.user.id = (token.twitterId || token.sub) as string;
+        session.user.name =
+          (token.name as string) ||
+          (token.username as string) ||
+          session.user.name ||
+          "Unknown User";
+        session.user.image = (token.image as string) || session.user.image;
         (session as ExtendedSession).accessToken = token;
         (session as ExtendedSession).jwtToken = token;
       }

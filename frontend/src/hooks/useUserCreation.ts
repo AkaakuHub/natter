@@ -22,15 +22,33 @@ export const useUserCreation = ({
       throw new Error("Session not available");
     }
 
+    // console.log("Creating user with session:", session);
+    // console.log("🔍 useUserCreation - session.user:", session.user);
+    // console.log("🔍 useUserCreation - accessToken:", (session as any).accessToken);
+    // console.log("🔍 useUserCreation - jwtToken:", (session as any).jwtToken);
+
+    // セッションのトークンから直接名前を取得
+    const extendedSession = session as ExtendedSession;
+    const tokenName =
+      extendedSession.accessToken?.name || extendedSession.jwtToken?.name;
+    const tokenUsername =
+      extendedSession.accessToken?.username ||
+      extendedSession.jwtToken?.username;
+
     const userData = {
       twitterId: session.user.id,
-      name: session.user.name || "Unknown User",
+      name:
+        session.user.name ||
+        tokenName ||
+        tokenUsername ||
+        session.user.email?.split("@")[0] ||
+        `User_${session.user.id.slice(-8)}`,
       image: session.user.image || undefined,
     };
 
-    console.log("Creating user with data:", userData);
-    const createdUser = await UsersApi.createUser(userData);
-    console.log("Created user:", createdUser);
+    // console.log("Creating user with data:", userData);
+    await UsersApi.createUser(userData);
+    // console.log("Created user:", createdUser);
 
     // キャッシュをクリアして新しいユーザー情報を取得
     const twitterId = session.user.id;
