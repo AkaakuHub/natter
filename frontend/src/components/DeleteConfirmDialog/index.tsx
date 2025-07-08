@@ -73,11 +73,31 @@ const DeleteConfirmDialog = ({
           {/* 投稿のプレビュー */}
           <div className="bg-surface-variant rounded-2xl p-4 mb-6">
             <p className="text-text text-sm line-clamp-3">{post.content}</p>
-            {post.images && post.images.length > 0 && (
-              <div className="mt-2 text-xs text-text-muted">
-                画像 {post.images.length} 枚が添付されています
-              </div>
-            )}
+            {(() => {
+              // imagesの処理を正しく行う
+              let imageArray: string[] = [];
+
+              if (post.images) {
+                if (Array.isArray(post.images)) {
+                  imageArray = post.images;
+                } else if (typeof post.images === "string") {
+                  try {
+                    const parsed = JSON.parse(post.images);
+                    imageArray = Array.isArray(parsed) ? parsed : [];
+                  } catch (e) {
+                    console.error("Failed to parse images JSON:", e);
+                    imageArray = [];
+                  }
+                }
+              }
+
+              // 実際に画像がある場合のみ表示
+              return imageArray.length > 0 ? (
+                <div className="mt-2 text-xs text-text-muted">
+                  画像 {imageArray.length} 枚が添付されています
+                </div>
+              ) : null;
+            })()}
           </div>
 
           {/* ボタン */}
