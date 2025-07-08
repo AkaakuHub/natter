@@ -98,7 +98,7 @@ const PostComponent = ({
   return (
     <>
       <article
-        className="bg-surface hover:bg-surface-hover transition-colors duration-200 border-b border-border py-6 px-6 cursor-pointer"
+        className="bg-surface hover:bg-surface-elevated transition-colors duration-200 border-b border-border py-6 px-6 cursor-pointer"
         onClick={(e) => {
           // クリックされた要素を確認
           const target = e.target as HTMLElement;
