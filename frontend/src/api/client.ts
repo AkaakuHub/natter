@@ -116,6 +116,12 @@ export class ApiClient {
     const url = `${this.baseURL}${endpoint}`;
     const token = await this.getAuthToken();
 
+    // デバッグ用: FormDataの内容をログ
+    console.log("📋 FormData contents:");
+    for (const [key, value] of formData.entries()) {
+      console.log(`  ${key}:`, value);
+    }
+
     const config: RequestInit = {
       method: "POST",
       headers: {
@@ -129,6 +135,8 @@ export class ApiClient {
       const response = await fetch(url, config);
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`HTTP ${response.status} error for FormData:`, errorText);
         if (response.status === 401) {
           console.warn("Authentication failed for FormData request");
           throw new Error("Authentication required");

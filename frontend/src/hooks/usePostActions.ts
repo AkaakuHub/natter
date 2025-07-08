@@ -126,9 +126,10 @@ export const usePostActions = (
   const handleReplyClick = () => {
     // 認証されていない場合はアラートを表示
     if (!currentUserId) {
-      alert("返信するにはログインが必要です。");
+      console.log("❌ No current user for reply");
       return;
     }
+    console.log("✅ User authenticated, opening reply modal");
     setShowReplyModal(true);
   };
 

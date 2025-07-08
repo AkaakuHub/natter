@@ -45,14 +45,16 @@ export class PostsService {
     }
 
     // リプライ先の投稿が存在するかチェック
-    if (replyToId) {
+    const numericReplyToId =
+      typeof replyToId === 'string' ? parseInt(replyToId, 10) : replyToId;
+    if (numericReplyToId) {
       const replyToPost = await this.prisma.post.findUnique({
-        where: { id: replyToId },
+        where: { id: numericReplyToId },
       });
 
       if (!replyToPost) {
         throw new BadRequestException(
-          `Post with id ${replyToId} does not exist`,
+          `Post with id ${numericReplyToId} does not exist`,
         );
       }
     }
@@ -61,7 +63,7 @@ export class PostsService {
       data: {
         ...sanitizedPostData,
         authorId,
-        replyToId,
+        replyToId: numericReplyToId,
         images: images ? JSON.stringify(images) : null,
       },
       include: {

@@ -214,7 +214,7 @@ const DetailedPostComponent = ({
         />
       )}
 
-      {showReplyModal && post && (
+      {showReplyModal && post && currentUser && (
         <ReplyModal
           isOpen={showReplyModal}
           onClose={() => setShowReplyModal(false)}

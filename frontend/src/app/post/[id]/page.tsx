@@ -5,13 +5,23 @@ import { redirect, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import BaseLayout from "@/components/layout/BaseLayout";
 import DetailedPostComponent from "@/components/DetailedPost";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const Post = () => {
   const params = useParams<{ id: string }>();
   const postId = params.id;
   const { data: session, status } = useSession();
-  const { currentUser } = useCurrentUser();
+
+  // セッションから直接ユーザー情報を取得（タイムラインと同じ方式）
+  const currentUser = session?.user
+    ? {
+        id: session.user.id,
+        name: session.user.name || "",
+        image: session.user.image || "",
+        twitterId: session.user.id,
+        createdAt: "",
+        updatedAt: "",
+      }
+    : null;
 
   useEffect(() => {
     if (status === "unauthenticated") {
