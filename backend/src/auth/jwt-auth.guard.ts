@@ -34,15 +34,24 @@ export class JwtAuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractTokenFromHeader(request);
 
+    console.log(
+      '🔍 JwtAuthGuard - Token extracted:',
+      token ? `${token.substring(0, 50)}...` : 'No token',
+    );
+
     if (!token) {
+      console.log('❌ JwtAuthGuard - No token provided');
       throw new UnauthorizedException('No token provided');
     }
 
     // JWTトークンを検証
     try {
+      console.log('🔍 JwtAuthGuard - Attempting to verify token with secret');
       const rawPayload = this.jwtService.verify(token, {
         secret: this.configService.get<string>('JWT_SECRET'),
       }) as unknown;
+
+      console.log('🔍 JwtAuthGuard - Raw payload from JWT verify:', rawPayload);
 
       if (this.isValidJwtPayload(rawPayload)) {
         const payload: JwtPayload = {
@@ -54,12 +63,18 @@ export class JwtAuthGuard implements CanActivate {
           timestamp: rawPayload.timestamp as string | undefined,
         };
 
+        console.log(
+          '✅ JwtAuthGuard - Valid payload, setting request.user:',
+          payload,
+        );
         request.user = payload;
         return true;
       }
 
+      console.log('❌ JwtAuthGuard - Invalid JWT payload structure');
       throw new UnauthorizedException('Invalid JWT payload');
-    } catch {
+    } catch (error) {
+      console.log('❌ JwtAuthGuard - JWT verification failed:', error);
       throw new UnauthorizedException('Invalid JWT token');
     }
   }

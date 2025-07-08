@@ -7,6 +7,11 @@ interface CreateUserData {
   image?: string;
 }
 
+export interface UpdateUserData {
+  name?: string;
+  image?: string;
+}
+
 export class UsersApi {
   static async getAllUsers(): Promise<User[]> {
     return ApiClient.get<User[]>("/users");
@@ -36,5 +41,12 @@ export class UsersApi {
       console.error("Error fetching user by Twitter ID:", error);
       return null;
     }
+  }
+
+  static async updateUser(
+    id: string,
+    updateData: UpdateUserData,
+  ): Promise<User> {
+    return ApiClient.patch<User>(`/users/${id}`, updateData);
   }
 }

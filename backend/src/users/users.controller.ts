@@ -4,13 +4,16 @@ import {
   Post,
   Body,
   Param,
+  Patch,
   NotFoundException,
   Headers,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { UsersService } from './users.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import * as jwt from 'jsonwebtoken';
 
 export class CreateUserDto {
@@ -21,6 +24,17 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @IsOptional()
+  @IsString()
+  image?: string;
+}
+
+export class UpdateUserDto {
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  name?: string;
 
   @IsOptional()
   @IsString()
@@ -63,6 +77,19 @@ export class UsersController {
       );
     }
     return user;
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    const updatedUser = await this.usersService.updateUser(id, updateUserDto);
+    if (!updatedUser) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return updatedUser;
   }
 
   @Post('verify-session')

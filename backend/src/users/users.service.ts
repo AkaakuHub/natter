@@ -7,6 +7,11 @@ interface CreateUserData {
   image?: string;
 }
 
+interface UpdateUserData {
+  name?: string;
+  image?: string;
+}
+
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
@@ -82,6 +87,20 @@ export class UsersService {
 
   async findAll() {
     return this.prisma.user.findMany();
+  }
+
+  async updateUser(id: string, updateData: UpdateUserData) {
+    try {
+      const updatedUser = await this.prisma.user.update({
+        where: { id },
+        data: updateData,
+      });
+      console.log('🔍 Updated user:', updatedUser);
+      return updatedUser;
+    } catch (error) {
+      console.error('❌ Error updating user:', error);
+      return null;
+    }
   }
 
   async findOne(id: string) {

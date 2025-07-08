@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import clsx from "clsx";
+import { IconEdit } from "@tabler/icons-react";
 import { getDominantColor } from "@/utils/colorUtils";
 import { ExtendedSession } from "@/types";
 import { UsersApi } from "@/api/users";
 import { User } from "@/api/types";
+import EditProfileModal from "./EditProfileModal";
 
 interface ProfileHeaderProps {
   session: ExtendedSession;
@@ -17,9 +19,19 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const lastUserIdRef = useRef<string | undefined>(undefined);
 
   const displayUser = targetUser || currentUser;
+  const isOwnProfile = !userId || userId === session.user?.id;
+
+  const handleUserUpdated = (updatedUser: User) => {
+    if (isOwnProfile) {
+      setCurrentUser(updatedUser);
+    } else {
+      setTargetUser(updatedUser);
+    }
+  };
 
   // 自分のユーザー情報を取得
   useEffect(() => {
@@ -104,14 +116,35 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
           className="rounded-full border-4 border-surface absolute -top-12"
         />
         <div className="mt-12 p-2">
-          <div className="text-2xl font-bold text-center text-text">
-            {displayUser?.name ?? "No Name"}
+          <div className="flex items-center justify-center gap-2">
+            <div className="text-2xl font-bold text-center text-text">
+              {displayUser?.name ?? "No Name"}
+            </div>
+            {isOwnProfile && displayUser && (
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="p-1 rounded-full hover:bg-surface-hover transition-colors"
+                title="プロフィールを編集"
+              >
+                <IconEdit size={20} className="text-text-muted" />
+              </button>
+            )}
           </div>
-          <div className="text-sm text-text-muted">
+          <div className="text-sm text-text-muted text-center">
             @{displayUser?.id ?? "no_id"}
           </div>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      {isOwnProfile && displayUser && (
+        <EditProfileModal
+          user={displayUser}
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onUserUpdated={handleUserUpdated}
+        />
+      )}
     </div>
   );
 };

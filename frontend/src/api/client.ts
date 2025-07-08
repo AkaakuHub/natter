@@ -10,9 +10,16 @@ export class ApiClient {
 
     try {
       const session = await getSession();
+      console.log("🔍 ApiClient - Current session:", session);
+
       if (session?.user?.id) {
         // JWTトークンをローカルストレージから取得を試みる
         let jwtToken = localStorage.getItem("jwt_token");
+
+        console.log(
+          "🔍 ApiClient - JWT token from localStorage:",
+          jwtToken ? `${jwtToken.substring(0, 50)}...` : "No token",
+        );
 
         // デバッグ: 既存のトークンをログ出力
         if (jwtToken) {
@@ -39,11 +46,16 @@ export class ApiClient {
           !this.hasRequiredFields(jwtToken);
 
         if (needNewToken) {
+          console.log("🔍 ApiClient - Need new token, requesting from backend");
+          // 古いトークンをクリア
+          localStorage.removeItem("jwt_token");
+
           const authResponse = await this.requestJWTToken(session.user.id);
 
           if (authResponse?.token) {
             jwtToken = authResponse.token;
             localStorage.setItem("jwt_token", jwtToken);
+            console.log("✅ ApiClient - New token obtained and stored");
           } else {
             console.error(
               "❌ Failed to obtain JWT token, response:",
@@ -204,6 +216,12 @@ export class ApiClient {
     const url = `${this.baseURL}${endpoint}`;
     const token = await this.getAuthToken();
 
+    console.log(`🔍 ApiClient - Making request to: ${url}`);
+    console.log(
+      `🔍 ApiClient - Token for request:`,
+      token ? `${token.substring(0, 50)}...` : "No token",
+    );
+
     const config: RequestInit = {
       headers: {
         "Content-Type": "application/json",
@@ -213,13 +231,46 @@ export class ApiClient {
       ...options,
     };
 
+    console.log(`🔍 ApiClient - Request headers:`, config.headers);
+
     try {
       const response = await fetch(url, config);
 
       if (!response.ok) {
         // 認証エラーの場合の適切なハンドリング
         if (response.status === 401) {
-          console.warn("Authentication failed for API request");
+          const errorText = await response.text();
+          console.warn("Authentication failed for API request:", errorText);
+
+          // JWT signature エラーの場合は古いトークンをクリアして再試行
+          if (
+            errorText.includes("Invalid JWT token") ||
+            errorText.includes("signature")
+          ) {
+            console.log("🔄 JWT signature error - clearing token and retrying");
+            localStorage.removeItem("jwt_token");
+            // 1回だけ再試行
+            const headers = (config.headers as Record<string, string>) || {};
+            if (!headers["X-Retry-Attempt"]) {
+              const newToken = await this.getAuthToken();
+              if (newToken) {
+                const retryConfig: RequestInit = {
+                  ...config,
+                  headers: {
+                    ...headers,
+                    Authorization: `Bearer ${newToken}`,
+                    "X-Retry-Attempt": "1",
+                  },
+                };
+                const retryResponse = await fetch(url, retryConfig);
+                if (retryResponse.ok) {
+                  const text = await retryResponse.text();
+                  return text ? JSON.parse(text) : ({} as T);
+                }
+              }
+            }
+          }
+
           // 認証が必要なエンドポイントでは、ユーザーに適切なメッセージを表示
           throw new Error("Authentication required");
         }
@@ -297,7 +348,39 @@ export class ApiClient {
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`HTTP ${response.status} error for FormData:`, errorText);
+
         if (response.status === 401) {
+          // JWT signature エラーの場合は古いトークンをクリアして再試行
+          if (
+            errorText.includes("Invalid JWT token") ||
+            errorText.includes("signature")
+          ) {
+            console.log(
+              "🔄 JWT signature error in FormData - clearing token and retrying",
+            );
+            localStorage.removeItem("jwt_token");
+            // 1回だけ再試行
+            const headers = (config.headers as Record<string, string>) || {};
+            if (!headers["X-Retry-Attempt"]) {
+              const newToken = await this.getAuthToken();
+              if (newToken) {
+                const retryConfig: RequestInit = {
+                  ...config,
+                  headers: {
+                    ...headers,
+                    Authorization: `Bearer ${newToken}`,
+                    "X-Retry-Attempt": "1",
+                  },
+                };
+                const retryResponse = await fetch(url, retryConfig);
+                if (retryResponse.ok) {
+                  const text = await retryResponse.text();
+                  return text ? JSON.parse(text) : ({} as T);
+                }
+              }
+            }
+          }
+
           console.warn("Authentication failed for FormData request");
           throw new Error("Authentication required");
         }
@@ -344,7 +427,44 @@ export class ApiClient {
       const response = await fetch(url, config);
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error(
+          `HTTP ${response.status} error for FormData PATCH:`,
+          errorText,
+        );
+
         if (response.status === 401) {
+          // JWT signature エラーの場合は古いトークンをクリアして再試行
+          if (
+            errorText.includes("Invalid JWT token") ||
+            errorText.includes("signature")
+          ) {
+            console.log(
+              "🔄 JWT signature error in FormData PATCH - clearing token and retrying",
+            );
+            localStorage.removeItem("jwt_token");
+            // 1回だけ再試行
+            const headers = (config.headers as Record<string, string>) || {};
+            if (!headers["X-Retry-Attempt"]) {
+              const newToken = await this.getAuthToken();
+              if (newToken) {
+                const retryConfig: RequestInit = {
+                  ...config,
+                  headers: {
+                    ...headers,
+                    Authorization: `Bearer ${newToken}`,
+                    "X-Retry-Attempt": "1",
+                  },
+                };
+                const retryResponse = await fetch(url, retryConfig);
+                if (retryResponse.ok) {
+                  const text = await retryResponse.text();
+                  return text ? JSON.parse(text) : ({} as T);
+                }
+              }
+            }
+          }
+
           console.warn("Authentication failed for FormData request");
           throw new Error("Authentication required");
         }
