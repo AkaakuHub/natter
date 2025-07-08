@@ -1,0 +1,111 @@
+import { useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+
+interface UseGlobalKeyboardShortcutsProps {
+  onCreatePost?: () => void;
+  onSearch?: () => void;
+  onHome?: () => void;
+  onProfile?: () => void;
+  onNotifications?: () => void;
+  onHelp?: () => void;
+  isModalOpen?: boolean;
+  isInputFocused?: boolean;
+}
+
+export const useGlobalKeyboardShortcuts = ({
+  onCreatePost,
+  onSearch,
+  onHome,
+  onProfile,
+  onNotifications,
+  onHelp,
+  isModalOpen = false,
+  isInputFocused = false,
+}: UseGlobalKeyboardShortcutsProps) => {
+  const router = useRouter();
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      // モーダルが開いている場合、または入力フィールドにフォーカスがある場合はスキップ
+      if (isModalOpen || isInputFocused) {
+        return;
+      }
+
+      // 修飾キーが押されている場合はスキップ（Ctrl+n等を防ぐため）
+      if (e.ctrlKey || e.metaKey || e.altKey) {
+        return;
+      }
+
+      // input, textarea, select要素にフォーカスがある場合はスキップ
+      const activeElement = document.activeElement;
+      if (
+        activeElement &&
+        (activeElement.tagName === "INPUT" ||
+          activeElement.tagName === "TEXTAREA" ||
+          activeElement.tagName === "SELECT" ||
+          activeElement.hasAttribute("contenteditable"))
+      ) {
+        return;
+      }
+
+      switch (e.key.toLowerCase()) {
+        case "n":
+          e.preventDefault();
+          onCreatePost?.();
+          break;
+        case "/":
+          e.preventDefault();
+          onSearch?.();
+          break;
+        case "h":
+          e.preventDefault();
+          onHome?.();
+          router.push("/");
+          break;
+        case "p":
+          e.preventDefault();
+          onProfile?.();
+          router.push("/profile");
+          break;
+        case "i":
+          e.preventDefault();
+          onNotifications?.();
+          router.push("/notification");
+          break;
+        case "g":
+          // gキーは後続のキーと組み合わせて使用（今後の拡張用）
+          e.preventDefault();
+          break;
+        case "?":
+          e.preventDefault();
+          onHelp?.();
+          break;
+        default:
+          break;
+      }
+    },
+    [
+      onCreatePost,
+      onSearch,
+      onHome,
+      onProfile,
+      onNotifications,
+      onHelp,
+      isModalOpen,
+      isInputFocused,
+      router,
+    ],
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
+  return {
+    // ショートカットの状態を返す（デバッグ用）
+    isActive: !isModalOpen && !isInputFocused,
+  };
+};

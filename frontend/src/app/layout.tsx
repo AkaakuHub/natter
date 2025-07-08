@@ -7,6 +7,7 @@ import "./globals.css";
 import NextAuthProvider from "@/app/providers";
 import { auth } from "@/auth";
 import { ToastProvider } from "@/hooks/useToast";
+import { AppStateProvider } from "@/contexts/AppStateContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,7 +47,9 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-surface text-text`}
       >
         <NextAuthProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <AppStateProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </AppStateProvider>
         </NextAuthProvider>
       </body>
     </html>

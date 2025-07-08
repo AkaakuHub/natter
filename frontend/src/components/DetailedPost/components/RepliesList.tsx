@@ -1,7 +1,7 @@
 import React from "react";
 import { Post } from "@/api";
 import PostComponent from "@/components/Post";
-import { transformReplyToPostComponent } from "@/utils/postTransformers";
+import { transformPostToPostComponent } from "@/utils/postTransformers";
 
 interface RepliesListProps {
   replies: Post[];
@@ -20,7 +20,7 @@ const RepliesList = ({ replies }: RepliesListProps) => {
         </h3>
         <div>
           {replies.map((reply) => {
-            const transformed = transformReplyToPostComponent(reply);
+            const transformed = transformPostToPostComponent(reply);
             if (!transformed) return null;
 
             const { transformedUser, transformedPost } = transformed;

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import PostComponent from "../Post";
-import CreatePostModal from "../CreatePostModal";
 import CreatePostButton from "../CreatePostButton";
 import { PostsApi, Post, User } from "../../api";
 import { transformPostToPostComponent } from "@/utils/postTransformers";
@@ -18,7 +17,6 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
 
   const fetchPosts = async () => {
     try {
@@ -37,11 +35,6 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
     fetchPosts();
   }, []);
 
-  const handlePostCreated = () => {
-    // 新しい投稿が作成されたら投稿一覧を再取得
-    fetchPosts();
-  };
-
   const handlePostUpdate = () => {
     // usePostActionsで楽観的更新済みのため、再取得は不要
     // fetchPosts();
@@ -50,6 +43,18 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
   const handlePostDelete = (postId: number) => {
     setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
   };
+
+  // グローバルな投稿作成イベントを監視
+  useEffect(() => {
+    const handleGlobalPostCreated = () => {
+      fetchPosts();
+    };
+
+    window.addEventListener("postCreated", handleGlobalPostCreated);
+    return () => {
+      window.removeEventListener("postCreated", handleGlobalPostCreated);
+    };
+  }, []);
 
   // currentUserはpropsから受け取る
 
@@ -93,14 +98,12 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
       </div>
 
       {/* 投稿作成ボタン */}
-      <CreatePostButton onClick={() => setIsCreatePostModalOpen(true)} />
-
-      {/* 投稿作成モーダル */}
-      <CreatePostModal
-        isOpen={isCreatePostModalOpen}
-        onClose={() => setIsCreatePostModalOpen(false)}
-        onPostCreated={handlePostCreated}
-        currentUser={currentUser}
+      <CreatePostButton
+        onClick={() => {
+          // nキーと同じ動作をトリガー
+          const event = new KeyboardEvent("keydown", { key: "n" });
+          document.dispatchEvent(event);
+        }}
       />
     </>
   );

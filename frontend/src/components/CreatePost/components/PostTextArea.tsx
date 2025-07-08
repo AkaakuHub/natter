@@ -1,5 +1,6 @@
 import React from "react";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useInputFocus } from "@/hooks/useInputFocus";
 
 interface PostTextAreaProps {
   value: string;
@@ -19,9 +20,11 @@ const PostTextArea = ({
   onSubmit,
 }: PostTextAreaProps) => {
   const { handleKeyDown } = useKeyboardShortcuts({ onSubmit });
+  const inputRef = useInputFocus();
 
   return (
     <textarea
+      ref={inputRef}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       onKeyDown={handleKeyDown}

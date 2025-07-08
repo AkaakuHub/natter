@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useGlobalKeyboardShortcuts } from "@/hooks/useGlobalKeyboardShortcuts";
+import { useAppState } from "@/contexts/AppStateContext";
 import Header from "./Header";
 import { FooterMenu } from "../FooterMenu";
 import Welcome from "../Welcome";
+import CreatePostModal from "../CreatePostModal";
+import ShortcutHelpModal from "../ShortcutHelpModal";
 import { usePathname } from "next/navigation";
 
 interface BaseLayoutProps {
@@ -16,6 +20,28 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
     useCurrentUser();
   const pathname = usePathname();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { isModalOpen, isInputFocused } = useAppState();
+  const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
+  const [isShortcutHelpModalOpen, setIsShortcutHelpModalOpen] = useState(false);
+
+  // グローバルキーボードショートカット
+  useGlobalKeyboardShortcuts({
+    onCreatePost: () => {
+      if (session && userExists) {
+        setIsCreatePostModalOpen(true);
+      }
+    },
+    onSearch: () => {
+      // 検索機能（今後実装）
+      console.log("検索ショートカット");
+    },
+    onHelp: () => {
+      setIsShortcutHelpModalOpen(true);
+    },
+    isModalOpen:
+      isModalOpen || isCreatePostModalOpen || isShortcutHelpModalOpen,
+    isInputFocused,
+  });
 
   // ローディング状態
   if (isLoading) {
@@ -61,6 +87,35 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
 
       {/* フッターメニュー */}
       <FooterMenu path={pathname} scrollContainerRef={scrollContainerRef} />
+
+      {/* グローバルモーダル */}
+      <CreatePostModal
+        isOpen={isCreatePostModalOpen}
+        onClose={() => setIsCreatePostModalOpen(false)}
+        onPostCreated={() => {
+          // 投稿作成後のハンドリング
+          setIsCreatePostModalOpen(false);
+          // グローバルイベントを発火してタイムラインをリフレッシュ
+          window.dispatchEvent(new CustomEvent("postCreated"));
+        }}
+        currentUser={
+          session?.user
+            ? {
+                id: session.user.id,
+                name: session.user.name || "Unknown User",
+                image: session.user.image || undefined,
+                twitterId: session.user.id,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              }
+            : null
+        }
+      />
+
+      <ShortcutHelpModal
+        isOpen={isShortcutHelpModalOpen}
+        onClose={() => setIsShortcutHelpModalOpen(false)}
+      />
     </div>
   );
 };
