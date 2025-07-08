@@ -12,6 +12,8 @@ import {
   UploadedFiles,
   Headers,
   UnauthorizedException,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -19,27 +21,26 @@ import { extname } from 'path';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Request } from 'express';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-  private extractUserIdFromHeader(authorization?: string): string {
-    if (!authorization || !authorization.startsWith('Bearer ')) {
-      throw new UnauthorizedException('Bearer token required');
+  private extractUserIdFromRequest(
+    req: Request & { user?: { id: string } },
+  ): string {
+    // JWT認証経由でユーザー情報を取得
+    if (req.user?.id) {
+      return req.user.id;
     }
 
-    const userId = authorization.substring(7); // Remove 'Bearer ' prefix
-
-    if (!userId) {
-      throw new UnauthorizedException('Invalid user ID');
-    }
-
-    console.log('Extracted userId:', userId); // デバッグ用
-    return userId;
+    throw new UnauthorizedException('Authentication required');
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FilesInterceptor('images', 10, {
       storage: diskStorage({
@@ -72,9 +73,9 @@ export class PostsController {
   create(
     @Body() createPostDto: CreatePostDto,
     @UploadedFiles() files: Express.Multer.File[],
-    @Headers('authorization') authorization?: string,
+    @Req() req: Request & { user?: { id: string } },
   ) {
-    const authorId = this.extractUserIdFromHeader(authorization);
+    const authorId = this.extractUserIdFromRequest(req);
     const imagePaths = files ? files.map((file) => file.filename) : [];
     const replyToId = createPostDto.replyToId
       ? parseInt(createPostDto.replyToId.toString())
@@ -113,6 +114,7 @@ export class PostsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FilesInterceptor('images', 10, {
       storage: diskStorage({
@@ -146,9 +148,9 @@ export class PostsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updatePostDto: UpdatePostDto,
     @UploadedFiles() files: Express.Multer.File[],
-    @Headers('authorization') authorization?: string,
+    @Req() req: Request & { user?: { id: string } },
   ) {
-    const userId = this.extractUserIdFromHeader(authorization);
+    const userId = this.extractUserIdFromRequest(req);
     const imagePaths = files ? files.map((file) => file.filename) : undefined;
     return this.postsService.updateWithOwnerCheck(id, userId, {
       ...updatePostDto,
@@ -157,20 +159,22 @@ export class PostsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   remove(
     @Param('id', ParseIntPipe) id: number,
-    @Headers('authorization') authorization?: string,
+    @Req() req: Request & { user?: { id: string } },
   ) {
-    const userId = this.extractUserIdFromHeader(authorization);
+    const userId = this.extractUserIdFromRequest(req);
     return this.postsService.removeWithOwnerCheck(id, userId);
   }
 
   @Post(':id/like')
+  @UseGuards(JwtAuthGuard)
   likePost(
     @Param('id', ParseIntPipe) postId: number,
-    @Headers('authorization') authorization?: string,
+    @Req() req: Request & { user?: { id: string } },
   ) {
-    const userId = this.extractUserIdFromHeader(authorization);
+    const userId = this.extractUserIdFromRequest(req);
     return this.postsService.likePost(postId, userId);
   }
 

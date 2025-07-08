@@ -11,12 +11,51 @@ export class ApiClient {
     try {
       const session = await getSession();
       if (session?.user?.id) {
-        // セッションが存在する場合は、そのまま Twitter ID を返す
-        console.log("Session found, returning user ID:", session.user.id);
-        return session.user.id;
+        // JWTトークンをローカルストレージから取得を試みる
+        let jwtToken = localStorage.getItem("jwt_token");
+
+        // デバッグ: 既存のトークンをログ出力
+        if (jwtToken) {
+          try {
+            const parts = jwtToken.split(".");
+            if (parts.length === 3) {
+              const decodedPayload = this.safeBase64Decode(parts[1]);
+              if (decodedPayload) {
+                const payload = JSON.parse(decodedPayload);
+                console.log("🔍 Existing token payload:", payload);
+              } else {
+                console.log("🔍 Failed to decode existing token payload");
+              }
+            }
+          } catch (e) {
+            console.log("🔍 Failed to parse existing token payload:", e);
+          }
+        }
+
+        // JWTトークンがない場合、期限切れの場合、または必要なフィールドがない場合は新しいエンドポイントで取得
+        const needNewToken =
+          !jwtToken ||
+          this.isTokenExpired(jwtToken) ||
+          !this.hasRequiredFields(jwtToken);
+
+        if (needNewToken) {
+          const authResponse = await this.requestJWTToken(session.user.id);
+
+          if (authResponse?.token) {
+            jwtToken = authResponse.token;
+            localStorage.setItem("jwt_token", jwtToken);
+          } else {
+            console.error(
+              "❌ Failed to obtain JWT token, response:",
+              authResponse,
+            );
+            return null;
+          }
+        }
+
+        return jwtToken;
       } else {
         console.warn("No session found - user may need to log in");
-        // ログイン済みなのにセッションがない場合の警告
         if (window.location.pathname !== "/login") {
           console.warn(
             "Warning: User appears to be logged in but no valid session found",
@@ -27,6 +66,135 @@ export class ApiClient {
       console.error("Failed to get auth token:", error);
     }
     return null;
+  }
+
+  private static safeBase64Decode(base64String: string): string | null {
+    try {
+      // JWT標準のBase64URLデコードを実装
+      // Base64URLをBase64に変換
+      let base64 = base64String.replace(/-/g, "+").replace(/_/g, "/");
+
+      // パディングを追加
+      const paddingNeeded = 4 - (base64.length % 4);
+      if (paddingNeeded !== 4) {
+        base64 += "=".repeat(paddingNeeded);
+      }
+
+      // まず通常のatobを試してみる
+      let rawDecoded;
+      try {
+        rawDecoded = atob(base64);
+      } catch (atobError) {
+        console.error("❌ Standard atob failed:", atobError);
+        // もしかしたらトークンがすでに破損している可能性
+        console.log(
+          "🔍 Raw token might be corrupted, clearing and forcing refresh",
+        );
+        localStorage.removeItem("jwt_token");
+        return null;
+      }
+
+      // UTF-8デコード
+      const decoded = decodeURIComponent(
+        rawDecoded
+          .split("")
+          .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join(""),
+      );
+      return decoded;
+    } catch (error) {
+      console.error("❌ Safe Base64 decode failed:", error);
+      console.log("🔍 Clearing corrupted token and forcing refresh");
+      localStorage.removeItem("jwt_token");
+      return null;
+    }
+  }
+
+  private static isTokenExpired(token: string): boolean {
+    try {
+      const parts = token.split(".");
+
+      if (parts.length !== 3) {
+        console.error("❌ Invalid JWT format - should have 3 parts");
+        return true;
+      }
+
+      // UTF-8対応のBase64デコードを使用
+      const decodedPayload = this.safeBase64Decode(parts[1]);
+      if (!decodedPayload) {
+        console.error("❌ Failed to decode JWT payload");
+        localStorage.removeItem("jwt_token");
+        return true;
+      }
+
+      const payload = JSON.parse(decodedPayload);
+      const currentTime = Date.now() / 1000;
+      const isExpired = payload.exp && payload.exp < currentTime;
+      return isExpired;
+    } catch (error) {
+      console.error("❌ Error checking token expiration:", error);
+      // 古いトークンをクリアして新しいトークンを取得させる
+      localStorage.removeItem("jwt_token");
+      return true; // エラーの場合は期限切れとみなす
+    }
+  }
+
+  private static hasRequiredFields(token: string): boolean {
+    try {
+      const parts = token.split(".");
+      if (parts.length !== 3) {
+        console.error("❌ Invalid JWT format in hasRequiredFields");
+        return false;
+      }
+
+      // UTF-8対応のBase64デコードを使用
+      const decodedPayload = this.safeBase64Decode(parts[1]);
+      if (!decodedPayload) {
+        console.error("❌ Failed to decode JWT payload in hasRequiredFields");
+        return false;
+      }
+
+      const payload = JSON.parse(decodedPayload);
+      const hasRequired = payload.id && payload.name && payload.twitterId;
+      return hasRequired;
+    } catch (error) {
+      console.error("❌ Error checking token structure:", error);
+      return false;
+    }
+  }
+
+  private static async requestJWTToken(
+    userId: string,
+  ): Promise<{ token?: string } | null> {
+    try {
+      const response = await fetch(`${this.baseURL}/auth/token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(
+          "❌ Failed to get JWT token:",
+          response.status,
+          errorText,
+        );
+        return null;
+      }
+
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error("❌ Error requesting JWT token:", error);
+      return null;
+    }
   }
 
   private static async request<T>(
@@ -85,12 +253,10 @@ export class ApiClient {
   }
 
   static async post<T>(endpoint: string, data?: unknown): Promise<T> {
-    console.log("🌐 ApiClient.post called:", { endpoint, data });
     const response = await this.request<T>(endpoint, {
       method: "POST",
       body: data ? JSON.stringify(data) : undefined,
     });
-    console.log("🌐 ApiClient.post response:", response);
     return response;
   }
 
@@ -115,12 +281,6 @@ export class ApiClient {
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     const token = await this.getAuthToken();
-
-    // デバッグ用: FormDataの内容をログ
-    console.log("📋 FormData contents:");
-    for (const [key, value] of formData.entries()) {
-      console.log(`  ${key}:`, value);
-    }
 
     const config: RequestInit = {
       method: "POST",

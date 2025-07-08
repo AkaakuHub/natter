@@ -1,4 +1,4 @@
-import { JwtPayload } from '../auth/auth.guard';
+import { JwtPayload } from '../auth/jwt-auth.guard';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
