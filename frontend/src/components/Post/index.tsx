@@ -51,8 +51,8 @@ const PostComponent = ({
   const { showToast } = useToast();
 
   // デバッグ: currentUserの状態を確認
-  console.log("🔍 PostComponent - currentUser:", currentUser);
-  console.log("🔍 PostComponent - currentUserId:", currentUserId);
+  // console.log("🔍 PostComponent - currentUser:", currentUser);
+  // console.log("🔍 PostComponent - currentUserId:", currentUserId);
 
   const handlePostUpdateCallback = () => {
     if (onPostUpdate) {

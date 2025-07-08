@@ -9,6 +9,8 @@ import { FooterMenu } from "../FooterMenu";
 import Welcome from "../Welcome";
 import CreatePostModal from "../CreatePostModal";
 import ShortcutHelpModal from "../ShortcutHelpModal";
+import TrendingPosts from "../Sidebar/TrendingPosts";
+import RecommendedUsers from "../Sidebar/RecommendedUsers";
 import { usePathname, useRouter } from "next/navigation";
 
 interface BaseLayoutProps {
@@ -77,12 +79,23 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
         userId={session?.user?.id}
       />
 
-      {/* メインコンテンツ */}
-      <div
-        ref={scrollContainerRef}
-        className="flex-1 overflow-y-auto bg-surface-variant mb-[60px]"
-      >
-        {children}
+      {/* メインコンテンツエリア */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* メインコンテンツ */}
+        <div
+          ref={scrollContainerRef}
+          className="flex-1 overflow-y-auto bg-surface-variant mb-[60px] max-w-md mx-auto lg:mx-0 lg:max-w-none"
+        >
+          {children}
+        </div>
+
+        {/* サイドバー（大画面のみ表示） */}
+        <div className="hidden lg:block w-80 bg-surface border-l border-border mb-[60px] overflow-y-auto">
+          <div className="p-4 space-y-6">
+            <TrendingPosts />
+            <RecommendedUsers currentUserId={session?.user?.id} />
+          </div>
+        </div>
       </div>
 
       {/* フッターメニュー */}

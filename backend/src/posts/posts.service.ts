@@ -502,6 +502,49 @@ export class PostsService {
     }));
   }
 
+  async getTrendingPosts(limit: number = 5) {
+    const posts = await this.prisma.post.findMany({
+      where: {
+        deletedAt: null,
+      },
+      include: {
+        author: true,
+        likes: {
+          include: {
+            user: true,
+          },
+        },
+        replyTo: {
+          include: {
+            author: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+            replies: true,
+          },
+        },
+      },
+      orderBy: [
+        {
+          likes: {
+            _count: 'desc',
+          },
+        },
+        {
+          createdAt: 'desc',
+        },
+      ],
+      take: limit,
+    });
+
+    return posts.map((post) => ({
+      ...post,
+      images: post.images ? (JSON.parse(post.images) as string[]) : [],
+    }));
+  }
+
   async searchPosts(searchTerm: string, type?: string) {
     const searchConditions = {
       AND: [

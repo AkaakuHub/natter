@@ -10,16 +10,10 @@ export class ApiClient {
 
     try {
       const session = await getSession();
-      console.log("🔍 ApiClient - Current session:", session);
 
       if (session?.user?.id) {
         // JWTトークンをローカルストレージから取得を試みる
         let jwtToken = localStorage.getItem("jwt_token");
-
-        console.log(
-          "🔍 ApiClient - JWT token from localStorage:",
-          jwtToken ? `${jwtToken.substring(0, 50)}...` : "No token",
-        );
 
         // デバッグ: 既存のトークンをログ出力
         if (jwtToken) {
@@ -28,8 +22,7 @@ export class ApiClient {
             if (parts.length === 3) {
               const decodedPayload = this.safeBase64Decode(parts[1]);
               if (decodedPayload) {
-                const payload = JSON.parse(decodedPayload);
-                console.log("🔍 Existing token payload:", payload);
+                JSON.parse(decodedPayload);
               } else {
                 console.log("🔍 Failed to decode existing token payload");
               }
@@ -46,7 +39,6 @@ export class ApiClient {
           !this.hasRequiredFields(jwtToken);
 
         if (needNewToken) {
-          console.log("🔍 ApiClient - Need new token, requesting from backend");
           // 古いトークンをクリア
           localStorage.removeItem("jwt_token");
 
@@ -55,7 +47,6 @@ export class ApiClient {
           if (authResponse?.token) {
             jwtToken = authResponse.token;
             localStorage.setItem("jwt_token", jwtToken);
-            console.log("✅ ApiClient - New token obtained and stored");
           } else {
             console.error(
               "❌ Failed to obtain JWT token, response:",
@@ -216,12 +207,6 @@ export class ApiClient {
     const url = `${this.baseURL}${endpoint}`;
     const token = await this.getAuthToken();
 
-    console.log(`🔍 ApiClient - Making request to: ${url}`);
-    console.log(
-      `🔍 ApiClient - Token for request:`,
-      token ? `${token.substring(0, 50)}...` : "No token",
-    );
-
     const config: RequestInit = {
       headers: {
         "Content-Type": "application/json",
@@ -230,9 +215,6 @@ export class ApiClient {
       },
       ...options,
     };
-
-    console.log(`🔍 ApiClient - Request headers:`, config.headers);
-
     try {
       const response = await fetch(url, config);
 

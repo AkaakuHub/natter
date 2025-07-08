@@ -88,6 +88,12 @@ export class PostsController {
     });
   }
 
+  @Get('trending')
+  getTrendingPosts(@Query('limit') limit?: string) {
+    const numLimit = limit ? parseInt(limit, 10) : 5;
+    return this.postsService.getTrendingPosts(numLimit);
+  }
+
   @Get()
   async findAll(
     @Query('type') type?: string,

@@ -49,4 +49,12 @@ export class UsersApi {
   ): Promise<User> {
     return ApiClient.patch<User>(`/users/${id}`, updateData);
   }
+
+  static async getRecommendedUsers(limit?: number): Promise<User[]> {
+    const params = new URLSearchParams();
+    if (limit) {
+      params.append("limit", limit.toString());
+    }
+    return ApiClient.get<User[]>(`/users/recommended?${params.toString()}`);
+  }
 }

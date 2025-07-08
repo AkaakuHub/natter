@@ -9,12 +9,15 @@ import {
   Headers,
   UnauthorizedException,
   UseGuards,
+  Query,
+  Req,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import * as jwt from 'jsonwebtoken';
+import { Request } from 'express';
 
 export class CreateUserDto {
   @IsString()
@@ -56,6 +59,17 @@ export class UsersController {
       createUserDto.name,
       createUserDto.image,
     );
+  }
+
+  @Get('recommended')
+  @UseGuards(JwtAuthGuard)
+  getRecommendedUsers(
+    @Req() req: Request & { user?: { id: string } },
+    @Query('limit') limit?: string,
+  ) {
+    const numLimit = limit ? parseInt(limit, 10) : 5;
+    const excludeUserId = req?.user?.id;
+    return this.usersService.getRecommendedUsers(numLimit, excludeUserId);
   }
 
   @Get()

@@ -133,4 +133,37 @@ export class UsersService {
       },
     });
   }
+
+  async getRecommendedUsers(limit: number = 5, excludeUserId?: string) {
+    const users = await this.prisma.user.findMany({
+      where: excludeUserId
+        ? {
+            id: {
+              not: excludeUserId,
+            },
+          }
+        : undefined,
+      include: {
+        _count: {
+          select: {
+            posts: true,
+            likes: true,
+          },
+        },
+      },
+      orderBy: [
+        {
+          posts: {
+            _count: 'desc',
+          },
+        },
+        {
+          createdAt: 'desc',
+        },
+      ],
+      take: limit,
+    });
+
+    return users;
+  }
 }

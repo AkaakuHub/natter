@@ -30,14 +30,6 @@ export const usePostActions = (
           : false;
       const newLikeCount = post.likes?.length || 0;
 
-      console.log("🔄 usePostActions useEffect:", {
-        postId: post.id,
-        currentUserId,
-        likes: post.likes?.length || 0,
-        newIsLiked,
-        newLikeCount,
-      });
-
       setIsLiked(newIsLiked);
       setLikeCount(newLikeCount);
     }
@@ -46,13 +38,6 @@ export const usePostActions = (
   const handleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    console.log("🎯 usePostActions handleLike called", {
-      postId: post?.id,
-      currentUserId,
-      isLiking,
-      post: post ? "exists" : "null",
-    });
 
     // 認証されていない場合はアラートを表示
     if (!currentUserId) {
@@ -72,12 +57,6 @@ export const usePostActions = (
     const previousIsLiked = isLiked;
     const previousLikeCount = likeCount;
 
-    console.log("📊 Before like (usePostActions):", {
-      previousIsLiked,
-      previousLikeCount,
-      postId: post.id,
-    });
-
     try {
       setIsLiking(true);
       // 楽観的更新
@@ -86,22 +65,13 @@ export const usePostActions = (
         previousIsLiked ? previousLikeCount - 1 : previousLikeCount + 1,
       );
 
-      console.log("🚀 Making API call to like post (usePostActions):", post.id);
       const response = await PostsApi.likePost(post.id);
-      console.log("✅ API response (usePostActions):", response);
 
       // API応答で状態を確定
       setIsLiked(response.liked);
       setLikeCount(
         response.liked ? previousLikeCount + 1 : previousLikeCount - 1,
       );
-
-      console.log("🔄 Final state (usePostActions):", {
-        isLiked: response.liked,
-        likeCount: response.liked
-          ? previousLikeCount + 1
-          : previousLikeCount - 1,
-      });
 
       // 投稿データを更新
       if (onPostUpdate) {

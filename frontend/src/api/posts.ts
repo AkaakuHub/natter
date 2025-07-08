@@ -79,4 +79,12 @@ export class PostsApi {
   static async getReplies(postId: number): Promise<Post[]> {
     return ApiClient.get<Post[]>(`/posts/${postId}/replies`);
   }
+
+  static async getTrendingPosts(limit?: number): Promise<Post[]> {
+    const params = new URLSearchParams();
+    if (limit) {
+      params.append("limit", limit.toString());
+    }
+    return ApiClient.get<Post[]>(`/posts/trending?${params.toString()}`);
+  }
 }
