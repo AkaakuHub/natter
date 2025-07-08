@@ -167,6 +167,43 @@ html {
   direction: ltr !important;
 }
 
+/* デフォルトでテキスト選択を有効にする */
+* {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+/* ボタンや画像などの非テキスト要素は選択を無効にする */
+button,
+img,
+svg,
+canvas,
+video,
+audio,
+[role="button"] {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* テキスト選択を有効にする */
+.selectable-text {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+/* 長い単語の改行を強制 */
+.break-long-words {
+  word-break: break-all;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
 /* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
   * {

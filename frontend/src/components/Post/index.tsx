@@ -99,7 +99,25 @@ const PostComponent = ({
     <>
       <article
         className="bg-surface hover:bg-surface-hover transition-colors duration-200 border-b border-border py-6 px-6 cursor-pointer"
-        onClick={() => currentPost?.id && navigateToPost(currentPost.id)}
+        onClick={(e) => {
+          // クリックされた要素を確認
+          const target = e.target as HTMLElement;
+
+          // ボタンやリンクなどのインタラクティブ要素の場合は無視
+          if (target.closest('button, a, [role="button"]')) {
+            return;
+          }
+
+          // テキスト選択中の場合はクリックイベントを無視
+          const selection = window.getSelection();
+          if (selection && selection.toString().length > 0) {
+            return;
+          }
+
+          if (currentPost?.id) {
+            navigateToPost(currentPost.id);
+          }
+        }}
       >
         <div className="flex gap-4">
           <UserAvatar

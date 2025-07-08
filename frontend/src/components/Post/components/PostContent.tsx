@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { getImageUrl } from "@/utils/postUtils";
+import { decodeHtmlEntities, breakLongWords } from "@/utils/htmlUtils";
 
 interface PostContentProps {
   content: string;
@@ -12,11 +13,38 @@ const PostContent = ({ content, images, onImageClick }: PostContentProps) => {
   // imagesが配列でない場合のチェック
   const imageArray = Array.isArray(images) ? images : [];
 
+  // HTMLエスケープされたコンテンツを復元し、長い単語を改行可能にする
+  const processedContent = React.useMemo(() => {
+    const decoded = decodeHtmlEntities(content);
+    return breakLongWords(decoded);
+  }, [content]);
+
   return (
     <>
       <div className="prose prose-lg max-w-none">
-        <p className="text-text leading-relaxed text-lg whitespace-pre-wrap mb-4">
-          {content}
+        <p
+          className="text-text leading-relaxed text-lg whitespace-pre-wrap mb-4 break-words selectable-text break-long-words"
+          style={{ userSelect: "text" }}
+          onMouseDown={(e) => {
+            // テキスト選択を開始する場合は親のクリックイベントを無効化
+            e.stopPropagation();
+          }}
+          onMouseUp={(e) => {
+            // テキストが選択されている場合は親のクリックイベントを無効化
+            const selection = window.getSelection();
+            if (selection && selection.toString().length > 0) {
+              e.stopPropagation();
+            }
+          }}
+          onClick={(e) => {
+            // テキストが選択されている場合は親のクリックイベントを無効化
+            const selection = window.getSelection();
+            if (selection && selection.toString().length > 0) {
+              e.stopPropagation();
+            }
+          }}
+        >
+          {processedContent}
         </p>
       </div>
       {imageArray && imageArray.length > 0 && (

@@ -54,10 +54,18 @@ export class PostsController {
         },
       }),
       fileFilter: (_req, file, cb) => {
+        // ファイルタイプチェック
         if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp|avif)$/)) {
           return cb(new Error('Only image files are allowed!'), false);
         }
+        // ファイルサイズチェック（10MB）
+        if (file.size > 10 * 1024 * 1024) {
+          return cb(new Error('File size exceeds 10MB limit!'), false);
+        }
         cb(null, true);
+      },
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB
       },
     }),
   )
@@ -119,10 +127,18 @@ export class PostsController {
         },
       }),
       fileFilter: (_req, file, cb) => {
+        // ファイルタイプチェック
         if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp|avif)$/)) {
           return cb(new Error('Only image files are allowed!'), false);
         }
+        // ファイルサイズチェック（10MB）
+        if (file.size > 10 * 1024 * 1024) {
+          return cb(new Error('File size exceeds 10MB limit!'), false);
+        }
         cb(null, true);
+      },
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB
       },
     }),
   )

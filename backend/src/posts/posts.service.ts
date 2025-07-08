@@ -3,6 +3,7 @@ import {
   BadRequestException,
   ForbiddenException,
 } from '@nestjs/common';
+import * as validator from 'validator';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -11,8 +12,24 @@ import { UpdatePostDto } from './dto/update-post.dto';
 export class PostsService {
   constructor(private prisma: PrismaService) {}
 
+  private sanitizeContent(content: string): string {
+    if (!content) return content;
+
+    // HTMLエンティティをエスケープし、XSS攻撃を防ぐ
+    return validator.escape(content);
+  }
+
   async create(createPostDto: CreatePostDto) {
     const { images, authorId, replyToId, ...postData } = createPostDto;
+
+    // コンテンツをサニタイズ
+    const sanitizedPostData = {
+      ...postData,
+      title: postData.title ? this.sanitizeContent(postData.title) : undefined,
+      content: postData.content
+        ? this.sanitizeContent(postData.content)
+        : undefined,
+    };
 
     if (!authorId) {
       throw new BadRequestException('Invalid authorId');
@@ -42,7 +59,7 @@ export class PostsService {
 
     return this.prisma.post.create({
       data: {
-        ...postData,
+        ...sanitizedPostData,
         authorId,
         replyToId,
         images: images ? JSON.stringify(images) : null,
@@ -333,10 +350,19 @@ export class PostsService {
     }
 
     const { images, ...postData } = updatePostDto;
+
+    // コンテンツをサニタイズ
+    const sanitizedPostData = {
+      ...postData,
+      title: postData.title ? this.sanitizeContent(postData.title) : undefined,
+      content: postData.content
+        ? this.sanitizeContent(postData.content)
+        : undefined,
+    };
     return this.prisma.post.update({
       where: { id },
       data: {
-        ...postData,
+        ...sanitizedPostData,
         images: images ? JSON.stringify(images) : undefined,
       },
       include: {
