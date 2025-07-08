@@ -23,8 +23,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
 
     if (!name.trim()) {
       setError("名前を入力してください");
@@ -60,7 +60,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   };
 
   const { handleKeyDown } = useKeyboardShortcuts({
-    onSubmit: () => handleSubmit({} as React.FormEvent),
+    onSubmit: () => handleSubmit(),
   });
 
   if (!isOpen) return null;
