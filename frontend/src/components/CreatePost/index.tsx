@@ -63,20 +63,13 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
     );
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     await submitPost(content, images);
 
     // 成功時にフォームをクリア
-    if (!error) {
-      setContent("");
-      clearImages();
-    }
-  };
-
-  const handlePostSubmit = async () => {
-    await submitPost(content, images);
-
     if (!error) {
       setContent("");
       clearImages();
@@ -95,7 +88,7 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
               onChange={setContent}
               characterLimit={characterLimit}
               disabled={isSubmitting}
-              onSubmit={handlePostSubmit}
+              onSubmit={() => handleSubmit()}
             />
 
             <ImagePreview
@@ -107,7 +100,7 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
 
             <PostActions
               onImageAdd={handleImageAdd}
-              onSubmit={handlePostSubmit}
+              onSubmit={() => handleSubmit()}
               remainingChars={remainingChars}
               isSubmitting={isSubmitting}
               isValid={isValid}
