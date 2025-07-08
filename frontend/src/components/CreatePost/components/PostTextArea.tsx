@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { useInputFocus } from "@/hooks/useInputFocus";
+import { useAppState } from "@/contexts/AppStateContext";
 
 interface PostTextAreaProps {
   value: string;
@@ -20,7 +20,24 @@ const PostTextArea = ({
   onSubmit,
 }: PostTextAreaProps) => {
   const { handleKeyDown } = useKeyboardShortcuts({ onSubmit });
-  const inputRef = useInputFocus();
+  const { setInputFocused } = useAppState();
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const element = inputRef.current;
+    if (!element) return;
+
+    const handleFocus = () => setInputFocused(true);
+    const handleBlur = () => setInputFocused(false);
+
+    element.addEventListener("focus", handleFocus);
+    element.addEventListener("blur", handleBlur);
+
+    return () => {
+      element.removeEventListener("focus", handleFocus);
+      element.removeEventListener("blur", handleBlur);
+    };
+  }, [setInputFocused]);
 
   return (
     <textarea

@@ -3,7 +3,7 @@ import { useAppState } from "@/contexts/AppStateContext";
 
 export const useInputFocus = () => {
   const { setInputFocused } = useAppState();
-  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     const element = inputRef.current;
