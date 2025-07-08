@@ -4,6 +4,7 @@ import React from "react";
 import { User, Post } from "@/api";
 import { ApiClient } from "@/api/client";
 import { useNavigation } from "@/hooks/useNavigation";
+import { useEffect } from "react";
 import { useDetailedPost } from "@/hooks/useDetailedPost";
 import { usePostActions } from "@/hooks/usePostActions";
 import { useImageModal } from "@/hooks/useImageModal";
@@ -31,16 +32,25 @@ const DetailedPostComponent = ({
   postId,
   currentUser,
 }: DetailedPostComponentProps) => {
-  const { goBack, navigateToProfile, navigateToPost } = useNavigation();
+  const { goBack, navigateToProfile, navigateToPost, navigateToTimeline } =
+    useNavigation();
   const { showToast } = useToast();
   const { sharePost } = usePostShare();
 
   const { post, loading, error, replies, setReplies, refreshPost } =
     useDetailedPost(postId, currentUser?.id);
 
+  // 削除された投稿の場合のリダイレクト処理
+  useEffect(() => {
+    if (post && post.deletedAt) {
+      showToast("この投稿は削除されています", "error", 3000);
+      navigateToTimeline();
+    }
+  }, [post, showToast, navigateToTimeline]);
+
   const handlePostUpdate = () => {
-    // 投稿データを更新するコールバック
-    refreshPost();
+    // usePostActionsで楽観的更新済みのため、再取得は不要
+    // refreshPost();
   };
 
   const {

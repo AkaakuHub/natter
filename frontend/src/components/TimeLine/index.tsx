@@ -40,8 +40,8 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
   };
 
   const handlePostUpdate = () => {
-    // いいね更新の場合は投稿一覧を再取得
-    fetchPosts();
+    // usePostActionsで楽観的更新済みのため、再取得は不要
+    // fetchPosts();
   };
 
   const handlePostDelete = (postId: number) => {

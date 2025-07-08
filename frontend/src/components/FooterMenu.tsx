@@ -12,10 +12,17 @@ const items = [
 
 function availableColor(pathname: string, href: string) {
   const normalizedPath = pathname.startsWith("/") ? pathname : `/${pathname}`;
-  const isAvailable =
-    href === "/"
-      ? normalizedPath === href || ["items", "stores"].includes(pathname)
-      : normalizedPath.startsWith(href);
+  console.log("normalizedPath:", normalizedPath);
+
+  let isAvailable = false;
+
+  if (href === "/") {
+    // ホーム（タイムライン）の場合：ルートパスのみアクティブ
+    isAvailable = normalizedPath === "/";
+  } else {
+    // その他のページ：パスがhrefで始まる場合
+    isAvailable = normalizedPath.startsWith(href);
+  }
 
   return isAvailable ? "text-interactive" : "text-text-muted";
 }

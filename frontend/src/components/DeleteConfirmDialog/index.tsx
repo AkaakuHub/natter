@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { createPortal } from "react-dom";
 import { IconTrash, IconX } from "@tabler/icons-react";
 import { Post } from "@/api/types";
 import { usePostDelete } from "@/hooks/usePostDelete";
@@ -37,9 +38,9 @@ const DeleteConfirmDialog = ({
 
   if (!isOpen) return null;
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-overlay"
       onClick={handleBackdropClick}
     >
       <div
@@ -100,6 +101,10 @@ const DeleteConfirmDialog = ({
       </div>
     </div>
   );
+
+  return typeof window !== "undefined"
+    ? createPortal(modalContent, document.body)
+    : null;
 };
 
 export default DeleteConfirmDialog;
