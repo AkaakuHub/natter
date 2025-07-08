@@ -11,7 +11,7 @@ const CreatePostButton: React.FC<CreatePostButtonProps> = ({ onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="fixed bottom-20 right-4 w-14 h-14 bg-interactive hover:bg-interactive-hover text-text-inverse rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 z-40"
+      className="fixed bottom-20 left-1/2 transform translate-x-[144px] lg:translate-x-[90px] w-14 h-14 bg-interactive hover:bg-interactive-hover text-text-inverse rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 z-40"
       aria-label="新しい投稿を作成"
     >
       <IconPlus size={24} strokeWidth={2.5} />
