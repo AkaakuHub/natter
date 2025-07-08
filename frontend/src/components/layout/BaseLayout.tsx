@@ -57,7 +57,7 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
   if (!session) {
     return (
       <div className="w-full h-screen flex flex-col">
-        <Header progress={1} />
+        <Header progress={1} scrollContainerRef={scrollContainerRef} />
         <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
           {children}
         </div>
@@ -77,6 +77,7 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
         profileImage={session?.user?.image || "no_avatar_image_128x128.png"}
         progress={1}
         userId={session?.user?.id}
+        scrollContainerRef={scrollContainerRef}
       />
 
       {/* メインコンテンツエリア */}

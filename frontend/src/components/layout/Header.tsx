@@ -14,6 +14,7 @@ interface HeaderProps {
   profileOnClick?: () => void;
   progress: number;
   userId?: string;
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 const Header = ({
@@ -21,6 +22,7 @@ const Header = ({
   profileOnClick,
   progress,
   userId,
+  scrollContainerRef,
 }: HeaderProps) => {
   const { navigateToProfile } = useNavigation();
   const { isOpen, toggle, close, ref } = useDropdown();
@@ -56,7 +58,7 @@ const Header = ({
         />
       </div>
 
-      <Logo />
+      <Logo scrollContainerRef={scrollContainerRef} />
 
       <div className="w-8"></div>
     </header>
