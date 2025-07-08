@@ -9,16 +9,28 @@ import {
 
 export class PostsApi {
   static async getAllPosts(): Promise<Post[]> {
-    return ApiClient.get<Post[]>("/posts");
+    try {
+      const posts = await ApiClient.get<Post[]>("/posts");
+      return Array.isArray(posts) ? posts : [];
+    } catch (error) {
+      console.error("Error fetching all posts:", error);
+      return [];
+    }
   }
 
   static async searchPosts(searchTerm: string, type?: string): Promise<Post[]> {
-    const params = new URLSearchParams();
-    params.append("search", searchTerm);
-    if (type) {
-      params.append("type", type);
+    try {
+      const params = new URLSearchParams();
+      params.append("search", searchTerm);
+      if (type) {
+        params.append("type", type);
+      }
+      const posts = await ApiClient.get<Post[]>(`/posts?${params.toString()}`);
+      return Array.isArray(posts) ? posts : [];
+    } catch (error) {
+      console.error("Error searching posts:", error);
+      return [];
     }
-    return ApiClient.get<Post[]>(`/posts?${params.toString()}`);
   }
 
   static async getPostById(id: number): Promise<Post> {
@@ -26,15 +38,35 @@ export class PostsApi {
   }
 
   static async getPostsByUser(userId: string): Promise<Post[]> {
-    return ApiClient.get<Post[]>(`/posts?userId=${userId}`);
+    try {
+      const posts = await ApiClient.get<Post[]>(`/posts?userId=${userId}`);
+      return Array.isArray(posts) ? posts : [];
+    } catch (error) {
+      console.error("Error fetching posts by user:", error);
+      return [];
+    }
   }
 
   static async getMediaPosts(): Promise<Post[]> {
-    return ApiClient.get<Post[]>("/posts?type=media");
+    try {
+      const posts = await ApiClient.get<Post[]>("/posts?type=media");
+      return Array.isArray(posts) ? posts : [];
+    } catch (error) {
+      console.error("Error fetching media posts:", error);
+      return [];
+    }
   }
 
   static async getLikedPosts(userId: string): Promise<Post[]> {
-    return ApiClient.get<Post[]>(`/posts?type=liked&userId=${userId}`);
+    try {
+      const posts = await ApiClient.get<Post[]>(
+        `/posts?type=liked&userId=${userId}`,
+      );
+      return Array.isArray(posts) ? posts : [];
+    } catch (error) {
+      console.error("Error fetching liked posts:", error);
+      return [];
+    }
   }
 
   static async createPost(data: CreatePostDto): Promise<Post> {
@@ -77,14 +109,28 @@ export class PostsApi {
   }
 
   static async getReplies(postId: number): Promise<Post[]> {
-    return ApiClient.get<Post[]>(`/posts/${postId}/replies`);
+    try {
+      const posts = await ApiClient.get<Post[]>(`/posts/${postId}/replies`);
+      return Array.isArray(posts) ? posts : [];
+    } catch (error) {
+      console.error("Error fetching replies:", error);
+      return [];
+    }
   }
 
   static async getTrendingPosts(limit?: number): Promise<Post[]> {
-    const params = new URLSearchParams();
-    if (limit) {
-      params.append("limit", limit.toString());
+    try {
+      const params = new URLSearchParams();
+      if (limit) {
+        params.append("limit", limit.toString());
+      }
+      const posts = await ApiClient.get<Post[]>(
+        `/posts/trending?${params.toString()}`,
+      );
+      return Array.isArray(posts) ? posts : [];
+    } catch (error) {
+      console.error("Error fetching trending posts:", error);
+      return [];
     }
-    return ApiClient.get<Post[]>(`/posts/trending?${params.toString()}`);
   }
 }

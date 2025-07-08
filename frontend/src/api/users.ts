@@ -14,7 +14,13 @@ interface UpdateUserData {
 
 export class UsersApi {
   static async getAllUsers(): Promise<User[]> {
-    return ApiClient.get<User[]>("/users");
+    try {
+      const users = await ApiClient.get<User[]>("/users");
+      return Array.isArray(users) ? users : [];
+    } catch (error) {
+      console.error("Error fetching all users:", error);
+      return [];
+    }
   }
 
   static async getUserById(id: string): Promise<User> {
@@ -51,10 +57,18 @@ export class UsersApi {
   }
 
   static async getRecommendedUsers(limit?: number): Promise<User[]> {
-    const params = new URLSearchParams();
-    if (limit) {
-      params.append("limit", limit.toString());
+    try {
+      const params = new URLSearchParams();
+      if (limit) {
+        params.append("limit", limit.toString());
+      }
+      const users = await ApiClient.get<User[]>(
+        `/users/recommended?${params.toString()}`,
+      );
+      return Array.isArray(users) ? users : [];
+    } catch (error) {
+      console.error("Error fetching recommended users:", error);
+      return [];
     }
-    return ApiClient.get<User[]>(`/users/recommended?${params.toString()}`);
   }
 }
