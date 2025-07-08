@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import PostComponent from "../Post";
 import CreatePostButton from "../CreatePostButton";
+import SkeletonCard from "../common/SkeletonCard";
 import { PostsApi, Post, User } from "../../api";
 import { transformPostToPostComponent } from "@/utils/postTransformers";
 import { ExtendedSession } from "@/types";
@@ -59,8 +60,10 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
 
   if (loading) {
     return (
-      <div className="w-full max-w-md mx-auto flex justify-center py-8">
-        <div className="text-text-muted">Loading posts...</div>
+      <div className="w-full max-w-md mx-auto">
+        {[...Array(3)].map((_, i) => (
+          <SkeletonCard key={i} />
+        ))}
       </div>
     );
   }

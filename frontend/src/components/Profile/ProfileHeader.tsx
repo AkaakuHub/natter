@@ -118,7 +118,9 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
         <div className="mt-12 p-2">
           <div className="flex items-center justify-center gap-2">
             <div className="text-2xl font-bold text-center text-text">
-              {displayUser?.name ?? "No Name"}
+              {displayUser?.name ?? (
+                <div className="h-8 w-32 bg-surface-variant animate-pulse rounded" />
+              )}
             </div>
             {isOwnProfile && displayUser && (
               <button

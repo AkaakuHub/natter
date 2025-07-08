@@ -43,7 +43,7 @@ const PostHeader = ({
         </button>
         <div className="flex-1 min-w-0">
           <button onClick={onUserClick} className="hover:underline block mb-1">
-            <h1 className="font-bold text-xl text-text hover:text-interactive transition-colors duration-300">
+            <h1 className="font-bold text-xl text-text hover:text-interactive transition-colors duration-300 text-left">
               {user?.name}
             </h1>
           </button>

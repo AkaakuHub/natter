@@ -13,25 +13,23 @@ const RepliesList = ({ replies }: RepliesListProps) => {
   }
 
   return (
-    <div className="border-t border-border-muted">
-      <div className="p-6">
-        <h3 className="text-lg font-semibold text-text mb-4">
-          リプライ ({replies.length})
-        </h3>
-        <div>
-          {replies.map((reply) => {
-            const transformed = transformPostToPostComponent(reply);
-            if (!transformed) return null;
+    <div className="border-t border-border-muted mt-8">
+      <h3 className="text-lg font-semibold text-text mb-6">
+        リプライ ({replies.length})
+      </h3>
+      <div className="space-y-4">
+        {replies.map((reply) => {
+          const transformed = transformPostToPostComponent(reply);
+          if (!transformed) return null;
 
-            const { transformedUser, transformedPost } = transformed;
+          const { transformedUser, transformedPost } = transformed;
 
-            return (
-              <div key={reply.id} className="border border-border rounded-lg">
-                <PostComponent user={transformedUser} post={transformedPost} />
-              </div>
-            );
-          })}
-        </div>
+          return (
+            <div key={reply.id}>
+              <PostComponent user={transformedUser} post={transformedPost} />
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -71,7 +71,7 @@ export function FooterMenu({ path, scrollContainerRef }: BottomMenuProps) {
 
   return (
     <footer className="h-[60px] fixed bottom-0 left-0 right-0 border-t border-border bg-surface z-10">
-      <nav className="flex justify-between items-center max-w-md mx-auto py-2">
+      <nav className="flex justify-between items-center max-w-md mx-auto">
         {items.map((item, index) => {
           const IconComponent = item.icon;
           return (
@@ -79,9 +79,10 @@ export function FooterMenu({ path, scrollContainerRef }: BottomMenuProps) {
               key={index}
               onClick={() => handleNavigation(item.href)}
               className={clsx(
-                "flex flex-col items-center justify-center w-full text-center transition-all duration-300",
+                "flex flex-col items-center justify-center w-full text-center transition-all duration-300 py-2 px-1 active:bg-surface-hover touch-manipulation",
                 availableColor(path, item.href),
               )}
+              style={{ minHeight: "48px" }}
             >
               <IconComponent className="h-6 w-6" />
               <span className="text-xs mt-1">{item.label}</span>

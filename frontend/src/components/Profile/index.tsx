@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import PostComponent from "@/components/Post";
+import SkeletonCard from "@/components/common/SkeletonCard";
 
 import { PostsApi, Post } from "@/api";
 import ProfileHeader from "./ProfileHeader";
@@ -63,7 +64,7 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
         setMediaPosts(
           userMediaPosts.filter((post) => post.authorId === targetUserId),
         );
-        setLikedPosts(userLikedPosts);
+        setLikedPosts(userLikedPosts.filter((post) => !post.deletedAt));
       } catch (err) {
         console.error("Failed to fetch user posts:", err);
         setError("Failed to load posts");
@@ -98,8 +99,10 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
       <div className="w-full h-full bg-surface text-text">
         <ProfileHeader session={session} userId={userId} />
         <TabsComponent activeTab={activeTab} onTabChange={handleTabChange} />
-        <div className="flex justify-center py-8">
-          <div className="text-text-muted">Loading posts...</div>
+        <div className="w-full">
+          {[...Array(3)].map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
         </div>
       </div>
     );
@@ -126,7 +129,13 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
           : likedPosts;
 
     if (loading) {
-      return <div className="text-center py-8">Loading...</div>;
+      return (
+        <div className="w-full">
+          {[...Array(3)].map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      );
     }
 
     if (error) {
