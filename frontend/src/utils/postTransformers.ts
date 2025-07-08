@@ -53,6 +53,3 @@ export const transformPostToPostComponent = (post: Post) => {
 
   return { transformedUser, transformedPost };
 };
-
-// Backward compatibility
-export const transformReplyToPostComponent = transformPostToPostComponent;

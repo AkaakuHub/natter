@@ -56,11 +56,3 @@ export interface PostLikesResponse {
   count: number;
   users: User[];
 }
-
-export interface Like {
-  id: number;
-  userId: string;
-  postId: number;
-  createdAt: string;
-  user?: User;
-}

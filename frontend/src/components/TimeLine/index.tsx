@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import PostComponent from "../Post";
-import CreatePost from "../CreatePost";
+import CreatePostModal from "../CreatePostModal";
+import CreatePostButton from "../CreatePostButton";
 import { PostsApi, Post, User } from "../../api";
 import { transformPostToPostComponent } from "@/utils/postTransformers";
 import { ExtendedSession } from "@/types";
@@ -17,6 +18,7 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
 
   const fetchPosts = async () => {
     try {
@@ -68,29 +70,39 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      {/* ポスト作成エリア */}
-      <CreatePost currentUser={currentUser} onPostCreated={handlePostCreated} />
+    <>
+      <div className="w-full max-w-md mx-auto">
+        {/* 投稿一覧 */}
+        {posts.map((post) => {
+          const transformed = transformPostToPostComponent(post);
+          if (!transformed) return null;
 
-      {/* 投稿一覧 */}
-      {posts.map((post) => {
-        const transformed = transformPostToPostComponent(post);
-        if (!transformed) return null;
+          const { transformedUser, transformedPost } = transformed;
 
-        const { transformedUser, transformedPost } = transformed;
+          return (
+            <PostComponent
+              key={post.id}
+              user={transformedUser}
+              post={transformedPost}
+              currentUser={currentUser}
+              onPostUpdate={handlePostUpdate}
+              onPostDelete={() => handlePostDelete(post.id)}
+            />
+          );
+        })}
+      </div>
 
-        return (
-          <PostComponent
-            key={post.id}
-            user={transformedUser}
-            post={transformedPost}
-            currentUser={currentUser}
-            onPostUpdate={handlePostUpdate}
-            onPostDelete={() => handlePostDelete(post.id)}
-          />
-        );
-      })}
-    </div>
+      {/* 投稿作成ボタン */}
+      <CreatePostButton onClick={() => setIsCreatePostModalOpen(true)} />
+
+      {/* 投稿作成モーダル */}
+      <CreatePostModal
+        isOpen={isCreatePostModalOpen}
+        onClose={() => setIsCreatePostModalOpen(false)}
+        onPostCreated={handlePostCreated}
+        currentUser={currentUser}
+      />
+    </>
   );
 };
 

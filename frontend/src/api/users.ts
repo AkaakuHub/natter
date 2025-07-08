@@ -7,7 +7,7 @@ interface CreateUserData {
   image?: string;
 }
 
-export interface UpdateUserData {
+interface UpdateUserData {
   name?: string;
   image?: string;
 }
