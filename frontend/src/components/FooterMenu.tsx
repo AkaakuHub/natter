@@ -28,19 +28,14 @@ function availableColor(pathname: string, href: string) {
 
 interface BottomMenuProps {
   path: string;
+  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export function FooterMenu({ path }: BottomMenuProps) {
+export function FooterMenu({ path, scrollContainerRef }: BottomMenuProps) {
   const router = useRouter();
 
   const handleNavigation = (href: string) => {
     const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-
-    console.log("🔍 FooterMenu handleNavigation:", {
-      href,
-      path,
-      normalizedPath,
-    });
 
     // 現在のタブと同じページにいる場合はスムーズスクロール
     let isCurrentPage = false;
@@ -53,18 +48,23 @@ export function FooterMenu({ path }: BottomMenuProps) {
       isCurrentPage = normalizedPath.startsWith(href);
     }
 
-    console.log("🔍 FooterMenu isCurrentPage:", isCurrentPage);
-
     if (isCurrentPage) {
-      console.log("✅ FooterMenu: Scrolling to top");
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
+      // Refを使ってスクロールコンテナにアクセス
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      } else {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }
+
       return;
     }
 
-    console.log("🔄 FooterMenu: Navigating to", href);
     router.push(href);
   };
 

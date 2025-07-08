@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import Header from "./Header";
 import { FooterMenu } from "../FooterMenu";
@@ -15,6 +15,7 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
   const { session, userExists, isLoading, createUserAndRefresh } =
     useCurrentUser();
   const pathname = usePathname();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // ローディング状態
   if (isLoading) {
@@ -29,8 +30,10 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
     return (
       <div className="w-full h-screen flex flex-col">
         <Header progress={1} />
-        <div className="flex-1 overflow-y-auto">{children}</div>
-        <FooterMenu path={pathname} />
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
+          {children}
+        </div>
+        <FooterMenu path={pathname} scrollContainerRef={scrollContainerRef} />
       </div>
     );
   }
@@ -49,12 +52,15 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
       />
 
       {/* メインコンテンツ */}
-      <div className="flex-1 overflow-y-auto bg-surface-variant">
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto bg-surface-variant"
+      >
         {children}
       </div>
 
       {/* フッターメニュー */}
-      <FooterMenu path={pathname} />
+      <FooterMenu path={pathname} scrollContainerRef={scrollContainerRef} />
     </div>
   );
 };
