@@ -12,7 +12,6 @@ const items = [
 
 function availableColor(pathname: string, href: string) {
   const normalizedPath = pathname.startsWith("/") ? pathname : `/${pathname}`;
-  console.log("normalizedPath:", normalizedPath);
 
   let isAvailable = false;
 

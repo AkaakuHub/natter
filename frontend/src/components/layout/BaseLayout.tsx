@@ -16,16 +16,6 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
     useCurrentUser();
   const pathname = usePathname();
 
-  // パスから現在のページタイプを判定
-  const getCurrentPageType = () => {
-    if (pathname === "/") return "timeline";
-    if (pathname.startsWith("/profile")) return "profile";
-    if (pathname.startsWith("/post")) return "detailedpost";
-    if (pathname.startsWith("/notification")) return "notification";
-    if (pathname.startsWith("/set-list")) return "set-list";
-    return "";
-  };
-
   // ローディング状態
   if (isLoading) {
     return (
@@ -40,7 +30,7 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
       <div className="w-full h-screen flex flex-col">
         <Header progress={1} />
         <div className="flex-1 overflow-y-auto">{children}</div>
-        <FooterMenu path={getCurrentPageType()} />
+        <FooterMenu path={pathname} />
       </div>
     );
   }
@@ -64,7 +54,7 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
       </div>
 
       {/* フッターメニュー */}
-      <FooterMenu path={getCurrentPageType()} />
+      <FooterMenu path={pathname} />
     </div>
   );
 };
