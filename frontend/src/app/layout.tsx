@@ -36,7 +36,31 @@ export default async function RootLayout({
   return (
     <html lang="ja">
       <head>
-        <meta name="apple-mobile-web-app-title" content="MyWebSite" />
+        <title>Natter</title>
+        <meta name="description" content="A simple post app" />
+        <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+        <meta name="apple-mobile-web-app-title" content="Natter" />
+        <meta property="og:title" content="Natter" />
+        <meta property="og:description" content="A simple post app" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://natter.akaaku.net" />
+        <meta
+          property="og:image"
+          content="https://natter.akaaku.net/og-image.png"
+        />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Natter" />
+        <meta name="twitter:description" content="A simple post app" />
+        <meta
+          name="twitter:image"
+          content="https://natter.akaaku.net/og-image.png"
+        />
+        <meta
+          httpEquiv="Cache-Control"
+          content="no-cache, no-store, must-revalidate"
+        />
+        <meta httpEquiv="Pragma" content="no-cache" />
+        <meta httpEquiv="Expires" content="0" />
         <link
           rel="manifest"
           href="manifest.json"

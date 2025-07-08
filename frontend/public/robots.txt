@@ -1,0 +1,20 @@
+User-agent: *
+Disallow: /api/
+Disallow: /posts/
+Disallow: /users/
+Disallow: /auth/
+Disallow: /server/
+
+# APIエンドポイントのクロールを禁止
+User-agent: *
+Disallow: /posts/trending
+Disallow: /posts/
+Disallow: /users/
+Disallow: /auth/
+Disallow: /server/
+
+# 外部APIのクロールを禁止
+User-agent: *
+Disallow: https://api-demo-natter.akaaku.net/
+
+Sitemap: https://natter.akaaku.net/sitemap.xml
