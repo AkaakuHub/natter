@@ -38,7 +38,8 @@ async function bootstrap() {
       req.path.startsWith('/posts') ||
       req.path.startsWith('/users') ||
       req.path.startsWith('/auth') ||
-      req.path.startsWith('/server')
+      req.path.startsWith('/server') ||
+      req.path.startsWith('/follows')
     ) {
       res.setHeader(
         'X-Robots-Tag',

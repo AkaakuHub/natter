@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { IconUserPlus } from "@tabler/icons-react";
+import Image from "next/image";
 import { UsersApi, User } from "@/api";
 import { useRouter } from "next/navigation";
+import FollowButton from "@/components/FollowButton";
 
 interface RecommendedUsersProps {
   currentUserId?: string;
@@ -88,9 +89,11 @@ const RecommendedUsers: React.FC<RecommendedUsersProps> = ({
               onClick={() => handleUserClick(user.id)}
               className="flex items-center gap-3 cursor-pointer hover:bg-surface p-2 rounded-lg transition-colors"
             >
-              <img
+              <Image
                 src={user.image || "/no_avatar_image_128x128.png"}
                 alt={user.name}
+                width={40}
+                height={40}
                 className="w-10 h-10 rounded-full"
               />
               <div className="flex-1 min-w-0">
@@ -101,16 +104,13 @@ const RecommendedUsers: React.FC<RecommendedUsersProps> = ({
                   {user._count?.posts || 0} 投稿
                 </p>
               </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  // フォロー機能は今後実装
-                  console.log("Follow user:", user.id);
-                }}
-                className="flex items-center justify-center w-8 h-8 bg-interactive hover:bg-interactive-hover text-text-inverse rounded-full transition-colors"
-              >
-                <IconUserPlus size={16} />
-              </button>
+              <div onClick={(e) => e.stopPropagation()}>
+                <FollowButton
+                  userId={user.id}
+                  currentUserId={currentUserId}
+                  compact={true}
+                />
+              </div>
             </div>
           ))
         )}

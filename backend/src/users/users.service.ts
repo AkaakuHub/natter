@@ -128,6 +128,8 @@ export class UsersService {
           select: {
             posts: true,
             likes: true,
+            following: true,
+            followers: true,
           },
         },
       },

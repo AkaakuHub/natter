@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { IconHeart, IconMessageCircle } from "@tabler/icons-react";
 import { PostsApi, Post } from "@/api";
 import { transformPostToPostComponent } from "@/utils/postTransformers";
@@ -74,9 +75,11 @@ const TrendingPosts: React.FC = () => {
               className="cursor-pointer hover:bg-surface p-3 rounded-lg transition-colors border border-border"
             >
               <div className="flex items-center gap-2 mb-2">
-                <img
+                <Image
                   src={transformedUser.image || "/no_avatar_image_128x128.png"}
                   alt={transformedUser.name}
+                  width={24}
+                  height={24}
                   className="w-6 h-6 rounded-full"
                 />
                 <span className="text-sm font-medium text-text truncate">

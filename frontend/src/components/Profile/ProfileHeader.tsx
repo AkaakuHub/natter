@@ -6,7 +6,9 @@ import { getDominantColor } from "@/utils/colorUtils";
 import { ExtendedSession } from "@/types";
 import { UsersApi } from "@/api/users";
 import { User } from "@/api/types";
+import { FollowsApi } from "@/api/follows";
 import EditProfileModal from "./EditProfileModal";
+import FollowButton from "@/components/FollowButton";
 
 interface ProfileHeaderProps {
   session: ExtendedSession;
@@ -20,6 +22,10 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [followCounts, setFollowCounts] = useState({
+    followingCount: 0,
+    followersCount: 0,
+  });
   const lastUserIdRef = useRef<string | undefined>(undefined);
 
   const displayUser = targetUser || currentUser;
@@ -51,6 +57,29 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
         });
     }
   }, [session.user?.id, session.user?.name, session.user?.image]);
+
+  // フォロー数を取得
+  useEffect(() => {
+    const fetchFollowCounts = async () => {
+      const targetUserId = userId || session.user?.id;
+      if (!targetUserId) return;
+
+      try {
+        const [following, followers] = await Promise.all([
+          FollowsApi.getFollowing(targetUserId),
+          FollowsApi.getFollowers(targetUserId),
+        ]);
+        setFollowCounts({
+          followingCount: following.length,
+          followersCount: followers.length,
+        });
+      } catch (error) {
+        console.error("Failed to fetch follow counts:", error);
+      }
+    };
+
+    fetchFollowCounts();
+  }, [userId, session.user?.id]);
 
   // 他のユーザー情報を取得
   useEffect(() => {
@@ -135,6 +164,40 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
           <div className="text-sm text-text-muted text-center">
             @{displayUser?.id ?? "no_id"}
           </div>
+
+          {/* フォロー数表示 */}
+          <div className="flex justify-center gap-6 mt-3">
+            <div className="text-center">
+              <div className="text-lg font-bold text-text">
+                {followCounts.followingCount}
+              </div>
+              <div className="text-xs text-text-muted">フォロー</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-bold text-text">
+                {followCounts.followersCount}
+              </div>
+              <div className="text-xs text-text-muted">フォロワー</div>
+            </div>
+          </div>
+
+          {!isOwnProfile && displayUser && (
+            <div className="flex justify-center mt-4">
+              <FollowButton
+                userId={displayUser.id}
+                currentUserId={session.user?.id}
+                onFollowChange={(isFollowing) => {
+                  // フォロー状態が変わったときにフォロワー数を更新（表示されているユーザーのフォロワー数を変更）
+                  setFollowCounts((prev) => ({
+                    ...prev,
+                    followersCount: isFollowing
+                      ? prev.followersCount + 1
+                      : prev.followersCount - 1,
+                  }));
+                }}
+              />
+            </div>
+          )}
         </div>
       </div>
 

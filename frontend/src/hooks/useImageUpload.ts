@@ -30,14 +30,31 @@ export const useImageUpload = (
       if (files) {
         const fileArray = Array.from(files);
         const remainingSlots = maxImages - images.length;
-        const filesToAdd = fileArray.slice(0, remainingSlots);
+
+        // ファイルサイズバリデーション（10MB制限）
+        const maxFileSize = 10 * 1024 * 1024; // 10MB
+        const validFiles = fileArray.filter((file) => {
+          if (file.size > maxFileSize) {
+            alert(
+              `ファイル "${file.name}" は10MBを超えています。10MB以下のファイルを選択してください。`,
+            );
+            return false;
+          }
+          return true;
+        });
+
+        if (validFiles.length === 0) {
+          return;
+        }
+
+        const filesToAdd = validFiles.slice(0, remainingSlots);
 
         setImages((prev) => [...prev, ...filesToAdd]);
 
         const previewUrls = filesToAdd.map((file) => URL.createObjectURL(file));
         setImagePreviewUrls((prev) => [...prev, ...previewUrls]);
 
-        if (fileArray.length > remainingSlots) {
+        if (validFiles.length > remainingSlots) {
           alert(
             `画像は最大${maxImages}枚までです。${remainingSlots}枚のみ追加されました。`,
           );
