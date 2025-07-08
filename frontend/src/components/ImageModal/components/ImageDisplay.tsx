@@ -18,10 +18,12 @@ const ImageDisplay = ({ currentImage, currentIndex }: ImageDisplayProps) => {
       alt={`画像 ${currentIndex + 1}`}
       width={1200}
       height={800}
-      className="max-w-[90vw] max-h-[90vh] object-contain cursor-default"
+      className="max-w-[90vw] max-h-[90vh] min-w-[400px] min-h-[300px] object-contain cursor-default"
       style={{
         maxWidth: "90vw",
         maxHeight: "90vh",
+        minWidth: "400px",
+        minHeight: "300px",
         width: "auto",
         height: "auto",
       }}

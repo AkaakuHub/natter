@@ -97,7 +97,7 @@ const ReplySourcePost = ({
               alt="投稿画像"
               width={60}
               height={60}
-              className="w-16 h-16 object-cover"
+              className="w-16 h-16 min-w-[64px] min-h-[64px] object-cover"
               onError={(e) => {
                 console.error("Image load error:", image.url, e);
               }}
