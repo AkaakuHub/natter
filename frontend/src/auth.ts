@@ -34,7 +34,7 @@ export const { handlers, auth } = NextAuth({
               },
               body: JSON.stringify({
                 twitterId: account.providerAccountId,
-                name: profile.name,
+                name: profile.name || profile.username || profile.login || "Unknown User",
                 image: profile.image,
               }),
             },

@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       { hostname: "pbs.twimg.com" },
       { hostname: "images.unsplash.com" },
       { hostname: "localhost" },
+      { hostname: "api-demo-natter.akaaku.net" },
     ],
   },
 };
