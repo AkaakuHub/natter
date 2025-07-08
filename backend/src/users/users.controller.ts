@@ -36,6 +36,7 @@ export class UsersController {
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
+    console.log('🔍 Received user creation request:', createUserDto);
     return this.usersService.findOrCreateByTwitterId(
       createUserDto.twitterId,
       createUserDto.name,

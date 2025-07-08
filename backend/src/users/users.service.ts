@@ -39,14 +39,23 @@ export class UsersService {
     name: string,
     image?: string,
   ) {
+    console.log('🔍 findOrCreateByTwitterId called with:', {
+      twitterId,
+      name,
+      image,
+    });
     let user = await this.findByTwitterId(twitterId);
 
     if (!user) {
+      console.log('🔍 User not found, creating new user with name:', name);
       user = await this.create({
         twitterId,
         name,
         image,
       });
+      console.log('🔍 Created user:', user);
+    } else {
+      console.log('🔍 Found existing user:', user);
     }
 
     return user;

@@ -19,12 +19,31 @@ export const { handlers, auth } = NextAuth({
     async jwt({ token, account, profile }) {
       // 最初のサインイン時
       if (account && profile) {
+        console.log("🔍 Twitter OAuth profile received:", profile);
+        console.log("🔍 Twitter OAuth account received:", account);
+        
         token.twitterId = account.providerAccountId;
         token.name = profile.name;
         token.image = profile.image;
 
         // バックエンドにユーザー情報を送信して作成/更新
         try {
+          const userData = {
+            twitterId: account.providerAccountId,
+            name: 
+              profile.name || 
+              profile.username || 
+              profile.login || 
+              profile.screen_name ||
+              profile.display_name ||
+              (profile as any)?.data?.name ||
+              (profile as any)?.data?.username ||
+              `User_${account.providerAccountId}`,
+            image: profile.image || profile.picture || (profile as any)?.data?.profile_image_url,
+          };
+          
+          console.log("🔍 Sending user data to backend:", userData);
+          
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/users`,
             {
@@ -32,11 +51,7 @@ export const { handlers, auth } = NextAuth({
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({
-                twitterId: account.providerAccountId,
-                name: profile.name || profile.username || profile.login || "Unknown User",
-                image: profile.image,
-              }),
+              body: JSON.stringify(userData),
             },
           );
 
