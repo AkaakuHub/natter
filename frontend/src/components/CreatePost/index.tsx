@@ -95,6 +95,7 @@ const CreatePost = ({ onPostCreated, currentUser }: CreatePostProps) => {
               onChange={setContent}
               characterLimit={characterLimit}
               disabled={isSubmitting}
+              onSubmit={handlePostSubmit}
             />
 
             <ImagePreview

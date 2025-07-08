@@ -30,6 +30,15 @@ const ReplyForm = ({
   isSubmitting,
   isValid,
 }: ReplyFormProps) => {
+  const handleKeyboardSubmit = () => {
+    if (isValid && !isSubmitting) {
+      const syntheticEvent = {
+        preventDefault: () => {},
+      } as React.FormEvent;
+      onSubmit(syntheticEvent);
+    }
+  };
+
   return (
     <form onSubmit={onSubmit} className="p-4">
       <div className="flex gap-3">
@@ -47,6 +56,7 @@ const ReplyForm = ({
             placeholder="リプライを投稿"
             characterLimit={280}
             disabled={isSubmitting}
+            onSubmit={handleKeyboardSubmit}
           />
 
           <ImagePreview imageUrls={imagePreviewUrls} onRemove={onImageRemove} />

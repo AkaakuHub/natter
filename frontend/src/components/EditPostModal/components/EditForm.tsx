@@ -29,6 +29,23 @@ const EditForm = ({
   hasChanges,
   characterLimit,
 }: EditFormProps) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Ctrl+Enter (Windows/Linux) または Cmd+Enter (Mac) で送信
+    if (
+      (e.ctrlKey || e.metaKey) &&
+      e.key === "Enter" &&
+      isValid &&
+      hasChanges &&
+      !isSubmitting
+    ) {
+      e.preventDefault();
+      const syntheticEvent = {
+        preventDefault: () => {},
+      } as React.FormEvent;
+      onSubmit(syntheticEvent);
+    }
+  };
+
   return (
     <form onSubmit={onSubmit} className="p-4">
       <div className="flex flex-col gap-4">
@@ -36,6 +53,7 @@ const EditForm = ({
         <textarea
           value={content}
           onChange={(e) => onContentChange(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="投稿内容を編集"
           className="w-full resize-none border-none outline-none text-lg placeholder-text-muted bg-transparent min-h-[120px]"
           maxLength={characterLimit}
