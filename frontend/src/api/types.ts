@@ -33,6 +33,14 @@ export interface Post {
   };
 }
 
+interface Like {
+  id: number;
+  userId: string;
+  postId: number;
+  createdAt: string;
+  user?: User;
+}
+
 export interface CreatePostDto {
   title?: string;
   content?: string;
