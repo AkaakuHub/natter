@@ -30,17 +30,6 @@ const ReplySourcePost = ({
   onPostClick,
   showReplyLabel = false,
 }: ReplySourcePostProps) => {
-  // 一時的なデバッグログ
-  console.log("🚨 REPLY SOURCE POST DEBUG:", {
-    variant,
-    postId: post.id,
-    receivedImages: post.images,
-    imageType: typeof post.images,
-    isArray: Array.isArray(post.images),
-    imageLength: post.images?.length || 0,
-    stringifiedImages: JSON.stringify(post.images),
-  });
-
   // 画像データを正規化（文字列化されたJSONを配列に変換）
   let normalizedImageArray: string[] = [];
   if (post.images) {
@@ -57,8 +46,6 @@ const ReplySourcePost = ({
     }
   }
 
-  console.log("🔧 NORMALIZED IMAGES:", normalizedImageArray);
-
   const hasImages = normalizedImageArray && normalizedImageArray.length > 0;
 
   // 画像データを統一形式に変換
@@ -73,8 +60,6 @@ const ReplySourcePost = ({
       };
     },
   );
-
-  console.log("🔧 FINAL NORMALIZED IMAGES:", normalizedImages);
 
   const isClickable = !!onPostClick;
 
