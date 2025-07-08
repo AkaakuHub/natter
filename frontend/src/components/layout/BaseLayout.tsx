@@ -9,7 +9,7 @@ import { FooterMenu } from "../FooterMenu";
 import Welcome from "../Welcome";
 import CreatePostModal from "../CreatePostModal";
 import ShortcutHelpModal from "../ShortcutHelpModal";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface BaseLayoutProps {
   children?: React.ReactNode;
@@ -19,6 +19,7 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
   const { session, userExists, isLoading, createUserAndRefresh } =
     useCurrentUser();
   const pathname = usePathname();
+  const router = useRouter();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { isModalOpen, isInputFocused } = useAppState();
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
@@ -32,8 +33,7 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
       }
     },
     onSearch: () => {
-      // 検索機能（今後実装）
-      console.log("検索ショートカット");
+      router.push("/search");
     },
     onHelp: () => {
       setIsShortcutHelpModalOpen(true);

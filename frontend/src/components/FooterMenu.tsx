@@ -1,11 +1,12 @@
 "use client";
 
-import { IconHome, IconVinyl, IconBell } from "@tabler/icons-react";
+import { IconHome, IconVinyl, IconBell, IconSearch } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 
 const items = [
   { label: "ホーム", icon: IconHome, href: "/" },
+  { label: "検索", icon: IconSearch, href: "/search" },
   { label: "通知", icon: IconBell, href: "/notification" },
   { label: "セトリ", icon: IconVinyl, href: "/set-list" },
 ];

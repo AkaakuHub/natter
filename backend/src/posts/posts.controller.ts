@@ -92,7 +92,12 @@ export class PostsController {
   async findAll(
     @Query('type') type?: string,
     @Query('userId') userId?: string,
+    @Query('search') search?: string,
   ) {
+    if (search) {
+      return this.postsService.searchPosts(search, type);
+    }
+
     if (type === 'media') {
       return this.postsService.findMediaPosts();
     }

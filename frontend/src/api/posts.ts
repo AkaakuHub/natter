@@ -12,6 +12,15 @@ export class PostsApi {
     return ApiClient.get<Post[]>("/posts");
   }
 
+  static async searchPosts(searchTerm: string, type?: string): Promise<Post[]> {
+    const params = new URLSearchParams();
+    params.append("search", searchTerm);
+    if (type) {
+      params.append("type", type);
+    }
+    return ApiClient.get<Post[]>(`/posts?${params.toString()}`);
+  }
+
   static async getPostById(id: number): Promise<Post> {
     return ApiClient.get<Post>(`/posts/${id}`);
   }

@@ -501,4 +501,82 @@ export class PostsService {
       images: reply.images ? (JSON.parse(reply.images) as string[]) : [],
     }));
   }
+
+  async searchPosts(searchTerm: string, type?: string) {
+    const searchConditions = {
+      AND: [
+        {
+          deletedAt: null, // 削除されていない投稿のみ
+        },
+        {
+          OR: [
+            {
+              content: {
+                contains: searchTerm,
+              },
+            },
+            {
+              title: {
+                contains: searchTerm,
+              },
+            },
+            {
+              author: {
+                name: {
+                  contains: searchTerm,
+                },
+              },
+            },
+          ],
+        },
+        // 画像フィルターが指定されている場合
+        ...(type === 'media'
+          ? [
+              {
+                images: {
+                  not: null,
+                },
+              },
+            ]
+          : []),
+      ],
+    };
+
+    const posts = await this.prisma.post.findMany({
+      where: searchConditions,
+      include: {
+        author: true,
+        likes: {
+          include: {
+            user: true,
+          },
+        },
+        replyTo: {
+          include: {
+            author: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+            replies: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return posts
+      .filter(
+        (post) =>
+          type !== 'media' ||
+          (post.images && (JSON.parse(post.images) as string[]).length > 0),
+      )
+      .map((post) => ({
+        ...post,
+        images: post.images ? (JSON.parse(post.images) as string[]) : [],
+      }));
+  }
 }
