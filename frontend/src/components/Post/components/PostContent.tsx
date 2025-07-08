@@ -23,8 +23,7 @@ const PostContent = ({ content, images, onImageClick }: PostContentProps) => {
     <>
       <div className="prose prose-lg max-w-none">
         <p
-          className="text-text leading-relaxed text-lg whitespace-pre-wrap mb-4 break-words selectable-text break-long-words"
-          style={{ userSelect: "text" }}
+          className="text-text leading-relaxed text-lg whitespace-pre-wrap mb-4 break-words selectable-text break-long-words cursor-text"
           onMouseDown={(e) => {
             // テキスト選択を開始する場合は親のクリックイベントを無効化
             e.stopPropagation();

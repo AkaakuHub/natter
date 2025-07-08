@@ -21,7 +21,6 @@ const PostTextArea = ({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       className="w-full resize-none border-none outline-none text-xl placeholder-gray-400 bg-transparent leading-relaxed font-medium focus:placeholder-gray-300 transition-all duration-300"
-      style={{ userSelect: "text" }}
       rows={3}
       maxLength={characterLimit}
       disabled={disabled}

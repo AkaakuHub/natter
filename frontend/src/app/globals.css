@@ -150,8 +150,13 @@ html {
 
 /* Selection styles */
 ::selection {
-  background-color: var(--primary);
-  color: var(--primary-foreground);
+  background-color: var(--color-interactive);
+  color: var(--color-text-inverse);
+}
+
+::-moz-selection {
+  background-color: var(--color-interactive);
+  color: var(--color-text-inverse);
 }
 
 /* Prevent text wrapping issues that cause vertical appearance */

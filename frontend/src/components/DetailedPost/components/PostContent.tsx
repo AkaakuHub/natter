@@ -19,7 +19,7 @@ const PostContent = ({ content, images, onImageClick }: PostContentProps) => {
   return (
     <div className="p-6">
       <div className="prose prose-lg max-w-none">
-        <p className="text-text text-lg leading-relaxed whitespace-pre-wrap font-medium break-words selectable-text break-long-words">
+        <p className="text-text text-lg leading-relaxed whitespace-pre-wrap font-medium break-words selectable-text break-long-words cursor-text">
           {processedContent}
         </p>
       </div>
