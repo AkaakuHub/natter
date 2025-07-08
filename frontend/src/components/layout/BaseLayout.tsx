@@ -54,7 +54,7 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
       {/* メインコンテンツ */}
       <div
         ref={scrollContainerRef}
-        className="flex-1 overflow-y-auto bg-surface-variant"
+        className="flex-1 overflow-y-auto bg-surface-variant mb-[60px]"
       >
         {children}
       </div>

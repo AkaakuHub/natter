@@ -1,4 +1,5 @@
 import React from "react";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 interface PostTextAreaProps {
   value: string;
@@ -17,13 +18,7 @@ const PostTextArea = ({
   disabled = false,
   onSubmit,
 }: PostTextAreaProps) => {
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Ctrl+Enter (Windows/Linux) または Cmd+Enter (Mac) で送信
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && onSubmit) {
-      e.preventDefault();
-      onSubmit();
-    }
-  };
+  const { handleKeyDown } = useKeyboardShortcuts({ onSubmit });
 
   return (
     <textarea

@@ -1,6 +1,7 @@
 import React from "react";
 import { IconPhoto } from "@tabler/icons-react";
 import ImagePreview from "@/components/CreatePost/components/ImagePreview";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 interface EditFormProps {
   content: string;
@@ -29,22 +30,15 @@ const EditForm = ({
   hasChanges,
   characterLimit,
 }: EditFormProps) => {
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Ctrl+Enter (Windows/Linux) または Cmd+Enter (Mac) で送信
-    if (
-      (e.ctrlKey || e.metaKey) &&
-      e.key === "Enter" &&
-      isValid &&
-      hasChanges &&
-      !isSubmitting
-    ) {
-      e.preventDefault();
+  const { handleKeyDown } = useKeyboardShortcuts({
+    onSubmit: () => {
       const syntheticEvent = {
         preventDefault: () => {},
       } as React.FormEvent;
       onSubmit(syntheticEvent);
-    }
-  };
+    },
+    canSubmit: isValid && hasChanges && !isSubmitting,
+  });
 
   return (
     <form onSubmit={onSubmit} className="p-4">

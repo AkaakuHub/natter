@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { IconX, IconCheck } from "@tabler/icons-react";
 import { User } from "@/api";
 import { UsersApi } from "@/api/users";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 interface EditProfileModalProps {
   user: User;
@@ -58,10 +59,14 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     onClose();
   };
 
+  const { handleKeyDown } = useKeyboardShortcuts({
+    onSubmit: () => handleSubmit({} as React.FormEvent),
+  });
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-surface bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-overlay flex items-center justify-center z-50 p-4">
       <div className="bg-surface rounded-lg max-w-md w-full">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
@@ -91,6 +96,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-interactive bg-surface text-text"
               placeholder="表示名を入力"
               maxLength={50}
