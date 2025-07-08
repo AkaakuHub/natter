@@ -30,10 +30,10 @@ const PostHeader = ({
 
   return (
     <div className="mb-3">
-      <div className="flex items-center justify-between mb-1">
-        <div className="flex flex-col items-center gap-2">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex flex-col items-start">
           <button
-            className="font-bold text-text hover:text-interactive transition-colors text-base text-start items-start"
+            className="font-bold text-text hover:text-interactive transition-colors text-base"
             onClick={(e) => {
               e.stopPropagation();
               onUserClick();
