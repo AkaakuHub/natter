@@ -34,12 +34,13 @@ export const { handlers, auth } = NextAuth({
               profile.name || 
               profile.username || 
               profile.login || 
-              profile.screen_name ||
-              profile.display_name ||
-              (profile as any)?.data?.name ||
-              (profile as any)?.data?.username ||
+              (profile as Record<string, unknown>).screen_name as string ||
+              (profile as Record<string, unknown>).display_name as string ||
+              ((profile as Record<string, unknown>).data as Record<string, unknown>)?.name as string ||
+              ((profile as Record<string, unknown>).data as Record<string, unknown>)?.username as string ||
               `User_${account.providerAccountId}`,
-            image: profile.image || profile.picture || (profile as any)?.data?.profile_image_url,
+            image: profile.image || (profile as Record<string, unknown>).picture as string || 
+              ((profile as Record<string, unknown>).data as Record<string, unknown>)?.profile_image_url as string,
           };
           
           console.log("🔍 Sending user data to backend:", userData);
