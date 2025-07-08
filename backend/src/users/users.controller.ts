@@ -9,12 +9,21 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { UsersService } from './users.service';
 import * as jwt from 'jsonwebtoken';
 
 export class CreateUserDto {
+  @IsString()
+  @IsNotEmpty()
   twitterId: string;
+
+  @IsString()
+  @IsNotEmpty()
   name: string;
+
+  @IsOptional()
+  @IsString()
   image?: string;
 }
 

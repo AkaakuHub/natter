@@ -23,9 +23,9 @@ export class AuthController {
       throw new UnauthorizedException('User ID is required');
     }
 
-    // ユーザーが存在するかチェック
+    // ユーザーが存在するかチェック（userIdはtwitterIdとして扱う）
     const userInfo = await this.prisma.user.findUnique({
-      where: { id: userId },
+      where: { twitterId: userId },
       select: { id: true, name: true, twitterId: true, image: true },
     });
 
