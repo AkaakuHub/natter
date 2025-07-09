@@ -9,6 +9,7 @@ import { ServerModule } from './server/server.module';
 import { PostsModule } from './posts/posts.module';
 import { FollowsModule } from './follows/follows.module';
 import { CharactersModule } from './characters/characters.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CharactersModule } from './characters/characters.module';
     PostsModule,
     FollowsModule,
     CharactersModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -4,9 +4,10 @@ import { PostsController } from './posts.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthModule } from '../auth/auth.module';
 import { PostOwnerGuard } from '../auth/post-owner.guard';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule],
+  imports: [PrismaModule, AuthModule, NotificationsModule],
   controllers: [PostsController],
   providers: [PostsService, PostOwnerGuard],
   exports: [PostsService],

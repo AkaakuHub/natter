@@ -7,10 +7,14 @@ import * as validator from 'validator';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class PostsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+  ) {}
 
   private sanitizeContent(content: string): string {
     if (!content) return content;
@@ -511,6 +515,7 @@ export class PostsService {
     });
 
     if (existingLike) {
+      // いいねを削除
       await this.prisma.like.delete({
         where: {
           userId_postId: {
@@ -519,14 +524,23 @@ export class PostsService {
           },
         },
       });
+
+      // 通知を削除
+      await this.notificationsService.removeLikeNotification(postId, userId);
+
       return { liked: false };
     } else {
+      // いいねを作成
       await this.prisma.like.create({
         data: {
           userId,
           postId,
         },
       });
+
+      // 通知を作成
+      await this.notificationsService.createLikeNotification(postId, userId);
+
       return { liked: true };
     }
   }

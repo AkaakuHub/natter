@@ -28,6 +28,10 @@ model User {
   // フォロー関係
   following Follow[] @relation("UserFollowing")
   followers Follow[] @relation("UserFollowers")
+  
+  // 通知関係
+  notifications Notification[] @relation("UserNotifications")
+  notificationActions Notification[] @relation("UserNotificationActions")
 }
 
 model Post {
@@ -51,6 +55,9 @@ model Post {
   replyToId Int?      // リプライ先のPost ID
   replyTo   Post?     @relation("PostReplies", fields: [replyToId], references: [id])
   replies   Post[]    @relation("PostReplies")
+  
+  // 通知関係
+  notifications Notification[]
 }
 
 model Like {
@@ -85,4 +92,28 @@ model Character {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, name]) // ユーザーごとにキャラクター名は一意
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  type      String   // 'like', 'reply', 'follow'
+  message   String?  // 通知メッセージ
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // 通知を受け取るユーザー
+  user      User     @relation("UserNotifications", fields: [userId], references: [id])
+  userId    String
+  
+  // 通知を発生させたユーザー
+  actor     User     @relation("UserNotificationActions", fields: [actorId], references: [id])
+  actorId   String
+  
+  // 関連する投稿（オプション）
+  post      Post?    @relation(fields: [postId], references: [id])
+  postId    Int?
+  
+  @@index([userId, read])
+  @@index([userId, createdAt])
 }
