@@ -75,6 +75,9 @@ export interface Character {
   createdAt: string;
   updatedAt: string;
   postsCount: number;
+  _count?: {
+    posts: number;
+  };
 }
 
 export interface CreateCharacterDto {
