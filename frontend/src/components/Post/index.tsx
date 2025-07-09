@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, lazy, Suspense } from "react";
 import { useNavigation } from "@/hooks/useNavigation";
 import { usePostActions } from "@/hooks/usePostActions";
 import { useImageModal } from "@/hooks/useImageModal";
@@ -9,8 +9,9 @@ import { usePostShare } from "@/hooks/usePostShare";
 import { useToast } from "@/hooks/useToast";
 import { Post, PostsApi } from "@/api";
 
-import ImageModal from "@/components/ImageModal";
-import ReplyModal from "@/components/ReplyModal";
+// 遅延読み込みモーダル
+const ImageModal = lazy(() => import("@/components/ImageModal"));
+const ReplyModal = lazy(() => import("@/components/ReplyModal"));
 
 import UserAvatar from "./components/UserAvatar";
 import PostHeader from "./components/PostHeader";
@@ -226,36 +227,42 @@ const PostComponent = ({
       </article>
 
       {isModalOpen && currentPost.images && currentPost.images.length > 0 && (
-        <ImageModal
-          isOpen={isModalOpen}
-          images={currentPost.images.map((image) => getImageUrl(image))}
-          currentIndex={selectedImageIndex}
-          onClose={closeImageModal}
-          onPrevious={selectedImageIndex > 0 ? handlePreviousImage : undefined}
-          onNext={
-            selectedImageIndex < currentPost.images.length - 1
-              ? handleNextImage
-              : undefined
-          }
-        />
+        <Suspense fallback={<div />}>
+          <ImageModal
+            isOpen={isModalOpen}
+            images={currentPost.images.map((image) => getImageUrl(image))}
+            currentIndex={selectedImageIndex}
+            onClose={closeImageModal}
+            onPrevious={
+              selectedImageIndex > 0 ? handlePreviousImage : undefined
+            }
+            onNext={
+              selectedImageIndex < currentPost.images.length - 1
+                ? handleNextImage
+                : undefined
+            }
+          />
+        </Suspense>
       )}
 
       {showReplyModal && (
-        <ReplyModal
-          isOpen={showReplyModal}
-          onClose={() => setShowReplyModal(false)}
-          replyToPost={{
-            id: currentPost.id,
-            content: currentPost.content || "",
-            images: currentPost.images || [],
-            author: {
-              name: user.name,
-              image: user.image,
-            },
-          }}
-          currentUser={currentUser}
-          onReplySubmit={handleReplySubmit}
-        />
+        <Suspense fallback={<div />}>
+          <ReplyModal
+            isOpen={showReplyModal}
+            onClose={() => setShowReplyModal(false)}
+            replyToPost={{
+              id: currentPost.id,
+              content: currentPost.content || "",
+              images: currentPost.images || [],
+              author: {
+                name: user.name,
+                image: user.image,
+              },
+            }}
+            currentUser={currentUser}
+            onReplySubmit={handleReplySubmit}
+          />
+        </Suspense>
       )}
     </>
   );

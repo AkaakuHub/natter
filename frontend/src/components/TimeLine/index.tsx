@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import PostComponent from "../Post";
 import CreatePostButton from "../CreatePostButton";
 import SkeletonCard from "../common/SkeletonCard";
-import { PostsApi, Post, User } from "../../api";
+import { User } from "../../api";
 import { transformPostToPostComponent } from "@/utils/postTransformers";
 import { ExtendedSession } from "@/types";
+import { usePosts } from "@/hooks/queries/usePosts";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS, type PostWithUser } from "@/hooks/queries/usePosts";
 
 interface TimeLineProps {
   session?: ExtendedSession;
@@ -14,51 +17,35 @@ interface TimeLineProps {
 }
 
 const TimeLine = ({ currentUser }: TimeLineProps) => {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchPosts = async () => {
-    try {
-      setLoading(true);
-      const fetchedPosts = await PostsApi.getAllPosts();
-      setPosts(fetchedPosts);
-    } catch (err) {
-      console.error("Failed to fetch posts:", err);
-      setError("Failed to load posts");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+  const { data: posts, isLoading, error } = usePosts();
+  const queryClient = useQueryClient();
 
   const handlePostUpdate = () => {
     // usePostActionsで楽観的更新済みのため、再取得は不要
-    // fetchPosts();
   };
 
   const handlePostDelete = (postId: number) => {
-    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+    // React Queryのキャッシュを更新
+    queryClient.setQueryData(
+      QUERY_KEYS.posts,
+      (oldPosts: PostWithUser[] | undefined) =>
+        oldPosts?.filter((post) => post.id !== postId) || [],
+    );
   };
 
   // グローバルな投稿作成イベントを監視
   useEffect(() => {
     const handleGlobalPostCreated = () => {
-      fetchPosts();
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.posts });
     };
 
     window.addEventListener("postCreated", handleGlobalPostCreated);
     return () => {
       window.removeEventListener("postCreated", handleGlobalPostCreated);
     };
-  }, []);
+  }, [queryClient]);
 
-  // currentUserはpropsから受け取る
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="w-full max-w-md mx-auto">
         {[...Array(3)].map((_, i) => (
@@ -71,7 +58,7 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
   if (error) {
     return (
       <div className="w-full max-w-md mx-auto flex justify-center py-8">
-        <div className="text-error">{error}</div>
+        <div className="text-error">Failed to load posts</div>
       </div>
     );
   }
@@ -80,7 +67,7 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
     <>
       <div className="w-full max-w-md mx-auto">
         {/* 投稿一覧 */}
-        {posts.map((post) => {
+        {posts?.map((post) => {
           const transformed = transformPostToPostComponent(post);
           if (!transformed) return null;
 

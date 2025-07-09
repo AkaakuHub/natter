@@ -27,13 +27,17 @@ export class FollowsApi {
   }
 
   static async getFollowing(userId?: string): Promise<FollowUser[]> {
-    const params = userId ? { userId } : {};
-    return ApiClient.get("/follows/following", { params });
+    const endpoint = userId
+      ? `/follows/following?userId=${userId}`
+      : "/follows/following";
+    return ApiClient.get(endpoint);
   }
 
   static async getFollowers(userId?: string): Promise<FollowUser[]> {
-    const params = userId ? { userId } : {};
-    return ApiClient.get("/follows/followers", { params });
+    const endpoint = userId
+      ? `/follows/followers?userId=${userId}`
+      : "/follows/followers";
+    return ApiClient.get(endpoint);
   }
 
   static async getFollowStatus(userId: string): Promise<FollowStatus> {

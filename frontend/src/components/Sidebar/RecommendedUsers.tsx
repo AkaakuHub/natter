@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
-import { UsersApi, User } from "@/api";
 import { useRouter } from "next/navigation";
 import FollowButton from "@/components/FollowButton";
+import { useRecommendedUsers } from "@/hooks/queries/useUsers";
 
 interface RecommendedUsersProps {
   currentUserId?: string;
@@ -13,30 +13,17 @@ interface RecommendedUsersProps {
 const RecommendedUsers: React.FC<RecommendedUsersProps> = ({
   currentUserId,
 }) => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const {
+    data: recommendedUsers = [],
+    isLoading: loading,
+    error,
+  } = useRecommendedUsers(5);
 
-  useEffect(() => {
-    const fetchRecommendedUsers = async () => {
-      try {
-        const recommendedUsers = await UsersApi.getRecommendedUsers(5);
-        // フロントエンド側でも自分を除外（バックエンドで除外されていない場合のフォールバック）
-        const filteredUsers = currentUserId
-          ? recommendedUsers.filter((user) => user.id !== currentUserId)
-          : recommendedUsers;
-        setUsers(filteredUsers);
-      } catch (err) {
-        console.error("Failed to fetch recommended users:", err);
-        setError("おすすめユーザーの取得に失敗しました");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRecommendedUsers();
-  }, [currentUserId]);
+  // フロントエンド側でも自分を除外（バックエンドで除外されていない場合のフォールバック）
+  const users = currentUserId
+    ? recommendedUsers.filter((user) => user.id !== currentUserId)
+    : recommendedUsers;
 
   const handleUserClick = (userId: string) => {
     router.push(`/profile/${userId}`);
@@ -69,7 +56,9 @@ const RecommendedUsers: React.FC<RecommendedUsersProps> = ({
         <h3 className="text-lg font-semibold text-text mb-4">
           おすすめユーザー
         </h3>
-        <p className="text-error text-sm">{error}</p>
+        <p className="text-error text-sm">
+          おすすめユーザーの取得に失敗しました
+        </p>
       </div>
     );
   }

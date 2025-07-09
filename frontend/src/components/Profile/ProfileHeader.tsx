@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import clsx from "clsx";
 import { IconEdit } from "@tabler/icons-react";
 import { getDominantColor } from "@/utils/colorUtils";
 import { ExtendedSession } from "@/types";
-import { UsersApi } from "@/api/users";
 import { User } from "@/api/types";
-import { FollowsApi } from "@/api/follows";
 import EditProfileModal from "./EditProfileModal";
 import FollowButton from "@/components/FollowButton";
+import { useFollowing, useFollowers } from "@/hooks/queries/useFollows";
+import { useUser } from "@/hooks/queries/useUsers";
 
 interface ProfileHeaderProps {
   session: ExtendedSession;
@@ -22,14 +22,27 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [followCounts, setFollowCounts] = useState({
-    followingCount: 0,
-    followersCount: 0,
-  });
-  const lastUserIdRef = useRef<string | undefined>(undefined);
 
-  const displayUser = targetUser || currentUser;
   const isOwnProfile = !userId || userId === session.user?.id;
+  const targetUserId = userId || session.user?.id;
+
+  // React Query hooks for user data
+  const { data: fetchedCurrentUser } = useUser(session.user?.id || "");
+  const { data: fetchedTargetUser } = useUser(userId || "");
+
+  // React Query hooks for follow data
+  const { data: following = [] } = useFollowing(targetUserId || "");
+  const { data: followers = [] } = useFollowers(targetUserId || "");
+
+  // Use React Query data if available, fallback to state
+  const effectiveCurrentUser = fetchedCurrentUser || currentUser;
+  const effectiveTargetUser = fetchedTargetUser || targetUser;
+  const displayUser = effectiveTargetUser || effectiveCurrentUser;
+
+  const followCounts = {
+    followingCount: following.length,
+    followersCount: followers.length,
+  };
 
   const handleUserUpdated = (updatedUser: User) => {
     if (isOwnProfile) {
@@ -39,68 +52,30 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
     }
   };
 
-  // 自分のユーザー情報を取得
+  // フォールバック用のセッション情報設定（React Queryでデータが取得できない場合）
   useEffect(() => {
-    if (session.user?.id) {
-      UsersApi.getUserById(session.user.id)
-        .then((user) => setCurrentUser(user))
-        .catch(() => {
-          // APIからユーザーが取得できない場合はセッション情報をフォールバック
-          setCurrentUser({
-            id: session.user.id,
-            name: session.user.name || "Unknown User",
-            image: session.user.image || undefined,
-            twitterId: session.user.id,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          });
-        });
+    if (session.user?.id && !fetchedCurrentUser && !currentUser) {
+      setCurrentUser({
+        id: session.user.id,
+        name: session.user.name || "Unknown User",
+        image: session.user.image || undefined,
+        twitterId: session.user.id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
     }
-  }, [session.user?.id, session.user?.name, session.user?.image]);
+  }, [session.user, fetchedCurrentUser, currentUser]);
 
-  // フォロー数を取得
+  // React Queryでデータが取得されたらローディング状態を更新
   useEffect(() => {
-    const fetchFollowCounts = async () => {
-      const targetUserId = userId || session.user?.id;
-      if (!targetUserId) return;
-
-      try {
-        const [following, followers] = await Promise.all([
-          FollowsApi.getFollowing(targetUserId),
-          FollowsApi.getFollowers(targetUserId),
-        ]);
-        setFollowCounts({
-          followingCount: following.length,
-          followersCount: followers.length,
-        });
-      } catch (error) {
-        console.error("Failed to fetch follow counts:", error);
-      }
-    };
-
-    fetchFollowCounts();
-  }, [userId, session.user?.id]);
-
-  // 他のユーザー情報を取得
-  useEffect(() => {
-    // 同じuserIdの場合は再実行しない
-    if (lastUserIdRef.current === userId) {
-      return;
-    }
-
-    lastUserIdRef.current = userId;
-
     if (userId && userId !== session.user?.id) {
-      setLoading(true);
-      UsersApi.getUserById(userId)
-        .then((user) => setTargetUser(user))
-        .catch(() => setTargetUser(null))
-        .finally(() => setLoading(false));
+      if (fetchedTargetUser) {
+        setLoading(false);
+      }
     } else {
-      setTargetUser(null);
       setLoading(false);
     }
-  }, [userId, session.user?.id]);
+  }, [userId, session.user?.id, fetchedTargetUser]);
 
   useEffect(() => {
     const image = displayUser?.image ?? "/no_avatar_image_128x128.png";
@@ -186,14 +161,8 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
               <FollowButton
                 userId={displayUser.id}
                 currentUserId={session.user?.id}
-                onFollowChange={(isFollowing) => {
-                  // フォロー状態が変わったときにフォロワー数を更新（表示されているユーザーのフォロワー数を変更）
-                  setFollowCounts((prev) => ({
-                    ...prev,
-                    followersCount: isFollowing
-                      ? prev.followersCount + 1
-                      : prev.followersCount - 1,
-                  }));
+                onFollowChange={() => {
+                  // React Queryが自動的にキャッシュを更新するため、何もしない
                 }}
               />
             </div>

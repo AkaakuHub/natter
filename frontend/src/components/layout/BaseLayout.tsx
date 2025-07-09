@@ -1,17 +1,19 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, lazy, Suspense } from "react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useGlobalKeyboardShortcuts } from "@/hooks/useGlobalKeyboardShortcuts";
 import { useAppState } from "@/contexts/AppStateContext";
 import Header from "./Header";
 import { FooterMenu } from "../FooterMenu";
 import Welcome from "../Welcome";
-import CreatePostModal from "../CreatePostModal";
-import ShortcutHelpModal from "../ShortcutHelpModal";
-import TrendingPosts from "../Sidebar/TrendingPosts";
-import RecommendedUsers from "../Sidebar/RecommendedUsers";
 import { usePathname, useRouter } from "next/navigation";
+
+// 遅延読み込みコンポーネント
+const CreatePostModal = lazy(() => import("../CreatePostModal"));
+const ShortcutHelpModal = lazy(() => import("../ShortcutHelpModal"));
+const TrendingPosts = lazy(() => import("../Sidebar/TrendingPosts"));
+const RecommendedUsers = lazy(() => import("../Sidebar/RecommendedUsers"));
 
 interface BaseLayoutProps {
   children?: React.ReactNode;
@@ -93,8 +95,20 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
         {/* サイドバー（大画面のみ表示） */}
         <div className="hidden lg:block w-80 bg-surface border-l border-border mb-[60px] overflow-y-auto">
           <div className="p-4 space-y-6">
-            <TrendingPosts />
-            <RecommendedUsers currentUserId={session?.user?.id} />
+            <Suspense
+              fallback={
+                <div className="h-32 bg-surface-variant animate-pulse rounded-lg" />
+              }
+            >
+              <TrendingPosts />
+            </Suspense>
+            <Suspense
+              fallback={
+                <div className="h-32 bg-surface-variant animate-pulse rounded-lg" />
+              }
+            >
+              <RecommendedUsers currentUserId={session?.user?.id} />
+            </Suspense>
           </div>
         </div>
       </div>
@@ -103,33 +117,41 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
       <FooterMenu path={pathname} scrollContainerRef={scrollContainerRef} />
 
       {/* グローバルモーダル */}
-      <CreatePostModal
-        isOpen={isCreatePostModalOpen}
-        onClose={() => setIsCreatePostModalOpen(false)}
-        onPostCreated={() => {
-          // 投稿作成後のハンドリング
-          setIsCreatePostModalOpen(false);
-          // グローバルイベントを発火してタイムラインをリフレッシュ
-          window.dispatchEvent(new CustomEvent("postCreated"));
-        }}
-        currentUser={
-          session?.user
-            ? {
-                id: session.user.id,
-                name: session.user.name || "Unknown User",
-                image: session.user.image || undefined,
-                twitterId: session.user.id,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-              }
-            : null
-        }
-      />
+      {isCreatePostModalOpen && (
+        <Suspense fallback={<div />}>
+          <CreatePostModal
+            isOpen={isCreatePostModalOpen}
+            onClose={() => setIsCreatePostModalOpen(false)}
+            onPostCreated={() => {
+              // 投稿作成後のハンドリング
+              setIsCreatePostModalOpen(false);
+              // グローバルイベントを発火してタイムラインをリフレッシュ
+              window.dispatchEvent(new CustomEvent("postCreated"));
+            }}
+            currentUser={
+              session?.user
+                ? {
+                    id: session.user.id,
+                    name: session.user.name || "Unknown User",
+                    image: session.user.image || undefined,
+                    twitterId: session.user.id,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                  }
+                : null
+            }
+          />
+        </Suspense>
+      )}
 
-      <ShortcutHelpModal
-        isOpen={isShortcutHelpModalOpen}
-        onClose={() => setIsShortcutHelpModalOpen(false)}
-      />
+      {isShortcutHelpModalOpen && (
+        <Suspense fallback={<div />}>
+          <ShortcutHelpModal
+            isOpen={isShortcutHelpModalOpen}
+            onClose={() => setIsShortcutHelpModalOpen(false)}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };

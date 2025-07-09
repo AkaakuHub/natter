@@ -1,6 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // パフォーマンス最適化
+  compress: true,
+  experimental: {
+    optimizePackageImports: ['@tabler/icons-react'],
+  },
+  
+  // 静的最適化とキャッシング
+  generateEtags: true,
+  poweredByHeader: false,
+  
   images: {
     // X(Twitter)のプロフィール画像を表示するために追加
     remotePatterns: [
@@ -9,6 +19,71 @@ const nextConfig: NextConfig = {
       { hostname: "localhost" },
       { hostname: "api-demo-natter.akaaku.net" },
     ],
+    // 画像最適化設定
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+  },
+  
+  // Webpack最適化
+  webpack: (config, { dev, isServer }) => {
+    // プロダクション環境での最適化
+    if (!dev && !isServer) {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            priority: 10,
+            chunks: 'all',
+          },
+          common: {
+            minChunks: 2,
+            priority: 5,
+            reuseExistingChunk: true,
+          },
+        },
+      };
+    }
+    return config;
+  },
+  
+  // レスポンスヘッダー最適化
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/api/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, max-age=0',
+          },
+        ],
+      },
+    ];
   },
 };
 

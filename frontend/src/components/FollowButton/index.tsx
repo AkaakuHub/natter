@@ -1,9 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { IconUserPlus, IconUserMinus } from "@tabler/icons-react";
-import { FollowsApi } from "@/api";
 import { useToast } from "@/hooks/useToast";
+import {
+  useFollowStatus,
+  useFollowUser,
+  useUnfollowUser,
+} from "@/hooks/queries/useFollows";
 
 interface FollowButtonProps {
   userId: string;
@@ -18,50 +22,41 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   onFollowChange,
   compact = false,
 }) => {
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
 
-  useEffect(() => {
-    const fetchFollowStatus = async () => {
-      try {
-        const status = await FollowsApi.getFollowStatus(userId);
-        setIsFollowing(status.isFollowing);
-      } catch (error) {
-        console.error("Failed to fetch follow status:", error);
-      }
-    };
-
-    fetchFollowStatus();
-  }, [userId]);
+  // React Query hooks
+  const { data: followStatus, isLoading: statusLoading } = useFollowStatus(
+    currentUserId || "",
+    userId,
+  );
+  const followMutation = useFollowUser();
+  const unfollowMutation = useUnfollowUser();
 
   // 自分自身の場合は何も表示しない
   if (!currentUserId || currentUserId === userId) {
     return null;
   }
 
+  const isFollowing = followStatus?.isFollowing ?? false;
+  const loading =
+    statusLoading || followMutation.isPending || unfollowMutation.isPending;
+
   const handleFollowToggle = async () => {
     if (loading) return;
 
     try {
-      setLoading(true);
-
       if (isFollowing) {
-        await FollowsApi.unfollowUser(userId);
-        setIsFollowing(false);
+        await unfollowMutation.mutateAsync(userId);
         showToast("フォローを解除しました", "success");
         onFollowChange?.(false);
       } else {
-        await FollowsApi.followUser(userId);
-        setIsFollowing(true);
+        await followMutation.mutateAsync(userId);
         showToast("フォローしました", "success");
         onFollowChange?.(true);
       }
     } catch (error) {
       console.error("Failed to toggle follow:", error);
       showToast("エラーが発生しました", "error");
-    } finally {
-      setLoading(false);
     }
   };
 
