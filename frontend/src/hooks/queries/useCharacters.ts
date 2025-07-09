@@ -3,7 +3,7 @@ import { CharactersApi } from "@/api";
 import type { Character, CreateCharacterDto, UpdateCharacterDto } from "@/api";
 
 // クエリキー
-export const CHARACTER_QUERY_KEYS = {
+const CHARACTER_QUERY_KEYS = {
   characters: ["characters"] as const,
   character: (id: number) => ["character", id] as const,
   search: (query: string) => ["characters", "search", query] as const,
@@ -18,16 +18,6 @@ export const useCharacters = (userId?: string) => {
         ? CharactersApi.getCharactersByUserId(userId)
         : CharactersApi.getCharacters(),
     staleTime: 5 * 60 * 1000, // 5分間はフレッシュとみなす
-  });
-};
-
-// 特定のキャラクター取得
-export const useCharacter = (id: number) => {
-  return useQuery({
-    queryKey: CHARACTER_QUERY_KEYS.character(id),
-    queryFn: () => CharactersApi.getCharacter(id),
-    enabled: !!id,
-    staleTime: 5 * 60 * 1000,
   });
 };
 

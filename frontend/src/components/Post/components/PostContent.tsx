@@ -19,7 +19,9 @@ const PostContent = ({
   onImageClick,
 }: PostContentProps) => {
   // imagesが配列でない場合のチェック
-  const imageArray = Array.isArray(images) ? images : [];
+  const imageArray = React.useMemo(() => {
+    return Array.isArray(images) ? images : [];
+  }, [images]);
 
   // 画像URLの配列を作成してプリロード
   const imageUrls = React.useMemo(() => {

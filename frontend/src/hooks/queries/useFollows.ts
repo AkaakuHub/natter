@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FollowsApi } from "@/api";
 
 // クエリキー
-export const FOLLOW_QUERY_KEYS = {
+const FOLLOW_QUERY_KEYS = {
   following: (userId: string) => ["follows", "following", userId] as const,
   followers: (userId: string) => ["follows", "followers", userId] as const,
   followStatus: (followerId: string, followingId: string) =>
