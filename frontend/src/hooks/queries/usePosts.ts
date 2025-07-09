@@ -8,6 +8,8 @@ export type PostWithUser = Post & {
     name: string;
     image?: string;
   };
+  likesCount?: number;
+  isLiked?: boolean;
 };
 
 // クエリキー
@@ -24,7 +26,9 @@ export const usePosts = () => {
   return useQuery({
     queryKey: QUERY_KEYS.posts,
     queryFn: () => PostsApi.getAllPosts(),
-    staleTime: 30 * 1000, // 30秒間はフレッシュとみなす
+    staleTime: 0, // 常に最新データを取得
+    refetchOnWindowFocus: true, // ウィンドウフォーカス時に再取得
+    refetchOnMount: true, // マウント時に再取得
   });
 };
 
@@ -44,7 +48,8 @@ export const usePost = (id: number) => {
     queryKey: QUERY_KEYS.post(id),
     queryFn: () => PostsApi.getPostById(id),
     enabled: !!id,
-    staleTime: 2 * 60 * 1000, // 2分間はフレッシュとみなす
+    staleTime: 0, // 常に最新データを取得
+    refetchOnWindowFocus: true, // ウィンドウフォーカス時に再取得
   });
 };
 
@@ -91,8 +96,24 @@ export const useCreatePost = () => {
       return PostsApi.createPostWithImages(formData);
     },
     onSuccess: (newPost) => {
-      // 投稿一覧のキャッシュを無効化
+      // 投稿一覧のキャッシュに新しい投稿を直接追加（楽観的更新）
+      queryClient.setQueryData(
+        QUERY_KEYS.posts,
+        (oldPosts: PostWithUser[] | undefined) => {
+          if (!oldPosts) return [newPost];
+          return [newPost, ...oldPosts];
+        },
+      );
+
+      // 投稿一覧のキャッシュを無効化して最新データを取得
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.posts });
+
+      // ユーザー別投稿のキャッシュも更新
+      if (newPost.author?.id) {
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.postsByUser(newPost.author.id),
+        });
+      }
 
       // リプライの場合は親投稿のキャッシュも無効化
       if (newPost.replyToId) {
@@ -100,6 +121,9 @@ export const useCreatePost = () => {
           queryKey: QUERY_KEYS.post(newPost.replyToId),
         });
       }
+
+      // トレンド投稿のキャッシュも更新
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.trendingPosts });
     },
   });
 };
@@ -111,11 +135,22 @@ export const useDeletePost = () => {
   return useMutation({
     mutationFn: (postId: number) => PostsApi.deletePost(postId),
     onSuccess: (_, postId) => {
+      // 投稿一覧のキャッシュから該当投稿を直接削除（楽観的更新）
+      queryClient.setQueryData(
+        QUERY_KEYS.posts,
+        (oldPosts: PostWithUser[] | undefined) => {
+          return oldPosts?.filter((post) => post.id !== postId) || [];
+        },
+      );
+
       // 該当投稿のキャッシュを削除
       queryClient.removeQueries({ queryKey: QUERY_KEYS.post(postId) });
 
       // 投稿一覧のキャッシュを無効化
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.posts });
+
+      // 関連キャッシュも更新
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.trendingPosts });
     },
   });
 };
@@ -126,12 +161,62 @@ export const useLikePost = () => {
 
   return useMutation({
     mutationFn: (postId: number) => PostsApi.likePost(postId),
-    onSuccess: (_, postId) => {
-      // 該当投稿のキャッシュを無効化
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.post(postId) });
+    onMutate: async (postId) => {
+      // 楽観的更新のために進行中のクエリをキャンセル
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.posts });
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.post(postId) });
 
-      // 投稿一覧のキャッシュを無効化（いいね数が変わるため）
+      // 現在のデータを取得（ロールバック用）
+      const previousPosts = queryClient.getQueryData(QUERY_KEYS.posts);
+      const previousPost = queryClient.getQueryData(QUERY_KEYS.post(postId));
+
+      // 楽観的更新：投稿一覧のいいね数を即座に更新
+      queryClient.setQueryData(
+        QUERY_KEYS.posts,
+        (oldPosts: PostWithUser[] | undefined) => {
+          return oldPosts?.map((post) => {
+            if (post.id === postId) {
+              return {
+                ...post,
+                likesCount: (post.likesCount || 0) + 1,
+                isLiked: true,
+              };
+            }
+            return post;
+          });
+        },
+      );
+
+      // 楽観的更新：単一投稿のいいね数も更新
+      queryClient.setQueryData(
+        QUERY_KEYS.post(postId),
+        (oldPost: PostWithUser | undefined) => {
+          if (oldPost) {
+            return {
+              ...oldPost,
+              likesCount: (oldPost.likesCount || 0) + 1,
+              isLiked: true,
+            };
+          }
+          return oldPost;
+        },
+      );
+
+      return { previousPosts, previousPost };
+    },
+    onError: (err, postId, context) => {
+      // エラー時はロールバック
+      if (context?.previousPosts) {
+        queryClient.setQueryData(QUERY_KEYS.posts, context.previousPosts);
+      }
+      if (context?.previousPost) {
+        queryClient.setQueryData(QUERY_KEYS.post(postId), context.previousPost);
+      }
+    },
+    onSettled: (_, __, postId) => {
+      // 最終的にサーバーから最新データを取得
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.posts });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.post(postId) });
     },
   });
 };
