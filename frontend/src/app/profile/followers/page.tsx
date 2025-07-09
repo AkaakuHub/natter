@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useSession } from "next-auth/react";
+import BaseLayout from "@/components/layout/BaseLayout";
 import FollowList from "@/components/FollowList";
 import { ExtendedSession } from "@/types";
 
@@ -10,20 +11,24 @@ const MyFollowersPage = () => {
 
   if (!session?.user?.id) {
     return (
-      <div className="w-full max-w-md mx-auto p-4">
-        <div className="text-center py-8">
-          <p className="text-text-muted">ログインが必要です</p>
+      <BaseLayout>
+        <div className="w-full max-w-md mx-auto p-4">
+          <div className="text-center py-8">
+            <p className="text-text-muted">ログインが必要です</p>
+          </div>
         </div>
-      </div>
+      </BaseLayout>
     );
   }
 
   return (
-    <FollowList
-      userId={session.user.id}
-      type="followers"
-      session={session as ExtendedSession}
-    />
+    <BaseLayout>
+      <FollowList
+        userId={session.user.id}
+        type="followers"
+        session={session as ExtendedSession}
+      />
+    </BaseLayout>
   );
 };
 

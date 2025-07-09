@@ -1,33 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import { IconHeart, IconMessageCircle } from "@tabler/icons-react";
-import { PostsApi, Post } from "@/api";
 import { transformPostToPostComponent } from "@/utils/postTransformers";
 import { useRouter } from "next/navigation";
+import { useTrendingPosts } from "@/hooks/queries/usePosts";
 
 const TrendingPosts: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-
-  useEffect(() => {
-    const fetchTrendingPosts = async () => {
-      try {
-        const trendingPosts = await PostsApi.getTrendingPosts(5);
-        setPosts(trendingPosts);
-      } catch (err) {
-        console.error("Failed to fetch trending posts:", err);
-        setError("人気投稿の取得に失敗しました");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTrendingPosts();
-  }, []);
+  const { data: posts = [], isLoading: loading, error } = useTrendingPosts();
 
   const handlePostClick = (postId: number) => {
     router.push(`/post/${postId}`);
@@ -53,7 +35,7 @@ const TrendingPosts: React.FC = () => {
     return (
       <div className="bg-surface-variant rounded-lg p-4">
         <h3 className="text-lg font-semibold text-text mb-4">人気の投稿</h3>
-        <p className="text-error text-sm">{error}</p>
+        <p className="text-error text-sm">人気投稿の取得に失敗しました</p>
       </div>
     );
   }
