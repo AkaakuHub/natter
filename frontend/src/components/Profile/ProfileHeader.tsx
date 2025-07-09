@@ -9,6 +9,7 @@ import EditProfileModal from "./EditProfileModal";
 import FollowButton from "@/components/FollowButton";
 import { useFollowing, useFollowers } from "@/hooks/queries/useFollows";
 import { useUser } from "@/hooks/queries/useUsers";
+import { useRouter } from "next/navigation";
 
 interface ProfileHeaderProps {
   session: ExtendedSession;
@@ -22,6 +23,7 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const router = useRouter();
 
   const isOwnProfile = !userId || userId === session.user?.id;
   const targetUserId = userId || session.user?.id;
@@ -42,6 +44,22 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
   const followCounts = {
     followingCount: following.length,
     followersCount: followers.length,
+  };
+
+  const handleFollowingClick = () => {
+    if (isOwnProfile) {
+      router.push("/profile/following");
+    } else {
+      router.push(`/profile/${targetUserId}/following`);
+    }
+  };
+
+  const handleFollowersClick = () => {
+    if (isOwnProfile) {
+      router.push("/profile/followers");
+    } else {
+      router.push(`/profile/${targetUserId}/followers`);
+    }
   };
 
   const handleUserUpdated = (updatedUser: User) => {
@@ -142,18 +160,26 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
 
           {/* フォロー数表示 */}
           <div className="flex justify-center gap-6 mt-3">
-            <div className="text-center">
+            <button
+              onClick={handleFollowingClick}
+              className="text-center hover:bg-surface-hover rounded-lg px-3 py-2 transition-colors cursor-pointer"
+              type="button"
+            >
               <div className="text-lg font-bold text-text">
                 {followCounts.followingCount}
               </div>
               <div className="text-xs text-text-muted">フォロー</div>
-            </div>
-            <div className="text-center">
+            </button>
+            <button
+              onClick={handleFollowersClick}
+              className="text-center hover:bg-surface-hover rounded-lg px-3 py-2 transition-colors cursor-pointer"
+              type="button"
+            >
               <div className="text-lg font-bold text-text">
                 {followCounts.followersCount}
               </div>
               <div className="text-xs text-text-muted">フォロワー</div>
-            </div>
+            </button>
           </div>
 
           {!isOwnProfile && displayUser && (
