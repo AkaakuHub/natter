@@ -1,20 +1,15 @@
 import { ApiClient } from "./client";
 
-export interface FollowUser {
+interface FollowUser {
   id: string;
   name: string;
   image?: string;
   followedAt: string;
 }
 
-export interface FollowStatus {
+interface FollowStatus {
   isFollowing: boolean;
   followedAt?: string;
-}
-
-export interface FollowCounts {
-  followingCount: number;
-  followersCount: number;
 }
 
 export class FollowsApi {

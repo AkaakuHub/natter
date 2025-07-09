@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { IconX } from "@tabler/icons-react";
+import { useImagePreload } from "@/hooks/useImagePreload";
 
 interface ImagePreviewProps {
   imageUrls: string[];
@@ -8,6 +9,9 @@ interface ImagePreviewProps {
 }
 
 const ImagePreview = ({ imageUrls, onRemove }: ImagePreviewProps) => {
+  // 画像をプリロード
+  useImagePreload(imageUrls);
+
   if (imageUrls.length === 0) return null;
 
   return (

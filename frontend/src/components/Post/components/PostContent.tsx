@@ -3,6 +3,7 @@ import Image from "next/image";
 import { getImageUrl } from "@/utils/postUtils";
 import { decodeHtmlEntities, breakLongWords } from "@/utils/htmlUtils";
 import { Character } from "@/api";
+import { useImagePreload } from "@/hooks/useImagePreload";
 
 interface PostContentProps {
   content: string;
@@ -19,6 +20,14 @@ const PostContent = ({
 }: PostContentProps) => {
   // imagesが配列でない場合のチェック
   const imageArray = Array.isArray(images) ? images : [];
+
+  // 画像URLの配列を作成してプリロード
+  const imageUrls = React.useMemo(() => {
+    return imageArray.map((image) => getImageUrl(image));
+  }, [imageArray]);
+
+  // 画像をプリロード
+  useImagePreload(imageUrls);
 
   // HTMLエスケープされたコンテンツを復元し、長い単語を改行可能にする
   const processedContent = React.useMemo(() => {
