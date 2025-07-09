@@ -8,6 +8,7 @@ import Header from "./Header";
 import { FooterMenu } from "../FooterMenu";
 import Welcome from "../Welcome";
 import { usePathname, useRouter } from "next/navigation";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 // 遅延読み込みコンポーネント
 const CreatePostModal = lazy(() => import("../CreatePostModal"));
@@ -28,6 +29,9 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
   const { isModalOpen, isInputFocused } = useAppState();
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [isShortcutHelpModalOpen, setIsShortcutHelpModalOpen] = useState(false);
+
+  // 大画面かどうかを判定
+  const isLargeScreen = useMediaQuery("(min-width: 1024px)");
 
   // グローバルキーボードショートカット
   useGlobalKeyboardShortcuts({
@@ -93,24 +97,26 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
         </div>
 
         {/* サイドバー（大画面のみ表示） */}
-        <div className="hidden lg:block w-80 bg-surface border-l border-border mb-[60px] overflow-y-auto">
-          <div className="p-4 space-y-6">
-            <Suspense
-              fallback={
-                <div className="h-32 bg-surface-variant animate-pulse rounded-lg" />
-              }
-            >
-              <TrendingPosts />
-            </Suspense>
-            <Suspense
-              fallback={
-                <div className="h-32 bg-surface-variant animate-pulse rounded-lg" />
-              }
-            >
-              <RecommendedUsers currentUserId={session?.user?.id} />
-            </Suspense>
+        {isLargeScreen && (
+          <div className="w-80 bg-surface border-l border-border mb-[60px] overflow-y-auto">
+            <div className="p-4 space-y-6">
+              <Suspense
+                fallback={
+                  <div className="h-32 bg-surface-variant animate-pulse rounded-lg" />
+                }
+              >
+                <TrendingPosts />
+              </Suspense>
+              <Suspense
+                fallback={
+                  <div className="h-32 bg-surface-variant animate-pulse rounded-lg" />
+                }
+              >
+                <RecommendedUsers currentUserId={session?.user?.id} />
+              </Suspense>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* フッターメニュー */}
