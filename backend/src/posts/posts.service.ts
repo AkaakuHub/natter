@@ -20,7 +20,8 @@ export class PostsService {
   }
 
   async create(createPostDto: CreatePostDto) {
-    const { images, authorId, replyToId, ...postData } = createPostDto;
+    const { images, authorId, replyToId, characterId, ...postData } =
+      createPostDto;
 
     // コンテンツをサニタイズ
     const sanitizedPostData = {
@@ -44,6 +45,19 @@ export class PostsService {
       throw new BadRequestException(`User with id ${authorId} does not exist`);
     }
 
+    // キャラクターIDが指定されている場合、所有者チェック
+    if (characterId) {
+      const character = await this.prisma.character.findFirst({
+        where: { id: characterId, userId: authorId },
+      });
+
+      if (!character) {
+        throw new BadRequestException(
+          `Character with id ${characterId} does not exist or does not belong to the user`,
+        );
+      }
+    }
+
     // リプライ先の投稿が存在するかチェック
     const numericReplyToId =
       typeof replyToId === 'string' ? parseInt(replyToId, 10) : replyToId;
@@ -64,10 +78,12 @@ export class PostsService {
         ...sanitizedPostData,
         authorId,
         replyToId: numericReplyToId,
+        characterId,
         images: images ? JSON.stringify(images) : null,
       },
       include: {
         author: true,
+        character: true,
         likes: {
           include: {
             user: true,
@@ -88,13 +104,14 @@ export class PostsService {
     });
   }
 
-  async findAll() {
+  async findAll(currentUserId?: string) {
     const posts = await this.prisma.post.findMany({
       where: {
         deletedAt: null, // 削除されていない投稿のみ
       },
       include: {
         author: true,
+        character: true,
         likes: {
           include: {
             user: true,
@@ -117,7 +134,7 @@ export class PostsService {
       },
     });
 
-    // replyToが削除されている場合の処理
+    // replyToが削除されている場合の処理とキャラクター隠蔽処理
     const postsWithReplyTo = await Promise.all(
       posts.map(async (post) => {
         let replyTo = post.replyTo;
@@ -133,9 +150,19 @@ export class PostsService {
           replyTo = deletedReplyTo;
         }
 
+        // キャラクター情報の隠蔽処理
+        let character = post.character;
+        if (character && currentUserId !== post.authorId) {
+          character = {
+            ...character,
+            name: '???',
+          };
+        }
+
         return {
           ...post,
           replyTo,
+          character,
           images: post.images ? (JSON.parse(post.images) as string[]) : [],
         };
       }),
@@ -144,11 +171,12 @@ export class PostsService {
     return postsWithReplyTo;
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, currentUserId?: string) {
     const post = await this.prisma.post.findUnique({
       where: { id },
       include: {
         author: true,
+        character: true,
         likes: {
           include: {
             user: true,
@@ -184,14 +212,24 @@ export class PostsService {
       replyTo = deletedReplyTo;
     }
 
+    // キャラクター情報の隠蔽処理
+    let character = post.character;
+    if (character && currentUserId !== post.authorId) {
+      character = {
+        ...character,
+        name: '???',
+      };
+    }
+
     return {
       ...post,
       replyTo,
+      character,
       images: post.images ? (JSON.parse(post.images) as string[]) : [],
     };
   }
 
-  async findByUser(userId: string) {
+  async findByUser(userId: string, currentUserId?: string) {
     const posts = await this.prisma.post.findMany({
       where: {
         authorId: userId,
@@ -199,6 +237,7 @@ export class PostsService {
       },
       include: {
         author: true,
+        character: true,
         likes: {
           include: {
             user: true,
@@ -221,13 +260,25 @@ export class PostsService {
       },
     });
 
-    return posts.map((post) => ({
-      ...post,
-      images: post.images ? (JSON.parse(post.images) as string[]) : [],
-    }));
+    return posts.map((post) => {
+      // キャラクター情報の隠蔽処理
+      let character = post.character;
+      if (character && currentUserId !== post.authorId) {
+        character = {
+          ...character,
+          name: '???',
+        };
+      }
+
+      return {
+        ...post,
+        character,
+        images: post.images ? (JSON.parse(post.images) as string[]) : [],
+      };
+    });
   }
 
-  async findMediaPosts() {
+  async findMediaPosts(currentUserId?: string) {
     const posts = await this.prisma.post.findMany({
       where: {
         images: {
@@ -237,6 +288,7 @@ export class PostsService {
       },
       include: {
         author: true,
+        character: true,
         likes: {
           include: {
             user: true,
@@ -264,19 +316,32 @@ export class PostsService {
         (post) =>
           post.images && (JSON.parse(post.images) as string[]).length > 0,
       )
-      .map((post) => ({
-        ...post,
-        images: post.images ? (JSON.parse(post.images) as string[]) : [],
-      }));
+      .map((post) => {
+        // キャラクター情報の隠蔽処理
+        let character = post.character;
+        if (character && currentUserId !== post.authorId) {
+          character = {
+            ...character,
+            name: '???',
+          };
+        }
+
+        return {
+          ...post,
+          character,
+          images: post.images ? (JSON.parse(post.images) as string[]) : [],
+        };
+      });
   }
 
-  async findLikedPosts(userId: string) {
+  async findLikedPosts(userId: string, currentUserId?: string) {
     const likedPosts = await this.prisma.like.findMany({
       where: { userId },
       include: {
         post: {
           include: {
             author: true,
+            character: true,
             likes: {
               include: {
                 user: true,
@@ -295,12 +360,24 @@ export class PostsService {
       },
     });
 
-    return likedPosts.map((like) => ({
-      ...like.post,
-      images: like.post.images
-        ? (JSON.parse(like.post.images) as string[])
-        : [],
-    }));
+    return likedPosts.map((like) => {
+      // キャラクター情報の隠蔽処理
+      let character = like.post.character;
+      if (character && currentUserId !== like.post.authorId) {
+        character = {
+          ...character,
+          name: '???',
+        };
+      }
+
+      return {
+        ...like.post,
+        character,
+        images: like.post.images
+          ? (JSON.parse(like.post.images) as string[])
+          : [],
+      };
+    });
   }
 
   async update(id: number, updatePostDto: UpdatePostDto) {
@@ -313,6 +390,7 @@ export class PostsService {
       },
       include: {
         author: true,
+        character: true,
         likes: {
           include: {
             user: true,
@@ -369,6 +447,7 @@ export class PostsService {
       },
       include: {
         author: true,
+        character: true,
         likes: {
           include: {
             user: true,
@@ -466,7 +545,7 @@ export class PostsService {
     };
   }
 
-  async getReplies(postId: number) {
+  async getReplies(postId: number, currentUserId?: string) {
     const replies = await this.prisma.post.findMany({
       where: {
         replyToId: postId,
@@ -474,6 +553,7 @@ export class PostsService {
       },
       include: {
         author: true,
+        character: true,
         likes: {
           include: {
             user: true,
@@ -496,19 +576,32 @@ export class PostsService {
       },
     });
 
-    return replies.map((reply) => ({
-      ...reply,
-      images: reply.images ? (JSON.parse(reply.images) as string[]) : [],
-    }));
+    return replies.map((reply) => {
+      // キャラクター情報の隠蔽処理
+      let character = reply.character;
+      if (character && currentUserId !== reply.authorId) {
+        character = {
+          ...character,
+          name: '???',
+        };
+      }
+
+      return {
+        ...reply,
+        character,
+        images: reply.images ? (JSON.parse(reply.images) as string[]) : [],
+      };
+    });
   }
 
-  async getTrendingPosts(limit: number = 5) {
+  async getTrendingPosts(limit: number = 5, currentUserId?: string) {
     const posts = await this.prisma.post.findMany({
       where: {
         deletedAt: null,
       },
       include: {
         author: true,
+        character: true,
         likes: {
           include: {
             user: true,
@@ -539,13 +632,25 @@ export class PostsService {
       take: limit,
     });
 
-    return posts.map((post) => ({
-      ...post,
-      images: post.images ? (JSON.parse(post.images) as string[]) : [],
-    }));
+    return posts.map((post) => {
+      // キャラクター情報の隠蔽処理
+      let character = post.character;
+      if (character && currentUserId !== post.authorId) {
+        character = {
+          ...character,
+          name: '???',
+        };
+      }
+
+      return {
+        ...post,
+        character,
+        images: post.images ? (JSON.parse(post.images) as string[]) : [],
+      };
+    });
   }
 
-  async searchPosts(searchTerm: string, type?: string) {
+  async searchPosts(searchTerm: string, type?: string, currentUserId?: string) {
     const searchConditions = {
       AND: [
         {
@@ -589,6 +694,7 @@ export class PostsService {
       where: searchConditions,
       include: {
         author: true,
+        character: true,
         likes: {
           include: {
             user: true,
@@ -617,9 +723,21 @@ export class PostsService {
           type !== 'media' ||
           (post.images && (JSON.parse(post.images) as string[]).length > 0),
       )
-      .map((post) => ({
-        ...post,
-        images: post.images ? (JSON.parse(post.images) as string[]) : [],
-      }));
+      .map((post) => {
+        // キャラクター情報の隠蔽処理
+        let character = post.character;
+        if (character && currentUserId !== post.authorId) {
+          character = {
+            ...character,
+            name: '???',
+          };
+        }
+
+        return {
+          ...post,
+          character,
+          images: post.images ? (JSON.parse(post.images) as string[]) : [],
+        };
+      });
   }
 }

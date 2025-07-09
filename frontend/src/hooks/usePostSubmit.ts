@@ -12,6 +12,7 @@ interface UsePostSubmitResult {
     content: string,
     images: File[],
     replyToId?: number,
+    characterId?: number,
   ) => Promise<void>;
   clearError: () => void;
 }
@@ -29,6 +30,7 @@ export const usePostSubmit = (
     content: string,
     images: File[],
     replyToId?: number,
+    characterId?: number,
   ) => {
     if (!content.trim() && images.length === 0) {
       setError("投稿内容または画像を入力してください");
@@ -61,6 +63,10 @@ export const usePostSubmit = (
 
       if (replyToId) {
         formData.append("replyToId", replyToId.toString());
+      }
+
+      if (characterId) {
+        formData.append("characterId", characterId.toString());
       }
 
       images.forEach((file) => {

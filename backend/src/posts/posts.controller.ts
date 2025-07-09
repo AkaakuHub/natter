@@ -22,6 +22,7 @@ import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { Request } from 'express';
 
 @Controller('posts')
@@ -89,40 +90,53 @@ export class PostsController {
   }
 
   @Get('trending')
-  getTrendingPosts(@Query('limit') limit?: string) {
+  getTrendingPosts(
+    @Query('limit') limit?: string,
+    @Req() req?: Request & { user?: { id: string } },
+  ) {
     const numLimit =
       limit && typeof limit === 'string' ? parseInt(limit, 10) : 5;
-    return this.postsService.getTrendingPosts(numLimit);
+    const currentUserId = req?.user?.id;
+    return this.postsService.getTrendingPosts(numLimit, currentUserId);
   }
 
   @Get()
+  @UseGuards(OptionalJwtAuthGuard)
   async findAll(
     @Query('type') type?: string,
     @Query('userId') userId?: string,
     @Query('search') search?: string,
+    @Req() req?: Request & { user?: { id: string } },
   ) {
+    const currentUserId = req?.user?.id;
+
     if (search) {
-      return this.postsService.searchPosts(search, type);
+      return this.postsService.searchPosts(search, type, currentUserId);
     }
 
     if (type === 'media') {
-      return this.postsService.findMediaPosts();
+      return this.postsService.findMediaPosts(currentUserId);
     }
 
     if (type === 'liked' && userId) {
-      return this.postsService.findLikedPosts(userId);
+      return this.postsService.findLikedPosts(userId, currentUserId);
     }
 
     if (userId) {
-      return this.postsService.findByUser(userId);
+      return this.postsService.findByUser(userId, currentUserId);
     }
 
-    return this.postsService.findAll();
+    return this.postsService.findAll(currentUserId);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.postsService.findOne(id);
+  @UseGuards(OptionalJwtAuthGuard)
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req?: Request & { user?: { id: string } },
+  ) {
+    const currentUserId = req?.user?.id;
+    return this.postsService.findOne(id, currentUserId);
   }
 
   @Patch(':id')
@@ -201,7 +215,12 @@ export class PostsController {
   }
 
   @Get(':id/replies')
-  getReplies(@Param('id', ParseIntPipe) postId: number) {
-    return this.postsService.getReplies(postId);
+  @UseGuards(OptionalJwtAuthGuard)
+  getReplies(
+    @Param('id', ParseIntPipe) postId: number,
+    @Req() req?: Request & { user?: { id: string } },
+  ) {
+    const currentUserId = req?.user?.id;
+    return this.postsService.getReplies(postId, currentUserId);
   }
 }

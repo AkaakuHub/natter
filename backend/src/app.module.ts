@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { ServerModule } from './server/server.module';
 import { PostsModule } from './posts/posts.module';
 import { FollowsModule } from './follows/follows.module';
+import { CharactersModule } from './characters/characters.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { FollowsModule } from './follows/follows.module';
     ServerModule,
     PostsModule,
     FollowsModule,
+    CharactersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

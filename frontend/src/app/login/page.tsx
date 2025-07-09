@@ -80,7 +80,13 @@ const LoginPage = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-surface-variant">
       <div className="flex flex-col items-center space-y-6 bg-surface p-8 rounded-lg shadow-md border border-border">
-        <Image src="/images/logo.png" alt="logo" width={128} height={128} />
+        <Image
+          src="/images/logo.png"
+          alt="logo"
+          width={128}
+          height={128}
+          priority
+        />
         {authError && (
           <div className="text-error text-sm bg-error-bg p-3 rounded-md border border-error">
             {authError}

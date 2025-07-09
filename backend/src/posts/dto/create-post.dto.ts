@@ -1,4 +1,10 @@
-import { IsOptional, IsString, MaxLength, IsArray } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  MaxLength,
+  IsArray,
+  IsInt,
+} from 'class-validator';
 
 export class CreatePostDto {
   @IsOptional()
@@ -21,4 +27,8 @@ export class CreatePostDto {
 
   @IsOptional()
   replyToId?: string | number;
+
+  @IsOptional()
+  @IsInt()
+  characterId?: number;
 }

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { IconX } from "@tabler/icons-react";
-import { User } from "@/api";
+import { User, Character } from "@/api";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { usePostSubmit } from "@/hooks/usePostSubmit";
 import { useFormValidation } from "@/hooks/useFormValidation";
@@ -12,6 +12,7 @@ import PostTextArea from "../CreatePost/components/PostTextArea";
 import ImagePreview from "../CreatePost/components/ImagePreview";
 import ErrorMessage from "../CreatePost/components/ErrorMessage";
 import PostActions from "../CreatePost/components/PostActions";
+import CharacterSelector from "../CharacterSelector";
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -27,6 +28,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   currentUser,
 }) => {
   const [content, setContent] = useState("");
+  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
+    null,
+  );
   const characterLimit = 280;
 
   const {
@@ -51,11 +55,12 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     if (e) {
       e.preventDefault();
     }
-    await submitPost(content, images);
+    await submitPost(content, images, undefined, selectedCharacter?.id);
 
     // 成功時にフォームをクリアしてモーダルを閉じる
     if (!error) {
       setContent("");
+      setSelectedCharacter(null);
       clearImages();
       onClose();
     }
@@ -63,6 +68,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
   const handleClose = () => {
     setContent("");
+    setSelectedCharacter(null);
     clearImages();
     onClose();
   };
@@ -100,14 +106,16 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 bg-overlay flex items-start justify-center z-50 p-4">
-      <div className="bg-surface rounded-lg max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto border border-border">
+    <div className="fixed inset-0 bg-overlay flex items-start justify-center z-50 p-3 sm:p-4">
+      <div className="bg-surface rounded-lg max-w-lg w-full mt-2 sm:mt-16 border border-border relative max-h-[95vh] sm:max-h-[80vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <h2 className="text-lg font-semibold text-text">新しい投稿</h2>
+        <div className="flex items-center justify-between p-4 sm:p-4 border-b border-border flex-shrink-0">
+          <h2 className="text-lg sm:text-lg font-semibold text-text">
+            新しい投稿
+          </h2>
           <button
             onClick={handleClose}
-            className="p-2 rounded-full hover:bg-surface-hover transition-colors"
+            className="p-2 rounded-full hover:bg-surface-hover active:bg-surface-hover transition-colors touch-manipulation"
             disabled={isSubmitting}
           >
             <IconX size={20} className="text-text-muted" />
@@ -115,39 +123,51 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-4">
-          <div className="flex gap-4">
-            <UserAvatar user={currentUser} />
+        <div className="flex-1 overflow-y-auto">
+          <form onSubmit={handleSubmit} className="p-4 sm:p-4">
+            <div className="flex gap-3 sm:gap-4">
+              <div className="hidden sm:block flex-shrink-0">
+                <UserAvatar user={currentUser} />
+              </div>
 
-            <div className="flex-1">
-              <PostTextArea
-                value={content}
-                onChange={setContent}
-                characterLimit={characterLimit}
-                disabled={isSubmitting}
-                onSubmit={() => handleSubmit()}
-                placeholder="今何してる？"
-              />
+              <div className="flex-1 min-w-0">
+                <PostTextArea
+                  value={content}
+                  onChange={setContent}
+                  characterLimit={characterLimit}
+                  disabled={isSubmitting}
+                  onSubmit={() => handleSubmit()}
+                  placeholder="今何してる？"
+                  autoFocus={true}
+                />
 
-              <ImagePreview
-                imageUrls={imagePreviewUrls}
-                onRemove={handleImageRemove}
-              />
+                <div className="mt-4 sm:mt-4">
+                  <CharacterSelector
+                    selectedCharacter={selectedCharacter}
+                    onCharacterChange={setSelectedCharacter}
+                  />
+                </div>
 
-              <ErrorMessage error={error} />
+                <ImagePreview
+                  imageUrls={imagePreviewUrls}
+                  onRemove={handleImageRemove}
+                />
 
-              <PostActions
-                onImageAdd={handleImageAdd}
-                onSubmit={() => handleSubmit()}
-                remainingChars={remainingChars}
-                isSubmitting={isSubmitting}
-                isValid={isValid}
-                imageCount={images.length}
-                maxImages={10}
-              />
+                <ErrorMessage error={error} />
+
+                <PostActions
+                  onImageAdd={handleImageAdd}
+                  onSubmit={() => handleSubmit()}
+                  remainingChars={remainingChars}
+                  isSubmitting={isSubmitting}
+                  isValid={isValid}
+                  imageCount={images.length}
+                  maxImages={10}
+                />
+              </div>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

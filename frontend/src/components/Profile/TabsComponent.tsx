@@ -1,12 +1,13 @@
 import React from "react";
 
-const TabKinds = ["tweets", "media", "likes"] as const;
+const TabKinds = ["tweets", "media", "likes", "characters"] as const;
 export type TabType = (typeof TabKinds)[number];
 
 const TabNames: Record<TabType, string> = {
   tweets: "ポスト",
   media: "メディア",
   likes: "いいね",
+  characters: "キャラクター",
 };
 
 interface TabsComponentProps {
@@ -15,10 +16,12 @@ interface TabsComponentProps {
 }
 
 const TabsComponent = ({ activeTab, onTabChange }: TabsComponentProps) => {
-  const tabs = TabKinds.map((tab) => ({
-    id: tab,
-    label: TabNames[tab],
-  }));
+  const tabs = TabKinds
+    // キャラクタータブは常に表示
+    .map((tab) => ({
+      id: tab,
+      label: TabNames[tab],
+    }));
 
   return (
     <div className="border-b border-border">

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { IconPhoto } from "@tabler/icons-react";
 import ImagePreview from "@/components/CreatePost/components/ImagePreview";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
@@ -15,6 +15,7 @@ interface EditFormProps {
   isValid: boolean;
   hasChanges: boolean;
   characterLimit: number;
+  autoFocus?: boolean;
 }
 
 const EditForm = ({
@@ -29,7 +30,10 @@ const EditForm = ({
   isValid,
   hasChanges,
   characterLimit,
+  autoFocus = false,
 }: EditFormProps) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   const { handleKeyDown } = useKeyboardShortcuts({
     onSubmit: () => {
       const syntheticEvent = {
@@ -40,11 +44,25 @@ const EditForm = ({
     canSubmit: isValid && hasChanges && !isSubmitting,
   });
 
+  useEffect(() => {
+    if (autoFocus && textareaRef.current) {
+      // 少し遅延を入れてフォーカスを設定（モーダルアニメーション完了後）
+      const timer = setTimeout(() => {
+        textareaRef.current?.focus();
+        // カーソルを末尾に移動
+        const textLength = textareaRef.current?.value.length || 0;
+        textareaRef.current?.setSelectionRange(textLength, textLength);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [autoFocus]);
+
   return (
     <form onSubmit={onSubmit} className="p-4">
       <div className="flex flex-col gap-4">
         {/* テキストエリア */}
         <textarea
+          ref={textareaRef}
           value={content}
           onChange={(e) => onContentChange(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -52,6 +70,7 @@ const EditForm = ({
           className="w-full resize-none border-none outline-none text-lg placeholder-text-muted bg-transparent min-h-[120px]"
           maxLength={characterLimit}
           disabled={isSubmitting}
+          style={{ fontSize: "16px" }}
         />
 
         {/* 画像プレビュー */}

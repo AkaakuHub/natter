@@ -9,6 +9,7 @@ interface PostTextAreaProps {
   characterLimit?: number;
   disabled?: boolean;
   onSubmit?: () => void;
+  autoFocus?: boolean;
 }
 
 const PostTextArea = ({
@@ -18,6 +19,7 @@ const PostTextArea = ({
   characterLimit = 280,
   disabled = false,
   onSubmit,
+  autoFocus = false,
 }: PostTextAreaProps) => {
   const { handleKeyDown } = useKeyboardShortcuts({ onSubmit });
   const { setInputFocused } = useAppState();
@@ -38,6 +40,16 @@ const PostTextArea = ({
       element.removeEventListener("blur", handleBlur);
     };
   }, [setInputFocused]);
+
+  useEffect(() => {
+    if (autoFocus && inputRef.current) {
+      // 少し遅延を入れてフォーカスを設定（モーダルアニメーション完了後）
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [autoFocus]);
 
   return (
     <textarea

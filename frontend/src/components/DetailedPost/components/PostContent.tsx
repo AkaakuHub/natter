@@ -2,14 +2,21 @@ import React from "react";
 import Image from "next/image";
 import { getImageUrl } from "@/utils/postUtils";
 import { decodeHtmlEntities, breakLongWords } from "@/utils/htmlUtils";
+import { Character } from "@/api";
 
 interface PostContentProps {
   content: string;
   images?: string[];
+  character?: Character;
   onImageClick: (index: number) => void;
 }
 
-const PostContent = ({ content, images, onImageClick }: PostContentProps) => {
+const PostContent = ({
+  content,
+  images,
+  character,
+  onImageClick,
+}: PostContentProps) => {
   // HTMLエスケープされたコンテンツを復元し、長い単語を改行可能にする
   const processedContent = React.useMemo(() => {
     const decoded = decodeHtmlEntities(content);
@@ -18,6 +25,18 @@ const PostContent = ({ content, images, onImageClick }: PostContentProps) => {
 
   return (
     <div className="p-6">
+      {/* キャラクター表示 */}
+      {character && (
+        <div className="mb-4 flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg border border-primary/20">
+          <div className="w-4 h-4 bg-primary/20 rounded-full flex items-center justify-center">
+            <div className="w-2 h-2 bg-primary rounded-full"></div>
+          </div>
+          <span className="text-sm font-medium text-primary">
+            {character.name}
+          </span>
+        </div>
+      )}
+
       <div className="prose prose-lg max-w-none">
         <p className="text-text text-lg leading-relaxed whitespace-pre-wrap font-medium break-words selectable-text break-long-words cursor-text">
           {processedContent}

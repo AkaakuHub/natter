@@ -210,6 +210,7 @@ const PostComponent = ({
             <PostContent
               content={currentPost.content || ""}
               images={currentPost.images}
+              character={currentPost.character}
               onImageClick={handleImageClick}
             />
             <PostActions

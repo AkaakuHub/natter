@@ -57,6 +57,7 @@ const ReplyForm = ({
             characterLimit={280}
             disabled={isSubmitting}
             onSubmit={handleKeyboardSubmit}
+            autoFocus={true}
           />
 
           <ImagePreview imageUrls={imagePreviewUrls} onRemove={onImageRemove} />

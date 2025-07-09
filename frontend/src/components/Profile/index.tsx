@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 import PostComponent from "@/components/Post";
 import SkeletonCard from "@/components/common/SkeletonCard";
+import CharacterList from "@/components/CharacterList";
 
 import { PostsApi, Post } from "@/api";
 import ProfileHeader from "./ProfileHeader";
@@ -32,6 +33,9 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
           updatedAt: "",
         }
       : null;
+
+  // 自分のプロフィールかどうかを判定
+  const isOwnProfile = !userId || userId === session?.user?.id;
   const [posts, setPosts] = useState<Post[]>([]);
   const [mediaPosts, setMediaPosts] = useState<Post[]>([]);
   const [likedPosts, setLikedPosts] = useState<Post[]>([]);
@@ -121,6 +125,11 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
   }
 
   const renderTabContent = () => {
+    // キャラクタータブの場合は専用コンポーネントを返す
+    if (activeTab === "characters") {
+      return <CharacterList userId={userId} isOwnProfile={isOwnProfile} />;
+    }
+
     const currentPosts =
       activeTab === "tweets"
         ? posts

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { IconX, IconCheck } from "@tabler/icons-react";
 import { User } from "@/api";
 import { UsersApi } from "@/api/users";
@@ -22,6 +22,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   const [name, setName] = useState(user.name || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -63,6 +64,17 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     onSubmit: () => handleSubmit(),
   });
 
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      // 少し遅延を入れてフォーカスを設定（モーダルアニメーション完了後）
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+        inputRef.current?.select(); // テキストを選択状態にする
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
@@ -92,6 +104,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               表示名
             </label>
             <input
+              ref={inputRef}
               id="name"
               type="text"
               value={name}
@@ -101,6 +114,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               placeholder="表示名を入力"
               maxLength={50}
               disabled={isSubmitting}
+              style={{ fontSize: "16px" }}
             />
             <div className="text-right text-xs text-text-muted mt-1">
               {name.length}/50

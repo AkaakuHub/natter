@@ -100,6 +100,7 @@ const EditPostModal = ({
             content.trim() !== (post.content || "").trim() || images.length > 0
           }
           characterLimit={characterLimit}
+          autoFocus={true}
         />
       </div>
     </div>

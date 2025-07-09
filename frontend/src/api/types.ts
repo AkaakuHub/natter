@@ -24,6 +24,8 @@ export interface Post {
   authorId?: string;
   author?: User;
   likes?: Like[];
+  characterId?: number;
+  character?: Character;
   replyToId?: number;
   replyTo?: Post;
   replies?: Post[];
@@ -47,6 +49,7 @@ export interface CreatePostDto {
   images?: string[];
   authorId?: string;
   replyToId?: number;
+  characterId?: number;
 }
 
 export interface UpdatePostDto {
@@ -63,4 +66,21 @@ export interface LikeResponse {
 export interface PostLikesResponse {
   count: number;
   users: User[];
+}
+
+export interface Character {
+  id: number;
+  name: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  postsCount: number;
+}
+
+export interface CreateCharacterDto {
+  name: string;
+}
+
+export interface UpdateCharacterDto {
+  name?: string;
 }
