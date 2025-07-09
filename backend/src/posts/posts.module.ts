@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsController } from './posts.controller';
 import { PrismaModule } from '../prisma/prisma.module';
@@ -7,7 +7,7 @@ import { PostOwnerGuard } from '../auth/post-owner.guard';
 import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, NotificationsModule],
+  imports: [PrismaModule, AuthModule, forwardRef(() => NotificationsModule)],
   controllers: [PostsController],
   providers: [PostsService, PostOwnerGuard],
   exports: [PostsService],

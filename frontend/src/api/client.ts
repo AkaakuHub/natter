@@ -189,6 +189,13 @@ export class ApiClient {
           response.status,
           errorText,
         );
+
+        // 401エラー（ユーザーが存在しない）の場合は特別な処理
+        if (response.status === 401) {
+          console.log("🔍 User not found, this might be a new user");
+          return null;
+        }
+
         return null;
       }
 
@@ -203,9 +210,14 @@ export class ApiClient {
   private static async request<T>(
     endpoint: string,
     options?: RequestInit,
+    skipAuth: boolean = false,
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
-    const token = await this.getAuthToken();
+    let token = null;
+
+    if (!skipAuth) {
+      token = await this.getAuthToken();
+    }
 
     const config: RequestInit = {
       headers: {
@@ -281,15 +293,23 @@ export class ApiClient {
     }
   }
 
-  static async get<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: "GET" });
+  static async get<T>(endpoint: string, skipAuth: boolean = false): Promise<T> {
+    return this.request<T>(endpoint, { method: "GET" }, skipAuth);
   }
 
-  static async post<T>(endpoint: string, data?: unknown): Promise<T> {
-    const response = await this.request<T>(endpoint, {
-      method: "POST",
-      body: data ? JSON.stringify(data) : undefined,
-    });
+  static async post<T>(
+    endpoint: string,
+    data?: unknown,
+    skipAuth: boolean = false,
+  ): Promise<T> {
+    const response = await this.request<T>(
+      endpoint,
+      {
+        method: "POST",
+        body: data ? JSON.stringify(data) : undefined,
+      },
+      skipAuth,
+    );
     return response;
   }
 

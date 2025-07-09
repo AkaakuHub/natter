@@ -26,13 +26,13 @@ export class NotificationsController {
   }
 
   @Get()
-  findAll(@Request() req: { user: { userId: string } }) {
-    return this.notificationsService.findAllByUser(req.user.userId);
+  findAll(@Request() req: { user: { id: string } }) {
+    return this.notificationsService.findAllByUser(req.user.id);
   }
 
   @Get('unread-count')
-  getUnreadCount(@Request() req: { user: { userId: string } }) {
-    return this.notificationsService.getUnreadCount(req.user.userId);
+  getUnreadCount(@Request() req: { user: { id: string } }) {
+    return this.notificationsService.getUnreadCount(req.user.id);
   }
 
   @Get(':id')
@@ -54,8 +54,8 @@ export class NotificationsController {
   }
 
   @Patch('mark-all-read')
-  markAllAsRead(@Request() req: { user: { userId: string } }) {
-    return this.notificationsService.markAllAsRead(req.user.userId);
+  markAllAsRead(@Request() req: { user: { id: string } }) {
+    return this.notificationsService.markAllAsRead(req.user.id);
   }
 
   @Delete(':id')

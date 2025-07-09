@@ -24,12 +24,38 @@ async function bootstrap() {
   });
 
   // CORS configuration
-  const frontendUrls = process.env.FRONTEND_URLS || 'http://localhost:3000';
+  const frontendUrls =
+    process.env.FRONTEND_URLS || 'http://localhost:3000,http://127.0.0.1:3000';
   app.use(
     cors({
       origin: frontendUrls.split(','),
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Retry-Attempt'],
+      credentials: true,
+      preflightContinue: false,
+      optionsSuccessStatus: 200,
     }),
   );
+
+  // Additional CORS headers for preflight
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header(
+      'Access-Control-Allow-Methods',
+      'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+    );
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Content-Type,Authorization,X-Retry-Attempt',
+    );
+    res.header('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+      res.status(200).end();
+      return;
+    }
+    next();
+  });
 
   // OGP生成を無効化するミドルウェア
   app.use((req: Request, res: Response, next: NextFunction) => {

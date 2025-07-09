@@ -28,24 +28,25 @@ export class UsersApi {
   }
 
   static async createUser(userData: CreateUserData): Promise<User> {
-    return ApiClient.post<User>("/users", userData);
+    return ApiClient.post<User>("/users", userData, true); // skipAuth = true
   }
 
   static async getUserByTwitterId(twitterId: string): Promise<User | null> {
     try {
-      return await ApiClient.get<User>(`/users/twitter/${twitterId}`);
+      return await ApiClient.get<User>(`/users/twitter/${twitterId}`, true); // skipAuth = true
     } catch (error: unknown) {
       // 404エラー（ユーザーが存在しない）の場合はnullを返す
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       if (
         errorMessage.includes("404") ||
-        errorMessage.includes("HTTP error! status: 404")
+        errorMessage.includes("HTTP error! status: 404") ||
+        errorMessage.includes("Failed to fetch")
       ) {
         return null;
       }
       console.error("Error fetching user by Twitter ID:", error);
-      return null;
+      throw error; // 他のエラーはそのまま投げる
     }
   }
 
