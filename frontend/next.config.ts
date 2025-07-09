@@ -52,6 +52,8 @@ const nextConfig: NextConfig = {
   
   // レスポンスヘッダー最適化
   async headers() {
+    const isDev = process.env.NODE_ENV === 'development';
+    
     return [
       {
         source: '/(.*)',
@@ -70,7 +72,9 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: isDev 
+              ? 'no-cache, no-store, must-revalidate, max-age=0'
+              : 'public, max-age=31536000, immutable',
           },
         ],
       },
