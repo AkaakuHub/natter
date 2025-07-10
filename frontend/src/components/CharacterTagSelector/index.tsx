@@ -188,7 +188,7 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
           {isDropdownOpen && (
             <div
               ref={dropdownRef}
-              className="absolute top-full left-0 right-0 mt-1 bg-surface border border-border rounded-lg shadow-lg z-50 max-h-48 overflow-hidden"
+              className="absolute top-full left-0 right-0 mt-1 bg-surface border border-border rounded-lg shadow-lg z-[60] max-h-48 overflow-hidden"
             >
               {/* キャラクター一覧 */}
               <div className="max-h-48 overflow-y-auto">

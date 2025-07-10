@@ -49,6 +49,7 @@ export const transformPostToPostComponent = (post: Post) => {
         }
       : undefined,
     replyToId: post.replyToId,
+    character: post.character,
   };
 
   return { transformedUser, transformedPost };

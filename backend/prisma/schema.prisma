@@ -83,13 +83,14 @@ model Follow {
 }
 
 model Character {
-  id        Int      @id @default(autoincrement())
-  name      String
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  posts     Post[]   // このキャラクターが使用された投稿
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  name       String
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  posts      Post[]   // このキャラクターが使用された投稿
+  postsCount Int      @default(0) // 使用回数のカウント
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@unique([userId, name]) // ユーザーごとにキャラクター名は一意
 }

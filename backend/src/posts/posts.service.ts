@@ -24,8 +24,15 @@ export class PostsService {
   }
 
   async create(createPostDto: CreatePostDto) {
+    console.log('Creating post with data:', createPostDto);
     const { images, authorId, replyToId, characterId, ...postData } =
       createPostDto;
+    console.log(
+      'Extracted characterId:',
+      characterId,
+      'type:',
+      typeof characterId,
+    );
 
     // コンテンツをサニタイズ
     const sanitizedPostData = {
@@ -77,7 +84,7 @@ export class PostsService {
       }
     }
 
-    return this.prisma.post.create({
+    const post = await this.prisma.post.create({
       data: {
         ...sanitizedPostData,
         authorId,
@@ -106,6 +113,27 @@ export class PostsService {
         },
       },
     });
+
+    // キャラクターの使用回数を更新
+    if (characterId) {
+      console.log(
+        'Updating character posts count for characterId:',
+        characterId,
+      );
+      await this.prisma.character.update({
+        where: { id: characterId },
+        data: {
+          postsCount: {
+            increment: 1,
+          },
+        },
+      });
+      console.log('Character posts count updated successfully');
+    } else {
+      console.log('No characterId provided, skipping posts count update');
+    }
+
+    return post;
   }
 
   async findAll(currentUserId?: string) {
@@ -482,6 +510,7 @@ export class PostsService {
     // 投稿の存在確認と所有者チェック
     const post = await this.prisma.post.findUnique({
       where: { id },
+      include: { character: true },
     });
 
     if (!post) {
@@ -490,6 +519,18 @@ export class PostsService {
 
     if (post.authorId !== userId) {
       throw new ForbiddenException('You can only delete your own posts');
+    }
+
+    // キャラクターの使用回数を減らす
+    if (post.characterId) {
+      await this.prisma.character.update({
+        where: { id: post.characterId },
+        data: {
+          postsCount: {
+            decrement: 1,
+          },
+        },
+      });
     }
 
     // 論理削除：削除時刻を設定し、内容を空にする

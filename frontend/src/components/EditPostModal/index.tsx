@@ -38,6 +38,7 @@ const EditPostModal = ({
     content,
     images.length,
     characterLimit,
+    !!post.character,
   );
 
   // モーダルが開かれた時に初期値を設定

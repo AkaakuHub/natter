@@ -66,14 +66,7 @@ export const usePostSubmit = (
       }
 
       if (characterId && typeof characterId === "number") {
-        console.log(
-          "Adding characterId to FormData:",
-          characterId,
-          typeof characterId,
-        );
         formData.append("characterId", characterId.toString());
-      } else if (characterId !== undefined) {
-        console.warn("Invalid characterId:", characterId, typeof characterId);
       }
 
       images.forEach((file) => {

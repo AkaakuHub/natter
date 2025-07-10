@@ -49,6 +49,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     content,
     images.length,
     characterLimit,
+    !!selectedCharacter,
   );
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -146,7 +147,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   autoFocus={true}
                 />
 
-                <div className="mt-4 sm:mt-4">
+                <div className="mt-4 sm:mt-4 relative z-10">
                   <CharacterTagSelector
                     selectedCharacter={selectedCharacter}
                     onCharacterChange={setSelectedCharacter}

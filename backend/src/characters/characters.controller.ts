@@ -30,12 +30,16 @@ export class CharactersController {
     @Query('userId') userId?: string,
     @Request() req?: ExpressRequest,
   ) {
+    const currentUserId = req?.user?.id;
     // 特定のユーザーのキャラクターを取得する場合
     if (userId) {
-      return this.charactersService.findAllByUser(userId, req?.user?.id);
+      return this.charactersService.findAllByUser(userId, currentUserId);
     }
-    // 自分のキャラクターを取得する場合
-    return this.charactersService.findAllByUser(req?.user?.id || '');
+    // 自分のキャラクターを取得する場合（認証が必要）
+    if (!currentUserId) {
+      return [];
+    }
+    return this.charactersService.findAllByUser(currentUserId, currentUserId);
   }
 
   // 名前でキャラクターを検索（オートコンプリート用）

@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { IconTrash, IconEdit, IconUser, IconPlus } from "@tabler/icons-react";
+import { IconTrash, IconEdit, IconUser } from "@tabler/icons-react";
 import {
   useCharacters,
   useDeleteCharacter,
   useUpdateCharacter,
-  useCreateCharacter,
 } from "@/hooks/queries/useCharacters";
 import type { Character } from "@/api";
 
@@ -23,13 +22,10 @@ const CharacterList: React.FC<CharacterListProps> = ({
     null,
   );
   const [editName, setEditName] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
-  const [newCharacterName, setNewCharacterName] = useState("");
 
   const { data: characters = [], isLoading, error } = useCharacters(userId);
   const deleteCharacterMutation = useDeleteCharacter();
   const updateCharacterMutation = useUpdateCharacter();
-  const createCharacterMutation = useCreateCharacter();
 
   const handleEditStart = (character: Character) => {
     setEditingCharacter(character);
@@ -66,20 +62,6 @@ const CharacterList: React.FC<CharacterListProps> = ({
     }
   };
 
-  const handleCreate = async () => {
-    if (!newCharacterName.trim()) return;
-
-    try {
-      await createCharacterMutation.mutateAsync({
-        name: newCharacterName.trim(),
-      });
-      setNewCharacterName("");
-      setIsCreating(false);
-    } catch (error) {
-      console.error("Failed to create character:", error);
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="p-4">
@@ -103,7 +85,7 @@ const CharacterList: React.FC<CharacterListProps> = ({
   return (
     <div className="p-4">
       {/* 新規作成セクション - 自分のプロフィールでのみ表示 */}
-      {isOwnProfile && (
+      {/* {isOwnProfile && (
         <div className="mb-6 p-4 bg-surface-secondary rounded-lg border border-border">
           <h3 className="text-lg font-semibold text-text mb-3">
             新しいキャラクター
@@ -155,7 +137,7 @@ const CharacterList: React.FC<CharacterListProps> = ({
             </button>
           )}
         </div>
-      )}
+      )} */}
 
       {/* キャラクター一覧 */}
       <div className="space-y-3">
@@ -188,7 +170,7 @@ const CharacterList: React.FC<CharacterListProps> = ({
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
                         className="flex-1 px-3 py-2 bg-surface border border-border rounded-lg text-text focus:outline-none focus:ring-2 focus:ring-primary"
-                        onKeyPress={(e) => {
+                        onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             handleEditSave();
                           }

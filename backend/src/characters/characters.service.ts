@@ -24,11 +24,18 @@ export class CharactersService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return characters.map((character) => ({
-      ...character,
-      name: currentUserId !== userId ? '???' : character.name,
-      postsCount: character._count.posts,
-    }));
+    return characters.map((character) => {
+      // 自分のキャラクターの場合は実名を表示、他人のキャラクターは「???」で隠蔽
+      const shouldHide = currentUserId !== userId;
+      console.log(
+        `Character ${character.name}: DB postsCount=${character.postsCount}, relation count=${character._count.posts}`,
+      );
+      return {
+        ...character,
+        name: shouldHide ? '???' : character.name,
+        postsCount: character.postsCount, // DBのpostsCountフィールドを使用
+      };
+    });
   }
 
   // 特定のキャラクターを取得
@@ -48,7 +55,7 @@ export class CharactersService {
 
     return {
       ...character,
-      postsCount: character._count.posts,
+      postsCount: character.postsCount, // DBのpostsCountフィールドを使用
     };
   }
 
@@ -69,7 +76,7 @@ export class CharactersService {
 
       return {
         ...character,
-        postsCount: character._count.posts,
+        postsCount: character.postsCount, // DBのpostsCountフィールドを使用
       };
     } catch (error) {
       if (
@@ -110,7 +117,7 @@ export class CharactersService {
 
       return {
         ...character,
-        postsCount: character._count.posts,
+        postsCount: character.postsCount, // DBのpostsCountフィールドを使用
       };
     } catch (error) {
       if (
@@ -150,7 +157,7 @@ export class CharactersService {
 
   // 名前でキャラクターを検索（オートコンプリート用）
   async searchByName(query: string, userId: string) {
-    return this.prisma.character.findMany({
+    const characters = await this.prisma.character.findMany({
       where: {
         userId,
         name: {
@@ -165,5 +172,10 @@ export class CharactersService {
       orderBy: { createdAt: 'desc' },
       take: 10,
     });
+
+    return characters.map((character) => ({
+      ...character,
+      postsCount: character.postsCount, // DBのpostsCountフィールドを使用
+    }));
   }
 }

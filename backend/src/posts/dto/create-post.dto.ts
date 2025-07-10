@@ -5,6 +5,7 @@ import {
   IsArray,
   IsInt,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreatePostDto {
   @IsOptional()
@@ -29,6 +30,11 @@ export class CreatePostDto {
   replyToId?: string | number;
 
   @IsOptional()
+  @Transform(({ value }: { value: unknown }) => {
+    if (value === undefined || value === null || value === '') return undefined;
+    const parsed = parseInt(value as string, 10);
+    return isNaN(parsed) ? value : parsed;
+  })
   @IsInt()
   characterId?: number;
 }

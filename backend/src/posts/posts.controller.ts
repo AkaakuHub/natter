@@ -81,11 +81,15 @@ export class PostsController {
     const replyToId = createPostDto.replyToId
       ? parseInt(createPostDto.replyToId.toString())
       : undefined;
+    const characterId = createPostDto.characterId
+      ? parseInt(createPostDto.characterId.toString())
+      : undefined;
     return this.postsService.create({
       ...createPostDto,
       authorId,
       images: imagePaths,
       replyToId,
+      characterId,
     });
   }
 
