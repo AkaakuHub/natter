@@ -49,13 +49,14 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   };
 
   const getNotificationMessage = () => {
+    const actorName = notification.actor?.name || "不明なユーザー";
     switch (notification.type) {
       case "like":
-        return `${notification.actor.name}があなたの投稿にいいねしました`;
+        return `${actorName}があなたの投稿にいいねしました`;
       case "reply":
-        return `${notification.actor.name}があなたの投稿に返信しました`;
+        return `${actorName}があなたの投稿に返信しました`;
       case "follow":
-        return `${notification.actor.name}があなたをフォローしました`;
+        return `${actorName}があなたをフォローしました`;
       default:
         return notification.message || "通知があります";
     }
@@ -89,8 +90,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         {/* アクターのアバター */}
         <div className="flex-shrink-0">
           <Image
-            src={notification.actor.image || "/no_avatar_image_128x128.png"}
-            alt={notification.actor.name}
+            src={notification.actor?.image || "/no_avatar_image_128x128.png"}
+            alt={notification.actor?.name || "不明なユーザー"}
             width={48}
             height={48}
             className="rounded-full"

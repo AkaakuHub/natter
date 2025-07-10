@@ -1,9 +1,13 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class FollowsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+  ) {}
 
   async followUser(followerId: string, followingId: string) {
     // 自分自身をフォローできない
@@ -51,6 +55,16 @@ export class FollowsService {
       },
     });
 
+    // フォロー通知を作成（エラーが発生してもフォロー操作は成功扱い）
+    try {
+      await this.notificationsService.createFollowNotification(
+        followingId,
+        followerId,
+      );
+    } catch (error) {
+      console.error('Failed to create follow notification:', error);
+    }
+
     return {
       message: 'Successfully followed user',
       follow,
@@ -81,6 +95,16 @@ export class FollowsService {
         },
       },
     });
+
+    // フォロー通知を削除（エラーが発生してもアンフォロー操作は成功扱い）
+    try {
+      await this.notificationsService.removeFollowNotification(
+        followingId,
+        followerId,
+      );
+    } catch (error) {
+      console.error('Failed to remove follow notification:', error);
+    }
 
     return {
       message: 'Successfully unfollowed user',

@@ -597,18 +597,8 @@ export class PostsService {
   }
 
   async likePost(postId: number, userId: string) {
-    const existingLike = await this.prisma.like.findUnique({
-      where: {
-        userId_postId: {
-          userId,
-          postId,
-        },
-      },
-    });
-
-    if (existingLike) {
-      // いいねを削除
-      await this.prisma.like.delete({
+    const result = await this.prisma.$transaction(async (tx) => {
+      const existingLike = await tx.like.findUnique({
         where: {
           userId_postId: {
             userId,
@@ -617,24 +607,46 @@ export class PostsService {
         },
       });
 
-      // 通知を削除
-      await this.notificationsService.removeLikeNotification(postId, userId);
+      if (existingLike) {
+        // いいねを削除
+        await tx.like.delete({
+          where: {
+            userId_postId: {
+              userId,
+              postId,
+            },
+          },
+        });
 
-      return { liked: false };
-    } else {
-      // いいねを作成
-      await this.prisma.like.create({
-        data: {
-          userId,
-          postId,
-        },
-      });
+        return { liked: false };
+      } else {
+        // いいねを作成
+        await tx.like.create({
+          data: {
+            userId,
+            postId,
+          },
+        });
 
-      // 通知を作成
-      await this.notificationsService.createLikeNotification(postId, userId);
+        return { liked: true };
+      }
+    });
 
-      return { liked: true };
+    // トランザクション外で通知処理を実行
+    try {
+      if (result.liked) {
+        // 通知を作成
+        await this.notificationsService.createLikeNotification(postId, userId);
+      } else {
+        // 通知を削除
+        await this.notificationsService.removeLikeNotification(postId, userId);
+      }
+    } catch (error) {
+      // 通知処理でエラーが発生してもいいね操作は成功扱い
+      console.error('Failed to handle notification:', error);
     }
+
+    return result;
   }
 
   async getPostLikes(postId: number) {

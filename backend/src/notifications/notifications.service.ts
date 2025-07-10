@@ -230,4 +230,38 @@ export class NotificationsService {
       },
     });
   }
+
+  // フォロー通知を作成
+  async createFollowNotification(userId: string, actorId: string) {
+    // 既存のフォロー通知があるかチェック
+    const existingNotification = await this.prisma.notification.findFirst({
+      where: {
+        type: 'follow',
+        userId,
+        actorId,
+      },
+    });
+
+    if (existingNotification) {
+      return existingNotification;
+    }
+
+    return this.create({
+      type: 'follow',
+      message: 'があなたをフォローしました',
+      userId,
+      actorId,
+    });
+  }
+
+  // フォロー通知を削除（アンフォロー時）
+  async removeFollowNotification(userId: string, actorId: string) {
+    return this.prisma.notification.deleteMany({
+      where: {
+        type: 'follow',
+        userId,
+        actorId,
+      },
+    });
+  }
 }

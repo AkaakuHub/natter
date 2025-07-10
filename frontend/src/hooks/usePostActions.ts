@@ -30,7 +30,8 @@ export const usePostActions = (
         currentUserId && post.likes
           ? post.likes.some((like) => like.userId === currentUserId)
           : false;
-      const newLikeCount = post.likes?.length || 0;
+      // _count.likesを優先し、フォールバックとしてlikes配列の長さを使用
+      const newLikeCount = post._count?.likes ?? post.likes?.length ?? 0;
 
       setIsLiked(newIsLiked);
       setLikeCount(newLikeCount);
@@ -75,17 +76,89 @@ export const usePostActions = (
         response.liked ? previousLikeCount + 1 : previousLikeCount - 1,
       );
 
-      // React Queryキャッシュを無効化してリアルタイム更新
-      queryClient.invalidateQueries({
-        queryKey: ["posts"],
+      // キャッシュデータを直接更新
+      const updatePostInCache = (cachedPost: Post) => {
+        if (cachedPost.id === post.id) {
+          const currentLikeCount =
+            cachedPost._count?.likes ?? cachedPost.likes?.length ?? 0;
+          const newLikeCount = response.liked
+            ? currentLikeCount + 1
+            : currentLikeCount - 1;
+
+          return {
+            ...cachedPost,
+            likes: response.liked
+              ? [
+                  ...(cachedPost.likes || []).filter(
+                    (like) => like.userId !== currentUserId,
+                  ),
+                  { userId: currentUserId, user: { id: currentUserId } },
+                ]
+              : (cachedPost.likes || []).filter(
+                  (like) => like.userId !== currentUserId,
+                ),
+            _count: {
+              ...cachedPost._count,
+              likes: Math.max(0, newLikeCount), // 負の値を防ぐ
+            },
+          };
+        }
+        return cachedPost;
+      };
+
+      // タイムライン投稿一覧のキャッシュを更新
+      queryClient.setQueryData(["posts"], (oldData: Post[] | undefined) => {
+        if (oldData) {
+          return oldData.map(updatePostInCache);
+        }
+        return oldData;
       });
 
-      // 特定の投稿のキャッシュも無効化
-      queryClient.invalidateQueries({
-        queryKey: ["post", post.id],
-      });
+      // トレンディング投稿のキャッシュを更新
+      queryClient.setQueryData(
+        ["posts", "trending"],
+        (oldData: Post[] | undefined) => {
+          if (oldData) {
+            return oldData.map(updatePostInCache);
+          }
+          return oldData;
+        },
+      );
 
-      // ユーザーのいいね投稿一覧も無効化（プロフィールのいいねタブ用）
+      // ユーザー投稿一覧のキャッシュを更新
+      queryClient.setQueryData(
+        ["posts", "user", post.authorId],
+        (oldData: Post[] | undefined) => {
+          if (oldData) {
+            return oldData.map(updatePostInCache);
+          }
+          return oldData;
+        },
+      );
+
+      // メディア投稿一覧のキャッシュを更新
+      queryClient.setQueryData(
+        ["posts", "media"],
+        (oldData: Post[] | undefined) => {
+          if (oldData) {
+            return oldData.map(updatePostInCache);
+          }
+          return oldData;
+        },
+      );
+
+      // 特定の投稿のキャッシュを更新
+      queryClient.setQueryData(
+        ["post", post.id],
+        (oldData: Post | undefined) => {
+          if (oldData) {
+            return updatePostInCache(oldData);
+          }
+          return oldData;
+        },
+      );
+
+      // いいね投稿一覧のキャッシュを無効化（構造が異なるため）
       if (currentUserId) {
         queryClient.invalidateQueries({
           queryKey: ["posts", "liked", currentUserId],
