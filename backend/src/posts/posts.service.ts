@@ -507,6 +507,10 @@ export class PostsService {
   }
 
   async removeWithOwnerCheck(id: number, userId: string) {
+    console.log(
+      `[DELETE POST] Starting deletion for post ${id} by user ${userId}`,
+    );
+
     // 投稿の存在確認と所有者チェック
     const post = await this.prisma.post.findUnique({
       where: { id },
@@ -521,27 +525,74 @@ export class PostsService {
       throw new ForbiddenException('You can only delete your own posts');
     }
 
-    // キャラクターの使用回数を減らす
-    if (post.characterId) {
-      await this.prisma.character.update({
-        where: { id: post.characterId },
+    console.log(
+      `[DELETE POST] Post found with characterId: ${post.characterId}`,
+    );
+
+    // トランザクションで削除処理とキャラクター使用回数の減算を実行
+    return this.prisma.$transaction(async (tx) => {
+      // 論理削除：削除時刻を設定し、内容を空にする
+      const deletedPost = await tx.post.update({
+        where: { id },
         data: {
-          postsCount: {
-            decrement: 1,
-          },
+          deletedAt: new Date(),
+          content: null,
+          title: null,
+          images: null,
         },
       });
-    }
 
-    // 論理削除：削除時刻を設定し、内容を空にする
-    return this.prisma.post.update({
-      where: { id },
-      data: {
-        deletedAt: new Date(),
-        content: null,
-        title: null,
-        images: null,
-      },
+      console.log(`[DELETE POST] Post ${id} marked as deleted`);
+
+      // キャラクターの使用回数を安全に減らす
+      if (post.characterId) {
+        console.log(
+          `[DELETE POST] Processing character ${post.characterId} count reduction`,
+        );
+
+        // 現在の使用回数を確認してから減算
+        const character = await tx.character.findUnique({
+          where: { id: post.characterId },
+          select: { postsCount: true },
+        });
+
+        console.log(
+          `[DELETE POST] Current character postsCount: ${character?.postsCount}`,
+        );
+
+        if (character && character.postsCount > 0) {
+          const newCount = character.postsCount - 1;
+          console.log(`[DELETE POST] New count will be: ${newCount}`);
+
+          if (newCount === 0) {
+            // 使用回数が0になる場合、キャラクターを削除
+            console.log(
+              `[DELETE POST] Deleting character ${post.characterId} as count reaches 0`,
+            );
+            await tx.character.delete({
+              where: { id: post.characterId },
+            });
+          } else {
+            // 使用回数を1減らす
+            console.log(
+              `[DELETE POST] Updating character ${post.characterId} count to ${newCount}`,
+            );
+            await tx.character.update({
+              where: { id: post.characterId },
+              data: {
+                postsCount: newCount,
+              },
+            });
+          }
+        } else {
+          console.log(`[DELETE POST] Character not found or count already 0`);
+        }
+      } else {
+        console.log(`[DELETE POST] No character associated with this post`);
+      }
+
+      console.log(`[DELETE POST] Transaction completed for post ${id}`);
+      return deletedPost;
     });
   }
 

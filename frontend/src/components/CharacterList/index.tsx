@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { IconTrash, IconEdit, IconUser } from "@tabler/icons-react";
+import { IconUser } from "@tabler/icons-react";
 import {
   useCharacters,
-  useDeleteCharacter,
+  // useDeleteCharacter,
   useUpdateCharacter,
 } from "@/hooks/queries/useCharacters";
 import type { Character } from "@/api";
@@ -24,13 +24,13 @@ const CharacterList: React.FC<CharacterListProps> = ({
   const [editName, setEditName] = useState("");
 
   const { data: characters = [], isLoading, error } = useCharacters(userId);
-  const deleteCharacterMutation = useDeleteCharacter();
+  // const deleteCharacterMutation = useDeleteCharacter();
   const updateCharacterMutation = useUpdateCharacter();
 
-  const handleEditStart = (character: Character) => {
-    setEditingCharacter(character);
-    setEditName(character.name);
-  };
+  // const handleEditStart = (character: Character) => {
+  //   setEditingCharacter(character);
+  //   setEditName(character.name);
+  // };
 
   const handleEditSave = async () => {
     if (!editingCharacter || !editName.trim()) return;
@@ -52,15 +52,15 @@ const CharacterList: React.FC<CharacterListProps> = ({
     setEditName("");
   };
 
-  const handleDelete = async (character: Character) => {
-    if (!confirm(`キャラクター「${character.name}」を削除しますか？`)) return;
+  // const handleDelete = async (character: Character) => {
+  //   if (!confirm(`キャラクター「${character.name}」を削除しますか？`)) return;
 
-    try {
-      await deleteCharacterMutation.mutateAsync(character.id);
-    } catch (error) {
-      console.error("Failed to delete character:", error);
-    }
-  };
+  //   try {
+  //     await deleteCharacterMutation.mutateAsync(character.id);
+  //   } catch (error) {
+  //     console.error("Failed to delete character:", error);
+  //   }
+  // };
 
   if (isLoading) {
     return (
@@ -206,7 +206,7 @@ const CharacterList: React.FC<CharacterListProps> = ({
                   )}
                 </div>
 
-                {isOwnProfile && editingCharacter?.id !== character.id && (
+                {/* {isOwnProfile && editingCharacter?.id !== character.id && (
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleEditStart(character)}
@@ -224,7 +224,7 @@ const CharacterList: React.FC<CharacterListProps> = ({
                       <IconTrash size={16} />
                     </button>
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           ))

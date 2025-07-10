@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { PostsApi } from "@/api/posts";
 import { Post } from "@/api/types";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -16,6 +17,7 @@ export const usePostDelete = (): UsePostDeleteResult => {
   const [error, setError] = useState<string | null>(null);
   const { currentUser } = useCurrentUser();
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
 
   const canDelete = (post: Post): boolean => {
     return currentUser?.id === post.authorId;
@@ -37,6 +39,12 @@ export const usePostDelete = (): UsePostDeleteResult => {
       console.log("🚀 Making delete API call:", id);
       await PostsApi.deletePost(id);
       console.log("✅ Delete API call successful");
+
+      // キャラクターキャッシュを無効化（ポスト削除でキャラクターの使用回数が変更されるため）
+      queryClient.invalidateQueries({
+        queryKey: ["characters"],
+      });
+
       showToast("投稿を削除しました", "success");
       return true;
     } catch (err) {
