@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { signOut } from "next-auth/react";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useDropdown } from "@/hooks/useDropdown";
+import { performCompleteLogout } from "@/utils/logout";
 
 import ProfileDropdown from "./Header/components/ProfileDropdown";
 import DropdownMenu from "./Header/components/DropdownMenu";
@@ -38,7 +38,10 @@ const Header = ({
 
   const handleLogout = async () => {
     close();
-    await signOut();
+    console.log(
+      "🔥 [Header] Logout button clicked, performing complete logout...",
+    );
+    await performCompleteLogout();
   };
 
   return (

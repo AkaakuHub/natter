@@ -7,12 +7,7 @@ export function middleware(req: NextRequest) {
   console.log(`💀 [MIDDLEWARE RUNNING] ${pathname}`);
 
   // SPAルートの一覧（静的ルート）
-  const spaRoutes = [
-    "/login",
-    "/search", 
-    "/notification",
-    "/set-list"
-  ];
+  const spaRoutes = ["/login", "/search", "/notification", "/set-list"];
 
   // 静的SPAルートをキャッチ
   if (spaRoutes.includes(pathname)) {
@@ -23,7 +18,9 @@ export function middleware(req: NextRequest) {
     url.pathname = "/";
     url.searchParams.set("spa-path", pathname);
 
-    console.log(`💀 [REWRITING SPA] ${pathname} -> / with spa-path=${pathname}`);
+    console.log(
+      `💀 [REWRITING SPA] ${pathname} -> / with spa-path=${pathname}`,
+    );
     return NextResponse.rewrite(url);
   }
 

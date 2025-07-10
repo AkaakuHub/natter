@@ -16,6 +16,7 @@ const CreatePostModal = lazy(() => import("../CreatePostModal"));
 const ShortcutHelpModal = lazy(() => import("../ShortcutHelpModal"));
 const TrendingPosts = lazy(() => import("../Sidebar/TrendingPosts"));
 const RecommendedUsers = lazy(() => import("../Sidebar/RecommendedUsers"));
+const NewPostBanner = lazy(() => import("../NewPostBanner"));
 
 interface HybridBaseLayoutProps {
   children?: React.ReactNode;
@@ -82,6 +83,13 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
 
   return (
     <div className="w-full h-screen flex flex-col">
+      {/* 新ポスト通知バナー */}
+      {session && userExists && (
+        <Suspense fallback={<div />}>
+          <NewPostBanner />
+        </Suspense>
+      )}
+
       {/* ヘッダー（既存の優れた実装保護） */}
       <Header
         profileImage={session?.user?.image || "no_avatar_image_128x128.png"}
@@ -95,6 +103,7 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
         {/* メインコンテンツ */}
         <div
           ref={scrollContainerRef}
+          data-scroll-container
           className="flex-1 overflow-y-auto bg-surface-variant max-w-md mx-auto lg:mx-0 lg:max-w-none scrollbar-hide"
           style={{
             scrollbarWidth: "none",

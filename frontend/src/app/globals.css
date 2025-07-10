@@ -272,6 +272,17 @@ audio,
   }
 }
 
+@keyframes slide-down {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 @keyframes shimmer {
   100% {
     transform: translateX(100%);
@@ -293,6 +304,9 @@ audio,
 }
 .animate-scale-in {
   animation: scale-in 0.2s ease-out;
+}
+.animate-slide-down {
+  animation: slide-down 0.4s ease-out;
 }
 .animate-shimmer {
   animation: shimmer 2s infinite;

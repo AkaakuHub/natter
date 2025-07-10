@@ -11,7 +11,7 @@ import {
 } from "@tabler/icons-react";
 import { Notification } from "@/api/notifications";
 import { useMarkAsRead } from "@/hooks/queries/useNotifications";
-import { useRouter } from "next/navigation";
+import { useNavigation } from "@/hooks/useNavigation";
 
 interface NotificationItemProps {
   notification: Notification;
@@ -20,7 +20,7 @@ interface NotificationItemProps {
 const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
 }) => {
-  const router = useRouter();
+  const { navigateToPost } = useNavigation();
   const markAsReadMutation = useMarkAsRead();
 
   const handleClick = () => {
@@ -31,7 +31,10 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
     // 投稿関連の通知の場合は投稿詳細ページに遷移
     if (notification.postId) {
-      router.push(`/post/${notification.postId}`);
+      console.log(
+        `🔥 [NotificationItem] Navigating to post: ${notification.postId}`,
+      );
+      navigateToPost(Number(notification.postId));
     }
   };
 

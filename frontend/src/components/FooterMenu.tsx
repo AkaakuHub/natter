@@ -2,7 +2,7 @@
 
 import { IconHome, IconVinyl, IconBell, IconSearch } from "@tabler/icons-react";
 import clsx from "clsx";
-import { useRouter } from "next/navigation";
+import { useNavigation } from "@/hooks/useNavigation";
 
 const items = [
   { label: "ホーム", icon: IconHome, href: "/" },
@@ -33,7 +33,8 @@ interface BottomMenuProps {
 }
 
 export function FooterMenu({ path, scrollContainerRef }: BottomMenuProps) {
-  const router = useRouter();
+  const { navigateToTimeline, navigateToSearch, navigateToNotification } =
+    useNavigation();
 
   const handleNavigation = (href: string) => {
     const normalizedPath = path.startsWith("/") ? path : `/${path}`;
@@ -66,7 +67,26 @@ export function FooterMenu({ path, scrollContainerRef }: BottomMenuProps) {
       return;
     }
 
-    router.push(href);
+    // SPA navigation for each specific route
+    console.log(`🔥 [FooterMenu] Navigating to: ${href}`);
+    switch (href) {
+      case "/":
+        navigateToTimeline();
+        break;
+      case "/search":
+        navigateToSearch();
+        break;
+      case "/notification":
+        navigateToNotification();
+        break;
+      case "/set-list":
+        // セトリページは現在SPA navigationに未対応のため、従来通りの遷移
+        window.location.href = href;
+        break;
+      default:
+        window.location.href = href;
+        break;
+    }
   };
 
   return (

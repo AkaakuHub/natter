@@ -82,6 +82,24 @@ export const useNavigation = () => {
     [nextRouter, spaRouter],
   );
 
+  const navigateToNotification = useCallback(() => {
+    if (spaRouter?.navigate) {
+      console.log("🔥 [SPA Navigation] Going to notification");
+      spaRouter.navigate("/notification");
+    } else {
+      nextRouter.push("/notification");
+    }
+  }, [nextRouter, spaRouter]);
+
+  const navigateToSearch = useCallback(() => {
+    if (spaRouter?.navigate) {
+      console.log("🔥 [SPA Navigation] Going to search");
+      spaRouter.navigate("/search");
+    } else {
+      nextRouter.push("/search");
+    }
+  }, [nextRouter, spaRouter]);
+
   const getCurrentPath = useCallback(() => {
     return pathname.slice(1) || "";
   }, [pathname]);
@@ -92,6 +110,8 @@ export const useNavigation = () => {
     navigateToPost,
     navigateToFollowing,
     navigateToFollowers,
+    navigateToNotification,
+    navigateToSearch,
     goBack,
     getCurrentPath,
     currentPath: pathname,

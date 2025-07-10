@@ -4,15 +4,16 @@ import React from "react";
 import Image from "next/image";
 import { IconHeart, IconMessageCircle } from "@tabler/icons-react";
 import { transformPostToPostComponent } from "@/utils/postTransformers";
-import { useRouter } from "next/navigation";
+import { useNavigation } from "@/hooks/useNavigation";
 import { useTrendingPosts } from "@/hooks/queries/usePosts";
 
 const TrendingPosts: React.FC = () => {
-  const router = useRouter();
+  const { navigateToPost } = useNavigation();
   const { data: posts = [], isLoading: loading, error } = useTrendingPosts();
 
   const handlePostClick = (postId: number) => {
-    router.push(`/post/${postId}`);
+    console.log(`🔥 [TrendingPosts] Navigating to post: ${postId}`);
+    navigateToPost(postId);
   };
 
   if (loading) {

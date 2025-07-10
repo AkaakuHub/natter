@@ -32,6 +32,11 @@ class UserCacheManager {
   clearOngoingRequest(twitterId: string): void {
     delete this.ongoingRequests[twitterId];
   }
+
+  clearAll(): void {
+    this.cache = {};
+    this.ongoingRequests = {};
+  }
 }
 
 export const userCacheManager = new UserCacheManager();

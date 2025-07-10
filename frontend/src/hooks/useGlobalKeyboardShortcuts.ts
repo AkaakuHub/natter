@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigation } from "@/hooks/useNavigation";
 
 interface UseGlobalKeyboardShortcutsProps {
   onCreatePost?: () => void;
@@ -22,7 +22,12 @@ export const useGlobalKeyboardShortcuts = ({
   isModalOpen = false,
   isInputFocused = false,
 }: UseGlobalKeyboardShortcutsProps) => {
-  const router = useRouter();
+  const {
+    navigateToTimeline,
+    navigateToProfile,
+    navigateToNotification,
+    navigateToSearch,
+  } = useNavigation();
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -55,22 +60,27 @@ export const useGlobalKeyboardShortcuts = ({
           break;
         case "/":
           e.preventDefault();
+          console.log("🔥 [KeyboardShortcut] Navigating to search");
           onSearch?.();
+          navigateToSearch();
           break;
         case "h":
           e.preventDefault();
+          console.log("🔥 [KeyboardShortcut] Navigating to home");
           onHome?.();
-          router.push("/");
+          navigateToTimeline();
           break;
         case "p":
           e.preventDefault();
+          console.log("🔥 [KeyboardShortcut] Navigating to profile");
           onProfile?.();
-          router.push("/profile");
+          navigateToProfile();
           break;
         case "i":
           e.preventDefault();
+          console.log("🔥 [KeyboardShortcut] Navigating to notifications");
           onNotifications?.();
-          router.push("/notification");
+          navigateToNotification();
           break;
         case "g":
           // gキーは後続のキーと組み合わせて使用（今後の拡張用）
@@ -93,7 +103,10 @@ export const useGlobalKeyboardShortcuts = ({
       onHelp,
       isModalOpen,
       isInputFocused,
-      router,
+      navigateToTimeline,
+      navigateToProfile,
+      navigateToNotification,
+      navigateToSearch,
     ],
   );
 

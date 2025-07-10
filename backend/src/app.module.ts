@@ -10,6 +10,7 @@ import { PostsModule } from './posts/posts.module';
 import { FollowsModule } from './follows/follows.module';
 import { CharactersModule } from './characters/characters.module';
 import { NotificationsModule } from './notifications/notifications.module';
+// import { BackupModule } from './modules/backup.module'; // 後で有効化
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     FollowsModule,
     CharactersModule,
     NotificationsModule,
+    // BackupModule, // 後で有効化
   ],
   controllers: [AppController],
   providers: [AppService],

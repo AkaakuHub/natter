@@ -63,10 +63,17 @@ export const useSessionManagement = ({
           checkUserExists(userId);
         }
       } else if (status === "unauthenticated") {
+        // ログアウト時は完全にクリア
+        console.log(
+          "🔥 [SessionManagement] Unauthenticated - clearing all cache and state",
+        );
         isInitializedRef.current = false;
         lastSessionIdRef.current = undefined;
         setCurrentUser(null);
         setUserExists(false);
+
+        // ユーザーキャッシュも完全クリア
+        userCacheManager.clearAll();
       }
     };
     run();

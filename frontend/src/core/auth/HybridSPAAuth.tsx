@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { useSession } from "next-auth/react";
 import { useTrueSPARouter } from "@/core/router/TrueSPARouter";
+import { performCompleteLogout } from "@/utils/logout";
 import type { User, Session } from "next-auth";
 
 interface AuthState {
@@ -126,10 +127,12 @@ export const HybridSPAAuthProvider: React.FC<HybridSPAAuthProviderProps> = ({
   }, [redirectAfterAuth, navigate, isInitialLoad, authState.isHydrated]);
 
   // ログアウト
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    console.log(
+      "🔥 [HybridSPAAuth] Logout called, performing complete logout...",
+    );
     setRedirectAfterAuth(null);
-    // NextAuth.jsのログアウトは外部で処理
-    window.location.href = "/login";
+    await performCompleteLogout();
   }, []);
 
   // 認証状態変化時の自動リダイレクト（hydration後のみ）
