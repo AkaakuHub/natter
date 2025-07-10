@@ -4,6 +4,7 @@ import Image, { ImageProps } from "next/image";
 interface OptimizedImageProps extends Omit<ImageProps, "onLoad" | "onError"> {
   fallback?: string;
   className?: string;
+  priority?: boolean;
 }
 
 const OptimizedImage: React.FC<OptimizedImageProps> = ({
@@ -11,6 +12,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   alt,
   fallback = "/no_avatar_image_128x128.png",
   className,
+  priority = false,
   ...props
 }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -35,9 +37,14 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
         alt={alt}
         onLoad={handleLoad}
         onError={handleError}
-        loading="lazy"
-        placeholder="blur"
-        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+        loading={priority ? undefined : "lazy"}
+        placeholder={priority ? undefined : "blur"}
+        blurDataURL={
+          priority
+            ? undefined
+            : "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjZjNmNGY2Ii8+Cjwvc3ZnPgo="
+        }
+        priority={priority}
         quality={75}
         {...props}
       />

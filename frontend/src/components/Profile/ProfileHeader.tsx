@@ -136,6 +136,7 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
           width={96}
           height={96}
           className="rounded-full border-4 border-surface absolute -top-12"
+          priority
         />
         <div className="mt-12 p-2">
           <div className="flex items-center justify-center gap-2">

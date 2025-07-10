@@ -28,6 +28,7 @@ const ProfileDropdown = ({
           height={32}
           className="rounded-full"
           style={{ opacity: progress }}
+          priority
         />
       ) : (
         <div className="rounded-full w-8 h-8 bg-surface-variant" />
