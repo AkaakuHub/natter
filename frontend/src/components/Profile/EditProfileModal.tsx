@@ -24,6 +24,13 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const updateUserMutation = useUpdateUser();
 
+  // モーダルが開かれたときに最新のユーザー名をセット
+  useEffect(() => {
+    if (isOpen && user.name) {
+      setName(user.name);
+    }
+  }, [isOpen, user.name]);
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
 
@@ -46,8 +53,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
       });
       onUserUpdated(updatedUser);
       onClose();
-      // リロード
-      window.location.reload();
     } catch (err) {
       console.error("Failed to update user:", err);
       setError("プロフィールの更新に失敗しました");
