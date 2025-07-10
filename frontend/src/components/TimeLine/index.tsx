@@ -67,23 +67,36 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
     <>
       <div className="w-full max-w-md mx-auto">
         {/* 投稿一覧 */}
-        {posts?.map((post) => {
-          const transformed = transformPostToPostComponent(post);
-          if (!transformed) return null;
+        {posts && posts.length > 0 ? (
+          posts.map((post) => {
+            const transformed = transformPostToPostComponent(post);
+            if (!transformed) return null;
 
-          const { transformedUser, transformedPost } = transformed;
+            const { transformedUser, transformedPost } = transformed;
 
-          return (
-            <PostComponent
-              key={post.id}
-              user={transformedUser}
-              post={transformedPost}
-              currentUser={currentUser}
-              onPostUpdate={handlePostUpdate}
-              onPostDelete={() => handlePostDelete(post.id)}
-            />
-          );
-        })}
+            return (
+              <PostComponent
+                key={post.id}
+                user={transformedUser}
+                post={transformedPost}
+                currentUser={currentUser}
+                onPostUpdate={handlePostUpdate}
+                onPostDelete={() => handlePostDelete(post.id)}
+              />
+            );
+          })
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 px-4">
+            <div className="text-center">
+              <p className="text-text-secondary text-lg mb-2">
+                まだ投稿がありません
+              </p>
+              <p className="text-text-secondary text-sm">
+                あなたが最初の発言者になりましょう！
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 投稿作成ボタン */}
