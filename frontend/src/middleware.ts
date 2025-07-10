@@ -1,38 +1,50 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { NextResponse, NextRequest } from "next/server";
 
-export default auth((req) => {
+export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // 認証不要なパス
+  // ULTRADEEPTHINK: 最もシンプルなログから開始
+  console.log(`💀 [MIDDLEWARE RUNNING] ${pathname}`);
+
+  // /post/:id の動的ルートをキャッチ
+  if (pathname.match(/^\/post\/\d+$/)) {
+    console.log(`💀 [POST ROUTE DETECTED] ${pathname}`);
+
+    // SPAページにリライト
+    const url = req.nextUrl.clone();
+    url.pathname = "/";
+    url.searchParams.set("spa-path", pathname);
+
+    console.log(`💀 [REWRITING] ${pathname} -> / with spa-path=${pathname}`);
+    return NextResponse.rewrite(url);
+  }
+
+  // /profile/* の動的ルートをキャッチ
   if (
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/post/") ||
-    (pathname.startsWith("/profile/") &&
-      pathname.includes("/") &&
-      pathname.split("/").length > 2) || // /profile/[id] など
-    pathname.startsWith("/api") ||
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/manifest.json") ||
-    pathname.startsWith("/favicon.ico") ||
-    pathname.startsWith("/images") ||
-    pathname.startsWith("/icon") ||
-    pathname.startsWith("/apple-icon")
+    pathname.match(/^\/profile\/\d+/) ||
+    pathname === "/profile/followers" ||
+    pathname === "/profile/following" ||
+    pathname.match(/^\/profile\/\d+\/followers$/) ||
+    pathname.match(/^\/profile\/\d+\/following$/)
   ) {
-    return NextResponse.next();
+    console.log(`💀 [PROFILE ROUTE DETECTED] ${pathname}`);
+
+    // SPAページにリライト
+    const url = req.nextUrl.clone();
+    url.pathname = "/";
+    url.searchParams.set("spa-path", pathname);
+
+    console.log(`💀 [REWRITING] ${pathname} -> / with spa-path=${pathname}`);
+    return NextResponse.rewrite(url);
   }
 
-  // 認証されていない場合はログインページにリダイレクト
-  if (!req.auth) {
-    const loginUrl = new URL("/login", req.url);
-    return NextResponse.redirect(loginUrl);
-  }
-
+  console.log(`💀 [PASSING THROUGH] ${pathname}`);
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: [
-    "/((?!api/auth|_next/static|_next/image|favicon.ico|manifest.json|icon|apple-icon).)*",
+    // 全てのパスにマッチ（静的アセット以外）
+    "/((?!_next/static|_next/image|favicon.ico|manifest.json|api).*)",
   ],
 };

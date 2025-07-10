@@ -1,33 +1,86 @@
 import { useRouter, usePathname } from "next/navigation";
 import { useCallback } from "react";
+import { useTrueSPARouter } from "@/core/router/TrueSPARouter";
 
 export const useNavigation = () => {
-  const router = useRouter();
+  const nextRouter = useRouter();
   const pathname = usePathname();
 
+  // SPA Router を常に呼び出し（React Hook Rules準拠）
+  const spaRouter = useTrueSPARouter();
+
   const navigateToTimeline = useCallback(() => {
-    router.push("/");
-  }, [router]);
+    if (spaRouter?.navigate) {
+      console.log("🔥 [SPA Navigation] Going to timeline");
+      spaRouter.navigate("/");
+    } else {
+      nextRouter.push("/");
+    }
+  }, [nextRouter, spaRouter]);
 
   const navigateToProfile = useCallback(
     (userId?: string) => {
       const profilePath = userId ? `/profile/${userId}` : "/profile";
-      router.push(profilePath);
+      if (spaRouter?.navigate) {
+        console.log(`🔥 [SPA Navigation] Going to profile: ${profilePath}`);
+        spaRouter.navigate(profilePath);
+      } else {
+        nextRouter.push(profilePath);
+      }
     },
-    [router],
+    [nextRouter, spaRouter],
   );
 
   const navigateToPost = useCallback(
     (postId: number) => {
       const postPath = `/post/${postId}`;
-      router.push(postPath);
+      if (spaRouter?.navigate) {
+        console.log(`🔥 [SPA Navigation] Going to post: ${postPath}`);
+        spaRouter.navigate(postPath);
+      } else {
+        nextRouter.push(postPath);
+      }
     },
-    [router],
+    [nextRouter, spaRouter],
   );
 
   const goBack = useCallback(() => {
-    router.back();
-  }, [router]);
+    if (spaRouter?.back) {
+      spaRouter.back();
+    } else {
+      nextRouter.back();
+    }
+  }, [nextRouter, spaRouter]);
+
+  const navigateToFollowing = useCallback(
+    (userId?: string) => {
+      const path = userId
+        ? `/profile/${userId}/following`
+        : "/profile/following";
+      if (spaRouter?.navigate) {
+        console.log(`🔥 [SPA Navigation] Going to following: ${path}`);
+        spaRouter.navigate(path);
+      } else {
+        nextRouter.push(path);
+      }
+    },
+    [nextRouter, spaRouter],
+  );
+
+  const navigateToFollowers = useCallback(
+    (userId?: string) => {
+      const path = userId
+        ? `/profile/${userId}/followers`
+        : "/profile/followers";
+      if (spaRouter?.navigate) {
+        console.log(`🔥 [SPA Navigation] Going to followers: ${path}`);
+        spaRouter.navigate(path);
+      } else {
+        nextRouter.push(path);
+      }
+    },
+    [nextRouter, spaRouter],
+  );
 
   const getCurrentPath = useCallback(() => {
     return pathname.slice(1) || "";
@@ -37,6 +90,8 @@ export const useNavigation = () => {
     navigateToTimeline,
     navigateToProfile,
     navigateToPost,
+    navigateToFollowing,
+    navigateToFollowers,
     goBack,
     getCurrentPath,
     currentPath: pathname,

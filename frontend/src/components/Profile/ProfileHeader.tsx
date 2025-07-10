@@ -9,7 +9,7 @@ import EditProfileModal from "./EditProfileModal";
 import FollowButton from "@/components/FollowButton";
 import { useFollowing, useFollowers } from "@/hooks/queries/useFollows";
 import { useUser } from "@/hooks/queries/useUsers";
-import { useRouter } from "next/navigation";
+import { useNavigation } from "@/hooks/useNavigation";
 
 interface ProfileHeaderProps {
   session: ExtendedSession | null;
@@ -28,7 +28,7 @@ const ProfileHeader = ({
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const router = useRouter();
+  const { navigateToFollowing, navigateToFollowers } = useNavigation();
 
   const isOwnProfile = !userId || userId === session?.user?.id;
   const targetUserId = userId || session?.user?.id;
@@ -52,18 +52,30 @@ const ProfileHeader = ({
   };
 
   const handleFollowingClick = () => {
+    console.log(
+      "🔥 [ProfileHeader] Following clicked, isOwnProfile:",
+      isOwnProfile,
+      "targetUserId:",
+      targetUserId,
+    );
     if (isOwnProfile) {
-      router.push("/profile/following");
+      navigateToFollowing();
     } else {
-      router.push(`/profile/${targetUserId}/following`);
+      navigateToFollowing(targetUserId);
     }
   };
 
   const handleFollowersClick = () => {
+    console.log(
+      "🔥 [ProfileHeader] Followers clicked, isOwnProfile:",
+      isOwnProfile,
+      "targetUserId:",
+      targetUserId,
+    );
     if (isOwnProfile) {
-      router.push("/profile/followers");
+      navigateToFollowers();
     } else {
-      router.push(`/profile/${targetUserId}/followers`);
+      navigateToFollowers(targetUserId);
     }
   };
 

@@ -58,7 +58,7 @@ export default async function RootLayout({
         <meta httpEquiv="Expires" content="0" />
         <link
           rel="manifest"
-          href="manifest.json"
+          href="/manifest.json"
           crossOrigin="use-credentials"
         />
       </head>

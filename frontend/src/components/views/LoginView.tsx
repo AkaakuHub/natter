@@ -1,25 +1,21 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { redirect, useSearchParams } from "next/navigation";
+import React, { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
-import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { useTrueSPARouter } from "@/core/router/TrueSPARouter";
+import { useHybridSPAAuth } from "@/core/auth/HybridSPAAuth";
 
-const LoginPage = () => {
-  const { data: session, status } = useSession();
-  const searchParams = useSearchParams();
-  const error = searchParams.get("error");
+const LoginView = () => {
+  const { currentRoute } = useTrueSPARouter();
+  const { redirectAfterLogin } = useHybridSPAAuth();
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (status === "authenticated") {
-      redirect("/");
-    }
-  }, [session, status]);
+    // URLのクエリパラメータからエラーを取得
+    const error = currentRoute?.query.get("error");
 
-  useEffect(() => {
     if (error) {
       switch (error) {
         case "OAuthSignin":
@@ -57,7 +53,7 @@ const LoginPage = () => {
           setAuthError("認証エラーが発生しました。");
       }
     }
-  }, [error]);
+  }, [currentRoute?.query]);
 
   const handleLogin = async () => {
     setAuthError(null);
@@ -65,11 +61,14 @@ const LoginPage = () => {
     try {
       const result = await signIn("twitter", {
         callbackUrl: "/",
-        redirect: true,
+        redirect: false,
       });
 
       if (result?.error) {
         setAuthError(`認証エラー: ${result.error}`);
+      } else if (result?.ok) {
+        // SPAルーターでリダイレクト
+        redirectAfterLogin();
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -104,4 +103,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default LoginView;
