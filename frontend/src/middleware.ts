@@ -6,16 +6,24 @@ export function middleware(req: NextRequest) {
   // ULTRADEEPTHINK: 最もシンプルなログから開始
   console.log(`💀 [MIDDLEWARE RUNNING] ${pathname}`);
 
-  // ログインページはSPAページにリライト（正常なSPAナビゲーション）
-  if (pathname === "/login") {
-    console.log(`💀 [LOGIN PAGE DETECTED] ${pathname}`);
-    
+  // SPAルートの一覧（静的ルート）
+  const spaRoutes = [
+    "/login",
+    "/search", 
+    "/notification",
+    "/set-list"
+  ];
+
+  // 静的SPAルートをキャッチ
+  if (spaRoutes.includes(pathname)) {
+    console.log(`💀 [SPA ROUTE DETECTED] ${pathname}`);
+
     // SPAページにリライト
     const url = req.nextUrl.clone();
     url.pathname = "/";
     url.searchParams.set("spa-path", pathname);
-    
-    console.log(`💀 [REWRITING LOGIN] ${pathname} -> / with spa-path=${pathname}`);
+
+    console.log(`💀 [REWRITING SPA] ${pathname} -> / with spa-path=${pathname}`);
     return NextResponse.rewrite(url);
   }
 
@@ -34,6 +42,7 @@ export function middleware(req: NextRequest) {
 
   // /profile/* の動的ルートをキャッチ
   if (
+    pathname === "/profile" ||
     pathname.match(/^\/profile\/\d+/) ||
     pathname === "/profile/followers" ||
     pathname === "/profile/following" ||
