@@ -89,7 +89,12 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
         {/* メインコンテンツ */}
         <div
           ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto bg-surface-variant mb-[60px] max-w-md mx-auto lg:mx-0 lg:max-w-none"
+          className="flex-1 overflow-y-auto bg-surface-variant max-w-md mx-auto lg:mx-0 lg:max-w-none scrollbar-hide"
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            paddingBottom: "60px",
+          }}
         >
           {children}
         </div>

@@ -4,10 +4,10 @@ const TabKinds = ["tweets", "media", "likes", "characters"] as const;
 export type TabType = (typeof TabKinds)[number];
 
 const TabNames: Record<TabType, string> = {
-  tweets: "ポスト",
-  media: "メディア",
+  tweets: "投稿",
+  media: "画像",
   likes: "いいね",
-  characters: "キャラクター",
+  characters: "人物",
 };
 
 interface TabsComponentProps {
@@ -30,13 +30,13 @@ const TabsComponent = ({ activeTab, onTabChange }: TabsComponentProps) => {
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id as TabType)}
-            className={`py-2 w-full ${
+            className={`py-1 sm:py-2 w-full text-sm sm:text-base transition-colors duration-200 ${
               activeTab === tab.id
                 ? "border-b-2 border-interactive font-bold text-text"
-                : "text-text-muted"
+                : "text-text-muted hover:text-text"
             }`}
           >
-            {tab.label}
+            <span className="inline">{tab.label}</span>
           </button>
         ))}
       </div>

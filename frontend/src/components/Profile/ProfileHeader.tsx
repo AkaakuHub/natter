@@ -14,9 +14,14 @@ import { useRouter } from "next/navigation";
 interface ProfileHeaderProps {
   session: ExtendedSession | null;
   userId?: string;
+  isCompact?: boolean;
 }
 
-const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
+const ProfileHeader = ({
+  session,
+  userId,
+  isCompact = false,
+}: ProfileHeaderProps) => {
   const [bgColor, setBgColor] = useState("#64748b");
   const [applyAnimation, setApplyAnimation] = useState(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
@@ -106,12 +111,12 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
   if (loading) {
     return (
       <div>
-        <div className="h-16 w-full bg-surface-variant animate-pulse" />
+        <div className="h-10 sm:h-16 w-full bg-surface-variant animate-pulse" />
         <div className="relative w-full flex flex-row items-center justify-center gap-2">
-          <div className="w-24 h-24 bg-surface-variant rounded-full animate-pulse absolute -top-12" />
-          <div className="mt-12 p-2">
-            <div className="h-8 w-32 bg-surface-variant animate-pulse rounded mb-2" />
-            <div className="h-4 w-20 bg-surface-variant animate-pulse rounded" />
+          <div className="w-16 h-16 sm:w-24 sm:h-24 bg-surface-variant rounded-full animate-pulse absolute -top-8 sm:-top-12" />
+          <div className="mt-8 sm:mt-12 p-2">
+            <div className="h-6 sm:h-8 w-24 sm:w-32 bg-surface-variant animate-pulse rounded mb-2" />
+            <div className="h-3 sm:h-4 w-16 sm:w-20 bg-surface-variant animate-pulse rounded" />
           </div>
         </div>
       </div>
@@ -122,7 +127,8 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
     <div>
       <div
         className={clsx(
-          "h-16 w-full flex items-center justify-center ease-in-out duration-500",
+          "w-full flex items-center justify-center ease-in-out duration-500",
+          "h-10 sm:h-16", // モバイルでより小さなヘッダー
           applyAnimation ? "animate-fade-in" : "",
         )}
         style={{
@@ -135,14 +141,24 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
           alt={displayUser?.name ?? "no_avatar"}
           width={96}
           height={96}
-          className="rounded-full border-4 border-surface absolute -top-12"
+          className="rounded-full border-4 border-surface absolute w-16 h-16 sm:w-24 sm:h-24 -top-8 sm:-top-12"
           priority
         />
-        <div className="mt-12 p-2">
+        <div
+          className={clsx(
+            "p-2 transition-all duration-300",
+            isCompact ? "mt-6 sm:mt-8" : "mt-8 sm:mt-12",
+          )}
+        >
           <div className="flex items-center justify-center gap-2">
-            <div className="text-2xl font-bold text-center text-text">
+            <div
+              className={clsx(
+                "font-bold text-center text-text transition-all duration-300",
+                isCompact ? "text-sm sm:text-lg" : "text-lg sm:text-2xl",
+              )}
+            >
               {displayUser?.name ?? (
-                <div className="h-8 w-32 bg-surface-variant animate-pulse rounded" />
+                <div className="h-6 sm:h-8 w-24 sm:w-32 bg-surface-variant animate-pulse rounded" />
               )}
             </div>
             {isOwnProfile && displayUser && (
@@ -151,27 +167,41 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
                 className="p-1 rounded-full hover:bg-surface-hover transition-colors"
                 title="プロフィールを編集"
               >
-                <IconEdit size={20} className="text-text-muted" />
+                <IconEdit size={18} className="text-text-muted sm:hidden" />
+                <IconEdit
+                  size={20}
+                  className="text-text-muted hidden sm:block"
+                />
               </button>
             )}
           </div>
-          <div className="text-sm text-text-muted text-center">
+          <div
+            className={clsx(
+              "text-text-muted text-center transition-all duration-300",
+              isCompact ? "text-xs" : "text-xs sm:text-sm",
+            )}
+          >
             @{displayUser?.id ?? "no_id"}
           </div>
 
           {/* フォロー数表示 */}
-          <div className="flex justify-center gap-6 mt-3">
+          <div
+            className={clsx(
+              "flex justify-center gap-4 sm:gap-6 transition-all duration-300",
+              isCompact ? "mt-1 sm:mt-2" : "mt-2 sm:mt-3",
+            )}
+          >
             <button
               onClick={session ? handleFollowingClick : undefined}
               disabled={!session}
-              className={`text-center rounded-lg px-3 py-2 transition-colors ${
+              className={`text-center rounded-lg px-2 sm:px-3 py-1 sm:py-2 transition-colors ${
                 session
                   ? "hover:bg-surface-hover cursor-pointer"
                   : "cursor-not-allowed opacity-50"
               }`}
               type="button"
             >
-              <div className="text-lg font-bold text-text">
+              <div className="text-sm sm:text-lg font-bold text-text">
                 {followCounts.followingCount}
               </div>
               <div className="text-xs text-text-muted">フォロー</div>
@@ -179,14 +209,14 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
             <button
               onClick={session ? handleFollowersClick : undefined}
               disabled={!session}
-              className={`text-center rounded-lg px-3 py-2 transition-colors ${
+              className={`text-center rounded-lg px-2 sm:px-3 py-1 sm:py-2 transition-colors ${
                 session
                   ? "hover:bg-surface-hover cursor-pointer"
                   : "cursor-not-allowed opacity-50"
               }`}
               type="button"
             >
-              <div className="text-lg font-bold text-text">
+              <div className="text-sm sm:text-lg font-bold text-text">
                 {followCounts.followersCount}
               </div>
               <div className="text-xs text-text-muted">フォロワー</div>
@@ -194,7 +224,7 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
           </div>
 
           {!isOwnProfile && displayUser && (
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-center mt-3 sm:mt-4">
               <FollowButton
                 userId={displayUser.id}
                 currentUserId={session?.user?.id}
