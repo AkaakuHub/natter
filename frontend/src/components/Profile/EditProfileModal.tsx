@@ -46,6 +46,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
       });
       onUserUpdated(updatedUser);
       onClose();
+      // リロード
+      window.location.reload();
     } catch (err) {
       console.error("Failed to update user:", err);
       setError("プロフィールの更新に失敗しました");
