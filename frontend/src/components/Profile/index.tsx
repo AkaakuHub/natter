@@ -179,12 +179,10 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
   };
 
   return (
-    <div className="w-full h-full bg-surface text-text">
+    <div className="w-full h-full bg-surface text-text flex flex-col">
       <ProfileHeader session={session} userId={userId} />
       <TabsComponent activeTab={activeTab} onTabChange={handleTabChange} />
-      <div className="overflow-y-auto h-[calc(100dvh-60px)] w-full">
-        {renderTabContent()}
-      </div>
+      <div className="flex-1 overflow-y-auto w-full">{renderTabContent()}</div>
     </div>
   );
 };
