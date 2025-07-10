@@ -45,7 +45,7 @@ export const useTrendingPosts = () => {
 export const useLikedPosts = (userId: string) => {
   return useQuery({
     queryKey: QUERY_KEYS.likedPosts(userId),
-    queryFn: () => PostsApi.getAllPosts({ type: "liked", userId }),
+    queryFn: () => PostsApi.getLikedPosts(userId),
     enabled: !!userId,
     staleTime: 0, // いいね状態は即座に反映したいため
     refetchOnWindowFocus: true,
@@ -57,7 +57,7 @@ export const useLikedPosts = (userId: string) => {
 export const usePostsByUser = (userId: string) => {
   return useQuery({
     queryKey: QUERY_KEYS.postsByUser(userId),
-    queryFn: () => PostsApi.getAllPosts({ userId }),
+    queryFn: () => PostsApi.getPostsByUser(userId),
     enabled: !!userId,
     staleTime: 0,
     refetchOnWindowFocus: true,

@@ -86,7 +86,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
           <button
             onClick={handleClose}
             className="p-2 rounded-full hover:bg-surface-hover transition-colors"
-            disabled={isSubmitting}
+            disabled={updateUserMutation.isPending}
           >
             <IconX size={20} className="text-text-muted" />
           </button>
