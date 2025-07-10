@@ -6,6 +6,19 @@ export function middleware(req: NextRequest) {
   // ULTRADEEPTHINK: 最もシンプルなログから開始
   console.log(`💀 [MIDDLEWARE RUNNING] ${pathname}`);
 
+  // ログインページはSPAページにリライト（正常なSPAナビゲーション）
+  if (pathname === "/login") {
+    console.log(`💀 [LOGIN PAGE DETECTED] ${pathname}`);
+    
+    // SPAページにリライト
+    const url = req.nextUrl.clone();
+    url.pathname = "/";
+    url.searchParams.set("spa-path", pathname);
+    
+    console.log(`💀 [REWRITING LOGIN] ${pathname} -> / with spa-path=${pathname}`);
+    return NextResponse.rewrite(url);
+  }
+
   // /post/:id の動的ルートをキャッチ
   if (pathname.match(/^\/post\/\d+$/)) {
     console.log(`💀 [POST ROUTE DETECTED] ${pathname}`);

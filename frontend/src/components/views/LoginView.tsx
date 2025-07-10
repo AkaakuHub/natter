@@ -4,17 +4,16 @@ import React, { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { useTrueSPARouter } from "@/core/router/TrueSPARouter";
 import { useHybridSPAAuth } from "@/core/auth/HybridSPAAuth";
 
 const LoginView = () => {
-  const { currentRoute } = useTrueSPARouter();
   const { redirectAfterLogin } = useHybridSPAAuth();
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
-    // URLのクエリパラメータからエラーを取得
-    const error = currentRoute?.query.get("error");
+    // URLのクエリパラメータからエラーを取得 - Next.js URLSearchParamsから直接取得
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get("error");
 
     if (error) {
       switch (error) {
@@ -53,7 +52,7 @@ const LoginView = () => {
           setAuthError("認証エラーが発生しました。");
       }
     }
-  }, [currentRoute?.query]);
+  }, []);
 
   const handleLogin = async () => {
     setAuthError(null);
