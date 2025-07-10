@@ -46,11 +46,20 @@ const PostActions = ({
         </button>
 
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onReply(e);
-          }}
-          className="flex items-center gap-2 px-4 py-2 rounded-full text-text-muted hover:text-interactive hover:bg-interactive-bg transition-colors duration-200"
+          onClick={
+            canInteract
+              ? (e) => {
+                  e.stopPropagation();
+                  onReply(e);
+                }
+              : undefined
+          }
+          disabled={!canInteract}
+          className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors duration-200 ${
+            canInteract
+              ? "text-text-muted hover:text-interactive hover:bg-interactive-bg"
+              : "text-text-muted opacity-50 cursor-not-allowed"
+          }`}
         >
           <IconMessageCircle size={18} />
           <span className="font-medium text-sm">{replyCount}</span>

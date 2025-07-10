@@ -236,6 +236,51 @@ export class ApiClient {
           const errorText = await response.text();
           console.warn("Authentication failed for API request:", errorText);
 
+          // 未ログイン時でも閲覧可能なエンドポイントのリスト
+          const publicReadEndpoints = [
+            "/posts", // 投稿一覧取得 (GET)
+            "/posts/", // 個別投稿取得 (GET /posts/:id)
+            "/users", // ユーザー情報取得 (GET)
+            "/users/", // 個別ユーザー情報取得 (GET /users/:id)
+            "/follows", // フォロー情報取得 (GET)
+            "/follows/", // フォロー関連情報 (GET)
+          ];
+
+          const isGetRequest = options?.method === "GET" || !options?.method;
+          const isPublicEndpoint = publicReadEndpoints.some((pattern) =>
+            endpoint.startsWith(pattern),
+          );
+
+          // GET リクエストで公開エンドポイントの場合は、認証なしで再試行
+          if (isGetRequest && isPublicEndpoint) {
+            console.log(
+              "🔓 Public endpoint accessed without auth, retrying without token",
+            );
+            try {
+              const publicConfig: RequestInit = {
+                ...config,
+                headers: {
+                  "Content-Type": "application/json",
+                  ...options?.headers,
+                  // Authorization ヘッダーを削除
+                },
+              };
+              delete (publicConfig.headers as Record<string, string>)
+                ?.Authorization;
+
+              const publicResponse = await fetch(url, publicConfig);
+              if (publicResponse.ok) {
+                const text = await publicResponse.text();
+                return text ? JSON.parse(text) : ({} as T);
+              }
+            } catch (publicError) {
+              console.warn("Failed to fetch public endpoint:", publicError);
+            }
+            // 公開エンドポイントの場合は、失敗してもエラーを投げずに空のデータを返す
+            console.log("🔓 Public endpoint failed, returning empty data");
+            return [] as T;
+          }
+
           // JWT signature エラーの場合は古いトークンをクリアして再試行
           if (
             errorText.includes("Invalid JWT token") ||

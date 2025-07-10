@@ -133,6 +133,19 @@ export class PostsService {
       console.log('No characterId provided, skipping posts count update');
     }
 
+    // 返信通知を作成
+    if (numericReplyToId) {
+      try {
+        await this.notificationsService.createReplyNotification(
+          numericReplyToId,
+          authorId,
+        );
+      } catch (error) {
+        // 通知処理でエラーが発生しても投稿作成は成功扱い
+        console.error('Failed to create reply notification:', error);
+      }
+    }
+
     return post;
   }
 

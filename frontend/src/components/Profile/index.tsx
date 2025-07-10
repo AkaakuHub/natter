@@ -14,7 +14,7 @@ import { transformPostToPostComponent } from "@/utils/postTransformers";
 import { ExtendedSession } from "@/types";
 
 interface ProfileComponentProps {
-  session: ExtendedSession;
+  session: ExtendedSession | null;
   userId?: string;
 }
 
@@ -45,7 +45,7 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
 
   useEffect(() => {
     const fetchUserPosts = async () => {
-      const targetUserId = userId || session.user?.id;
+      const targetUserId = userId || session?.user?.id;
       if (!targetUserId) return;
 
       // 同じユーザーIDの場合は再実行しない
@@ -78,7 +78,7 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
     };
 
     fetchUserPosts();
-  }, [session.user?.id, userId]);
+  }, [session?.user?.id, userId]);
 
   const handleTabChange = (tab: TabType) => setActiveTab(tab);
 

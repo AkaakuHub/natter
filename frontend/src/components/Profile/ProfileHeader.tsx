@@ -12,7 +12,7 @@ import { useUser } from "@/hooks/queries/useUsers";
 import { useRouter } from "next/navigation";
 
 interface ProfileHeaderProps {
-  session: ExtendedSession;
+  session: ExtendedSession | null;
   userId?: string;
 }
 
@@ -25,11 +25,11 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const router = useRouter();
 
-  const isOwnProfile = !userId || userId === session.user?.id;
-  const targetUserId = userId || session.user?.id;
+  const isOwnProfile = !userId || userId === session?.user?.id;
+  const targetUserId = userId || session?.user?.id;
 
   // React Query hooks for user data
-  const { data: fetchedCurrentUser } = useUser(session.user?.id || "");
+  const { data: fetchedCurrentUser } = useUser(session?.user?.id || "");
   const { data: fetchedTargetUser } = useUser(userId || "");
 
   // React Query hooks for follow data
@@ -72,7 +72,7 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
 
   // フォールバック用のセッション情報設定（React Queryでデータが取得できない場合）
   useEffect(() => {
-    if (session.user?.id && !fetchedCurrentUser && !currentUser) {
+    if (session?.user?.id && !fetchedCurrentUser && !currentUser) {
       setCurrentUser({
         id: session.user.id,
         name: session.user.name || "Unknown User",
@@ -82,18 +82,18 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
         updatedAt: new Date().toISOString(),
       });
     }
-  }, [session.user, fetchedCurrentUser, currentUser]);
+  }, [session?.user, fetchedCurrentUser, currentUser]);
 
   // React Queryでデータが取得されたらローディング状態を更新
   useEffect(() => {
-    if (userId && userId !== session.user?.id) {
+    if (userId && userId !== session?.user?.id) {
       if (fetchedTargetUser) {
         setLoading(false);
       }
     } else {
       setLoading(false);
     }
-  }, [userId, session.user?.id, fetchedTargetUser]);
+  }, [userId, session?.user?.id, fetchedTargetUser]);
 
   useEffect(() => {
     const image = displayUser?.image ?? "/no_avatar_image_128x128.png";
@@ -162,8 +162,13 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
           {/* フォロー数表示 */}
           <div className="flex justify-center gap-6 mt-3">
             <button
-              onClick={handleFollowingClick}
-              className="text-center hover:bg-surface-hover rounded-lg px-3 py-2 transition-colors cursor-pointer"
+              onClick={session ? handleFollowingClick : undefined}
+              disabled={!session}
+              className={`text-center rounded-lg px-3 py-2 transition-colors ${
+                session
+                  ? "hover:bg-surface-hover cursor-pointer"
+                  : "cursor-not-allowed opacity-50"
+              }`}
               type="button"
             >
               <div className="text-lg font-bold text-text">
@@ -172,8 +177,13 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
               <div className="text-xs text-text-muted">フォロー</div>
             </button>
             <button
-              onClick={handleFollowersClick}
-              className="text-center hover:bg-surface-hover rounded-lg px-3 py-2 transition-colors cursor-pointer"
+              onClick={session ? handleFollowersClick : undefined}
+              disabled={!session}
+              className={`text-center rounded-lg px-3 py-2 transition-colors ${
+                session
+                  ? "hover:bg-surface-hover cursor-pointer"
+                  : "cursor-not-allowed opacity-50"
+              }`}
               type="button"
             >
               <div className="text-lg font-bold text-text">
@@ -187,7 +197,7 @@ const ProfileHeader = ({ session, userId }: ProfileHeaderProps) => {
             <div className="flex justify-center mt-4">
               <FollowButton
                 userId={displayUser.id}
-                currentUserId={session.user?.id}
+                currentUserId={session?.user?.id}
                 onFollowChange={() => {
                   // React Queryが自動的にキャッシュを更新するため、何もしない
                 }}

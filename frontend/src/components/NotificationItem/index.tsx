@@ -49,7 +49,11 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   };
 
   const getNotificationMessage = () => {
-    const actorName = notification.actor?.name || "不明なユーザー";
+    if (!notification.actor?.name) {
+      return null; // アクター情報が読み込まれていない場合はnullを返す
+    }
+
+    const actorName = notification.actor.name;
     switch (notification.type) {
       case "like":
         return `${actorName}があなたの投稿にいいねしました`;
@@ -79,6 +83,41 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     });
   };
 
+  const notificationMessage = getNotificationMessage();
+
+  // アクター情報が読み込まれていない場合はスケルトンを表示
+  if (!notificationMessage) {
+    return (
+      <article className="bg-surface border-b border-border py-6 px-6">
+        <div className="flex gap-4">
+          {/* スケルトンアバター */}
+          <div className="flex-shrink-0">
+            <div className="w-12 h-12 bg-border rounded-full animate-pulse"></div>
+          </div>
+
+          {/* スケルトンコンテンツ */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-5 h-5 bg-border rounded animate-pulse"></div>
+              <div className="h-4 bg-border rounded animate-pulse w-48"></div>
+            </div>
+
+            {/* スケルトン投稿プレビュー */}
+            <div className="mt-3 p-3 bg-surface-variant rounded-lg border border-border">
+              <div className="h-3 bg-border rounded animate-pulse w-full mb-2"></div>
+              <div className="h-3 bg-border rounded animate-pulse w-3/4"></div>
+            </div>
+
+            {/* スケルトン日時 */}
+            <div className="mt-3">
+              <div className="h-3 bg-border rounded animate-pulse w-16"></div>
+            </div>
+          </div>
+        </div>
+      </article>
+    );
+  }
+
   return (
     <article
       onClick={handleClick}
@@ -91,7 +130,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         <div className="flex-shrink-0">
           <Image
             src={notification.actor?.image || "/no_avatar_image_128x128.png"}
-            alt={notification.actor?.name || "不明なユーザー"}
+            alt={notification.actor?.name || "ユーザー"}
             width={48}
             height={48}
             className="rounded-full"
@@ -103,7 +142,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           <div className="flex items-center gap-2 mb-2">
             {getNotificationIcon()}
             <span className="text-sm font-medium text-text">
-              {getNotificationMessage()}
+              {notificationMessage}
             </span>
             {/* 未読インジケーター */}
             {!notification.read && (

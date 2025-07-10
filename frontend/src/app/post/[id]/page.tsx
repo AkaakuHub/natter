@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { redirect, useParams } from "next/navigation";
+import React from "react";
+import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import BaseLayout from "@/components/layout/BaseLayout";
 import DetailedPostComponent from "@/components/DetailedPost";
@@ -24,12 +24,6 @@ const Post = () => {
         }
       : null;
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      redirect("/login");
-    }
-  }, [status]);
-
   if (isNaN(parseInt(postId))) {
     return (
       <BaseLayout>
@@ -48,10 +42,6 @@ const Post = () => {
         </div>
       </BaseLayout>
     );
-  }
-
-  if (!session) {
-    return null;
   }
 
   return (

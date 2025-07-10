@@ -12,13 +12,13 @@ export const usePostShare = () => {
 
   const sharePost = useCallback(
     async (postId: string, postContent: string, authorName: string) => {
+      const postUrl = `${window.location.origin}/post/${postId}`;
+      const shareText = `${authorName}さんの投稿\n${postContent}\n${postUrl}`;
+
       const shareData: ShareData = {
-        url: `${window.location.origin}/post/${postId}`,
+        url: postUrl,
         title: `${authorName}さんの投稿 - Natter`,
-        text:
-          postContent.length > 100
-            ? `${postContent.substring(0, 100)}...`
-            : postContent,
+        text: shareText,
       };
 
       try {
@@ -31,13 +31,9 @@ export const usePostShare = () => {
           await navigator.share(shareData);
           showToast("投稿を共有しました", "success", 3000);
         } else {
-          // フォールバック: クリップボードにURLをコピー
-          await navigator.clipboard.writeText(shareData.url);
-          showToast(
-            "投稿のURLをクリップボードにコピーしました",
-            "success",
-            3000,
-          );
+          // フォールバック: クリップボードに指定形式のテキストをコピー
+          await navigator.clipboard.writeText(shareText);
+          showToast("投稿をクリップボードにコピーしました", "success", 3000);
         }
       } catch (error) {
         // エラーハンドリング
@@ -48,12 +44,8 @@ export const usePostShare = () => {
 
         try {
           // Web Share API が失敗した場合、クリップボードにコピーを試行
-          await navigator.clipboard.writeText(shareData.url);
-          showToast(
-            "投稿のURLをクリップボードにコピーしました",
-            "success",
-            3000,
-          );
+          await navigator.clipboard.writeText(shareText);
+          showToast("投稿をクリップボードにコピーしました", "success", 3000);
         } catch (clipboardError) {
           // クリップボードへのコピーも失敗した場合
           console.error(
@@ -61,7 +53,7 @@ export const usePostShare = () => {
             clipboardError,
           );
           showToast(
-            "共有に失敗しました。URLを手動でコピーしてください。",
+            "共有に失敗しました。テキストを手動でコピーしてください。",
             "error",
             5000,
           );

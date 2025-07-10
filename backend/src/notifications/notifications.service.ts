@@ -264,4 +264,32 @@ export class NotificationsService {
       },
     });
   }
+
+  // 返信通知を作成
+  async createReplyNotification(postId: number, actorId: string) {
+    // 元の投稿の作成者を取得
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!post || !post.author) {
+      return null;
+    }
+
+    return this.create({
+      type: 'reply',
+      message: 'があなたの投稿に返信しました',
+      userId: post.author.id,
+      actorId,
+      postId,
+    });
+  }
 }

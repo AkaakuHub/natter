@@ -63,11 +63,9 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
   if (!session) {
     return (
       <div className="w-full h-screen flex flex-col">
-        <Header progress={1} scrollContainerRef={scrollContainerRef} />
         <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
           {children}
         </div>
-        <FooterMenu path={pathname} scrollContainerRef={scrollContainerRef} />
       </div>
     );
   }

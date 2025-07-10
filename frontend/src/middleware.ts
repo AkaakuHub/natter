@@ -7,6 +7,10 @@ export default auth((req) => {
   // 認証不要なパス
   if (
     pathname.startsWith("/login") ||
+    pathname.startsWith("/post/") ||
+    (pathname.startsWith("/profile/") &&
+      pathname.includes("/") &&
+      pathname.split("/").length > 2) || // /profile/[id] など
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/manifest.json") ||

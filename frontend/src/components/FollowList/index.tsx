@@ -13,14 +13,14 @@ import { ExtendedSession } from "@/types";
 interface FollowListProps {
   userId: string;
   type: "following" | "followers";
-  session: ExtendedSession;
+  session: ExtendedSession | null;
 }
 
 const FollowList: React.FC<FollowListProps> = ({ userId, type, session }) => {
   const router = useRouter();
   const { data: targetUser } = useUser(userId);
 
-  const isOwnProfile = userId === session.user?.id;
+  const isOwnProfile = userId === session?.user?.id;
 
   const handleBackClick = () => {
     if (isOwnProfile) {
@@ -56,13 +56,15 @@ const FollowList: React.FC<FollowListProps> = ({ userId, type, session }) => {
         {/* Header with back button */}
         <div className="sticky top-0 bg-surface/80 backdrop-blur-md border-b border-surface-variant z-10">
           <div className="flex items-center gap-3 p-4">
-            <button
-              onClick={handleBackClick}
-              className="p-2 hover:bg-surface-hover rounded-full transition-colors"
-              title="戻る"
-            >
-              <IconArrowLeft size={20} className="text-text" />
-            </button>
+            {session && (
+              <button
+                onClick={handleBackClick}
+                className="p-2 hover:bg-surface-hover rounded-full transition-colors"
+                title="戻る"
+              >
+                <IconArrowLeft size={20} className="text-text" />
+              </button>
+            )}
             <div className="flex-1">
               <h1 className="text-xl font-bold text-text">
                 {isFollowing ? "フォロー中" : "フォロワー"}
@@ -90,13 +92,15 @@ const FollowList: React.FC<FollowListProps> = ({ userId, type, session }) => {
         {/* Header with back button */}
         <div className="sticky top-0 bg-surface/80 backdrop-blur-md border-b border-surface-variant z-10">
           <div className="flex items-center gap-3 p-4">
-            <button
-              onClick={handleBackClick}
-              className="p-2 hover:bg-surface-hover rounded-full transition-colors"
-              title="戻る"
-            >
-              <IconArrowLeft size={20} className="text-text" />
-            </button>
+            {session && (
+              <button
+                onClick={handleBackClick}
+                className="p-2 hover:bg-surface-hover rounded-full transition-colors"
+                title="戻る"
+              >
+                <IconArrowLeft size={20} className="text-text" />
+              </button>
+            )}
             <div className="flex-1">
               <h1 className="text-xl font-bold text-text">
                 {isFollowing ? "フォロー中" : "フォロワー"}
@@ -120,13 +124,15 @@ const FollowList: React.FC<FollowListProps> = ({ userId, type, session }) => {
       {/* Header with back button */}
       <div className="sticky top-0 bg-surface/80 backdrop-blur-md border-b border-surface-variant z-10">
         <div className="flex items-center gap-3 p-4">
-          <button
-            onClick={handleBackClick}
-            className="p-2 hover:bg-surface-hover rounded-full transition-colors"
-            title="戻る"
-          >
-            <IconArrowLeft size={20} className="text-text" />
-          </button>
+          {session && (
+            <button
+              onClick={handleBackClick}
+              className="p-2 hover:bg-surface-hover rounded-full transition-colors"
+              title="戻る"
+            >
+              <IconArrowLeft size={20} className="text-text" />
+            </button>
+          )}
           <div className="flex-1">
             <h1 className="text-xl font-bold text-text">
               {isFollowing ? "フォロー中" : "フォロワー"}
@@ -189,7 +195,7 @@ const FollowList: React.FC<FollowListProps> = ({ userId, type, session }) => {
                 <div className="flex-shrink-0">
                   <FollowButton
                     userId={user.id}
-                    currentUserId={session.user?.id}
+                    currentUserId={session?.user?.id}
                     compact={true}
                   />
                 </div>

@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useSession } from "next-auth/react";
 import BaseLayout from "@/components/layout/BaseLayout";
-import { redirect, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { ExtendedSession } from "@/types";
 import ProfileComponent from "@/components/Profile";
 
@@ -11,12 +11,6 @@ const ProfileById = () => {
   const { data: session, status } = useSession();
   const params = useParams<{ id: string }>();
   const userId = params.id;
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      redirect("/login");
-    }
-  }, [status]);
 
   if (status === "loading") {
     return (
@@ -28,13 +22,12 @@ const ProfileById = () => {
     );
   }
 
-  if (!session) {
-    return null;
-  }
-
   return (
     <BaseLayout>
-      <ProfileComponent session={session as ExtendedSession} userId={userId} />
+      <ProfileComponent
+        session={session as ExtendedSession | null}
+        userId={userId}
+      />
     </BaseLayout>
   );
 };

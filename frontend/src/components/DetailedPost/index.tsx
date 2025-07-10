@@ -110,20 +110,32 @@ const DetailedPostComponent = ({
   }
 
   if (error || !post) {
-    return <ErrorState error={error} onBack={goBack} />;
+    return (
+      <ErrorState
+        error={error}
+        onBack={goBack}
+        canInteract={!!currentUser?.id}
+      />
+    );
   }
 
   const user = post.author;
 
   if (!user) {
-    return <ErrorState error="投稿者の情報が見つかりません" onBack={goBack} />;
+    return (
+      <ErrorState
+        error="投稿者の情報が見つかりません"
+        onBack={goBack}
+        canInteract={!!currentUser?.id}
+      />
+    );
   }
   const canInteract = !!currentUser?.id;
 
   return (
     <div className="bg-gradient-to-br from-surface-variant to-surface-variant/60 min-h-full">
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <BackButton onBack={goBack} />
+        {canInteract && <BackButton onBack={goBack} />}
 
         <div className="bg-surface/90 backdrop-blur-sm rounded-3xl shadow-soft hover:shadow-glow border border-border/60 transition-all duration-300">
           {post.replyTo ? (
