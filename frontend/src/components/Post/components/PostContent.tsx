@@ -3,6 +3,10 @@ import Image from "next/image";
 import { IconUser } from "@tabler/icons-react";
 import { getImageUrl } from "@/utils/postUtils";
 import { decodeHtmlEntities, breakLongWords } from "@/utils/htmlUtils";
+import {
+  getCharacterColorStyle,
+  getCharacterTextColor,
+} from "@/utils/characterColorUtils";
 import { Character } from "@/api";
 import { useImagePreload } from "@/hooks/useImagePreload";
 
@@ -42,9 +46,18 @@ const PostContent = ({
     <>
       {/* キャラクター表示 */}
       {character && (
-        <div className="mb-3 flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg border border-primary/20">
-          <IconUser size={16} className="text-primary" />
-          <span className="text-sm font-medium text-primary">
+        <div
+          className="mb-3 flex items-center gap-2 px-3 py-2 rounded-lg border"
+          style={getCharacterColorStyle(character.name, 0.5)}
+        >
+          <IconUser
+            size={16}
+            style={{ color: getCharacterTextColor(character.name) }}
+          />
+          <span
+            className="text-sm font-medium"
+            style={{ color: getCharacterTextColor(character.name) }}
+          >
             {character.name}
           </span>
         </div>

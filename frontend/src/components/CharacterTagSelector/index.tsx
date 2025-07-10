@@ -7,6 +7,10 @@ import {
   useCreateCharacter,
   useSearchCharacters,
 } from "@/hooks/queries/useCharacters";
+import {
+  getCharacterColorStyle,
+  getCharacterTextColor,
+} from "@/utils/characterColorUtils";
 import type { Character } from "@/api";
 
 interface CharacterTagSelectorProps {
@@ -138,16 +142,27 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
 
           {/* 選択されたキャラクタータグ */}
           {selectedCharacter && (
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
-              <span className="text-sm font-medium text-primary">
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1 border rounded-full"
+              style={getCharacterColorStyle(selectedCharacter.name, 0.5)}
+            >
+              <span
+                className="text-sm font-medium"
+                style={{ color: getCharacterTextColor(selectedCharacter.name) }}
+              >
                 {selectedCharacter.name}
               </span>
               <button
                 type="button"
                 onClick={handleRemoveTag}
-                className="p-0.5 hover:bg-primary/20 rounded-full transition-colors"
+                className="p-0.5 hover:bg-surface-hover rounded-full transition-colors"
               >
-                <IconX size={14} className="text-primary" />
+                <IconX
+                  size={14}
+                  style={{
+                    color: getCharacterTextColor(selectedCharacter.name),
+                  }}
+                />
               </button>
             </div>
           )}
