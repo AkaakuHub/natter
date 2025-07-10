@@ -215,7 +215,7 @@ const CharacterList: React.FC<CharacterListProps> = ({
                   ) : (
                     <div>
                       <h4 className="font-medium text-text">
-                        {isOwnProfile ? character.name : "???"}
+                        {character.name}
                       </h4>
                       <p className="text-sm text-text-muted">
                         {character.postsCount || 0}回使用

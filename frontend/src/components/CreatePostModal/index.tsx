@@ -12,7 +12,7 @@ import PostTextArea from "../CreatePost/components/PostTextArea";
 import ImagePreview from "../CreatePost/components/ImagePreview";
 import ErrorMessage from "../CreatePost/components/ErrorMessage";
 import PostActions from "../CreatePost/components/PostActions";
-import CharacterSelector from "../CharacterSelector";
+import CharacterTagSelector from "../CharacterTagSelector";
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -55,7 +55,12 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     if (e) {
       e.preventDefault();
     }
-    await submitPost(content, images, undefined, selectedCharacter?.id);
+    await submitPost(
+      content,
+      images,
+      undefined,
+      selectedCharacter?.id || undefined,
+    );
 
     // 成功時にフォームをクリアしてモーダルを閉じる
     if (!error) {
@@ -142,7 +147,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 />
 
                 <div className="mt-4 sm:mt-4">
-                  <CharacterSelector
+                  <CharacterTagSelector
                     selectedCharacter={selectedCharacter}
                     onCharacterChange={setSelectedCharacter}
                   />

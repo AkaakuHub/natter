@@ -50,7 +50,10 @@ const CharacterSelector: React.FC<CharacterSelectorProps> = ({
   }, []);
 
   // キャラクター作成
-  const handleCreateCharacter = async () => {
+  const handleCreateCharacter = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     if (!newCharacterName.trim()) return;
 
     try {

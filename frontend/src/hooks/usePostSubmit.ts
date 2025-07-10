@@ -32,8 +32,8 @@ export const usePostSubmit = (
     replyToId?: number,
     characterId?: number,
   ) => {
-    if (!content.trim() && images.length === 0) {
-      setError("投稿内容または画像を入力してください");
+    if (!content.trim() && images.length === 0 && !characterId) {
+      setError("投稿内容、画像、またはキャラクターを設定してください");
       return;
     }
 
@@ -65,8 +65,15 @@ export const usePostSubmit = (
         formData.append("replyToId", replyToId.toString());
       }
 
-      if (characterId) {
+      if (characterId && typeof characterId === "number") {
+        console.log(
+          "Adding characterId to FormData:",
+          characterId,
+          typeof characterId,
+        );
         formData.append("characterId", characterId.toString());
+      } else if (characterId !== undefined) {
+        console.warn("Invalid characterId:", characterId, typeof characterId);
       }
 
       images.forEach((file) => {
