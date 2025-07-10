@@ -187,7 +187,7 @@ export class PostsService {
         if (character && currentUserId !== post.authorId) {
           character = {
             ...character,
-            name: '???',
+            name: '?'.repeat(character.name.length),
           };
         }
 
@@ -249,7 +249,7 @@ export class PostsService {
     if (character && currentUserId !== post.authorId) {
       character = {
         ...character,
-        name: '???',
+        name: '?'.repeat(character.name.length),
       };
     }
 
@@ -298,7 +298,7 @@ export class PostsService {
       if (character && currentUserId !== post.authorId) {
         character = {
           ...character,
-          name: '???',
+          name: '?'.repeat(character.name.length),
         };
       }
 
@@ -354,7 +354,7 @@ export class PostsService {
         if (character && currentUserId !== post.authorId) {
           character = {
             ...character,
-            name: '???',
+            name: '?'.repeat(character.name.length),
           };
         }
 
@@ -398,7 +398,7 @@ export class PostsService {
       if (character && currentUserId !== like.post.authorId) {
         character = {
           ...character,
-          name: '???',
+          name: '?'.repeat(character.name.length),
         };
       }
 
@@ -637,7 +637,7 @@ export class PostsService {
       if (character && currentUserId !== reply.authorId) {
         character = {
           ...character,
-          name: '???',
+          name: '?'.repeat(character.name.length),
         };
       }
 
@@ -693,7 +693,7 @@ export class PostsService {
       if (character && currentUserId !== post.authorId) {
         character = {
           ...character,
-          name: '???',
+          name: '?'.repeat(character.name.length),
         };
       }
 
@@ -784,7 +784,7 @@ export class PostsService {
         if (character && currentUserId !== post.authorId) {
           character = {
             ...character,
-            name: '???',
+            name: '?'.repeat(character.name.length),
           };
         }
 

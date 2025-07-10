@@ -25,14 +25,14 @@ export class CharactersService {
     });
 
     return characters.map((character) => {
-      // 自分のキャラクターの場合は実名を表示、他人のキャラクターは「???」で隠蔽
+      // 自分のキャラクターの場合は実名を表示、他人のキャラクターは文字数分の「?」で隠蔽
       const shouldHide = currentUserId !== userId;
       console.log(
         `Character ${character.name}: DB postsCount=${character.postsCount}, relation count=${character._count.posts}`,
       );
       return {
         ...character,
-        name: shouldHide ? '???' : character.name,
+        name: shouldHide ? '?'.repeat(character.name.length) : character.name,
         postsCount: character.postsCount, // DBのpostsCountフィールドを使用
       };
     });
