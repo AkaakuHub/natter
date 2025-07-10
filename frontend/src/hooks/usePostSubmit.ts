@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { User } from "@/api";
 import { useToast } from "@/hooks/useToast";
 import { useNavigation } from "@/hooks/useNavigation";
@@ -25,6 +26,7 @@ export const usePostSubmit = (
   const [error, setError] = useState<string | null>(null);
   const { showToast } = useToast();
   const { navigateToPost } = useNavigation();
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (
     content: string,
@@ -66,7 +68,14 @@ export const usePostSubmit = (
       }
 
       if (characterId && typeof characterId === "number") {
+        console.log("Adding characterId to FormData:", characterId);
         formData.append("characterId", characterId.toString());
+      } else {
+        console.log(
+          "No characterId provided or invalid type:",
+          characterId,
+          typeof characterId,
+        );
       }
 
       images.forEach((file) => {
@@ -78,6 +87,23 @@ export const usePostSubmit = (
         "/posts",
         formData,
       );
+
+      // キャラクターが使用された場合、キャラクター一覧のキャッシュを無効化
+      if (characterId) {
+        queryClient.invalidateQueries({
+          queryKey: ["characters"],
+        });
+        // ユーザー別のキャラクター一覧も無効化
+        queryClient.invalidateQueries({
+          queryKey: ["characters", currentUser.id],
+        });
+      }
+
+      // 投稿一覧のキャッシュも無効化（新しい投稿を反映）
+      queryClient.invalidateQueries({
+        queryKey: ["posts"],
+      });
+
       onPostCreated?.();
 
       const message = replyToId

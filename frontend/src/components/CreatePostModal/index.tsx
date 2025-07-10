@@ -112,7 +112,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 bg-overlay flex items-start justify-center z-50 p-3 sm:p-4">
+    <div className="fixed inset-0 bg-overlay flex items-start justify-center z-50 p-3 sm:p-4 overflow-y-auto">
       <div className="bg-surface rounded-lg max-w-lg w-full mt-2 sm:mt-16 border border-border relative max-h-[95vh] sm:max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-4 border-b border-border flex-shrink-0">
@@ -147,7 +147,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   autoFocus={true}
                 />
 
-                <div className="mt-4 sm:mt-4 relative z-10">
+                <div className="mt-4 sm:mt-4 relative z-50">
                   <CharacterTagSelector
                     selectedCharacter={selectedCharacter}
                     onCharacterChange={setSelectedCharacter}

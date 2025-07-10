@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IconX, IconCheck } from "@tabler/icons-react";
 import { User } from "@/api";
-import { UsersApi } from "@/api/users";
+import { useUpdateUser } from "@/hooks/queries/useUsers";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 interface EditProfileModalProps {
@@ -20,9 +20,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   onUserUpdated,
 }) => {
   const [name, setName] = useState(user.name || "");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const updateUserMutation = useUpdateUser();
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -37,20 +37,18 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
       return;
     }
 
-    setIsSubmitting(true);
     setError(null);
 
     try {
-      const updatedUser = await UsersApi.updateUser(user.id, {
-        name: name.trim(),
+      const updatedUser = await updateUserMutation.mutateAsync({
+        userId: user.id,
+        data: { name: name.trim() },
       });
       onUserUpdated(updatedUser);
       onClose();
     } catch (err) {
       console.error("Failed to update user:", err);
       setError("プロフィールの更新に失敗しました");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -113,7 +111,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-interactive bg-surface text-text"
               placeholder="表示名を入力"
               maxLength={50}
-              disabled={isSubmitting}
+              disabled={updateUserMutation.isPending}
               style={{ fontSize: "16px" }}
             />
             <div className="text-right text-xs text-text-muted mt-1">
@@ -133,16 +131,16 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               type="button"
               onClick={handleClose}
               className="px-4 py-2 text-sm border border-border rounded-lg hover:bg-surface-hover transition-colors"
-              disabled={isSubmitting}
+              disabled={updateUserMutation.isPending}
             >
               キャンセル
             </button>
             <button
               type="submit"
               className="px-4 py-2 text-sm bg-interactive text-text-inverse rounded-lg hover:bg-interactive-hover transition-colors disabled:bg-interactive-disabled flex items-center gap-2"
-              disabled={isSubmitting || !name.trim()}
+              disabled={updateUserMutation.isPending || !name.trim()}
             >
-              {isSubmitting ? (
+              {updateUserMutation.isPending ? (
                 <>
                   <div className="w-4 h-4 border-2 border-text-inverse border-t-transparent rounded-full animate-spin" />
                   保存中...

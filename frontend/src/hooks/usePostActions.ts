@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { PostsApi, Post } from "@/api";
 
 interface UsePostActionsResult {
@@ -20,6 +21,7 @@ export const usePostActions = (
   const [likeCount, setLikeCount] = useState(0);
   const [isLiking, setIsLiking] = useState(false);
   const [showReplyModal, setShowReplyModal] = useState(false);
+  const queryClient = useQueryClient();
 
   // 投稿データの変更に対応して状態を更新
   useEffect(() => {
@@ -72,6 +74,23 @@ export const usePostActions = (
       setLikeCount(
         response.liked ? previousLikeCount + 1 : previousLikeCount - 1,
       );
+
+      // React Queryキャッシュを無効化してリアルタイム更新
+      queryClient.invalidateQueries({
+        queryKey: ["posts"],
+      });
+
+      // 特定の投稿のキャッシュも無効化
+      queryClient.invalidateQueries({
+        queryKey: ["post", post.id],
+      });
+
+      // ユーザーのいいね投稿一覧も無効化（プロフィールのいいねタブ用）
+      if (currentUserId) {
+        queryClient.invalidateQueries({
+          queryKey: ["posts", "liked", currentUserId],
+        });
+      }
 
       // 投稿データを更新
       if (onPostUpdate) {

@@ -48,9 +48,9 @@ export const useCreateCharacter = () => {
         },
       );
 
-      // キャラクター一覧のキャッシュを無効化
+      // 全てのキャラクター関連キャッシュを無効化
       queryClient.invalidateQueries({
-        queryKey: CHARACTER_QUERY_KEYS.characters,
+        queryKey: ["characters"],
       });
     },
   });
@@ -82,7 +82,7 @@ export const useUpdateCharacter = () => {
 
       // 関連キャッシュを無効化
       queryClient.invalidateQueries({
-        queryKey: CHARACTER_QUERY_KEYS.characters,
+        queryKey: ["characters"],
       });
     },
   });
@@ -112,7 +112,7 @@ export const useDeleteCharacter = () => {
 
       // キャラクター一覧のキャッシュを無効化
       queryClient.invalidateQueries({
-        queryKey: CHARACTER_QUERY_KEYS.characters,
+        queryKey: ["characters"],
       });
     },
   });

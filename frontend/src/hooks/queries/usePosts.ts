@@ -40,3 +40,39 @@ export const useTrendingPosts = () => {
     staleTime: 5 * 60 * 1000, // 5分間はフレッシュとみなす
   });
 };
+
+// ユーザーのいいね投稿取得
+export const useLikedPosts = (userId: string) => {
+  return useQuery({
+    queryKey: QUERY_KEYS.likedPosts(userId),
+    queryFn: () => PostsApi.getAllPosts({ type: "liked", userId }),
+    enabled: !!userId,
+    staleTime: 0, // いいね状態は即座に反映したいため
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
+};
+
+// ユーザーの投稿取得
+export const usePostsByUser = (userId: string) => {
+  return useQuery({
+    queryKey: QUERY_KEYS.postsByUser(userId),
+    queryFn: () => PostsApi.getAllPosts({ userId }),
+    enabled: !!userId,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
+};
+
+// 単一投稿取得
+export const usePost = (postId: number) => {
+  return useQuery({
+    queryKey: QUERY_KEYS.post(postId),
+    queryFn: () => PostsApi.getPostById(postId),
+    enabled: !!postId,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
+};

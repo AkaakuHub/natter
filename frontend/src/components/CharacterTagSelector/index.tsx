@@ -131,12 +131,12 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
   return (
     <div className="w-full">
       <div className="mb-3">
-        <label className="block text-sm font-medium text-text mb-2">
-          キャラクター
-        </label>
+        <div className="flex items-center gap-3 mb-2">
+          <label className="block text-sm font-medium text-text">
+            キャラクター
+          </label>
 
-        {/* 選択されたキャラクタータグ */}
-        <div className="flex items-center gap-2 mb-2 min-h-[40px]">
+          {/* 選択されたキャラクタータグ */}
           {selectedCharacter && (
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
               <span className="text-sm font-medium text-primary">
@@ -188,7 +188,7 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
           {isDropdownOpen && (
             <div
               ref={dropdownRef}
-              className="absolute top-full left-0 right-0 mt-1 bg-surface border border-border rounded-lg shadow-lg z-[60] max-h-48 overflow-hidden"
+              className="absolute top-full left-0 right-0 mt-1 bg-surface border border-border rounded-lg shadow-lg z-[60] max-h-48 overflow-hidden transform-gpu"
             >
               {/* キャラクター一覧 */}
               <div className="max-h-48 overflow-y-auto">

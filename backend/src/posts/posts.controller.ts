@@ -76,6 +76,7 @@ export class PostsController {
     @UploadedFiles() files: Express.Multer.File[],
     @Req() req: Request & { user?: { id: string } },
   ) {
+    console.log('POST /posts - Raw createPostDto:', createPostDto);
     const authorId = this.extractUserIdFromRequest(req);
     const imagePaths = files ? files.map((file) => file.filename) : [];
     const replyToId = createPostDto.replyToId
@@ -84,6 +85,12 @@ export class PostsController {
     const characterId = createPostDto.characterId
       ? parseInt(createPostDto.characterId.toString())
       : undefined;
+    console.log(
+      'POST /posts - Parsed characterId:',
+      characterId,
+      'from',
+      createPostDto.characterId,
+    );
     return this.postsService.create({
       ...createPostDto,
       authorId,
