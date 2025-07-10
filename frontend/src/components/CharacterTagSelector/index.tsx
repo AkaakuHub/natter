@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { IconPlus, IconX } from "@tabler/icons-react";
 import {
   useCharacters,
@@ -25,10 +26,16 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [dropdownPosition, setDropdownPosition] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+  });
 
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const addFormRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const { data: characters = [], error: charactersError } = useCharacters();
   const { data: searchResults = [] } = useSearchCharacters(searchQuery);
@@ -105,13 +112,43 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
     const value = e.target.value;
     setInputValue(value);
     setSearchQuery(value);
+    updateDropdownPosition();
     setIsDropdownOpen(true);
+  };
+
+  // ドロップダウンの位置を計算
+  const updateDropdownPosition = () => {
+    if (inputRef.current) {
+      const rect = inputRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
   };
 
   // 入力フォーカス
   const handleInputFocus = () => {
+    updateDropdownPosition();
     setIsDropdownOpen(true);
   };
+
+  // ウィンドウリサイズ時の位置更新
+  useEffect(() => {
+    const handleResize = () => {
+      if (isDropdownOpen) {
+        updateDropdownPosition();
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("scroll", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", handleResize);
+    };
+  }, [isDropdownOpen]);
 
   // Enterキーでの作成/選択
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -135,7 +172,7 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
   return (
     <div className="w-full">
       <div className="mb-3">
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex items-center gap-3 mb-2 h-8">
           <label className="block text-sm font-medium text-text">
             キャラクター
           </label>
@@ -169,14 +206,14 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
         </div>
 
         {/* 入力欄とドロップダウン */}
-        <div className="relative">
+        <div ref={containerRef} className="relative">
           <input
             ref={inputRef}
             type="text"
             value={inputValue}
             onChange={handleInputChange}
             onFocus={handleInputFocus}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             placeholder="キャラクター名を入力..."
             className="w-full px-4 py-3 sm:py-2 bg-surface border border-border rounded-lg text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary text-base sm:text-sm transition-colors"
             style={{ fontSize: "16px" }}
@@ -199,43 +236,52 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
               </button>
             )}
 
-          {/* ドロップダウンメニュー */}
-          {isDropdownOpen && (
-            <div
-              ref={dropdownRef}
-              className="absolute top-full left-0 right-0 mt-1 bg-surface border border-border rounded-lg shadow-lg z-[60] max-h-48 overflow-hidden transform-gpu"
-            >
-              {/* キャラクター一覧 */}
-              <div className="max-h-48 overflow-y-auto">
-                {!charactersError && displayCharacters.length > 0 ? (
-                  displayCharacters.map((character) => (
-                    <button
-                      key={character.id}
-                      onClick={() => handleSelectCharacter(character)}
-                      className="w-full px-3 py-2 text-left hover:bg-surface-hover transition-colors border-b border-border last:border-b-0"
-                    >
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium text-text">
-                          {character.name}
-                        </span>
-                        <span className="text-xs text-text-muted">
-                          {character.postsCount || 0}回使用
-                        </span>
-                      </div>
-                    </button>
-                  ))
-                ) : (
-                  <div className="p-3 text-center text-sm text-text-muted">
-                    {charactersError
-                      ? "読み込みに失敗しました"
-                      : inputValue.trim()
-                        ? "新しいキャラクターを作成します"
-                        : "キャラクター名を入力してください"}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+          {/* ドロップダウンメニュー（ポータル） */}
+          {isDropdownOpen &&
+            typeof window !== "undefined" &&
+            createPortal(
+              <div
+                ref={dropdownRef}
+                className="fixed bg-surface border border-border rounded-lg shadow-lg z-[9999] max-h-48 overflow-hidden transform-gpu"
+                style={{
+                  top: dropdownPosition.top + 4,
+                  left: dropdownPosition.left,
+                  width: dropdownPosition.width,
+                  pointerEvents: "auto",
+                }}
+              >
+                {/* キャラクター一覧 */}
+                <div className="max-h-48 overflow-y-auto">
+                  {!charactersError && displayCharacters.length > 0 ? (
+                    displayCharacters.map((character) => (
+                      <button
+                        key={character.id}
+                        onClick={() => handleSelectCharacter(character)}
+                        className="w-full px-3 py-2 text-left hover:bg-surface-hover transition-colors border-b border-border last:border-b-0"
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-medium text-text">
+                            {character.name}
+                          </span>
+                          <span className="text-xs text-text-muted">
+                            {character.postsCount || 0}回使用
+                          </span>
+                        </div>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="p-3 text-center text-sm text-text-muted">
+                      {charactersError
+                        ? "読み込みに失敗しました"
+                        : inputValue.trim()
+                          ? "新しいキャラクターを作成します"
+                          : "キャラクター名を入力してください"}
+                    </div>
+                  )}
+                </div>
+              </div>,
+              document.body,
+            )}
         </div>
       </div>
     </div>
