@@ -88,8 +88,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
   const notificationMessage = getNotificationMessage();
 
-  // アクター情報が読み込まれていない場合はスケルトンを表示
-  if (!notificationMessage) {
+  // 通知データ自体が不完全な場合のみスケルトンを表示
+  // actor情報が一時的に欠けている場合はデフォルト値を使用
+  if (!notification.id || !notification.type) {
     return (
       <article className="bg-surface border-b border-border py-6 px-6">
         <div className="flex gap-4">
@@ -145,7 +146,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           <div className="flex items-center gap-2 mb-2">
             {getNotificationIcon()}
             <span className="text-sm font-medium text-text">
-              {notificationMessage}
+              {notificationMessage ||
+                `${notification.actor?.name || "誰か"}から通知があります`}
             </span>
             {/* 未読インジケーター */}
             {!notification.read && (

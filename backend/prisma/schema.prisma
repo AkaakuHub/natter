@@ -39,6 +39,7 @@ model Post {
   title     String?
   content   String?
   images    String? // JSON string of image URLs array
+  url       String? // URL欄（他人からは隠蔽される）
   published Boolean   @default(true)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

@@ -56,39 +56,3 @@ export function getCharacterColorStyle(
     borderColor: baseColor,
   };
 }
-
-/**
- * キャラクター名に基づいてテキスト色を生成（背景色とのコントラストを考慮）
- * @param name キャラクター名
- * @returns テキスト色文字列
- */
-export function getCharacterTextColor(name: string): string {
-  const baseColor = getCharacterColor(name);
-
-  // 明度に基づいてテキスト色を決定
-  // 薄い背景色には濃いテキストが適している
-  const rgb = hexToRgb(baseColor);
-  if (!rgb) return "#374151"; // gray-700 (fallback)
-
-  const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
-
-  // 薄い色パレットなので、基本的に濃いテキストを使用
-  // 非常に明るい色（brightness > 200）の場合はより濃いテキスト
-  return brightness > 200 ? "#111827" : "#374151"; // gray-900 or gray-700
-}
-
-/**
- * HEX色をRGBに変換
- * @param hex HEX色文字列
- * @returns RGB オブジェクト
- */
-function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
-    ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16),
-      }
-    : null;
-}

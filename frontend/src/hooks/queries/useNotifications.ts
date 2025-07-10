@@ -18,8 +18,11 @@ export const useNotifications = () => {
   return useQuery({
     queryKey: NOTIFICATION_QUERY_KEYS.notifications,
     queryFn: () => NotificationsApi.getNotifications(),
-    staleTime: 30 * 1000, // 30秒間はフレッシュとみなす
+    staleTime: 0, // 常に最新データを取得（スケルトン問題回避のため）
     refetchOnWindowFocus: true,
+    refetchOnMount: true, // マウント時に常に再フェッチ
+    retry: 3, // 失敗時のリトライ回数
+    retryDelay: 1000, // リトライ間隔
   });
 };
 

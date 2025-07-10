@@ -187,6 +187,7 @@ const DetailedPostComponent = ({
           <PostContent
             content={post.content || ""}
             images={post.images}
+            url={post.url}
             character={post.character}
             onImageClick={handleImageClick}
           />

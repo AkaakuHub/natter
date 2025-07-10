@@ -17,6 +17,7 @@ export interface Post {
   title?: string;
   content?: string;
   images: string[];
+  url?: string;
   published: boolean;
   createdAt: string;
   updatedAt: string;
@@ -47,6 +48,7 @@ export interface CreatePostDto {
   title?: string;
   content?: string;
   images?: string[];
+  url?: string;
   authorId?: string;
   replyToId?: number;
   characterId?: number;
@@ -56,6 +58,7 @@ export interface UpdatePostDto {
   title?: string;
   content?: string;
   images?: string[];
+  url?: string;
   published?: boolean;
 }
 

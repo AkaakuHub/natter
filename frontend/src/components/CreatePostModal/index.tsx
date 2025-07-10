@@ -28,6 +28,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   currentUser,
 }) => {
   const [content, setContent] = useState("");
+  const [url, setUrl] = useState("");
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
   );
@@ -59,6 +60,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     await submitPost(
       content,
       images,
+      url,
       undefined,
       selectedCharacter?.id || undefined,
     );
@@ -66,6 +68,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     // 成功時にフォームをクリアしてモーダルを閉じる
     if (!error) {
       setContent("");
+      setUrl("");
       setSelectedCharacter(null);
       clearImages();
       onClose();
@@ -74,6 +77,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
   const handleClose = () => {
     setContent("");
+    setUrl("");
     setSelectedCharacter(null);
     clearImages();
     onClose();
@@ -152,6 +156,28 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                     selectedCharacter={selectedCharacter}
                     onCharacterChange={setSelectedCharacter}
                   />
+                </div>
+
+                {/* URL入力欄 */}
+                <div className="mt-3">
+                  <input
+                    type="url"
+                    value={url}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // URL長さ制限チェック
+                      if (value.length <= 500) {
+                        setUrl(value);
+                      }
+                    }}
+                    placeholder="URL（他の人には見えません）"
+                    className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-surface text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-interactive focus:border-transparent"
+                    disabled={isSubmitting}
+                    maxLength={500}
+                  />
+                  <div className="mt-1 text-xs text-text-muted">
+                    {url.length}/500文字
+                  </div>
                 </div>
 
                 <ImagePreview

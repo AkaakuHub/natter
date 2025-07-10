@@ -24,6 +24,11 @@ export class CreatePostDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(500, { message: 'URL must not exceed 500 characters' })
+  url?: string;
+
+  @IsOptional()
+  @IsString()
   authorId?: string;
 
   @IsOptional()

@@ -25,7 +25,7 @@ export class PostsService {
 
   async create(createPostDto: CreatePostDto) {
     console.log('Creating post with data:', createPostDto);
-    const { images, authorId, replyToId, characterId, ...postData } =
+    const { images, authorId, replyToId, characterId, url, ...postData } =
       createPostDto;
     console.log(
       'Extracted characterId:',
@@ -41,6 +41,7 @@ export class PostsService {
       content: postData.content
         ? this.sanitizeContent(postData.content)
         : undefined,
+      url: url ? this.sanitizeContent(url) : undefined,
     };
 
     if (!authorId) {
@@ -204,10 +205,17 @@ export class PostsService {
           };
         }
 
+        // URL隠蔽処理（他人の投稿のURLは隠蔽）
+        let url = post.url;
+        if (url && currentUserId !== post.authorId) {
+          url = '???';
+        }
+
         return {
           ...post,
           replyTo,
           character,
+          url,
           images: post.images ? (JSON.parse(post.images) as string[]) : [],
         };
       }),
@@ -266,10 +274,17 @@ export class PostsService {
       };
     }
 
+    // URL隠蔽処理（他人の投稿のURLは隠蔽）
+    let url = post.url;
+    if (url && currentUserId !== post.authorId) {
+      url = '???';
+    }
+
     return {
       ...post,
       replyTo,
       character,
+      url,
       images: post.images ? (JSON.parse(post.images) as string[]) : [],
     };
   }

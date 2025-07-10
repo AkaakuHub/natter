@@ -15,6 +15,7 @@ export const transformPostToPostComponent = (post: Post) => {
     authorId: post.authorId || post.author.id,
     content: post.content || "",
     images: post.images || [],
+    url: post.url || undefined,
     createdAt: post.createdAt,
     updatedAt: post.updatedAt || post.createdAt,
     published: post.published ?? true,

@@ -3,16 +3,14 @@ import Image from "next/image";
 import { IconUser } from "@tabler/icons-react";
 import { getImageUrl } from "@/utils/postUtils";
 import { decodeHtmlEntities, breakLongWords } from "@/utils/htmlUtils";
-import {
-  getCharacterColorStyle,
-  getCharacterTextColor,
-} from "@/utils/characterColorUtils";
+import { getCharacterColorStyle } from "@/utils/characterColorUtils";
 import { Character } from "@/api";
 import { useImagePreload } from "@/hooks/useImagePreload";
 
 interface PostContentProps {
   content: string;
   images?: string[];
+  url?: string;
   character?: Character;
   onImageClick: (index: number) => void;
 }
@@ -20,6 +18,7 @@ interface PostContentProps {
 const PostContent = ({
   content,
   images,
+  url,
   character,
   onImageClick,
 }: PostContentProps) => {
@@ -37,6 +36,12 @@ const PostContent = ({
     return breakLongWords(decoded);
   }, [content]);
 
+  // URLもHTMLエスケープされている場合があるのでデコード
+  const processedUrl = React.useMemo(() => {
+    if (!url || url === "???") return url;
+    return decodeHtmlEntities(url);
+  }, [url]);
+
   return (
     <div className="p-6">
       {/* キャラクター表示 */}
@@ -45,14 +50,8 @@ const PostContent = ({
           className="mb-4 flex items-center gap-2 px-3 py-2 rounded-lg border"
           style={getCharacterColorStyle(character.name, 0.5)}
         >
-          <IconUser
-            size={16}
-            style={{ color: getCharacterTextColor(character.name) }}
-          />
-          <span
-            className="text-sm font-medium"
-            style={{ color: getCharacterTextColor(character.name) }}
-          >
+          <IconUser size={16} className="text-text" />
+          <span className="text-sm font-medium text-text">
             {character.name}
           </span>
         </div>
@@ -63,6 +62,34 @@ const PostContent = ({
           {processedContent}
         </p>
       </div>
+
+      {/* URL表示 */}
+      {processedUrl && processedUrl !== "???" && (
+        <div className="mt-4 p-4 bg-surface-variant rounded-lg border border-border">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-text-muted">URL:</span>
+            <a
+              href={processedUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-interactive hover:text-interactive-hover underline break-all"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {processedUrl}
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* URL隠蔽表示 */}
+      {processedUrl === "???" && (
+        <div className="mt-4 p-4 bg-surface-variant rounded-lg border border-border">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-text-muted">URL:</span>
+            <span className="text-sm text-text-muted">???</span>
+          </div>
+        </div>
+      )}
 
       {/* Images */}
       {images && images.length > 0 && (

@@ -12,6 +12,7 @@ interface UsePostSubmitResult {
   handleSubmit: (
     content: string,
     images: File[],
+    url?: string,
     replyToId?: number,
     characterId?: number,
   ) => Promise<void>;
@@ -31,6 +32,7 @@ export const usePostSubmit = (
   const handleSubmit = async (
     content: string,
     images: File[],
+    url?: string,
     replyToId?: number,
     characterId?: number,
   ) => {
@@ -61,6 +63,10 @@ export const usePostSubmit = (
       const formData = new FormData();
       if (content.trim()) {
         formData.append("content", content.trim());
+      }
+
+      if (url?.trim()) {
+        formData.append("url", url.trim());
       }
 
       if (replyToId) {

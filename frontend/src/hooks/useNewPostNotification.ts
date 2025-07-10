@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface NewPostNotificationState {
@@ -20,34 +20,65 @@ export const useNewPostNotification = () => {
   // タブのvisibility状態を監視
   const [isTabActive, setIsTabActive] = useState(true);
 
+  // stateのrefを保持してコールバック内で最新値を参照
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
   const checkForNewPosts = useCallback(async () => {
     try {
-      // タイムラインデータをキャッシュから取得
-      const timelineData = queryClient.getQueryData(["posts", "timeline"]);
+      console.log("🔥 [NewPost] Checking for new posts...");
 
-      if (!timelineData || !Array.isArray(timelineData)) return;
+      // タイムラインクエリを強制的に再取得
+      await queryClient.invalidateQueries({ queryKey: ["posts"] });
+      await queryClient.refetchQueries({ queryKey: ["posts"] });
+
+      // キャッシュから最新データを取得
+      const timelineData = queryClient.getQueryData(["posts"]);
+      console.log("🔥 [NewPost] Timeline data:", timelineData);
+
+      if (!timelineData || !Array.isArray(timelineData)) {
+        console.log("🔥 [NewPost] No timeline data available");
+        return;
+      }
 
       const posts = timelineData as Array<{
         id: string;
         createdAt: string;
         [key: string]: unknown;
       }>;
-      if (posts.length === 0) return;
+
+      if (posts.length === 0) {
+        console.log("🔥 [NewPost] No posts in timeline");
+        return;
+      }
 
       const latestPost = posts[0];
       const latestPostId = latestPost.id;
+      console.log(
+        "🔥 [NewPost] Latest post ID:",
+        latestPostId,
+        "Last known ID:",
+        state.lastPostId,
+      );
 
       // 初回設定
       if (!state.lastPostId) {
+        console.log("🔥 [NewPost] Setting initial last post ID");
         setState((prev) => ({ ...prev, lastPostId: latestPostId }));
         return;
       }
 
       // 新しいポストがあるかチェック
       if (latestPostId !== state.lastPostId) {
+        console.log("🔥 [NewPost] New posts detected!");
+
+        // 前回チェック以降の新しいポストを取得
+        const lastCheckTime = getLastCheckTime();
         const newPosts = posts.filter(
-          (post) => new Date(post.createdAt) > new Date(getLastCheckTime()),
+          (post) => new Date(post.createdAt) > new Date(lastCheckTime),
         );
+
+        console.log("🔥 [NewPost] New posts count:", newPosts.length);
 
         if (newPosts.length > 0) {
           setState((prev) => ({
@@ -75,19 +106,34 @@ export const useNewPostNotification = () => {
   useEffect(() => {
     const handleVisibilityChange = () => {
       const isActive = !document.hidden;
+      console.log("🔥 [NewPost] Tab visibility changed, is active:", isActive);
       setIsTabActive(isActive);
 
-      if (isActive && state.hasNewPosts) {
-        // タブがアクティブになったときに新ポストをチェック
-        checkForNewPosts();
+      if (isActive) {
+        // タブがアクティブになったときは常に新ポストをチェック
+        console.log("🔥 [NewPost] Tab became active, checking for new posts");
+        setTimeout(() => {
+          checkForNewPosts();
+        }, 500); // 少し遅延させてページの復帰を確実にする
       }
     };
 
+    // ページロード時とフォーカス時にもチェック
+    const handleFocus = () => {
+      console.log("🔥 [NewPost] Window focused");
+      setTimeout(() => {
+        checkForNewPosts();
+      }, 500);
+    };
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
+
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
     };
-  }, [state.hasNewPosts, checkForNewPosts]);
+  }, [checkForNewPosts]);
 
   // 定期的に新ポストをチェック（タブが非アクティブの時のみ）
   useEffect(() => {
@@ -103,7 +149,7 @@ export const useNewPostNotification = () => {
   // 新ポスト通知をクリックした時の処理
   const handleNewPostClick = useCallback(() => {
     // タイムラインを更新
-    queryClient.invalidateQueries({ queryKey: ["posts", "timeline"] });
+    queryClient.invalidateQueries({ queryKey: ["posts"] });
 
     // 通知状態をリセット
     setState((prev) => ({
