@@ -9,6 +9,8 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { ImageProcessingService } from '../services/image-processing.service';
+import { promises as fs } from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class PostsService {
@@ -221,27 +223,8 @@ export class PostsService {
           url = '???';
         }
 
-        // 画像隠蔽処理（非公開設定かつ他人の投稿の場合）
-        let images = post.images ? (JSON.parse(post.images) as string[]) : [];
-        if (
-          !post.imagesPublic &&
-          currentUserId !== post.authorId &&
-          images.length > 0
-        ) {
-          // 他人の非公開画像にブラー・モザイク処理を適用
-          images = await Promise.all(
-            images.map(async (imagePath) => {
-              try {
-                return await this.imageProcessingService.applyBlurAndMosaic(
-                  imagePath,
-                );
-              } catch (error) {
-                console.error('Failed to process image:', error);
-                return 'HIDDEN_IMAGE'; // 処理に失敗した場合は隠蔽マーカー
-              }
-            }),
-          );
-        }
+        // 画像処理は動的にエンドポイントで行うため、ここでは元のファイル名のまま返す
+        const images = post.images ? (JSON.parse(post.images) as string[]) : [];
 
         return {
           ...post,
@@ -312,27 +295,8 @@ export class PostsService {
       url = '???';
     }
 
-    // 画像隠蔽処理（非公開設定かつ他人の投稿の場合）
-    let images = post.images ? (JSON.parse(post.images) as string[]) : [];
-    if (
-      !post.imagesPublic &&
-      currentUserId !== post.authorId &&
-      images.length > 0
-    ) {
-      // 他人の非公開画像にブラー・モザイク処理を適用
-      images = await Promise.all(
-        images.map(async (imagePath) => {
-          try {
-            return await this.imageProcessingService.applyBlurAndMosaic(
-              imagePath,
-            );
-          } catch (error) {
-            console.error('Failed to process image:', error);
-            return 'HIDDEN_IMAGE'; // 処理に失敗した場合は隠蔽マーカー
-          }
-        }),
-      );
-    }
+    // 画像処理は動的にエンドポイントで行うため、ここでは元のファイル名のまま返す
+    const images = post.images ? (JSON.parse(post.images) as string[]) : [];
 
     return {
       ...post,
@@ -939,5 +903,112 @@ export class PostsService {
           images: post.images ? (JSON.parse(post.images) as string[]) : [],
         };
       });
+  }
+
+  /**
+   * 画像バッファを取得（同じエンドポイントで動的に処理）
+   */
+  async getImageBuffer(
+    filename: string,
+    currentUserId?: string,
+  ): Promise<Buffer> {
+    try {
+      // ファイル名から画像を含む投稿を検索
+      const post = await this.prisma.post.findFirst({
+        where: {
+          images: {
+            contains: filename,
+          },
+        },
+        include: {
+          author: true,
+        },
+      });
+
+      if (!post) {
+        // 投稿が見つからない場合は処理済み画像を返す
+        return await this.imageProcessingService.getBlurredImageBuffer(
+          filename,
+        );
+      }
+
+      // 1. 自分の投稿で認証済みの場合のみ元画像
+      if (currentUserId && currentUserId === post.authorId) {
+        const originalPath = path.join(process.cwd(), 'uploads', filename);
+        return await fs.readFile(originalPath);
+      }
+
+      // 2. 画像が公開設定で認証済みの場合のみ元画像
+      if (post.imagesPublic && currentUserId) {
+        const originalPath = path.join(process.cwd(), 'uploads', filename);
+        return await fs.readFile(originalPath);
+      }
+
+      // 3. その他の場合（未認証、他人、非公開）は必ず処理済み画像
+      return await this.imageProcessingService.getBlurredImageBuffer(filename);
+    } catch (error) {
+      console.error('Failed to get image buffer:', error);
+      // エラー時も処理済み画像を返す
+      return await this.imageProcessingService.getBlurredImageBuffer(filename);
+    }
+  }
+
+  /**
+   * 画像パスを取得（認証状態に応じて動的処理）
+   */
+  async getProcessedImagePath(
+    filename: string,
+    currentUserId?: string,
+  ): Promise<string> {
+    try {
+      // ファイル名から画像を含む投稿を検索
+      const post = await this.prisma.post.findFirst({
+        where: {
+          images: {
+            contains: filename,
+          },
+        },
+        include: {
+          author: true,
+        },
+      });
+
+      if (!post) {
+        // 投稿が見つからない場合は処理済み画像を返す（セキュリティのため）
+        const processedImagePath =
+          await this.imageProcessingService.applyBlurAndMosaic(filename);
+        return processedImagePath;
+      }
+
+      // 1. 自分の投稿で認証済みの場合のみ元画像
+      if (currentUserId && currentUserId === post.authorId) {
+        return filename;
+      }
+
+      // 2. 画像が公開設定で投稿者が確認できる場合のみ元画像
+      if (post.imagesPublic && currentUserId) {
+        return filename;
+      }
+
+      // 3. その他の場合（未認証、他人、非公開）は必ず処理済み画像
+      const processedImagePath =
+        await this.imageProcessingService.applyBlurAndMosaic(filename);
+      return processedImagePath;
+    } catch (error) {
+      console.error('Failed to process image request:', error);
+      // エラー時も処理済み画像を返す（セキュリティのため）
+      try {
+        const processedImagePath =
+          await this.imageProcessingService.applyBlurAndMosaic(filename);
+        return processedImagePath;
+      } catch (processingError) {
+        console.error(
+          'Failed to process image on error fallback:',
+          processingError,
+        );
+        // セキュリティ上、エラー時も元画像は絶対に返さない
+        throw new Error('Image processing failed completely');
+      }
+    }
   }
 }

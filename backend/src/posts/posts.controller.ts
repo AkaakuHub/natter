@@ -14,20 +14,25 @@ import {
   UnauthorizedException,
   UseGuards,
   Req,
+  Res,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { PostsService } from './posts.service';
+import { OgImageService } from '../services/og-image.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly ogImageService: OgImageService,
+  ) {}
 
   private extractUserIdFromRequest(
     req: Request & { user?: { id: string } },
@@ -221,8 +226,46 @@ export class PostsController {
   }
 
   @Get('images/:filename')
-  getImage(@Param('filename') filename: string) {
-    return { url: `/uploads/${filename}` };
+  @UseGuards(OptionalJwtAuthGuard)
+  async getImage(
+    @Param('filename') filename: string,
+    @Res() res: Response,
+    @Req() req?: Request & { user?: { id: string } },
+  ) {
+    try {
+      const currentUserId = req?.user?.id;
+      console.log(
+        `🔒 [IMAGE ACCESS] User: ${currentUserId || 'UNAUTHENTICATED'}, File: ${filename}`,
+      );
+
+      // 同じエンドポイントで動的に画像データを生成
+      const imageBuffer = await this.postsService.getImageBuffer(
+        filename,
+        currentUserId,
+      );
+
+      // キャッシュを無効化するヘッダーを設定
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.setHeader('Content-Type', 'image/jpeg');
+
+      console.log(`🔒 [IMAGE SERVE] Serving dynamic image for: ${filename}`);
+      return res.send(imageBuffer);
+    } catch (error) {
+      console.error('Failed to serve image:', error);
+      // セキュリティ上、エラー時は黒い画像を返す
+      const blackImageSvg = `
+        <svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="400" fill="#000000"/>
+          <text x="200" y="200" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="24">
+            Access Denied
+          </text>
+        </svg>
+      `;
+      res.setHeader('Content-Type', 'image/svg+xml');
+      return res.send(blackImageSvg);
+    }
   }
 
   @Get(':id/replies')
@@ -233,5 +276,29 @@ export class PostsController {
   ) {
     const currentUserId = req?.user?.id;
     return this.postsService.getReplies(postId, currentUserId);
+  }
+
+  @Get('ogp/top')
+  async generateTopOgImage() {
+    const imagePath = await this.ogImageService.generateTopPageOgImage();
+    return { imagePath };
+  }
+
+  @Get('ogp/:id')
+  async generatePostOgImage(@Param('id', ParseIntPipe) id: number) {
+    const post = await this.postsService.findOne(id);
+    if (!post) {
+      throw new Error('Post not found');
+    }
+
+    // URLとキャラクター情報は隠蔽された状態で来るため、そのまま使用
+    const imagePath = await this.ogImageService.generatePostOgImage({
+      id: post.id,
+      content: post.content || '',
+      authorName: post.author?.name || 'Unknown User',
+      createdAt: post.createdAt.toISOString(),
+    });
+
+    return { imagePath };
   }
 }

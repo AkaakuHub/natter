@@ -1,10 +1,31 @@
 import { NextResponse, NextRequest } from "next/server";
+import { auth } from "@/auth";
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // ULTRADEEPTHINK: 最もシンプルなログから開始
   console.log(`💀 [MIDDLEWARE RUNNING] ${pathname}`);
+
+  // 認証が不要なパブリックルート
+  const publicRoutes = ["/login"];
+
+  // 認証チェック（パブリックルート以外）
+  if (!publicRoutes.includes(pathname)) {
+    try {
+      const session = await auth();
+
+      if (!session) {
+        console.log(`💀 [AUTH REQUIRED] Redirecting ${pathname} to /login`);
+        return NextResponse.redirect(new URL("/login", req.url));
+      }
+
+      console.log(`💀 [AUTH OK] User authenticated for ${pathname}`);
+    } catch (error) {
+      console.error(`💀 [AUTH ERROR] ${error}`);
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+  }
 
   // SPAルートの一覧（静的ルート）
   const spaRoutes = ["/login", "/search", "/notification", "/set-list"];
