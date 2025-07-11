@@ -24,6 +24,8 @@ export class UsersApi {
   }
 
   static async getUserById(id: string): Promise<User> {
+    console.log("🚨 [UsersApi.getUserById] Called with id:", id);
+    console.log("🚨 [UsersApi.getUserById] Stack trace:", new Error().stack);
     return ApiClient.get<User>(`/users/${id}`);
   }
 

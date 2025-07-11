@@ -18,6 +18,19 @@ const ProfileView = () => {
   console.log("🚨 [PROFILE VIEW] Route params:", currentRoute?.params);
   console.log("🚨 [PROFILE VIEW] Route path:", currentRoute?.path);
 
+  // Post IDが間違ってuserIdとして使用されることを防ぐ
+  if (userId && !isNaN(Number(userId)) && Number(userId) < 10000) {
+    console.warn(
+      "🚨 [PROFILE VIEW] BLOCKED: userId looks like a Post ID:",
+      userId,
+    );
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-error">Invalid Profile ID</div>
+      </div>
+    );
+  }
+
   if (status === "loading") {
     return (
       <div className="flex items-center justify-center h-64">
