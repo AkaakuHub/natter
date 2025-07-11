@@ -28,9 +28,6 @@ export default async function RootLayout({
 }) {
   await auth();
 
-  const NEXT_PUBLIC_BASE_URL =
-    process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-
   return (
     <html lang="ja">
       <head>
@@ -38,21 +35,7 @@ export default async function RootLayout({
         <meta name="description" content="A simple post app" />
         <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
         <meta name="apple-mobile-web-app-title" content="Natter" />
-        <meta property="og:title" content="Natter" />
-        <meta property="og:description" content="A simple post app" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={NEXT_PUBLIC_BASE_URL} />
-        <meta
-          property="og:image"
-          content={`${NEXT_PUBLIC_BASE_URL}/og-image.png`}
-        />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Natter" />
-        <meta name="twitter:description" content="A simple post app" />
-        <meta
-          name="twitter:image"
-          content={`${NEXT_PUBLIC_BASE_URL}/og-image.png`}
-        />
+        {/* OGP meta tags are handled by generateMetadata in page.tsx */}
         <meta
           httpEquiv="Cache-Control"
           content="no-cache, no-store, must-revalidate"

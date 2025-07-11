@@ -69,10 +69,13 @@ export async function GET(request: NextRequest) {
           ? cleanContent.substring(0, 200) + "..."
           : cleanContent;
 
+      // 常にデフォルトのOG画像を使用
+      const ogImage = `${process.env.NEXT_PUBLIC_BASE_URL}${data.imagePath}`;
+
       return NextResponse.json({
         title: `${post.author.name}の投稿 - Natter`,
         description: description || "Natterでの投稿をチェック",
-        image: `${process.env.NEXT_PUBLIC_BASE_URL}${data.imagePath}`,
+        image: ogImage,
         url: `${process.env.NEXT_PUBLIC_BASE_URL}/post/${postId}`,
         author: post.author.name,
         publishedTime: post.createdAt,
