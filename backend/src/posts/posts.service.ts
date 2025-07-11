@@ -8,12 +8,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { NotificationsService } from '../notifications/notifications.service';
+import { ImageProcessingService } from '../services/image-processing.service';
 
 @Injectable()
 export class PostsService {
   constructor(
     private prisma: PrismaService,
     private notificationsService: NotificationsService,
+    private imageProcessingService: ImageProcessingService,
   ) {}
 
   private sanitizeContent(content: string): string {
@@ -25,8 +27,15 @@ export class PostsService {
 
   async create(createPostDto: CreatePostDto) {
     console.log('Creating post with data:', createPostDto);
-    const { images, authorId, replyToId, characterId, url, ...postData } =
-      createPostDto;
+    const {
+      images,
+      authorId,
+      replyToId,
+      characterId,
+      url,
+      imagesPublic,
+      ...postData
+    } = createPostDto;
     console.log(
       'Extracted characterId:',
       characterId,
@@ -42,6 +51,7 @@ export class PostsService {
         ? this.sanitizeContent(postData.content)
         : undefined,
       url: url ? this.sanitizeContent(url) : undefined,
+      imagesPublic: imagesPublic || false, // デフォルトは非公開
     };
 
     if (!authorId) {
@@ -211,12 +221,34 @@ export class PostsService {
           url = '???';
         }
 
+        // 画像隠蔽処理（非公開設定かつ他人の投稿の場合）
+        let images = post.images ? (JSON.parse(post.images) as string[]) : [];
+        if (
+          !post.imagesPublic &&
+          currentUserId !== post.authorId &&
+          images.length > 0
+        ) {
+          // 他人の非公開画像にブラー・モザイク処理を適用
+          images = await Promise.all(
+            images.map(async (imagePath) => {
+              try {
+                return await this.imageProcessingService.applyBlurAndMosaic(
+                  imagePath,
+                );
+              } catch (error) {
+                console.error('Failed to process image:', error);
+                return 'HIDDEN_IMAGE'; // 処理に失敗した場合は隠蔽マーカー
+              }
+            }),
+          );
+        }
+
         return {
           ...post,
           replyTo,
           character,
           url,
-          images: post.images ? (JSON.parse(post.images) as string[]) : [],
+          images,
         };
       }),
     );
@@ -280,12 +312,34 @@ export class PostsService {
       url = '???';
     }
 
+    // 画像隠蔽処理（非公開設定かつ他人の投稿の場合）
+    let images = post.images ? (JSON.parse(post.images) as string[]) : [];
+    if (
+      !post.imagesPublic &&
+      currentUserId !== post.authorId &&
+      images.length > 0
+    ) {
+      // 他人の非公開画像にブラー・モザイク処理を適用
+      images = await Promise.all(
+        images.map(async (imagePath) => {
+          try {
+            return await this.imageProcessingService.applyBlurAndMosaic(
+              imagePath,
+            );
+          } catch (error) {
+            console.error('Failed to process image:', error);
+            return 'HIDDEN_IMAGE'; // 処理に失敗した場合は隠蔽マーカー
+          }
+        }),
+      );
+    }
+
     return {
       ...post,
       replyTo,
       character,
       url,
-      images: post.images ? (JSON.parse(post.images) as string[]) : [],
+      images,
     };
   }
 

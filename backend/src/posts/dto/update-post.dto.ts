@@ -22,6 +22,10 @@ export class UpdatePostDto {
   images?: string[];
 
   @IsOptional()
+  @IsBoolean()
+  imagesPublic?: boolean;
+
+  @IsOptional()
   @IsString()
   @MaxLength(500, { message: 'URL must not exceed 500 characters' })
   url?: string;

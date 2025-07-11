@@ -23,6 +23,10 @@ export class CreatePostDto {
   images?: string[];
 
   @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  imagesPublic?: boolean;
+
+  @IsOptional()
   @IsString()
   @MaxLength(500, { message: 'URL must not exceed 500 characters' })
   url?: string;

@@ -35,18 +35,19 @@ model User {
 }
 
 model Post {
-  id        Int       @id @default(autoincrement())
-  title     String?
-  content   String?
-  images    String? // JSON string of image URLs array
-  url       String? // URL欄（他人からは隠蔽される）
-  published Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime? // 論理削除用
-  author    User?     @relation(fields: [authorId], references: [id])
-  authorId  String?
-  likes     Like[]
+  id            Int       @id @default(autoincrement())
+  title         String?
+  content       String?
+  images        String? // JSON string of image URLs array
+  imagesPublic  Boolean   @default(false) // 画像公開設定（デフォルト非公開）
+  url           String? // URL欄（他人からは隠蔽される）
+  published     Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime? // 論理削除用
+  author        User?     @relation(fields: [authorId], references: [id])
+  authorId      String?
+  likes         Like[]
   
   // キャラクター関係
   character   Character? @relation(fields: [characterId], references: [id])

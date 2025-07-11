@@ -5,11 +5,12 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { AuthModule } from '../auth/auth.module';
 import { PostOwnerGuard } from '../auth/post-owner.guard';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { ImageProcessingService } from '../services/image-processing.service';
 
 @Module({
   imports: [PrismaModule, AuthModule, forwardRef(() => NotificationsModule)],
   controllers: [PostsController],
-  providers: [PostsService, PostOwnerGuard],
+  providers: [PostsService, PostOwnerGuard, ImageProcessingService],
   exports: [PostsService],
 })
 export class PostsModule {}

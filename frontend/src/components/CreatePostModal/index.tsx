@@ -29,6 +29,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 }) => {
   const [content, setContent] = useState("");
   const [url, setUrl] = useState("");
+  const [imagesPublic, setImagesPublic] = useState(false); // デフォルト非公開
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
   );
@@ -61,6 +62,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
       content,
       images,
       url,
+      imagesPublic,
       undefined,
       selectedCharacter?.id || undefined,
     );
@@ -69,6 +71,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     if (!error) {
       setContent("");
       setUrl("");
+      setImagesPublic(false);
       setSelectedCharacter(null);
       clearImages();
       onClose();
@@ -78,6 +81,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   const handleClose = () => {
     setContent("");
     setUrl("");
+    setImagesPublic(false);
     setSelectedCharacter(null);
     clearImages();
     onClose();
@@ -184,6 +188,27 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   imageUrls={imagePreviewUrls}
                   onRemove={handleImageRemove}
                 />
+
+                {/* 画像公開設定（画像がある場合のみ表示） */}
+                {images.length > 0 && (
+                  <div className="mt-3 p-3 bg-surface-variant rounded-lg border border-border">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={imagesPublic}
+                        onChange={(e) => setImagesPublic(e.target.checked)}
+                        className="w-4 h-4 text-interactive bg-surface border-border rounded focus:ring-interactive focus:ring-2"
+                        disabled={isSubmitting}
+                      />
+                      <span className="text-sm text-text">
+                        画像を他の人からも見えるようにする
+                      </span>
+                    </label>
+                    <div className="mt-1 text-xs text-text-muted">
+                      チェックしない場合、画像は自分にのみ表示されます
+                    </div>
+                  </div>
+                )}
 
                 <ErrorMessage error={error} />
 

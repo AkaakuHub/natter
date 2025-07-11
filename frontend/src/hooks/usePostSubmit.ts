@@ -13,6 +13,7 @@ interface UsePostSubmitResult {
     content: string,
     images: File[],
     url?: string,
+    imagesPublic?: boolean,
     replyToId?: number,
     characterId?: number,
   ) => Promise<void>;
@@ -33,6 +34,7 @@ export const usePostSubmit = (
     content: string,
     images: File[],
     url?: string,
+    imagesPublic?: boolean,
     replyToId?: number,
     characterId?: number,
   ) => {
@@ -67,6 +69,10 @@ export const usePostSubmit = (
 
       if (url?.trim()) {
         formData.append("url", url.trim());
+      }
+
+      if (images.length > 0) {
+        formData.append("imagesPublic", (imagesPublic || false).toString());
       }
 
       if (replyToId) {
