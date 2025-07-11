@@ -90,8 +90,6 @@ export const TrueSPARouterProvider: React.FC<TrueSPARouterProviderProps> = ({
   // ナビゲーション関数
   const navigate = useCallback(
     (to: string, options?: { replace?: boolean; state?: unknown }) => {
-      console.log(`🔥 [SPA Navigate] Navigating to: ${to}`);
-
       // 純粋なSPAナビゲーション（リロードなし）
       setIsLoading(true);
       routeEngine.navigate(to, options);

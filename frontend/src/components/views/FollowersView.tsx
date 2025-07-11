@@ -10,13 +10,6 @@ const FollowersView = () => {
   const { currentRoute } = useTrueSPARouter();
   const { data: session, status } = useSession();
 
-  console.log(
-    "🔥 [FollowersView] Current route:",
-    currentRoute?.path,
-    "params:",
-    currentRoute?.params,
-  );
-
   if (status === "loading") {
     return (
       <div className="flex items-center justify-center h-64">
@@ -31,27 +24,10 @@ const FollowersView = () => {
   if (currentRoute?.path === "/profile/followers") {
     // 自分のフォロワーページ
     targetUserId = session?.user?.id;
-    console.log(
-      "🔥 [FollowersView] Own followers page, user ID:",
-      targetUserId,
-    );
   } else if (currentRoute?.path?.match(/^\/profile\/\d+\/followers$/)) {
     // 他人のフォロワーページ (/profile/:id/followers)
     targetUserId = currentRoute.params?.id;
-    console.log(
-      "🔥 [FollowersView] Other user followers page, user ID:",
-      targetUserId,
-    );
   }
-
-  console.log(
-    "🔥 [FollowersView] Final target user ID:",
-    targetUserId,
-    "Session user ID:",
-    session?.user?.id,
-    "Current path:",
-    currentRoute?.path,
-  );
 
   if (!targetUserId) {
     return (

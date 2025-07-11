@@ -12,12 +12,6 @@ const ProfileView = () => {
 
   const userId = currentRoute?.params.id;
 
-  console.log("🚨 [PROFILE VIEW] Component mounted!");
-  console.log("🚨 [PROFILE VIEW] Current route:", currentRoute);
-  console.log("🚨 [PROFILE VIEW] User ID:", userId);
-  console.log("🚨 [PROFILE VIEW] Route params:", currentRoute?.params);
-  console.log("🚨 [PROFILE VIEW] Route path:", currentRoute?.path);
-
   // Post IDが間違ってuserIdとして使用されることを防ぐ
   if (userId && !isNaN(Number(userId)) && Number(userId) < 10000) {
     console.warn(

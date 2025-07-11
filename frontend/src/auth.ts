@@ -31,7 +31,6 @@ export const { handlers, auth } = NextAuth({
       clientId: process.env.AUTH_TWITTER_ID || "",
       clientSecret: process.env.AUTH_TWITTER_SECRET || "",
       profile(profile: TwitterProfile) {
-        // console.log("🔍 Raw Twitter profile data:", profile);
         // データが { data: { ... } } 形式で来ている場合の対応
         const userData: TwitterProfileData = profile.data || profile;
         return {

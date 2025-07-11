@@ -45,10 +45,6 @@ const ReplyModal = ({
 
   if (!isOpen) return null;
 
-  // デバッグ: ReplyModalの状態確認
-  console.log("🔍 ReplyModal - isOpen:", isOpen);
-  console.log("🔍 ReplyModal - currentUser:", currentUser);
-
   // 認証されていない場合はログインメッセージを表示
   if (!currentUser) {
     console.log("❌ ReplyModal: No current user, showing login message");

@@ -51,10 +51,6 @@ const PostComponent = ({
   const { sharePost } = usePostShare();
   const { showToast } = useToast();
 
-  // デバッグ: currentUserの状態を確認
-  // console.log("🔍 PostComponent - currentUser:", currentUser);
-  // console.log("🔍 PostComponent - currentUserId:", currentUserId);
-
   const handlePostUpdateCallback = () => {
     if (onPostUpdate) {
       onPostUpdate();
@@ -98,12 +94,6 @@ const PostComponent = ({
     }
 
     try {
-      console.log("🚀 Submitting reply:", {
-        content,
-        postId: currentPost.id,
-        authorId: currentUserId,
-      });
-
       const formData = new FormData();
       formData.append("content", content);
       formData.append("authorId", currentUserId);
@@ -115,7 +105,6 @@ const PostComponent = ({
       });
 
       const newReply = await PostsApi.createPostWithImages(formData);
-      console.log("✅ Reply submitted successfully:", newReply);
 
       // 成功トースト通知を表示（クリックで新しい返信ポストに遷移）
       showToast("返信を投稿しました", "success", 3000, () => {

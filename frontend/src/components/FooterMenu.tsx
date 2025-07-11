@@ -68,7 +68,6 @@ export function FooterMenu({ path, scrollContainerRef }: BottomMenuProps) {
     }
 
     // SPA navigation for each specific route
-    console.log(`🔥 [FooterMenu] Navigating to: ${href}`);
     switch (href) {
       case "/":
         navigateToTimeline();

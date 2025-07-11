@@ -30,15 +30,7 @@ export const usePostEdit = (): UsePostEditResult => {
     content: string,
     images?: File[],
   ): Promise<Post | null> => {
-    console.log("✏️ editPost called:", {
-      id,
-      content,
-      images: images?.length || 0,
-      user: currentUser?.id,
-    });
-
     if (!currentUser) {
-      console.log("❌ No user for edit");
       setError("ログインが必要です");
       return null;
     }
@@ -50,7 +42,6 @@ export const usePostEdit = (): UsePostEditResult => {
       let updatedPost: Post;
 
       if (images && images.length > 0) {
-        console.log("🖼️ Updating with images using FormData");
         // 画像がある場合はFormDataを使用
         const formData = new FormData();
         formData.append("content", content);
@@ -61,14 +52,11 @@ export const usePostEdit = (): UsePostEditResult => {
 
         updatedPost = await PostsApi.updatePostWithImages(id, formData);
       } else {
-        console.log("📝 Updating text only");
         // テキストのみの場合は通常のAPIを使用
         updatedPost = await PostsApi.updatePost(id, {
           content,
         });
       }
-
-      console.log("✅ Edit API call successful:", updatedPost);
       showToast("投稿を編集しました", "success");
 
       // updatedAtを現在時刻で更新

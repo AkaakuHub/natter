@@ -21,13 +21,8 @@ export const useDetailedPost = (
   const [error, setError] = useState<string | null>(null);
 
   const fetchPost = async () => {
-    console.log("🚨 [USE DETAILED POST] fetchPost called with postId:", postId);
-    console.log("🚨 [USE DETAILED POST] postId type:", typeof postId);
-    console.log("🚨 [USE DETAILED POST] Stack trace:", new Error().stack);
-
     // postIdの妥当性をチェック
     if (!postId || postId === "undefined" || postId === "null") {
-      console.log("🚨 [USE DETAILED POST] Invalid postId:", postId);
       setError("投稿IDが無効です");
       setLoading(false);
       return;
@@ -36,13 +31,10 @@ export const useDetailedPost = (
     // parseIntは大きな数値で精度を失うので、バックエンドがstring IDを受け入れるよう修正するまでの暫定対処
     const numericPostId = Number(postId);
     if (isNaN(numericPostId) || !Number.isSafeInteger(numericPostId)) {
-      console.log("🔍 [USE DETAILED POST] Invalid or unsafe postId:", postId);
       setError("投稿IDが無効です");
       setLoading(false);
       return;
     }
-
-    console.log("🔍 [USE DETAILED POST] Using numeric postId:", numericPostId);
 
     try {
       setLoading(true);

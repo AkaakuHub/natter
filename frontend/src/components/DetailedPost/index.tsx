@@ -159,10 +159,6 @@ const DetailedPostComponent = ({
                   },
                 }}
                 onParentPostClick={() => {
-                  console.log(
-                    "🔍 [PARENT POST NAV] Reply to ID:",
-                    post.replyTo?.id,
-                  );
                   if (post.replyTo?.id) {
                     navigateToPost(post.replyTo.id);
                   }
@@ -182,8 +178,6 @@ const DetailedPostComponent = ({
             user={user}
             createdAt={post.createdAt}
             onUserClick={() => {
-              console.log("🔍 [PROFILE NAV] User object:", user);
-              console.log("🔍 [PROFILE NAV] User ID:", user?.id);
               if (user?.id) {
                 navigateToProfile(user.id);
               }

@@ -12,19 +12,12 @@ const USER_QUERY_KEYS = {
 export const useUser = (userId: string) => {
   // デバッグ: useUserが呼ばれた場所を特定
   if (userId && userId !== "") {
-    console.log(
-      "🚨 [useUser] Called with userId:",
-      userId,
-      "type:",
-      typeof userId,
-    );
     // 数値っぽい場合は警告
     if (!isNaN(Number(userId)) && Number(userId) < 1000) {
       console.warn(
         "🚨 [useUser] SUSPICIOUS: userId looks like a Post ID:",
         userId,
       );
-      console.log("🚨 [useUser] Stack trace:", new Error().stack);
     }
   }
 

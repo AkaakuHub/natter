@@ -24,10 +24,7 @@ export const usePostDelete = (): UsePostDeleteResult => {
   };
 
   const deletePost = async (id: number): Promise<boolean> => {
-    console.log("🗑️ deletePost called:", { id, user: currentUser?.id });
-
     if (!currentUser) {
-      console.log("❌ No user for delete");
       setError("ログインが必要です");
       return false;
     }
@@ -35,11 +32,7 @@ export const usePostDelete = (): UsePostDeleteResult => {
     try {
       setIsDeleting(true);
       setError(null);
-
-      console.log("🚀 Making delete API call:", id);
       await PostsApi.deletePost(id);
-      console.log("✅ Delete API call successful");
-
       // キャラクターキャッシュを無効化（ポスト削除でキャラクターの使用回数が変更されるため）
       queryClient.invalidateQueries({
         queryKey: ["characters"],

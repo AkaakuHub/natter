@@ -11,7 +11,6 @@ export const useNavigation = () => {
 
   const navigateToTimeline = useCallback(() => {
     if (spaRouter?.navigate) {
-      console.log("🔥 [SPA Navigation] Going to timeline");
       spaRouter.navigate("/");
     } else {
       nextRouter.push("/");
@@ -22,7 +21,6 @@ export const useNavigation = () => {
     (userId?: string) => {
       const profilePath = userId ? `/profile/${userId}` : "/profile";
       if (spaRouter?.navigate) {
-        console.log(`🔥 [SPA Navigation] Going to profile: ${profilePath}`);
         spaRouter.navigate(profilePath);
       } else {
         nextRouter.push(profilePath);
@@ -34,9 +32,6 @@ export const useNavigation = () => {
   const navigateToPost = useCallback(
     (postId: number | string) => {
       const postPath = `/post/${postId}`;
-      console.log(
-        `🔥 [SPA Navigation] Going to post: ${postPath} (ID type: ${typeof postId})`,
-      );
       if (spaRouter?.navigate) {
         spaRouter.navigate(postPath);
       } else {
@@ -60,7 +55,6 @@ export const useNavigation = () => {
         ? `/profile/${userId}/following`
         : "/profile/following";
       if (spaRouter?.navigate) {
-        console.log(`🔥 [SPA Navigation] Going to following: ${path}`);
         spaRouter.navigate(path);
       } else {
         nextRouter.push(path);
@@ -75,7 +69,6 @@ export const useNavigation = () => {
         ? `/profile/${userId}/followers`
         : "/profile/followers";
       if (spaRouter?.navigate) {
-        console.log(`🔥 [SPA Navigation] Going to followers: ${path}`);
         spaRouter.navigate(path);
       } else {
         nextRouter.push(path);
@@ -86,7 +79,6 @@ export const useNavigation = () => {
 
   const navigateToNotification = useCallback(() => {
     if (spaRouter?.navigate) {
-      console.log("🔥 [SPA Navigation] Going to notification");
       spaRouter.navigate("/notification");
     } else {
       nextRouter.push("/notification");
@@ -95,7 +87,6 @@ export const useNavigation = () => {
 
   const navigateToSearch = useCallback(() => {
     if (spaRouter?.navigate) {
-      console.log("🔥 [SPA Navigation] Going to search");
       spaRouter.navigate("/search");
     } else {
       nextRouter.push("/search");
@@ -104,7 +95,6 @@ export const useNavigation = () => {
 
   const navigateToLogin = useCallback(() => {
     if (spaRouter?.navigate) {
-      console.log("🔥 [SPA Navigation] Going to login");
       spaRouter.navigate("/login");
     } else {
       nextRouter.push("/login");

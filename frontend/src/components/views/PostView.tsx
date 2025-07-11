@@ -11,12 +11,6 @@ const PostView = () => {
 
   const postId = currentRoute?.params.id;
 
-  console.log("🚨 [POST VIEW] Component mounted!");
-  console.log("🚨 [POST VIEW] Current route:", currentRoute);
-  console.log("🚨 [POST VIEW] Post ID:", postId);
-  console.log("🚨 [POST VIEW] Route params:", currentRoute?.params);
-  console.log("🚨 [POST VIEW] Route path:", currentRoute?.path);
-
   // セッションから直接ユーザー情報を取得
   const currentUser =
     session?.user && session.user.id

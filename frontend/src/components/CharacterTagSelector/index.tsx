@@ -77,11 +77,9 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
     }
 
     try {
-      console.log("Creating character with name:", inputValue.trim());
       const newCharacter = await createCharacterMutation.mutateAsync({
         name: inputValue.trim(),
       });
-      console.log("Created character:", newCharacter);
       onCharacterChange(newCharacter);
       setInputValue("");
       setIsDropdownOpen(false);

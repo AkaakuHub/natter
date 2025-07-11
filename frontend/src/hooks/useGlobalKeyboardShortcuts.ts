@@ -60,25 +60,21 @@ export const useGlobalKeyboardShortcuts = ({
           break;
         case "/":
           e.preventDefault();
-          console.log("🔥 [KeyboardShortcut] Navigating to search");
           onSearch?.();
           navigateToSearch();
           break;
         case "h":
           e.preventDefault();
-          console.log("🔥 [KeyboardShortcut] Navigating to home");
           onHome?.();
           navigateToTimeline();
           break;
         case "p":
           e.preventDefault();
-          console.log("🔥 [KeyboardShortcut] Navigating to profile");
           onProfile?.();
           navigateToProfile();
           break;
         case "i":
           e.preventDefault();
-          console.log("🔥 [KeyboardShortcut] Navigating to notifications");
           onNotifications?.();
           navigateToNotification();
           break;

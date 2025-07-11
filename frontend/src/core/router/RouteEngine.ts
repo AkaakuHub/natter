@@ -75,22 +75,12 @@ export class RouteEngine extends EventEmitter {
   private matchRoute(
     pathname: string,
   ): { route: RouteDefinition; params: RouteParams } | null {
-    console.log(`🔍 [ROUTE ENGINE] matchRoute called with: ${pathname}`);
-    console.log(
-      `🔍 [ROUTE ENGINE] Available routes:`,
-      this.routes.map((r) => r.pattern),
-    );
-
     for (const route of this.routes) {
-      console.log(`🔍 [ROUTE ENGINE] Checking route pattern: ${route.pattern}`);
       const params = this.extractParams(route.pattern, pathname);
-      console.log(`🔍 [ROUTE ENGINE] extractParams result:`, params);
       if (params !== null) {
-        console.log(`🔍 [ROUTE ENGINE] Route matched: ${route.pattern}`);
         return { route, params };
       }
     }
-    console.log(`🔍 [ROUTE ENGINE] No route matched for: ${pathname}`);
     return null;
   }
 
@@ -138,10 +128,6 @@ export class RouteEngine extends EventEmitter {
     const spaPath = url.searchParams.get("spa-path");
     const actualPath = spaPath || url.pathname;
 
-    console.log(
-      `🔍 [ROUTE ENGINE] URL: ${url.pathname} | SPA Path: ${spaPath} | Actual Path: ${actualPath}`,
-    );
-
     const route: ParsedRoute = {
       path: actualPath,
       params: {},
@@ -152,7 +138,6 @@ export class RouteEngine extends EventEmitter {
     const match = this.matchRoute(actualPath);
     if (match) {
       route.params = match.params;
-      console.log(`🔍 [ROUTE ENGINE] Matched route params:`, match.params);
     } else {
       console.log(`🔍 [ROUTE ENGINE] No route match found for: ${actualPath}`);
     }
@@ -256,11 +241,7 @@ export class RouteEngine extends EventEmitter {
    * ルート定義を取得
    */
   getRouteDefinition(pathname: string): RouteDefinition | null {
-    console.log(
-      `🔍 [ROUTE ENGINE] getRouteDefinition called with: ${pathname}`,
-    );
     const match = this.matchRoute(pathname);
-    console.log(`🔍 [ROUTE ENGINE] Match result:`, match);
     return match?.route || null;
   }
 

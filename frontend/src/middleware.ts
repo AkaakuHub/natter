@@ -5,8 +5,6 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // SLEEPANDMAXDEPTHTHINK: 最も単純な解決策
-  console.log(`💀 [MIDDLEWARE] Processing: ${pathname}`);
-
   // ステップ1: SPAルートの判定とリライト処理を最初に実行
   const spaRoutes = ["/login", "/search", "/notification", "/set-list"];
   const isPostDetail = pathname.match(/^\/post\/\d+$/);
@@ -17,8 +15,6 @@ export async function middleware(req: NextRequest) {
 
   // SPAルートの場合は即座にリライト（認証チェックなし）
   if (needsRewrite) {
-    console.log(`💀 [SPA REWRITE] ${pathname} -> /?spa-path=${pathname}`);
-
     const url = req.nextUrl.clone();
     url.pathname = "/";
     url.searchParams.set("spa-path", pathname);
@@ -32,8 +28,6 @@ export async function middleware(req: NextRequest) {
     const spaPath = req.nextUrl.searchParams.get("spa-path");
 
     if (spaPath) {
-      console.log(`💀 [SPA PAGE] Loading: ${spaPath}`);
-
       // 公開ページの判定
       const publicRoutes = ["/login"];
       const isSpaPostDetail = spaPath.match(/^\/post\/\d+$/);
@@ -51,8 +45,6 @@ export async function middleware(req: NextRequest) {
             console.log(`💀 [AUTH REQUIRED] ${spaPath} -> /login`);
             return NextResponse.redirect(new URL("/login", req.url));
           }
-
-          console.log(`💀 [AUTH OK] ${spaPath} - User: ${session.user?.name}`);
         } catch (error) {
           console.error(`💀 [AUTH ERROR] ${spaPath}:`, error);
           return NextResponse.redirect(new URL("/login", req.url));
@@ -69,16 +61,12 @@ export async function middleware(req: NextRequest) {
           console.log(`💀 [AUTH REQUIRED] / -> /login`);
           return NextResponse.redirect(new URL("/login", req.url));
         }
-
-        console.log(`💀 [AUTH OK] / - User: ${session.user?.name}`);
       } catch (error) {
         console.error(`💀 [AUTH ERROR] /:`, error);
         return NextResponse.redirect(new URL("/login", req.url));
       }
     }
   }
-
-  console.log(`💀 [PASS THROUGH] ${pathname}`);
   return NextResponse.next();
 }
 

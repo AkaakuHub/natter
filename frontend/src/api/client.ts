@@ -192,7 +192,6 @@ export class ApiClient {
 
         // 401エラー（ユーザーが存在しない）の場合は特別な処理
         if (response.status === 401) {
-          console.log("🔍 User not found, this might be a new user");
           return null;
         }
 
@@ -255,9 +254,6 @@ export class ApiClient {
 
           // GET リクエストで公開エンドポイントの場合は、認証なしで再試行
           if (isGetRequest && isPublicEndpoint) {
-            console.log(
-              "🔓 Public endpoint accessed without auth, retrying without token",
-            );
             try {
               const publicConfig: RequestInit = {
                 ...config,
@@ -279,7 +275,6 @@ export class ApiClient {
               console.warn("Failed to fetch public endpoint:", publicError);
             }
             // 公開エンドポイントの場合は、失敗してもエラーを投げずに空のデータを返す
-            console.log("🔓 Public endpoint failed, returning empty data");
             return [] as T;
           }
 

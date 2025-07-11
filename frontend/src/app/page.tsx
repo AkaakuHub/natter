@@ -128,16 +128,6 @@ const HybridSinglePageApplication = async ({ searchParams }: Props) => {
   const ssrMode = params["ssr-mode"] === "true";
 
   const initialPath = ssrPath || spaPath || "/";
-
-  // デバッグログ
-  console.log("🔥 [SSR Page] SearchParams:", {
-    params,
-    ssrPath,
-    spaPath,
-    ssrMode,
-    initialPath,
-  });
-
   return <HybridSPA initialPath={initialPath} ssrMode={ssrMode} />;
 };
 

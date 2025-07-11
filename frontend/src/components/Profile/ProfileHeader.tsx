@@ -22,10 +22,6 @@ const ProfileHeader = ({
   userId,
   isCompact = false,
 }: ProfileHeaderProps) => {
-  console.log("🚨 [ProfileHeader] Mounted with userId:", userId);
-  console.log("🚨 [ProfileHeader] session?.user?.id:", session?.user?.id);
-  console.log("🚨 [ProfileHeader] userId type:", typeof userId);
-
   const [bgColor, setBgColor] = useState("#64748b");
   const [applyAnimation, setApplyAnimation] = useState(false);
   const [targetUser, setTargetUser] = useState<User | null>(null);
@@ -56,12 +52,6 @@ const ProfileHeader = ({
   };
 
   const handleFollowingClick = () => {
-    console.log(
-      "🔥 [ProfileHeader] Following clicked, isOwnProfile:",
-      isOwnProfile,
-      "targetUserId:",
-      targetUserId,
-    );
     if (isOwnProfile) {
       navigateToFollowing();
     } else {
@@ -70,12 +60,6 @@ const ProfileHeader = ({
   };
 
   const handleFollowersClick = () => {
-    console.log(
-      "🔥 [ProfileHeader] Followers clicked, isOwnProfile:",
-      isOwnProfile,
-      "targetUserId:",
-      targetUserId,
-    );
     if (isOwnProfile) {
       navigateToFollowers();
     } else {

@@ -12,7 +12,6 @@ const TrendingPosts: React.FC = () => {
   const { data: posts = [], isLoading: loading, error } = useTrendingPosts();
 
   const handlePostClick = (postId: number) => {
-    console.log(`🔥 [TrendingPosts] Navigating to post: ${postId}`);
     navigateToPost(postId);
   };
 

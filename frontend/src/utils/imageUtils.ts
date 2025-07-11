@@ -31,10 +31,6 @@ const getJWTToken = async (): Promise<string | null> => {
         return null;
       }
 
-      console.log(
-        "🔒 [IMAGE AUTH] Valid JWT token found for user:",
-        payload.id,
-      );
       return jwtToken;
     } catch (error) {
       console.warn("🔒 [IMAGE AUTH] Failed to decode JWT token:", error);
@@ -55,12 +51,6 @@ const getJWTToken = async (): Promise<string | null> => {
 export const fetchImageWithAuth = async (imageUrl: string): Promise<string> => {
   try {
     const jwtToken = await getJWTToken();
-
-    console.log(`🔒 [IMAGE AUTH] Fetching image: ${imageUrl}`);
-    console.log(
-      `🔒 [IMAGE AUTH] JWT Token: ${jwtToken ? "Present" : "Missing"}`,
-    );
-
     const response = await fetch(imageUrl, {
       method: "GET",
       headers: {
@@ -70,18 +60,12 @@ export const fetchImageWithAuth = async (imageUrl: string): Promise<string> => {
       },
       credentials: "include",
     });
-
-    console.log(`🔒 [IMAGE AUTH] Response status: ${response.status}`);
-
     if (!response.ok) {
       throw new Error(`Failed to fetch image: ${response.status}`);
     }
 
     const blob = await response.blob();
     const blobUrl = URL.createObjectURL(blob);
-    console.log(
-      `🔒 [IMAGE AUTH] ✅ Image fetched successfully (${blob.size} bytes)`,
-    );
     return blobUrl;
   } catch (error) {
     console.error("🔒 [IMAGE AUTH] ❌ Error fetching image with auth:", error);

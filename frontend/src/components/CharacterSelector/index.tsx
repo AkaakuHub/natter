@@ -101,12 +101,6 @@ const CharacterSelector: React.FC<CharacterSelectorProps> = ({
     setIsOpen(false);
   };
 
-  // デバッグ用コンソールログ
-  useEffect(() => {
-    console.log("CharacterSelector - characters:", characters);
-    console.log("CharacterSelector - error:", charactersError);
-  }, [characters, charactersError]);
-
   return (
     <div className="w-full relative">
       <div className="flex items-center gap-2 mb-2">

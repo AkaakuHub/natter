@@ -26,18 +26,13 @@ export const useNewPostNotification = () => {
 
   const checkForNewPosts = useCallback(async () => {
     try {
-      console.log("🔥 [NewPost] Checking for new posts...");
-
       // タイムラインクエリを強制的に再取得
       await queryClient.invalidateQueries({ queryKey: ["posts"] });
       await queryClient.refetchQueries({ queryKey: ["posts"] });
 
       // キャッシュから最新データを取得
       const timelineData = queryClient.getQueryData(["posts"]);
-      console.log("🔥 [NewPost] Timeline data:", timelineData);
-
       if (!timelineData || !Array.isArray(timelineData)) {
-        console.log("🔥 [NewPost] No timeline data available");
         return;
       }
 
@@ -48,37 +43,24 @@ export const useNewPostNotification = () => {
       }>;
 
       if (posts.length === 0) {
-        console.log("🔥 [NewPost] No posts in timeline");
         return;
       }
 
       const latestPost = posts[0];
       const latestPostId = latestPost.id;
-      console.log(
-        "🔥 [NewPost] Latest post ID:",
-        latestPostId,
-        "Last known ID:",
-        state.lastPostId,
-      );
-
       // 初回設定
       if (!state.lastPostId) {
-        console.log("🔥 [NewPost] Setting initial last post ID");
         setState((prev) => ({ ...prev, lastPostId: latestPostId }));
         return;
       }
 
       // 新しいポストがあるかチェック
       if (latestPostId !== state.lastPostId) {
-        console.log("🔥 [NewPost] New posts detected!");
-
         // 前回チェック以降の新しいポストを取得
         const lastCheckTime = getLastCheckTime();
         const newPosts = posts.filter(
           (post) => new Date(post.createdAt) > new Date(lastCheckTime),
         );
-
-        console.log("🔥 [NewPost] New posts count:", newPosts.length);
 
         if (newPosts.length > 0) {
           setState((prev) => ({
@@ -106,12 +88,10 @@ export const useNewPostNotification = () => {
   useEffect(() => {
     const handleVisibilityChange = () => {
       const isActive = !document.hidden;
-      console.log("🔥 [NewPost] Tab visibility changed, is active:", isActive);
       setIsTabActive(isActive);
 
       if (isActive) {
         // タブがアクティブになったときは常に新ポストをチェック
-        console.log("🔥 [NewPost] Tab became active, checking for new posts");
         setTimeout(() => {
           checkForNewPosts();
         }, 500); // 少し遅延させてページの復帰を確実にする
@@ -120,7 +100,6 @@ export const useNewPostNotification = () => {
 
     // ページロード時とフォーカス時にもチェック
     const handleFocus = () => {
-      console.log("🔥 [NewPost] Window focused");
       setTimeout(() => {
         checkForNewPosts();
       }, 500);

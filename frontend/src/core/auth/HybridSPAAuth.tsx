@@ -128,9 +128,6 @@ export const HybridSPAAuthProvider: React.FC<HybridSPAAuthProviderProps> = ({
 
   // ログアウト
   const logout = useCallback(async () => {
-    console.log(
-      "🔥 [HybridSPAAuth] Logout called, performing complete logout...",
-    );
     setRedirectAfterAuth(null);
     await performCompleteLogout();
   }, []);

@@ -21,12 +21,6 @@ export const useUserCreation = ({
     if (!session?.user?.id) {
       throw new Error("Session not available");
     }
-
-    // console.log("Creating user with session:", session);
-    // console.log("🔍 useUserCreation - session.user:", session.user);
-    // console.log("🔍 useUserCreation - accessToken:", (session as any).accessToken);
-    // console.log("🔍 useUserCreation - jwtToken:", (session as any).jwtToken);
-
     // セッションのトークンから直接名前を取得
     const extendedSession = session as ExtendedSession;
     const tokenName =
@@ -45,11 +39,7 @@ export const useUserCreation = ({
         `User_${session.user.id.slice(-8)}`,
       image: session.user.image || undefined,
     };
-
-    // console.log("Creating user with data:", userData);
     await UsersApi.createUser(userData);
-    // console.log("Created user:", createdUser);
-
     // キャッシュをクリアして新しいユーザー情報を取得
     const twitterId = session.user.id;
     clearUserCache(twitterId);

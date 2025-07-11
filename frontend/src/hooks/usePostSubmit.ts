@@ -60,8 +60,6 @@ export const usePostSubmit = (
         return;
       }
 
-      console.log("Submitting post with session user:", session.user.id);
-
       const formData = new FormData();
       if (content.trim()) {
         formData.append("content", content.trim());
@@ -80,14 +78,7 @@ export const usePostSubmit = (
       }
 
       if (characterId && typeof characterId === "number") {
-        console.log("Adding characterId to FormData:", characterId);
         formData.append("characterId", characterId.toString());
-      } else {
-        console.log(
-          "No characterId provided or invalid type:",
-          characterId,
-          typeof characterId,
-        );
       }
 
       images.forEach((file) => {

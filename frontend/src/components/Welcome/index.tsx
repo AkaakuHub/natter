@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { UsersApi } from "@/api/users";
 import { ExtendedSession } from "@/types";
 
 interface WelcomeProps {
@@ -19,19 +18,6 @@ const Welcome = ({ session, onUserCreated }: WelcomeProps) => {
     try {
       setIsCreating(true);
       setError(null);
-
-      console.log("Creating user with session:", session);
-
-      const userData = {
-        twitterId: session.user.id,
-        name: session.user.name || "Unknown User",
-        image: session.user.image || undefined,
-      };
-
-      console.log("User data to create:", userData);
-
-      const createdUser = await UsersApi.createUser(userData);
-      console.log("Created user:", createdUser);
 
       await onUserCreated();
     } catch (err) {

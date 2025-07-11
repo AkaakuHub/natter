@@ -31,9 +31,6 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
     // 投稿関連の通知の場合は投稿詳細ページに遷移
     if (notification.postId) {
-      console.log(
-        `🔥 [NotificationItem] Navigating to post: ${notification.postId}`,
-      );
       navigateToPost(Number(notification.postId));
     }
   };

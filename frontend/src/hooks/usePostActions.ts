@@ -44,16 +44,11 @@ export const usePostActions = (
 
     // 認証されていない場合はアラートを表示
     if (!currentUserId) {
-      console.log("❌ No current user");
       alert("いいねするにはログインが必要です。");
       return;
     }
 
     if (isLiking || !post) {
-      console.log("❌ Early return:", {
-        isLiking,
-        post: post ? "exists" : "null",
-      });
       return;
     }
 
@@ -167,7 +162,6 @@ export const usePostActions = (
 
       // 投稿データを更新
       if (onPostUpdate) {
-        console.log("🔄 Calling onPostUpdate");
         onPostUpdate();
       }
     } catch (error) {
@@ -188,10 +182,8 @@ export const usePostActions = (
   const handleReplyClick = () => {
     // 認証されていない場合はアラートを表示
     if (!currentUserId) {
-      console.log("❌ No current user for reply");
       return;
     }
-    console.log("✅ User authenticated, opening reply modal");
     setShowReplyModal(true);
   };
 

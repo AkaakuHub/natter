@@ -38,9 +38,6 @@ const Header = ({
 
   const handleLogout = async () => {
     close();
-    console.log(
-      "🔥 [Header] Logout button clicked, performing complete logout...",
-    );
     await performCompleteLogout();
   };
 
