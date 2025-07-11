@@ -41,39 +41,55 @@ export const ViewRenderer: React.FC<ViewRendererProps> = ({
   const [error, setError] = useState<Error | null>(null);
 
   // プリロード用のコンポーネントマップ
+  // 注意: より具体的なパターンを先に配置して、曖昧なマッチングを避ける
   const componentMap = useMemo(
-    () => ({
-      "/": HomeView,
-      "/search": SearchView,
-      "/login": LoginView,
-      "/notification": NotificationView,
-      "/post/:id": PostView,
-      "/profile": ProfileView,
-      "/profile/:id": ProfileView,
-      "/profile/following": FollowingView,
-      "/profile/followers": FollowersView,
-      "/profile/:id/following": FollowingView,
-      "/profile/:id/followers": FollowersView,
-      "/set-list": SetListView,
-    }),
+    () => [
+      { pattern: "/", component: HomeView },
+      { pattern: "/search", component: SearchView },
+      { pattern: "/login", component: LoginView },
+      { pattern: "/notification", component: NotificationView },
+      { pattern: "/set-list", component: SetListView },
+      { pattern: "/profile/following", component: FollowingView },
+      { pattern: "/profile/followers", component: FollowersView },
+      { pattern: "/profile/:id/following", component: FollowingView },
+      { pattern: "/profile/:id/followers", component: FollowersView },
+      { pattern: "/profile/:id", component: ProfileView },
+      { pattern: "/profile", component: ProfileView },
+      { pattern: "/post/:id", component: PostView },
+    ],
     [],
   );
 
   // パスベースでコンポーネントを解決
   const resolveComponentByPath = useCallback(
     async (pathname: string): Promise<React.ComponentType> => {
-      // 動的パラメータをパターンに変換
-      const patterns = Object.keys(componentMap);
+      console.log(
+        `🔍 [VIEW RENDERER] Resolving component by path: ${pathname}`,
+      );
 
-      for (const pattern of patterns) {
-        if (matchPattern(pattern, pathname)) {
-          const ComponentLoader =
-            componentMap[pattern as keyof typeof componentMap];
+      // 動的パラメータをパターンに変換
+      const patterns = componentMap.map((item) => item.pattern);
+      console.log(`🔍 [VIEW RENDERER] Available patterns:`, patterns);
+
+      for (const item of componentMap) {
+        console.log(
+          `🔍 [VIEW RENDERER] Checking pattern: ${item.pattern} vs ${pathname}`,
+        );
+        if (matchPattern(item.pattern, pathname)) {
+          console.log(`🔍 [VIEW RENDERER] Pattern matched: ${item.pattern}`);
+          const ComponentLoader = item.component;
+          console.log(
+            `🔍 [VIEW RENDERER] Component loader:`,
+            ComponentLoader.name,
+          );
           return ComponentLoader;
         }
       }
 
       // 404の場合
+      console.log(
+        `🔍 [VIEW RENDERER] No pattern matched, returning NotFoundView`,
+      );
       return NotFoundView;
     },
     [componentMap],
@@ -86,16 +102,27 @@ export const ViewRenderer: React.FC<ViewRendererProps> = ({
         setIsLoading(true);
         setError(null);
 
+        console.log(
+          `🔍 [VIEW RENDERER] Resolving component for path: ${pathname}`,
+        );
+
         // ルート定義を取得
         const routeDef = routeEngine.getRouteDefinition(pathname);
+        console.log(`🔍 [VIEW RENDERER] Route definition:`, routeDef);
 
         if (routeDef?.component) {
           // ルート定義からコンポーネントを動的ロード
+          console.log(`🔍 [VIEW RENDERER] Using route definition component`);
           const { default: Component } = await routeDef.component();
+          console.log(`🔍 [VIEW RENDERER] Loaded component:`, Component.name);
           setViewComponent(() => Component);
         } else {
           // フォールバック: パスベースでコンポーネントを解決
+          console.log(
+            `🔍 [VIEW RENDERER] Using fallback path-based resolution`,
+          );
           const Component = await resolveComponentByPath(pathname);
+          console.log(`🔍 [VIEW RENDERER] Resolved component:`, Component.name);
           setViewComponent(() => Component);
         }
       } catch (err) {
@@ -111,21 +138,46 @@ export const ViewRenderer: React.FC<ViewRendererProps> = ({
 
   // パターンマッチング
   const matchPattern = (pattern: string, pathname: string): boolean => {
-    if (pattern === pathname) return true;
+    console.log(`🔍 [PATTERN MATCH] Checking: ${pattern} vs ${pathname}`);
+
+    if (pattern === pathname) {
+      console.log(`🔍 [PATTERN MATCH] Exact match: ${pattern}`);
+      return true;
+    }
 
     const patternParts = pattern.split("/").filter(Boolean);
     const pathParts = pathname.split("/").filter(Boolean);
 
-    if (patternParts.length !== pathParts.length) return false;
+    console.log(
+      `🔍 [PATTERN MATCH] Pattern parts: [${patternParts.join(", ")}]`,
+    );
+    console.log(`🔍 [PATTERN MATCH] Path parts: [${pathParts.join(", ")}]`);
 
-    return patternParts.every((part, index) => {
-      return part.startsWith(":") || part === pathParts[index];
+    if (patternParts.length !== pathParts.length) {
+      console.log(
+        `🔍 [PATTERN MATCH] Length mismatch: ${patternParts.length} vs ${pathParts.length}`,
+      );
+      return false;
+    }
+
+    const match = patternParts.every((part, index) => {
+      const isParamMatch = part.startsWith(":");
+      const isExactMatch = part === pathParts[index];
+      console.log(
+        `🔍 [PATTERN MATCH] Part ${index}: "${part}" vs "${pathParts[index]}" - param:${isParamMatch}, exact:${isExactMatch}`,
+      );
+      return isParamMatch || isExactMatch;
     });
+
+    console.log(`🔍 [PATTERN MATCH] Final result: ${match}`);
+    return match;
   };
 
   // ルート変更時にコンポーネントを解決
   useEffect(() => {
     if (currentRoute?.path) {
+      console.log(`🚨 [VIEW RENDERER] Route changed to: ${currentRoute.path}`);
+      console.log(`🚨 [VIEW RENDERER] Route params:`, currentRoute.params);
       resolveViewComponent(currentRoute.path);
     }
   }, [currentRoute?.path, resolveViewComponent]);

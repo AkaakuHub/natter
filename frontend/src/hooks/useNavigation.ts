@@ -32,10 +32,12 @@ export const useNavigation = () => {
   );
 
   const navigateToPost = useCallback(
-    (postId: number) => {
+    (postId: number | string) => {
       const postPath = `/post/${postId}`;
+      console.log(
+        `🔥 [SPA Navigation] Going to post: ${postPath} (ID type: ${typeof postId})`,
+      );
       if (spaRouter?.navigate) {
-        console.log(`🔥 [SPA Navigation] Going to post: ${postPath}`);
         spaRouter.navigate(postPath);
       } else {
         nextRouter.push(postPath);

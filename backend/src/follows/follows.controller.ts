@@ -10,14 +10,15 @@ import {
 } from '@nestjs/common';
 import { FollowsService } from './follows.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { Request } from 'express';
 
 @Controller('follows')
-@UseGuards(JwtAuthGuard)
 export class FollowsController {
   constructor(private readonly followsService: FollowsService) {}
 
   @Post(':userId')
+  @UseGuards(JwtAuthGuard)
   async followUser(
     @Param('userId') userId: string,
     @Req() req: Request & { user?: { id: string } },
@@ -30,6 +31,7 @@ export class FollowsController {
   }
 
   @Delete(':userId')
+  @UseGuards(JwtAuthGuard)
   async unfollowUser(
     @Param('userId') userId: string,
     @Req() req: Request & { user?: { id: string } },
@@ -42,6 +44,7 @@ export class FollowsController {
   }
 
   @Get('following')
+  @UseGuards(OptionalJwtAuthGuard)
   async getFollowing(
     @Req() req: Request & { user?: { id: string } },
     @Query('userId') userId?: string,
@@ -54,6 +57,7 @@ export class FollowsController {
   }
 
   @Get('followers')
+  @UseGuards(OptionalJwtAuthGuard)
   async getFollowers(
     @Req() req: Request & { user?: { id: string } },
     @Query('userId') userId?: string,
@@ -66,6 +70,7 @@ export class FollowsController {
   }
 
   @Get('status/:userId')
+  @UseGuards(JwtAuthGuard)
   async getFollowStatus(
     @Param('userId') userId: string,
     @Req() req: Request & { user?: { id: string } },

@@ -244,6 +244,8 @@ export class ApiClient {
             "/users/", // 個別ユーザー情報取得 (GET /users/:id)
             "/follows", // フォロー情報取得 (GET)
             "/follows/", // フォロー関連情報 (GET)
+            "/characters", // キャラクター情報取得 (GET)
+            "/characters/", // 個別キャラクター情報取得 (GET /characters/:id)
           ];
 
           const isGetRequest = options?.method === "GET" || !options?.method;

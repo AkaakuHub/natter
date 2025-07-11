@@ -157,7 +157,15 @@ const DetailedPostComponent = ({
                     image: post.replyTo.author?.image,
                   },
                 }}
-                onParentPostClick={() => navigateToPost(post.replyTo!.id)}
+                onParentPostClick={() => {
+                  console.log(
+                    "🔍 [PARENT POST NAV] Reply to ID:",
+                    post.replyTo?.id,
+                  );
+                  if (post.replyTo?.id) {
+                    navigateToPost(post.replyTo.id);
+                  }
+                }}
               />
             )
           ) : post.replyToId ? (
@@ -172,7 +180,13 @@ const DetailedPostComponent = ({
           <PostHeader
             user={user}
             createdAt={post.createdAt}
-            onUserClick={() => navigateToProfile(user?.id)}
+            onUserClick={() => {
+              console.log("🔍 [PROFILE NAV] User object:", user);
+              console.log("🔍 [PROFILE NAV] User ID:", user?.id);
+              if (user?.id) {
+                navigateToProfile(user.id);
+              }
+            }}
             post={post}
             onPostUpdate={() => {
               // 投稿が更新された場合は再取得

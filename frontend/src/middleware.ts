@@ -10,17 +10,19 @@ export async function middleware(req: NextRequest) {
   // ステップ1: SPAルートの判定とリライト処理を最初に実行
   const spaRoutes = ["/login", "/search", "/notification", "/set-list"];
   const isPostDetail = pathname.match(/^\/post\/\d+$/);
-  const isProfile = pathname === "/profile" || pathname.match(/^\/profile\/\d+/);
-  const needsRewrite = spaRoutes.includes(pathname) || isPostDetail || isProfile;
+  const isProfile =
+    pathname === "/profile" || pathname.match(/^\/profile\/\d+/);
+  const needsRewrite =
+    spaRoutes.includes(pathname) || isPostDetail || isProfile;
 
   // SPAルートの場合は即座にリライト（認証チェックなし）
   if (needsRewrite) {
     console.log(`💀 [SPA REWRITE] ${pathname} -> /?spa-path=${pathname}`);
-    
+
     const url = req.nextUrl.clone();
     url.pathname = "/";
     url.searchParams.set("spa-path", pathname);
-    
+
     return NextResponse.rewrite(url);
   }
 
@@ -28,26 +30,28 @@ export async function middleware(req: NextRequest) {
   // "/" へのリクエストは認証チェック（SPAページがロードされる）
   if (pathname === "/") {
     const spaPath = req.nextUrl.searchParams.get("spa-path");
-    
+
     if (spaPath) {
       console.log(`💀 [SPA PAGE] Loading: ${spaPath}`);
-      
+
       // 公開ページの判定
       const publicRoutes = ["/login"];
       const isSpaPostDetail = spaPath.match(/^\/post\/\d+$/);
-      const isSpaProfile = spaPath === "/profile" || spaPath.match(/^\/profile\/\d+/);
-      const isPublicSpaPage = publicRoutes.includes(spaPath) || isSpaPostDetail || isSpaProfile;
-      
+      const isSpaProfile =
+        spaPath === "/profile" || spaPath.match(/^\/profile\/\d+/);
+      const isPublicSpaPage =
+        publicRoutes.includes(spaPath) || isSpaPostDetail || isSpaProfile;
+
       if (!isPublicSpaPage) {
         // 認証が必要なSPAページ
         try {
           const session = await auth();
-          
+
           if (!session) {
             console.log(`💀 [AUTH REQUIRED] ${spaPath} -> /login`);
             return NextResponse.redirect(new URL("/login", req.url));
           }
-          
+
           console.log(`💀 [AUTH OK] ${spaPath} - User: ${session.user?.name}`);
         } catch (error) {
           console.error(`💀 [AUTH ERROR] ${spaPath}:`, error);
@@ -60,12 +64,12 @@ export async function middleware(req: NextRequest) {
       // 通常のトップページ（認証が必要）
       try {
         const session = await auth();
-        
+
         if (!session) {
           console.log(`💀 [AUTH REQUIRED] / -> /login`);
           return NextResponse.redirect(new URL("/login", req.url));
         }
-        
+
         console.log(`💀 [AUTH OK] / - User: ${session.user?.name}`);
       } catch (error) {
         console.error(`💀 [AUTH ERROR] /:`, error);
@@ -77,7 +81,6 @@ export async function middleware(req: NextRequest) {
   console.log(`💀 [PASS THROUGH] ${pathname}`);
   return NextResponse.next();
 }
-
 
 export const config = {
   matcher: [

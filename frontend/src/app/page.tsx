@@ -57,41 +57,51 @@ export async function generateMetadata({
     }
 
     // デフォルト（トップページ）のメタデータ
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/ogp?type=top`,
-      {
-        next: { revalidate: 86400 }, // 24時間キャッシュ
-      },
-    );
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒でタイムアウト
 
-    if (response.ok) {
-      const ogpData = await response.json();
-      return {
-        title: ogpData.title,
-        description: ogpData.description,
-        openGraph: {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/ogp?type=top`,
+        {
+          next: { revalidate: 86400 }, // 24時間キャッシュ
+          signal: controller.signal,
+        },
+      );
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const ogpData = await response.json();
+        return {
           title: ogpData.title,
           description: ogpData.description,
-          images: [
-            {
-              url: ogpData.image,
-              width: 1200,
-              height: 630,
-              alt: "Natter - ソーシャルメディアプラットフォーム",
-            },
-          ],
-          type: "website",
-          url: ogpData.url,
-          siteName: "Natter",
-        },
-        twitter: {
-          card: "summary_large_image",
-          title: ogpData.title,
-          description: ogpData.description,
-          images: [ogpData.image],
-          site: "@natter_app",
-        },
-      };
+          openGraph: {
+            title: ogpData.title,
+            description: ogpData.description,
+            images: [
+              {
+                url: ogpData.image,
+                width: 1200,
+                height: 630,
+                alt: "Natter - ソーシャルメディアプラットフォーム",
+              },
+            ],
+            type: "website",
+            url: ogpData.url,
+            siteName: "Natter",
+          },
+          twitter: {
+            card: "summary_large_image",
+            title: ogpData.title,
+            description: ogpData.description,
+            images: [ogpData.image],
+            site: "@natter_app",
+          },
+        };
+      }
+    } catch (error) {
+      console.error("Failed to generate metadata:", error);
     }
   } catch (error) {
     console.error("Failed to generate metadata:", error);

@@ -12,6 +12,12 @@ const ProfileView = () => {
 
   const userId = currentRoute?.params.id;
 
+  console.log("🚨 [PROFILE VIEW] Component mounted!");
+  console.log("🚨 [PROFILE VIEW] Current route:", currentRoute);
+  console.log("🚨 [PROFILE VIEW] User ID:", userId);
+  console.log("🚨 [PROFILE VIEW] Route params:", currentRoute?.params);
+  console.log("🚨 [PROFILE VIEW] Route path:", currentRoute?.path);
+
   if (status === "loading") {
     return (
       <div className="flex items-center justify-center h-64">

@@ -10,6 +10,7 @@ interface PostHeaderProps {
     id?: string;
     name?: string;
     image?: string;
+    twitterId?: string;
   };
   createdAt: string | number | Date;
   onUserClick: () => void;
@@ -47,7 +48,9 @@ const PostHeader = ({
               {user?.name}
             </h1>
           </button>
-          <p className="text-text-muted text-sm mb-2">@{user?.id}</p>
+          <p className="text-text-muted text-sm mb-2">
+            @{user?.twitterId || user?.id}
+          </p>
           <time className="text-xs text-text-muted">
             {formatDate(
               post?.updatedAt && post.updatedAt !== post.createdAt

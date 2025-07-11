@@ -13,7 +13,7 @@ export const useUser = (userId: string) => {
   return useQuery({
     queryKey: USER_QUERY_KEYS.user(userId),
     queryFn: () => UsersApi.getUserById(userId),
-    enabled: !!userId,
+    enabled: !!userId && userId !== "",
     staleTime: 5 * 60 * 1000, // 5分間はフレッシュとみなす
   });
 };
