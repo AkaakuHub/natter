@@ -296,39 +296,14 @@ export class PostsController {
   }
 
   @Get('ogp/top')
-  async generateTopOgImage() {
-    const imagePath = await this.ogImageService.generateTopPageOgImage();
-    return { imagePath };
+  generateTopOgImage() {
+    // 画像生成を無効化し、固定パスを返す
+    return { imagePath: '/og-image.png' };
   }
 
   @Get('ogp/:id')
-  async generatePostOgImage(@Param('id', ParseIntPipe) id: number) {
-    try {
-      const post = await this.postsService.findOne(id);
-      if (!post) {
-        console.error(`Post ${id} not found for OGP generation`);
-        throw new Error('Post not found');
-      }
-
-      console.log(
-        `🖼️ [OGP] Generating image for post ${id}: "${post.content?.substring(0, 50)}..."`,
-      );
-
-      // URLとキャラクター情報は隠蔽された状態で来るため、そのまま使用
-      const imagePath = await this.ogImageService.generatePostOgImage({
-        id: post.id,
-        content: post.content || '',
-        authorName: post.author?.name || 'Unknown User',
-        createdAt: post.createdAt.toISOString(),
-      });
-
-      console.log(`🖼️ [OGP] Generated image path: ${imagePath}`);
-      return { imagePath };
-    } catch (error: unknown) {
-      console.error(`Failed to generate OGP image for post ${id}:`, error);
-      // フォールバック: トップページ画像を返す
-      const fallbackPath = await this.ogImageService.generateTopPageOgImage();
-      return { imagePath: fallbackPath };
-    }
+  generatePostOgImage() {
+    // 画像生成を無効化し、固定パスを返す
+    return { imagePath: '/og-image.png' };
   }
 }
