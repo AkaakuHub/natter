@@ -10,8 +10,33 @@ export async function middleware(req: NextRequest) {
   // 認証が不要なパブリックルート
   const publicRoutes = ["/login"];
 
-  // 認証チェック（パブリックルート以外）
-  if (!publicRoutes.includes(pathname)) {
+  // OGP生成とボットアクセスのため、ポスト詳細は認証なしでもアクセス可能
+  const isPostDetail = pathname.match(/^\/post\/\d+$/);
+  const userAgent = req.headers.get("user-agent") || "";
+  const isBot =
+    userAgent.includes("bot") ||
+    userAgent.includes("Bot") ||
+    userAgent.includes("crawler") ||
+    userAgent.includes("spider") ||
+    userAgent.includes("facebookexternalhit") ||
+    userAgent.includes("Twitterbot") ||
+    userAgent.includes("LinkedInBot") ||
+    userAgent.includes("Discordbot");
+
+  if (isPostDetail) {
+    if (isBot) {
+      console.log(
+        `💀 [OGP BOT ACCESS] Allowing ${pathname} for bot: ${userAgent}`,
+      );
+      // ボットの場合は認証チェックをスキップ
+    } else {
+      console.log(
+        `💀 [POST DETAIL] Allowing ${pathname} for unauthenticated users (OGP support)`,
+      );
+      // 一般ユーザーもポスト詳細はログインなしで閲覧可能
+    }
+  } else if (!publicRoutes.includes(pathname)) {
+    // その他のページは認証が必要
     try {
       const session = await auth();
 

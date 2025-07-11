@@ -26,13 +26,33 @@ export async function GET(request: NextRequest) {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/posts/ogp/${postId}`,
       );
+
+      if (!response.ok) {
+        console.error(
+          `Failed to generate OG image for post ${postId}:`,
+          response.status,
+        );
+        throw new Error(`OG image generation failed: ${response.status}`);
+      }
+
       const data = await response.json();
 
       // ポスト詳細も取得
       const postResponse = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}`,
       );
+
+      if (!postResponse.ok) {
+        console.error(`Failed to fetch post ${postId}:`, postResponse.status);
+        throw new Error(`Post fetch failed: ${postResponse.status}`);
+      }
+
       const post = await postResponse.json();
+
+      if (!post || !post.id) {
+        console.error(`Post ${postId} not found or invalid`);
+        throw new Error(`Post ${postId} not found`);
+      }
 
       // コンテンツをクリーンアップ（HTMLエンティティをデコード）
       const cleanContent =
