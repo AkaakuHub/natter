@@ -907,11 +907,16 @@ export class PostsService {
 
   /**
    * 画像バッファを取得（同じエンドポイントで動的に処理）
+   * 🔒 SECURITY CRITICAL: 他人からは絶対に処理済み画像のみを返す
    */
   async getImageBuffer(
     filename: string,
     currentUserId?: string,
   ): Promise<Buffer> {
+    console.log(
+      `🔒 [IMAGE BUFFER] Processing ${filename} for user: ${currentUserId || 'UNAUTHENTICATED'}`,
+    );
+
     try {
       // ファイル名から画像を含む投稿を検索
       const post = await this.prisma.post.findFirst({
@@ -926,29 +931,47 @@ export class PostsService {
       });
 
       if (!post) {
-        // 投稿が見つからない場合は処理済み画像を返す
+        console.log(
+          `🔒 [IMAGE BUFFER] Post not found for ${filename} - returning processed image`,
+        );
         return await this.imageProcessingService.getBlurredImageBuffer(
           filename,
         );
       }
 
-      // 1. 自分の投稿で認証済みの場合のみ元画像
+      console.log(
+        `🔒 [IMAGE BUFFER] Found post ${post.id} by ${post.authorId}, imagesPublic: ${post.imagesPublic}`,
+      );
+
+      // 🔒 SECURITY RULE 1: 自分の投稿で認証済みの場合のみ元画像
       if (currentUserId && currentUserId === post.authorId) {
+        console.log(
+          `🔒 [IMAGE BUFFER] ✅ OWNER ACCESS - returning original image for ${filename}`,
+        );
         const originalPath = path.join(process.cwd(), 'uploads', filename);
         return await fs.readFile(originalPath);
       }
 
-      // 2. 画像が公開設定で認証済みの場合のみ元画像
+      // 🔒 SECURITY RULE 2: 画像が公開設定で認証済みの場合のみ元画像
       if (post.imagesPublic && currentUserId) {
+        console.log(
+          `🔒 [IMAGE BUFFER] ✅ PUBLIC ACCESS - returning original image for ${filename}`,
+        );
         const originalPath = path.join(process.cwd(), 'uploads', filename);
         return await fs.readFile(originalPath);
       }
 
-      // 3. その他の場合（未認証、他人、非公開）は必ず処理済み画像
+      // 🔒 SECURITY RULE 3: その他の場合（未認証、他人、非公開）は必ず処理済み画像
+      console.log(
+        `🔒 [IMAGE BUFFER] ❌ RESTRICTED ACCESS - returning processed image for ${filename}`,
+      );
+      console.log(
+        `🔒 [IMAGE BUFFER] Reason: currentUserId=${currentUserId}, authorId=${post.authorId}, imagesPublic=${post.imagesPublic}`,
+      );
       return await this.imageProcessingService.getBlurredImageBuffer(filename);
     } catch (error) {
-      console.error('Failed to get image buffer:', error);
-      // エラー時も処理済み画像を返す
+      console.error('🔒 [IMAGE BUFFER] ERROR:', error);
+      // エラー時も処理済み画像を返す（セキュリティ重要）
       return await this.imageProcessingService.getBlurredImageBuffer(filename);
     }
   }

@@ -10,7 +10,6 @@ import {
   Query,
   UseInterceptors,
   UploadedFiles,
-  Headers,
   UnauthorizedException,
   UseGuards,
   Req,
@@ -234,26 +233,29 @@ export class PostsController {
   ) {
     try {
       const currentUserId = req?.user?.id;
+      const userAgent = req?.headers['user-agent'] || '';
       console.log(
-        `🔒 [IMAGE ACCESS] User: ${currentUserId || 'UNAUTHENTICATED'}, File: ${filename}`,
+        `🔒 [IMAGE CONTROLLER] User: ${currentUserId || 'UNAUTHENTICATED'}, File: ${filename}, UA: ${userAgent}`,
       );
 
-      // 同じエンドポイントで動的に画像データを生成
-      const imageBuffer = await this.postsService.getImageBuffer(
+      // 🔒 SECURITY CRITICAL: 同じエンドポイントで動的に画像データを生成
+      const imageBuffer: Buffer = await this.postsService.getImageBuffer(
         filename,
         currentUserId,
       );
 
-      // キャッシュを無効化するヘッダーを設定
+      // キャッシュを無効化するヘッダーを設定（セキュリティ重要）
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
       res.setHeader('Content-Type', 'image/jpeg');
 
-      console.log(`🔒 [IMAGE SERVE] Serving dynamic image for: ${filename}`);
+      console.log(
+        `🔒 [IMAGE CONTROLLER] ✅ Serving dynamic image for: ${filename} (${imageBuffer.length} bytes)`,
+      );
       return res.send(imageBuffer);
-    } catch (error) {
-      console.error('Failed to serve image:', error);
+    } catch (error: unknown) {
+      console.error('🔒 [IMAGE CONTROLLER] ❌ Failed to serve image:', error);
       // セキュリティ上、エラー時は黒い画像を返す
       const blackImageSvg = `
         <svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
@@ -307,7 +309,7 @@ export class PostsController {
 
       console.log(`🖼️ [OGP] Generated image path: ${imagePath}`);
       return { imagePath };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Failed to generate OGP image for post ${id}:`, error);
       // フォールバック: トップページ画像を返す
       const fallbackPath = await this.ogImageService.generateTopPageOgImage();

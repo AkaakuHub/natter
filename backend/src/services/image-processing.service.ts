@@ -112,11 +112,19 @@ export class ImageProcessingService {
 
   /**
    * ブラー・モザイク処理済み画像のバッファを直接返す（キャッシュなし）
+   * 🔒 SECURITY CRITICAL: 他人からは絶対に元画像を見せない
    */
   async getBlurredImageBuffer(originalFilename: string): Promise<Buffer> {
     const originalPath = path.join(this.uploadsPath, originalFilename);
 
+    console.log(
+      `🔒 [IMAGE PROCESSING] Processing ${originalFilename} for privacy protection`,
+    );
+
     try {
+      // 元画像の存在チェック
+      await fs.access(originalPath);
+
       const image = sharp(originalPath);
       const metadata = await image.metadata();
 
@@ -124,9 +132,17 @@ export class ImageProcessingService {
         throw new Error('画像のメタデータを読み取れませんでした。');
       }
 
+      console.log(
+        `🔒 [IMAGE PROCESSING] Original size: ${metadata.width}x${metadata.height}`,
+      );
+
       // 毎回新しい処理を適用（キャッシュしない）
       const pixelatedWidth = Math.max(Math.floor(metadata.width / 32), 4);
       const pixelatedHeight = Math.max(Math.floor(metadata.height / 32), 4);
+
+      console.log(
+        `🔒 [IMAGE PROCESSING] Pixelating to: ${pixelatedWidth}x${pixelatedHeight}`,
+      );
 
       const processedImageBuffer = await image
         // 極小サイズに縮小
@@ -153,10 +169,13 @@ export class ImageProcessingService {
         .jpeg({ quality: 20 })
         .toBuffer();
 
+      console.log(
+        `🔒 [IMAGE PROCESSING] ✅ Processed image size: ${processedImageBuffer.length} bytes`,
+      );
       return processedImageBuffer;
     } catch (error) {
-      console.error('動的画像処理中にエラーが発生しました:', error);
-      // エラー時は黒い画像を返す
+      console.error('🔒 [IMAGE PROCESSING] ❌ Error during processing:', error);
+      // エラー時は黒い画像を返す（セキュリティ重要）
       const blackImageBuffer = await sharp({
         create: {
           width: 400,
@@ -168,6 +187,9 @@ export class ImageProcessingService {
         .jpeg({ quality: 50 })
         .toBuffer();
 
+      console.log(
+        `🔒 [IMAGE PROCESSING] ❌ Returning black image (${blackImageBuffer.length} bytes)`,
+      );
       return blackImageBuffer;
     }
   }

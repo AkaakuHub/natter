@@ -1,11 +1,11 @@
 import React from "react";
-import Image from "next/image";
 import { IconUser } from "@tabler/icons-react";
 import { getImageUrl } from "@/utils/postUtils";
 import { decodeHtmlEntities, breakLongWords } from "@/utils/htmlUtils";
 import { getCharacterColorStyle } from "@/utils/characterColorUtils";
 import { Character } from "@/api";
 import { useImagePreload } from "@/hooks/useImagePreload";
+import AuthenticatedImage from "@/components/common/AuthenticatedImage";
 
 interface PostContentProps {
   content: string;
@@ -109,12 +109,14 @@ const PostContent = ({
                 onClick={() => onImageClick(idx)}
                 className="relative overflow-hidden rounded-3xl focus:outline-none focus:ring-2 focus:ring-interactive/50 focus:ring-offset-2 shadow-soft hover:shadow-glow"
               >
-                <Image
+                <AuthenticatedImage
                   src={imageSrc}
                   alt={`Post image ${idx + 1}`}
                   width={512}
                   height={512}
                   className="w-full h-auto min-h-[250px] min-w-[250px] object-cover cursor-pointer rounded-3xl"
+                  loading="lazy"
+                  decoding="async"
                 />
               </button>
             );

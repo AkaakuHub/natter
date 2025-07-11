@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import AuthenticatedImage from "@/components/common/AuthenticatedImage";
 
 interface ImageDisplayProps {
   currentImage: string;
@@ -13,11 +13,9 @@ const ImageDisplay = ({ currentImage, currentIndex }: ImageDisplayProps) => {
   };
 
   return (
-    <Image
+    <AuthenticatedImage
       src={currentImage}
       alt={`画像 ${currentIndex + 1}`}
-      width={1200}
-      height={800}
       className="max-w-[90vw] max-h-[90vh] min-w-[400px] min-h-[300px] object-contain cursor-default"
       style={{
         maxWidth: "90vw",
@@ -27,9 +25,9 @@ const ImageDisplay = ({ currentImage, currentIndex }: ImageDisplayProps) => {
         width: "auto",
         height: "auto",
       }}
-      quality={100}
-      priority
       onClick={handleImageClick}
+      loading="eager"
+      decoding="async"
     />
   );
 };

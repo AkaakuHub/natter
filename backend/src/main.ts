@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { join } from 'path';
 import * as cors from 'cors';
 import { Request, Response, NextFunction } from 'express';
 
@@ -18,10 +17,10 @@ async function bootstrap() {
     }),
   );
 
-  // Static files for uploads
-  app.useStaticAssets(join(process.cwd(), 'uploads'), {
-    prefix: '/uploads/',
-  });
+  // Static files for uploads - DISABLED for security (use dynamic endpoints instead)
+  // app.useStaticAssets(join(process.cwd(), 'uploads'), {
+  //   prefix: '/uploads/',
+  // });
 
   // CORS configuration
   const frontendUrls =

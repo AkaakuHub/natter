@@ -14,5 +14,5 @@ export const getImageUrl = (image: string): string => {
   const isFullUrl = image.startsWith("http://") || image.startsWith("https://");
   return isFullUrl
     ? image
-    : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
+    : `${process.env.NEXT_PUBLIC_API_URL}/posts/images/${image}`;
 };

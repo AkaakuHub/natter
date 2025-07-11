@@ -1,11 +1,11 @@
 import React from "react";
-import Image from "next/image";
 import { IconUser } from "@tabler/icons-react";
 import { getImageUrl } from "@/utils/postUtils";
 import { decodeHtmlEntities, breakLongWords } from "@/utils/htmlUtils";
 import { getCharacterColorStyle } from "@/utils/characterColorUtils";
 import { Character } from "@/api";
 import { useImagePreload } from "@/hooks/useImagePreload";
+import AuthenticatedImage from "@/components/common/AuthenticatedImage";
 
 interface PostContentProps {
   content: string;
@@ -167,7 +167,7 @@ const PostContent = ({
                       : ""
                 }`}
               >
-                <Image
+                <AuthenticatedImage
                   src={imageSrc}
                   alt="Post Image"
                   className={`rounded-2xl ${
@@ -179,6 +179,8 @@ const PostContent = ({
                   }`}
                   width={200}
                   height={200}
+                  loading="lazy"
+                  decoding="async"
                 />
               </button>
             );
