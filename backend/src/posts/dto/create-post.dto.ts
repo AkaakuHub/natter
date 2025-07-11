@@ -4,6 +4,7 @@ import {
   MaxLength,
   IsArray,
   IsInt,
+  IsBoolean,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 
@@ -24,6 +25,7 @@ export class CreatePostDto {
 
   @IsOptional()
   @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
   imagesPublic?: boolean;
 
   @IsOptional()
