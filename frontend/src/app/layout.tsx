@@ -28,6 +28,9 @@ export default async function RootLayout({
 }) {
   await auth();
 
+  const NEXT_PUBLIC_BASE_URL =
+    process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
   return (
     <html lang="ja">
       <head>
@@ -38,17 +41,17 @@ export default async function RootLayout({
         <meta property="og:title" content="Natter" />
         <meta property="og:description" content="A simple post app" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://natter.akaaku.net" />
+        <meta property="og:url" content={NEXT_PUBLIC_BASE_URL} />
         <meta
           property="og:image"
-          content="https://natter.akaaku.net/og-image.png"
+          content={`${NEXT_PUBLIC_BASE_URL}/og-image.png`}
         />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Natter" />
         <meta name="twitter:description" content="A simple post app" />
         <meta
           name="twitter:image"
-          content="https://natter.akaaku.net/og-image.png"
+          content={`${NEXT_PUBLIC_BASE_URL}/og-image.png`}
         />
         <meta
           httpEquiv="Cache-Control"
