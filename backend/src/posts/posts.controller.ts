@@ -14,6 +14,7 @@ import {
   UseGuards,
   Req,
   Res,
+  NotFoundException,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -146,12 +147,26 @@ export class PostsController {
 
   @Get(':id')
   @UseGuards(OptionalJwtAuthGuard)
-  findOne(
+  async findOne(
     @Param('id', ParseIntPipe) id: number,
     @Req() req?: Request & { user?: { id: string } },
   ) {
     const currentUserId = req?.user?.id;
-    return this.postsService.findOne(id, currentUserId);
+    console.log(
+      `🔍 [POST DETAIL] Fetching post ${id} for user: ${currentUserId || 'UNAUTHENTICATED'}`,
+    );
+
+    const post = await this.postsService.findOne(id, currentUserId);
+
+    if (!post) {
+      console.log(`🔍 [POST DETAIL] Post ${id} not found`);
+      throw new NotFoundException('Post not found');
+    }
+
+    console.log(
+      `🔍 [POST DETAIL] ✅ Post ${id} found: "${post.content?.substring(0, 50)}..."`,
+    );
+    return post;
   }
 
   @Patch(':id')

@@ -4,108 +4,80 @@ import { auth } from "@/auth";
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // ULTRADEEPTHINK: 最もシンプルなログから開始
-  console.log(`💀 [MIDDLEWARE RUNNING] ${pathname}`);
+  // SLEEPANDMAXDEPTHTHINK: 最も単純な解決策
+  console.log(`💀 [MIDDLEWARE] Processing: ${pathname}`);
 
-  // 認証が不要なパブリックルート
-  const publicRoutes = ["/login"];
-
-  // OGP生成とボットアクセスのため、ポスト詳細は認証なしでもアクセス可能
+  // ステップ1: SPAルートの判定とリライト処理を最初に実行
+  const spaRoutes = ["/login", "/search", "/notification", "/set-list"];
   const isPostDetail = pathname.match(/^\/post\/\d+$/);
-  const userAgent = req.headers.get("user-agent") || "";
-  const isBot =
-    userAgent.includes("bot") ||
-    userAgent.includes("Bot") ||
-    userAgent.includes("crawler") ||
-    userAgent.includes("spider") ||
-    userAgent.includes("facebookexternalhit") ||
-    userAgent.includes("Twitterbot") ||
-    userAgent.includes("LinkedInBot") ||
-    userAgent.includes("Discordbot");
+  const isProfile = pathname === "/profile" || pathname.match(/^\/profile\/\d+/);
+  const needsRewrite = spaRoutes.includes(pathname) || isPostDetail || isProfile;
 
-  if (isPostDetail) {
-    if (isBot) {
-      console.log(
-        `💀 [OGP BOT ACCESS] Allowing ${pathname} for bot: ${userAgent}`,
-      );
-      // ボットの場合は認証チェックをスキップ
+  // SPAルートの場合は即座にリライト（認証チェックなし）
+  if (needsRewrite) {
+    console.log(`💀 [SPA REWRITE] ${pathname} -> /?spa-path=${pathname}`);
+    
+    const url = req.nextUrl.clone();
+    url.pathname = "/";
+    url.searchParams.set("spa-path", pathname);
+    
+    return NextResponse.rewrite(url);
+  }
+
+  // ステップ2: 非SPAルートの認証チェック
+  // "/" へのリクエストは認証チェック（SPAページがロードされる）
+  if (pathname === "/") {
+    const spaPath = req.nextUrl.searchParams.get("spa-path");
+    
+    if (spaPath) {
+      console.log(`💀 [SPA PAGE] Loading: ${spaPath}`);
+      
+      // 公開ページの判定
+      const publicRoutes = ["/login"];
+      const isSpaPostDetail = spaPath.match(/^\/post\/\d+$/);
+      const isSpaProfile = spaPath === "/profile" || spaPath.match(/^\/profile\/\d+/);
+      const isPublicSpaPage = publicRoutes.includes(spaPath) || isSpaPostDetail || isSpaProfile;
+      
+      if (!isPublicSpaPage) {
+        // 認証が必要なSPAページ
+        try {
+          const session = await auth();
+          
+          if (!session) {
+            console.log(`💀 [AUTH REQUIRED] ${spaPath} -> /login`);
+            return NextResponse.redirect(new URL("/login", req.url));
+          }
+          
+          console.log(`💀 [AUTH OK] ${spaPath} - User: ${session.user?.name}`);
+        } catch (error) {
+          console.error(`💀 [AUTH ERROR] ${spaPath}:`, error);
+          return NextResponse.redirect(new URL("/login", req.url));
+        }
+      } else {
+        console.log(`💀 [PUBLIC SPA PAGE] ${spaPath} - No auth required`);
+      }
     } else {
-      console.log(
-        `💀 [POST DETAIL] Allowing ${pathname} for unauthenticated users (OGP support)`,
-      );
-      // 一般ユーザーもポスト詳細はログインなしで閲覧可能
-    }
-  } else if (!publicRoutes.includes(pathname)) {
-    // その他のページは認証が必要
-    try {
-      const session = await auth();
-
-      if (!session) {
-        console.log(`💀 [AUTH REQUIRED] Redirecting ${pathname} to /login`);
+      // 通常のトップページ（認証が必要）
+      try {
+        const session = await auth();
+        
+        if (!session) {
+          console.log(`💀 [AUTH REQUIRED] / -> /login`);
+          return NextResponse.redirect(new URL("/login", req.url));
+        }
+        
+        console.log(`💀 [AUTH OK] / - User: ${session.user?.name}`);
+      } catch (error) {
+        console.error(`💀 [AUTH ERROR] /:`, error);
         return NextResponse.redirect(new URL("/login", req.url));
       }
-
-      console.log(`💀 [AUTH OK] User authenticated for ${pathname}`);
-    } catch (error) {
-      console.error(`💀 [AUTH ERROR] ${error}`);
-      return NextResponse.redirect(new URL("/login", req.url));
     }
   }
 
-  // SPAルートの一覧（静的ルート）
-  const spaRoutes = ["/login", "/search", "/notification", "/set-list"];
-
-  // 静的SPAルートをキャッチ
-  if (spaRoutes.includes(pathname)) {
-    console.log(`💀 [SPA ROUTE DETECTED] ${pathname}`);
-
-    // SPAページにリライト
-    const url = req.nextUrl.clone();
-    url.pathname = "/";
-    url.searchParams.set("spa-path", pathname);
-
-    console.log(
-      `💀 [REWRITING SPA] ${pathname} -> / with spa-path=${pathname}`,
-    );
-    return NextResponse.rewrite(url);
-  }
-
-  // /post/:id の動的ルートをキャッチ
-  if (pathname.match(/^\/post\/\d+$/)) {
-    console.log(`💀 [POST ROUTE DETECTED] ${pathname}`);
-
-    // SPAページにリライト
-    const url = req.nextUrl.clone();
-    url.pathname = "/";
-    url.searchParams.set("spa-path", pathname);
-
-    console.log(`💀 [REWRITING] ${pathname} -> / with spa-path=${pathname}`);
-    return NextResponse.rewrite(url);
-  }
-
-  // /profile/* の動的ルートをキャッチ
-  if (
-    pathname === "/profile" ||
-    pathname.match(/^\/profile\/\d+/) ||
-    pathname === "/profile/followers" ||
-    pathname === "/profile/following" ||
-    pathname.match(/^\/profile\/\d+\/followers$/) ||
-    pathname.match(/^\/profile\/\d+\/following$/)
-  ) {
-    console.log(`💀 [PROFILE ROUTE DETECTED] ${pathname}`);
-
-    // SPAページにリライト
-    const url = req.nextUrl.clone();
-    url.pathname = "/";
-    url.searchParams.set("spa-path", pathname);
-
-    console.log(`💀 [REWRITING] ${pathname} -> / with spa-path=${pathname}`);
-    return NextResponse.rewrite(url);
-  }
-
-  console.log(`💀 [PASSING THROUGH] ${pathname}`);
+  console.log(`💀 [PASS THROUGH] ${pathname}`);
   return NextResponse.next();
 }
+
 
 export const config = {
   matcher: [

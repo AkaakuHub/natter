@@ -100,6 +100,15 @@ export const useNavigation = () => {
     }
   }, [nextRouter, spaRouter]);
 
+  const navigateToLogin = useCallback(() => {
+    if (spaRouter?.navigate) {
+      console.log("🔥 [SPA Navigation] Going to login");
+      spaRouter.navigate("/login");
+    } else {
+      nextRouter.push("/login");
+    }
+  }, [nextRouter, spaRouter]);
+
   const getCurrentPath = useCallback(() => {
     return pathname.slice(1) || "";
   }, [pathname]);
@@ -112,6 +121,7 @@ export const useNavigation = () => {
     navigateToFollowers,
     navigateToNotification,
     navigateToSearch,
+    navigateToLogin,
     goBack,
     getCurrentPath,
     currentPath: pathname,

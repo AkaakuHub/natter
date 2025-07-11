@@ -5,7 +5,7 @@ import {
   IconShare,
   IconLogin,
 } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
+import { useNavigation } from "@/hooks/useNavigation";
 
 interface PostActionsProps {
   isLiked: boolean;
@@ -28,10 +28,10 @@ const PostActions = ({
   onShare,
   canInteract,
 }: PostActionsProps) => {
-  const router = useRouter();
+  const navigation = useNavigation();
 
   const handleLoginClick = () => {
-    router.push("/login");
+    navigation.navigateToLogin();
   };
 
   if (!canInteract) {

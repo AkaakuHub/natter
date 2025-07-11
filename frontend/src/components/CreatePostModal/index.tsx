@@ -6,6 +6,7 @@ import { User, Character } from "@/api";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { usePostSubmit } from "@/hooks/usePostSubmit";
 import { useFormValidation } from "@/hooks/useFormValidation";
+import { useNavigation } from "@/hooks/useNavigation";
 
 import UserAvatar from "../CreatePost/components/UserAvatar";
 import PostTextArea from "../CreatePost/components/PostTextArea";
@@ -34,6 +35,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     null,
   );
   const characterLimit = 280;
+  const navigation = useNavigation();
 
   const {
     images,
@@ -107,12 +109,12 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
             >
               閉じる
             </button>
-            <a
-              href="/login"
+            <button
+              onClick={() => navigation.navigateToLogin()}
               className="px-4 py-2 bg-interactive text-text-inverse rounded-lg hover:bg-interactive-hover"
             >
               ログイン
-            </a>
+            </button>
           </div>
         </div>
       </div>

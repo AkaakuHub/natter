@@ -16,6 +16,7 @@ import { ConfigService } from '@nestjs/config';
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import * as jwt from 'jsonwebtoken';
 import { Request } from 'express';
 
@@ -78,8 +79,18 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  @UseGuards(OptionalJwtAuthGuard)
+  async findOne(@Param('id') id: string) {
+    console.log(`🔍 [USER DETAIL] Fetching user ${id}`);
+    const user = await this.usersService.findOne(id);
+
+    if (!user) {
+      console.log(`🔍 [USER DETAIL] User ${id} not found`);
+      throw new NotFoundException('User not found');
+    }
+
+    console.log(`🔍 [USER DETAIL] ✅ User ${id} found: "${user.name}"`);
+    return user;
   }
 
   @Get('twitter/:twitterId')

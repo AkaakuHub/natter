@@ -57,7 +57,7 @@ const routes: RouteDefinition[] = [
     meta: {
       description: "View post on Natter",
     },
-    authRequired: true,
+    authRequired: false, // MAXDEPTHGODULTRADEEPTHINK: OGPとログインなしアクセスのため
   },
   {
     pattern: "/profile",
@@ -66,7 +66,7 @@ const routes: RouteDefinition[] = [
     meta: {
       description: "Your profile on Natter",
     },
-    authRequired: true,
+    authRequired: false, // MAXDEPTHGODULTRADEEPTHINK: OGPとログインなしアクセスのため
   },
   // 🔥 静的ルートを動的ルートより先に配置！
   {
@@ -76,7 +76,7 @@ const routes: RouteDefinition[] = [
     meta: {
       description: "People you follow on Natter",
     },
-    authRequired: true,
+    authRequired: false, // MAXDEPTHGODULTRADEEPTHINK: OGPとログインなしアクセスのため
   },
   {
     pattern: "/profile/followers",
@@ -85,7 +85,7 @@ const routes: RouteDefinition[] = [
     meta: {
       description: "Your followers on Natter",
     },
-    authRequired: true,
+    authRequired: false, // MAXDEPTHGODULTRADEEPTHINK: OGPとログインなしアクセスのため
   },
   // 🔥 動的ルートは静的ルートの後に配置
   {
@@ -95,7 +95,7 @@ const routes: RouteDefinition[] = [
     meta: {
       description: "User profile on Natter",
     },
-    authRequired: true,
+    authRequired: false, // MAXDEPTHGODULTRADEEPTHINK: OGPとログインなしアクセスのため
   },
   {
     pattern: "/profile/:id/following",

@@ -124,16 +124,27 @@ export class RouteEngine extends EventEmitter {
   private parseCurrentURL(): ParsedRoute {
     const url = new URL(window.location.href);
 
+    // MAXDEPTHGODULTRADEEPTHINK: SPA パスを考慮
+    const spaPath = url.searchParams.get("spa-path");
+    const actualPath = spaPath || url.pathname;
+
+    console.log(
+      `🔍 [ROUTE ENGINE] URL: ${url.pathname} | SPA Path: ${spaPath} | Actual Path: ${actualPath}`,
+    );
+
     const route: ParsedRoute = {
-      path: url.pathname,
+      path: actualPath,
       params: {},
       query: url.searchParams,
       hash: url.hash,
     };
 
-    const match = this.matchRoute(url.pathname);
+    const match = this.matchRoute(actualPath);
     if (match) {
       route.params = match.params;
+      console.log(`🔍 [ROUTE ENGINE] Matched route params:`, match.params);
+    } else {
+      console.log(`🔍 [ROUTE ENGINE] No route match found for: ${actualPath}`);
     }
 
     this.currentRoute = route;
