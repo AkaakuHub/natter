@@ -7,7 +7,9 @@
     "dev:backend": "cd backend && pnpm run start:dev",
     "dev": "concurrently --kill-others-on-fail --prefix-colors \"blue,green\" --prefix \"[{name}]\" --names \"frontend,backend\" \"pnpm run dev:frontend\" \"pnpm run dev:backend\"",
     "dev:clean": "pkill -f 'next\\|nest' || true && pnpm run dev",
-    "stop": "pkill -f 'next\\|nest' || true"
+    "stop": "pkill -f 'next\\|nest' || true",
+    "start:prod": "cd backend && pnpm run build && pnpm run start:prod",
+    "backup": "cd backend && cp prisma/dev.db backups/dev-$(date +%Y-%m-%dT%H-%M-%S).db && echo \"✅ Database backup created: backups/dev-$(date +%Y-%m-%dT%H-%M-%S).db\""
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
