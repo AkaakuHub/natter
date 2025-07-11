@@ -119,9 +119,9 @@ export class ImageProcessingService {
         `🔒 [IMAGE PROCESSING] Original size: ${metadata.width}x${metadata.height}`,
       );
 
-      // 手動でピクセルモザイク処理 - 8x8ブロック分割（計64ブロック）
-      const blocksPerRow = 8;
-      const blocksPerCol = 8;
+      // 手動でピクセルモザイク処理 - 4x4ブロック分割（計16ブロック）
+      const blocksPerRow = 4;
+      const blocksPerCol = 4;
       const blockWidth = Math.floor(metadata.width / blocksPerRow);
       const blockHeight = Math.floor(metadata.height / blocksPerCol);
 
@@ -136,7 +136,7 @@ export class ImageProcessingService {
       // 新しい画像データを作成
       const newData = Buffer.alloc(data.length);
 
-      // 8x8ブロック（計64ブロック）ごとに平均色を計算してモザイク処理
+      // 4x4ブロック（計16ブロック）ごとに平均色を計算してモザイク処理
       for (let blockY = 0; blockY < blocksPerCol; blockY++) {
         for (let blockX = 0; blockX < blocksPerRow; blockX++) {
           // 現在のブロックの位置を計算
