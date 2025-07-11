@@ -99,11 +99,6 @@ export class ImageProcessingService {
    */
   async getBlurredImageBuffer(originalFilename: string): Promise<Buffer> {
     const originalPath = path.join(this.uploadsPath, originalFilename);
-
-    console.log(
-      `🔒 [IMAGE PROCESSING] *** MANUAL PIXEL MOSAIC for ${originalFilename} ***`,
-    );
-
     try {
       // 元画像の存在チェック
       await fs.access(originalPath);
@@ -115,10 +110,6 @@ export class ImageProcessingService {
         throw new Error('画像のメタデータを読み取れませんでした。');
       }
 
-      console.log(
-        `🔒 [IMAGE PROCESSING] Original size: ${metadata.width}x${metadata.height}`,
-      );
-
       // 手動でピクセルモザイク処理 - 4x4ブロック分割（計16ブロック）
       const blocksPerRow = 4;
       const blocksPerCol = 4;
@@ -128,10 +119,6 @@ export class ImageProcessingService {
       const { data, info } = await image
         .raw()
         .toBuffer({ resolveWithObject: true });
-
-      console.log(
-        `🔒 [IMAGE PROCESSING] Processing ${info.width}x${info.height} into ${blocksPerRow}x${blocksPerCol} blocks (${blockWidth}x${blockHeight}px each)`,
-      );
 
       // 新しい画像データを作成
       const newData = Buffer.alloc(data.length);
@@ -189,9 +176,6 @@ export class ImageProcessingService {
         .jpeg({ quality: 80 })
         .toBuffer();
 
-      console.log(
-        `🔒 [IMAGE PROCESSING] ✅ MANUAL MOSAIC created: ${mosaicImageBuffer.length} bytes`,
-      );
       return mosaicImageBuffer;
     } catch (error) {
       console.error(
@@ -245,7 +229,6 @@ export class ImageProcessingService {
       await Promise.all(
         files.map((file) => fs.unlink(path.join(this.processedPath, file))),
       );
-      console.log('Processed images directory cleared');
     } catch (error) {
       console.error('Failed to clear processed images:', error);
     }

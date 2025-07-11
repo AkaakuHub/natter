@@ -81,7 +81,6 @@ export class PostsController {
     @UploadedFiles() files: Express.Multer.File[],
     @Req() req: Request & { user?: { id: string } },
   ) {
-    console.log('POST /posts - Raw createPostDto:', createPostDto);
     const authorId = this.extractUserIdFromRequest(req);
     const imagePaths = files ? files.map((file) => file.filename) : [];
     const replyToId = createPostDto.replyToId
@@ -90,12 +89,6 @@ export class PostsController {
     const characterId = createPostDto.characterId
       ? parseInt(createPostDto.characterId.toString())
       : undefined;
-    console.log(
-      'POST /posts - Parsed characterId:',
-      characterId,
-      'from',
-      createPostDto.characterId,
-    );
     return this.postsService.create({
       ...createPostDto,
       authorId,
@@ -152,10 +145,6 @@ export class PostsController {
     @Req() req?: Request & { user?: { id: string } },
   ) {
     const currentUserId = req?.user?.id;
-    console.log(
-      `🔍 [POST DETAIL] Fetching post ${id} for user: ${currentUserId || 'UNAUTHENTICATED'}`,
-    );
-
     const post = await this.postsService.findOne(id, currentUserId);
 
     if (!post) {
@@ -163,9 +152,6 @@ export class PostsController {
       throw new NotFoundException('Post not found');
     }
 
-    console.log(
-      `🔍 [POST DETAIL] ✅ Post ${id} found: "${post.content?.substring(0, 50)}..."`,
-    );
     return post;
   }
 
@@ -248,10 +234,10 @@ export class PostsController {
   ) {
     try {
       const currentUserId = req?.user?.id;
-      const userAgent = req?.headers['user-agent'] || '';
-      console.log(
-        `🔒 [IMAGE CONTROLLER] User: ${currentUserId || 'UNAUTHENTICATED'}, File: ${filename}, UA: ${userAgent}`,
-      );
+      // const userAgent = req?.headers['user-agent'] || '';
+      // console.log(
+      //   `🔒 [IMAGE CONTROLLER] User: ${currentUserId || 'UNAUTHENTICATED'}, File: ${filename}, UA: ${userAgent}`,
+      // );
 
       // 🔒 SECURITY CRITICAL: 同じエンドポイントで動的に画像データを生成
       const imageBuffer: Buffer = await this.postsService.getImageBuffer(
@@ -264,10 +250,6 @@ export class PostsController {
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
       res.setHeader('Content-Type', 'image/jpeg');
-
-      console.log(
-        `🔒 [IMAGE CONTROLLER] ✅ Serving dynamic image for: ${filename} (${imageBuffer.length} bytes)`,
-      );
       return res.send(imageBuffer);
     } catch (error: unknown) {
       console.error('🔒 [IMAGE CONTROLLER] ❌ Failed to serve image:', error);

@@ -28,7 +28,6 @@ export class PostsService {
   }
 
   async create(createPostDto: CreatePostDto) {
-    console.log('Creating post with data:', createPostDto);
     const {
       images,
       authorId,
@@ -38,13 +37,6 @@ export class PostsService {
       imagesPublic,
       ...postData
     } = createPostDto;
-    console.log(
-      'Extracted characterId:',
-      characterId,
-      'type:',
-      typeof characterId,
-    );
-
     // コンテンツをサニタイズ
     const sanitizedPostData = {
       ...postData,
@@ -129,10 +121,6 @@ export class PostsService {
 
     // キャラクターの使用回数を更新
     if (characterId) {
-      console.log(
-        'Updating character posts count for characterId:',
-        characterId,
-      );
       await this.prisma.character.update({
         where: { id: characterId },
         data: {
@@ -141,7 +129,6 @@ export class PostsService {
           },
         },
       });
-      console.log('Character posts count updated successfully');
     } else {
       console.log('No characterId provided, skipping posts count update');
     }
@@ -553,10 +540,6 @@ export class PostsService {
   }
 
   async removeWithOwnerCheck(id: number, userId: string) {
-    console.log(
-      `[DELETE POST] Starting deletion for post ${id} by user ${userId}`,
-    );
-
     // 投稿の存在確認と所有者チェック
     const post = await this.prisma.post.findUnique({
       where: { id },
@@ -571,10 +554,6 @@ export class PostsService {
       throw new ForbiddenException('You can only delete your own posts');
     }
 
-    console.log(
-      `[DELETE POST] Post found with characterId: ${post.characterId}`,
-    );
-
     // トランザクションで削除処理とキャラクター使用回数の減算を実行
     return this.prisma.$transaction(async (tx) => {
       // 論理削除：削除時刻を設定し、内容を空にする
@@ -588,41 +567,23 @@ export class PostsService {
         },
       });
 
-      console.log(`[DELETE POST] Post ${id} marked as deleted`);
-
       // キャラクターの使用回数を安全に減らす
       if (post.characterId) {
-        console.log(
-          `[DELETE POST] Processing character ${post.characterId} count reduction`,
-        );
-
         // 現在の使用回数を確認してから減算
         const character = await tx.character.findUnique({
           where: { id: post.characterId },
           select: { postsCount: true },
         });
 
-        console.log(
-          `[DELETE POST] Current character postsCount: ${character?.postsCount}`,
-        );
-
         if (character && character.postsCount > 0) {
           const newCount = character.postsCount - 1;
-          console.log(`[DELETE POST] New count will be: ${newCount}`);
-
           if (newCount === 0) {
             // 使用回数が0になる場合、キャラクターを削除
-            console.log(
-              `[DELETE POST] Deleting character ${post.characterId} as count reaches 0`,
-            );
             await tx.character.delete({
               where: { id: post.characterId },
             });
           } else {
             // 使用回数を1減らす
-            console.log(
-              `[DELETE POST] Updating character ${post.characterId} count to ${newCount}`,
-            );
             await tx.character.update({
               where: { id: post.characterId },
               data: {
@@ -913,10 +874,6 @@ export class PostsService {
     filename: string,
     currentUserId?: string,
   ): Promise<Buffer> {
-    console.log(
-      `🔒 [IMAGE BUFFER] Processing ${filename} for user: ${currentUserId || 'UNAUTHENTICATED'}`,
-    );
-
     try {
       // ファイル名から画像を含む投稿を検索
       const post = await this.prisma.post.findFirst({
@@ -938,25 +895,14 @@ export class PostsService {
           filename,
         );
       }
-
-      console.log(
-        `🔒 [IMAGE BUFFER] Found post ${post.id} by ${post.authorId}, imagesPublic: ${post.imagesPublic}`,
-      );
-
       // 🔒 SECURITY RULE 1: 自分の投稿で認証済みの場合のみ元画像
       if (currentUserId && currentUserId === post.authorId) {
-        console.log(
-          `🔒 [IMAGE BUFFER] ✅ OWNER ACCESS - returning original image for ${filename}`,
-        );
         const originalPath = path.join(process.cwd(), 'uploads', filename);
         return await fs.readFile(originalPath);
       }
 
       // 🔒 SECURITY RULE 2: 画像が公開設定で認証済みの場合のみ元画像
       if (post.imagesPublic && currentUserId) {
-        console.log(
-          `🔒 [IMAGE BUFFER] ✅ PUBLIC ACCESS - returning original image for ${filename}`,
-        );
         const originalPath = path.join(process.cwd(), 'uploads', filename);
         return await fs.readFile(originalPath);
       }

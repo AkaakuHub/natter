@@ -54,7 +54,6 @@ export class UsersController {
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    console.log('🔍 Received user creation request:', createUserDto);
     return this.usersService.findOrCreateByTwitterId(
       createUserDto.twitterId,
       createUserDto.name,
@@ -81,7 +80,6 @@ export class UsersController {
   @Get(':id')
   @UseGuards(OptionalJwtAuthGuard)
   async findOne(@Param('id') id: string) {
-    console.log(`🔍 [USER DETAIL] Fetching user ${id}`);
     const user = await this.usersService.findOne(id);
 
     if (!user) {
@@ -89,7 +87,6 @@ export class UsersController {
       throw new NotFoundException('User not found');
     }
 
-    console.log(`🔍 [USER DETAIL] ✅ User ${id} found: "${user.name}"`);
     return user;
   }
 

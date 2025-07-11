@@ -44,12 +44,6 @@ export class UsersService {
     name: string,
     image?: string,
   ) {
-    // console.log('🔍 findOrCreateByTwitterId called with:', {
-    //   twitterId,
-    //   name,
-    //   image,
-    // });
-
     // 名前の検証: フォールバック名の場合は警告
     if (name.startsWith('User_')) {
       console.warn('⚠️  Warning: Using fallback name pattern:', name);
@@ -58,19 +52,14 @@ export class UsersService {
     let user = await this.findByTwitterId(twitterId);
 
     if (!user) {
-      // console.log('🔍 User not found, creating new user with name:', name);
       user = await this.create({
         twitterId,
         name,
         image,
       });
-      // console.log('🔍 Created user:', user);
     } else {
-      console.log('🔍 Found existing user:', user);
-
       // 既存ユーザーの名前がフォールバック名で、新しい名前が実際の名前の場合、更新
       if (user.name.startsWith('User_') && !name.startsWith('User_')) {
-        // console.log('🔍 Updating user name from fallback to actual name');
         user = await this.prisma.user.update({
           where: { twitterId },
           data: {
@@ -78,7 +67,6 @@ export class UsersService {
             image: image || user.image,
           },
         });
-        // console.log('🔍 Updated user:', user);
       }
     }
 
@@ -95,7 +83,6 @@ export class UsersService {
         where: { id },
         data: updateData,
       });
-      console.log('🔍 Updated user:', updatedUser);
       return updatedUser;
     } catch (error) {
       console.error('❌ Error updating user:', error);

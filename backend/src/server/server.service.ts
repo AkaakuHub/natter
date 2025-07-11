@@ -17,10 +17,6 @@ export class ServerService {
     const passkey = this.configService.get<string>('PASSKEY');
     const now = new Date();
 
-    console.log(
-      `${now.toLocaleString()}: ${key}, status=${key === passkey ? 'OK' : 'NG'}`,
-    );
-
     if (key && key === passkey) {
       let userInfo: {
         id: string;

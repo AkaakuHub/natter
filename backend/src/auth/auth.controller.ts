@@ -43,24 +43,9 @@ export class AuthController {
       timestamp: new Date().toISOString(),
     };
 
-    console.log('🔍 Payload before JWT signing:', payload);
-
     const token = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('JWT_SECRET'),
     });
-
-    console.log('✅ JWT token generated for user:', userInfo.id);
-    console.log(
-      '🔍 Generated token (first 100 chars):',
-      token.substring(0, 100) + '...',
-    );
-
-    // トークンの構造を確認
-    const parts = token.split('.');
-    console.log('🔍 JWT parts count:', parts.length);
-    console.log('🔍 Header part length:', parts[0]?.length);
-    console.log('🔍 Payload part length:', parts[1]?.length);
-    console.log('🔍 Signature part length:', parts[2]?.length);
 
     return {
       status: 'OK',
