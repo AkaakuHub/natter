@@ -1,6 +1,8 @@
 import React from "react";
 import Image from "next/image";
 import { IconArrowLeft } from "@tabler/icons-react";
+import { getImageUrl } from "@/utils/postUtils";
+import AuthenticatedImage from "@/components/common/AuthenticatedImage";
 
 interface PostImage {
   id: number;
@@ -50,15 +52,10 @@ const ReplySourcePost = ({
 
   // 画像データを統一形式に変換
   const normalizedImages: PostImage[] = normalizedImageArray.map(
-    (image, index) => {
-      const imageUrl = image.startsWith("http")
-        ? image
-        : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
-      return {
-        id: index,
-        url: imageUrl,
-      };
-    },
+    (image, index) => ({
+      id: index,
+      url: getImageUrl(image),
+    }),
   );
 
   const isClickable = !!onPostClick;
@@ -77,15 +74,12 @@ const ReplySourcePost = ({
             key={`${image.id}-${idx}`}
             className="relative overflow-hidden rounded-lg"
           >
-            <Image
+            <AuthenticatedImage
               src={image.url}
               alt="投稿画像"
               width={60}
               height={60}
               className="w-16 h-16 min-w-[64px] min-h-[64px] object-cover"
-              onError={(e) => {
-                console.error("Image load error:", image.url, e);
-              }}
             />
           </div>
         ))}

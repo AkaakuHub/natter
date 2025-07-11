@@ -10,6 +10,7 @@ import { usePostActions } from "@/hooks/usePostActions";
 import { useImageModal } from "@/hooks/useImageModal";
 import { useToast } from "@/hooks/useToast";
 import { usePostShare } from "@/hooks/usePostShare";
+import { getImageUrl } from "@/utils/postUtils";
 
 import BackButton from "./components/BackButton";
 import LoadingState from "./components/LoadingState";
@@ -224,13 +225,7 @@ const DetailedPostComponent = ({
       {isModalOpen && post?.images && post.images.length > 0 && (
         <ImageModal
           isOpen={isModalOpen}
-          images={post.images.map((image) => {
-            const isFullUrl =
-              image.startsWith("http://") || image.startsWith("https://");
-            return isFullUrl
-              ? image
-              : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${image}`;
-          })}
+          images={post.images.map((image) => getImageUrl(image))}
           currentIndex={selectedImageIndex}
           onClose={closeImageModal}
           onPrevious={selectedImageIndex > 0 ? handlePreviousImage : undefined}
