@@ -48,39 +48,22 @@ export class ImageProcessingService {
         throw new Error('画像のメタデータを読み取れませんでした。');
       }
 
-      // --- 修正箇所 ---
+      // 8x8ピクセルブロックのピクセルアート処理
+      const blockSize = 8;
+      const newWidth = Math.ceil(metadata.width / blockSize);
+      const newHeight = Math.ceil(metadata.height / blockSize);
 
-      // 1. 極端に小さなサイズに縮小（強力なモザイク効果）
-      const pixelatedWidth = Math.max(Math.floor(metadata.width / 32), 4);
-      const pixelatedHeight = Math.max(Math.floor(metadata.height / 32), 4);
-
-      // 2. 多段階の劣化処理で元画像を完全に認識不能にする
       const finalImageBuffer = await image
-        // 第1段階: 極小サイズに縮小
-        .resize(pixelatedWidth, pixelatedHeight, {
+        // Step 1: 8x8ブロックに縮小
+        .resize(newWidth, newHeight, {
           kernel: 'nearest',
         })
-        // 第2段階: 元サイズに拡大（大きなブロック生成）
+        // Step 2: 元サイズに拡大してピクセルアート化
         .resize(metadata.width, metadata.height, {
           kernel: 'nearest',
         })
-        // 第3段階: 色相・彩度・明度を大幅に変更
-        .modulate({
-          brightness: 0.3, // 暗く
-          saturation: 0.2, // 彩度を大幅に下げる
-          hue: 90, // 色相を90度変更
-        })
-        // 第4段階: 強力なブラー
-        .blur(15)
-        // 第5段階: 色味を完全に変更
-        .tint({ r: 150, g: 100, b: 200 })
-        // 第6段階: さらにブラー
-        .blur(8)
-        // 第7段階: 最低品質で保存
-        .jpeg({ quality: 20 })
+        .jpeg({ quality: 50 })
         .toBuffer();
-
-      // --- 修正ここまで ---
 
       await fs.writeFile(processedPath, finalImageBuffer);
 
@@ -118,7 +101,7 @@ export class ImageProcessingService {
     const originalPath = path.join(this.uploadsPath, originalFilename);
 
     console.log(
-      `🔒 [IMAGE PROCESSING] Processing ${originalFilename} for privacy protection`,
+      `🔒 [IMAGE PROCESSING] *** MANUAL PIXEL MOSAIC for ${originalFilename} ***`,
     );
 
     try {
@@ -136,46 +119,82 @@ export class ImageProcessingService {
         `🔒 [IMAGE PROCESSING] Original size: ${metadata.width}x${metadata.height}`,
       );
 
-      // 毎回新しい処理を適用（キャッシュしない）
-      const pixelatedWidth = Math.max(Math.floor(metadata.width / 32), 4);
-      const pixelatedHeight = Math.max(Math.floor(metadata.height / 32), 4);
+      // 手動でピクセルモザイク処理
+      const blockSize = 16; // 16x16ピクセルブロック
+      const { data, info } = await image
+        .raw()
+        .toBuffer({ resolveWithObject: true });
 
       console.log(
-        `🔒 [IMAGE PROCESSING] Pixelating to: ${pixelatedWidth}x${pixelatedHeight}`,
+        `🔒 [IMAGE PROCESSING] Processing ${info.width}x${info.height} with ${blockSize}px blocks`,
       );
 
-      const processedImageBuffer = await image
-        // 極小サイズに縮小
-        .resize(pixelatedWidth, pixelatedHeight, {
-          kernel: 'nearest',
-        })
-        // 元サイズに拡大（大きなブロック生成）
-        .resize(metadata.width, metadata.height, {
-          kernel: 'nearest',
-        })
-        // 色相・彩度・明度を大幅に変更
-        .modulate({
-          brightness: 0.3,
-          saturation: 0.2,
-          hue: 90,
-        })
-        // 強力なブラー
-        .blur(15)
-        // 色味を完全に変更
-        .tint({ r: 150, g: 100, b: 200 })
-        // さらにブラー
-        .blur(8)
-        // 最低品質JPEG
-        .jpeg({ quality: 20 })
+      // 新しい画像データを作成
+      const newData = Buffer.alloc(data.length);
+
+      // ブロックごとに平均色を計算してモザイク処理
+      for (let y = 0; y < info.height; y += blockSize) {
+        for (let x = 0; x < info.width; x += blockSize) {
+          // ブロック内の平均色を計算
+          let totalR = 0,
+            totalG = 0,
+            totalB = 0;
+          let pixelCount = 0;
+
+          for (let dy = 0; dy < blockSize && y + dy < info.height; dy++) {
+            for (let dx = 0; dx < blockSize && x + dx < info.width; dx++) {
+              const pixelIndex =
+                ((y + dy) * info.width + (x + dx)) * info.channels;
+              totalR += data[pixelIndex];
+              totalG += data[pixelIndex + 1];
+              totalB += data[pixelIndex + 2];
+              pixelCount++;
+            }
+          }
+
+          // 平均色を計算
+          const avgR = Math.floor(totalR / pixelCount);
+          const avgG = Math.floor(totalG / pixelCount);
+          const avgB = Math.floor(totalB / pixelCount);
+
+          // ブロック全体を平均色で塗りつぶす
+          for (let dy = 0; dy < blockSize && y + dy < info.height; dy++) {
+            for (let dx = 0; dx < blockSize && x + dx < info.width; dx++) {
+              const pixelIndex =
+                ((y + dy) * info.width + (x + dx)) * info.channels;
+              newData[pixelIndex] = avgR;
+              newData[pixelIndex + 1] = avgG;
+              newData[pixelIndex + 2] = avgB;
+            }
+          }
+        }
+      }
+
+      // 新しい画像を作成
+      const mosaicImageBuffer = await sharp(newData, {
+        raw: {
+          width: info.width,
+          height: info.height,
+          channels: info.channels,
+        },
+      })
+        .jpeg({ quality: 80 })
         .toBuffer();
 
       console.log(
-        `🔒 [IMAGE PROCESSING] ✅ Processed image size: ${processedImageBuffer.length} bytes`,
+        `🔒 [IMAGE PROCESSING] ✅ MANUAL MOSAIC created: ${mosaicImageBuffer.length} bytes`,
       );
-      return processedImageBuffer;
+      return mosaicImageBuffer;
     } catch (error) {
-      console.error('🔒 [IMAGE PROCESSING] ❌ Error during processing:', error);
-      // エラー時は黒い画像を返す（セキュリティ重要）
+      console.error(
+        '🔒 [IMAGE PROCESSING] ❌ CRITICAL ERROR during processing:',
+        error,
+      );
+      console.error(
+        '🔒 [IMAGE PROCESSING] ❌ ERROR STACK:',
+        (error as Error).stack,
+      );
+      // エラー時は完全に黒い画像を返す
       const blackImageBuffer = await sharp({
         create: {
           width: 400,
@@ -184,7 +203,7 @@ export class ImageProcessingService {
           background: { r: 0, g: 0, b: 0, alpha: 1 },
         },
       })
-        .jpeg({ quality: 50 })
+        .jpeg({ quality: 10 })
         .toBuffer();
 
       console.log(
