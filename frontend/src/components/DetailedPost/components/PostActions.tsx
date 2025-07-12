@@ -87,7 +87,7 @@ const PostActions = ({
           className="flex items-center gap-2 px-4 py-3 rounded-full text-text-muted hover:text-success hover:bg-success-bg transition-all duration-300 hover:scale-105"
         >
           <IconShare size={20} />
-          <span className="font-medium">シェア</span>
+          <span className="font-medium">共有</span>
         </button>
       </div>
     </div>

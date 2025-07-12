@@ -10,6 +10,7 @@ import { ExtendedSession } from "@/types";
 import { usePosts } from "@/hooks/queries/usePosts";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS, type PostWithUser } from "@/hooks/queries/usePosts";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 
 interface TimeLineProps {
   session?: ExtendedSession;
@@ -17,7 +18,7 @@ interface TimeLineProps {
 }
 
 const TimeLine = ({ currentUser }: TimeLineProps) => {
-  const { data: posts, isLoading, error } = usePosts();
+  const { data: posts, isLoading, error, refetch } = usePosts();
   const queryClient = useQueryClient();
 
   const handlePostUpdate = () => {
@@ -32,6 +33,17 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
         oldPosts?.filter((post) => post.id !== postId) || [],
     );
   };
+
+  const handleRefresh = async () => {
+    await refetch();
+  };
+
+  const { isPulling, pullDistance, isRefreshing, bindTouchEvents } =
+    usePullToRefresh({
+      onRefresh: handleRefresh,
+      threshold: 80,
+      enableSound: true,
+    });
 
   // グローバルな投稿作成イベントを監視
   useEffect(() => {
@@ -65,7 +77,40 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
 
   return (
     <>
-      <div className="w-full max-w-md mx-auto">
+      <div
+        className="w-full max-w-md mx-auto relative"
+        {...bindTouchEvents}
+        style={{
+          transform: isPulling
+            ? `translateY(${Math.min(pullDistance, 40)}px)`
+            : "none",
+          transition: isPulling ? "none" : "transform 0.2s ease-out",
+        }}
+      >
+        {/* プルトゥリフレッシュインジケーター */}
+        {(isPulling || isRefreshing) && (
+          <div
+            className="fixed top-[-38px] left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-center"
+            style={{
+              opacity: isPulling ? Math.min(pullDistance / 80, 1) : 1,
+            }}
+          >
+            <div className="bg-surface rounded-full p-2 shadow-lg border border-border">
+              <div
+                className={`w-4 h-4 border-2 border-interactive border-t-transparent rounded-full ${
+                  isRefreshing ? "animate-spin" : ""
+                }`}
+                style={{
+                  transform:
+                    !isRefreshing && isPulling
+                      ? `rotate(${pullDistance * 4}deg)`
+                      : "none",
+                }}
+              />
+            </div>
+          </div>
+        )}
+
         {/* 投稿一覧 */}
         {posts && posts.length > 0 ? (
           posts.map((post) => {
