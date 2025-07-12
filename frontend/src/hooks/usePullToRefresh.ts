@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState } from "react";
+import { useRef, useCallback, useState, useEffect } from "react";
 import { audioPlayer } from "@/utils/audioUtils";
 
 interface PullToRefreshOptions {
@@ -12,11 +12,7 @@ interface PullToRefreshResult {
   isPulling: boolean;
   pullDistance: number;
   isRefreshing: boolean;
-  bindTouchEvents: {
-    onTouchStart: (e: React.TouchEvent) => void;
-    onTouchMove: (e: React.TouchEvent) => void;
-    onTouchEnd: () => void;
-  };
+  containerRef: React.RefObject<HTMLDivElement>;
 }
 
 export const usePullToRefresh = ({
@@ -31,7 +27,7 @@ export const usePullToRefresh = ({
 
   const startY = useRef<number>(0);
   const currentY = useRef<number>(0);
-  const scrollElement = useRef<Element | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const hasPlayedSound = useRef<boolean>(false);
 
   // 音声再生関数
@@ -42,12 +38,12 @@ export const usePullToRefresh = ({
     hasPlayedSound.current = true;
   }, [enableSound]);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    // スクロール要素を取得
-    scrollElement.current = e.currentTarget as Element;
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    const element = containerRef.current;
+    if (!element) return;
 
     // 最上部にいるかチェック
-    if (scrollElement.current.scrollTop > 0) return;
+    if (element.scrollTop > 0) return;
 
     startY.current = e.touches[0].clientY;
     currentY.current = startY.current;
@@ -55,8 +51,9 @@ export const usePullToRefresh = ({
   }, []);
 
   const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      if (!scrollElement.current || scrollElement.current.scrollTop > 0) {
+    (e: TouchEvent) => {
+      const element = containerRef.current;
+      if (!element || element.scrollTop > 0) {
         if (isPulling) {
           setIsPulling(false);
           setPullDistance(0);
@@ -108,14 +105,26 @@ export const usePullToRefresh = ({
     hasPlayedSound.current = false;
   }, [isPulling, pullDistance, threshold, onRefresh]);
 
+  // ネイティブイベントリスナーの設定
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+
+    element.addEventListener("touchstart", handleTouchStart, { passive: true });
+    element.addEventListener("touchmove", handleTouchMove, { passive: false });
+    element.addEventListener("touchend", handleTouchEnd, { passive: true });
+
+    return () => {
+      element.removeEventListener("touchstart", handleTouchStart);
+      element.removeEventListener("touchmove", handleTouchMove);
+      element.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [handleTouchStart, handleTouchMove, handleTouchEnd]);
+
   return {
     isPulling,
     pullDistance,
     isRefreshing,
-    bindTouchEvents: {
-      onTouchStart: handleTouchStart,
-      onTouchMove: handleTouchMove,
-      onTouchEnd: handleTouchEnd,
-    },
+    containerRef,
   };
 };

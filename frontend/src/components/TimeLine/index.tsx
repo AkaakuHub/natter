@@ -11,6 +11,7 @@ import { usePosts } from "@/hooks/queries/usePosts";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS, type PostWithUser } from "@/hooks/queries/usePosts";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { audioPlayer } from "@/utils/audioUtils";
 
 interface TimeLineProps {
   session?: ExtendedSession;
@@ -38,7 +39,7 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
     await refetch();
   };
 
-  const { isPulling, pullDistance, isRefreshing, bindTouchEvents } =
+  const { isPulling, pullDistance, isRefreshing, containerRef } =
     usePullToRefresh({
       onRefresh: handleRefresh,
       threshold: 80,
@@ -51,9 +52,23 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.posts });
     };
 
+    // ユーザーインタラクションを初期化
+    const handleUserInteraction = () => {
+      audioPlayer.markUserInteraction();
+      document.removeEventListener("touchstart", handleUserInteraction);
+      document.removeEventListener("click", handleUserInteraction);
+    };
+
     window.addEventListener("postCreated", handleGlobalPostCreated);
+    document.addEventListener("touchstart", handleUserInteraction, {
+      passive: true,
+    });
+    document.addEventListener("click", handleUserInteraction);
+
     return () => {
       window.removeEventListener("postCreated", handleGlobalPostCreated);
+      document.removeEventListener("touchstart", handleUserInteraction);
+      document.removeEventListener("click", handleUserInteraction);
     };
   }, [queryClient]);
 
@@ -78,8 +93,8 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
   return (
     <>
       <div
+        ref={containerRef}
         className="w-full max-w-md mx-auto relative"
-        {...bindTouchEvents}
         style={{
           transform: isPulling
             ? `translateY(${Math.min(pullDistance, 40)}px)`

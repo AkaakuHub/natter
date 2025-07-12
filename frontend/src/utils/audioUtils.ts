@@ -5,6 +5,7 @@
 export class AudioPlayer {
   private static instance: AudioPlayer;
   private audioCache: Map<string, HTMLAudioElement> = new Map();
+  private userHasInteracted = false;
 
   static getInstance(): AudioPlayer {
     if (!AudioPlayer.instance) {
@@ -44,9 +45,22 @@ export class AudioPlayer {
   }
 
   /**
+   * ユーザーインタラクションをマーク
+   */
+  markUserInteraction(): void {
+    this.userHasInteracted = true;
+  }
+
+  /**
    * 音声を再生
    */
   async playSound(soundPath: string, volume: number = 0.5): Promise<void> {
+    // ユーザーインタラクションなしでは再生しない
+    if (!this.userHasInteracted) {
+      console.warn("Cannot play audio: User interaction required");
+      return;
+    }
+
     try {
       let audio = this.audioCache.get(soundPath);
 
