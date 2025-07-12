@@ -100,6 +100,9 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
             ? `translateY(${Math.min(pullDistance, 40)}px)`
             : "none",
           transition: isPulling ? "none" : "transform 0.2s ease-out",
+          overscrollBehaviorY: "none",
+          WebkitOverflowScrolling: "touch",
+          touchAction: "pan-x pan-down pinch-zoom",
         }}
       >
         {/* プルトゥリフレッシュインジケーター */}

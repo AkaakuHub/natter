@@ -70,6 +70,10 @@ body {
   font-variant-numeric: tabular-nums;
   writing-mode: horizontal-tb;
   direction: ltr;
+
+  /* iOS Safari pull-to-refresh無効化 */
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 .dark {
