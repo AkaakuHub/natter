@@ -888,9 +888,6 @@ export class PostsService {
       });
 
       if (!post) {
-        console.log(
-          `🔒 [IMAGE BUFFER] Post not found for ${filename} - returning processed image`,
-        );
         return await this.imageProcessingService.getBlurredImageBuffer(
           filename,
         );
@@ -908,12 +905,6 @@ export class PostsService {
       }
 
       // 🔒 SECURITY RULE 3: その他の場合（未認証、他人、非公開）は必ず処理済み画像
-      console.log(
-        `🔒 [IMAGE BUFFER] ❌ RESTRICTED ACCESS - returning processed image for ${filename}`,
-      );
-      console.log(
-        `🔒 [IMAGE BUFFER] Reason: currentUserId=${currentUserId}, authorId=${post.authorId}, imagesPublic=${post.imagesPublic}`,
-      );
       return await this.imageProcessingService.getBlurredImageBuffer(filename);
     } catch (error) {
       console.error('🔒 [IMAGE BUFFER] ERROR:', error);
