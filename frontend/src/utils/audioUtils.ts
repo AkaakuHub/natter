@@ -74,7 +74,7 @@ export class AudioPlayer {
    */
   async playRefreshSound(): Promise<void> {
     // 実際の音声ファイルを再生
-    await this.playSound("/sounds/refresh-pull.mp3", 0.3);
+    await this.playSound("/sounds/refresh.mp3", 0.3);
   }
 
   /**

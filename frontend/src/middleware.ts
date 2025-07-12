@@ -73,6 +73,6 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     // 全てのパスにマッチ（静的アセット以外）
-    "/((?!_next/static|_next/image|favicon.ico|manifest.json|api).*)",
+    "/((?!_next/static|_next/image|favicon.ico|manifest.json|api|sounds).*)",
   ],
 };
