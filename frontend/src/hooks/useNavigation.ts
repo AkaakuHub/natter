@@ -93,6 +93,22 @@ export const useNavigation = () => {
     }
   }, [nextRouter, spaRouter]);
 
+  const navigateToTimer = useCallback(() => {
+    if (spaRouter?.navigate) {
+      spaRouter.navigate("/timer");
+    } else {
+      nextRouter.push("/timer");
+    }
+  }, [nextRouter, spaRouter]);
+
+  const navigateToSetList = useCallback(() => {
+    if (spaRouter?.navigate) {
+      spaRouter.navigate("/set-list");
+    } else {
+      nextRouter.push("/set-list");
+    }
+  }, [nextRouter, spaRouter]);
+
   const navigateToLogin = useCallback(() => {
     if (spaRouter?.navigate) {
       spaRouter.navigate("/login");
@@ -113,6 +129,8 @@ export const useNavigation = () => {
     navigateToFollowers,
     navigateToNotification,
     navigateToSearch,
+    navigateToTimer,
+    navigateToSetList,
     navigateToLogin,
     goBack,
     getCurrentPath,

@@ -23,6 +23,7 @@ const ProfileView = lazy(() => import("@/components/views/ProfileView"));
 const FollowersView = lazy(() => import("@/components/views/FollowersView"));
 const FollowingView = lazy(() => import("@/components/views/FollowingView"));
 const SetListView = lazy(() => import("@/components/views/SetListView"));
+const TimerView = lazy(() => import("@/components/views/TimerView"));
 
 // 404ページ
 const NotFoundView = lazy(() => import("@/components/views/NotFoundView"));
@@ -48,6 +49,7 @@ export const ViewRenderer: React.FC<ViewRendererProps> = ({
       { pattern: "/search", component: SearchView },
       { pattern: "/login", component: LoginView },
       { pattern: "/notification", component: NotificationView },
+      { pattern: "/timer", component: TimerView },
       { pattern: "/set-list", component: SetListView },
       { pattern: "/profile/following", component: FollowingView },
       { pattern: "/profile/followers", component: FollowersView },

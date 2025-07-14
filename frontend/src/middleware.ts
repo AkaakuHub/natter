@@ -6,7 +6,13 @@ export async function middleware(req: NextRequest) {
 
   // SLEEPANDMAXDEPTHTHINK: 最も単純な解決策
   // ステップ1: SPAルートの判定とリライト処理を最初に実行
-  const spaRoutes = ["/login", "/search", "/notification", "/set-list"];
+  const spaRoutes = [
+    "/login",
+    "/search",
+    "/notification",
+    "/timer",
+    "/set-list",
+  ];
   const isPostDetail = pathname.match(/^\/post\/\d+$/);
   const isProfile =
     pathname === "/profile" || pathname.match(/^\/profile\/\d+/);

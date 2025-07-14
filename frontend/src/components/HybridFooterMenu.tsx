@@ -1,6 +1,12 @@
 "use client";
 
-import { IconHome, IconVinyl, IconBell, IconSearch } from "@tabler/icons-react";
+import {
+  IconHome,
+  IconVinyl,
+  IconBell,
+  IconSearch,
+  IconClock,
+} from "@tabler/icons-react";
 import clsx from "clsx";
 import { useTrueSPARouter } from "@/core/router/TrueSPARouter";
 import { useHybridSPAAuth } from "@/core/auth/HybridSPAAuth";
@@ -9,6 +15,7 @@ const items = [
   { label: "ホーム", icon: IconHome, href: "/" },
   { label: "検索", icon: IconSearch, href: "/search" },
   { label: "通知", icon: IconBell, href: "/notification" },
+  { label: "タイマー", icon: IconClock, href: "/timer" },
   { label: "セトリ", icon: IconVinyl, href: "/set-list" },
 ];
 

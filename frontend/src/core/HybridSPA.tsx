@@ -116,6 +116,15 @@ const routes: RouteDefinition[] = [
     authRequired: true,
   },
   {
+    pattern: "/timer",
+    component: () => import("@/components/views/TimerView"),
+    title: "Natter - Timer",
+    meta: {
+      description: "Timer functionality on Natter",
+    },
+    authRequired: false,
+  },
+  {
     pattern: "/set-list",
     component: () => import("@/components/views/SetListView"),
     title: "Natter - Characters",

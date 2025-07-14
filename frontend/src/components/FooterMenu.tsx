@@ -1,6 +1,12 @@
 "use client";
 
-import { IconHome, IconVinyl, IconBell, IconSearch } from "@tabler/icons-react";
+import {
+  IconHome,
+  IconVinyl,
+  IconBell,
+  IconSearch,
+  IconClock,
+} from "@tabler/icons-react";
 import clsx from "clsx";
 import { useNavigation } from "@/hooks/useNavigation";
 
@@ -8,6 +14,7 @@ const items = [
   { label: "ホーム", icon: IconHome, href: "/" },
   { label: "検索", icon: IconSearch, href: "/search" },
   { label: "通知", icon: IconBell, href: "/notification" },
+  { label: "タイマー", icon: IconClock, href: "/timer" },
   { label: "セトリ", icon: IconVinyl, href: "/set-list" },
 ];
 
@@ -33,8 +40,13 @@ interface BottomMenuProps {
 }
 
 export function FooterMenu({ path, scrollContainerRef }: BottomMenuProps) {
-  const { navigateToTimeline, navigateToSearch, navigateToNotification } =
-    useNavigation();
+  const {
+    navigateToTimeline,
+    navigateToSearch,
+    navigateToNotification,
+    navigateToTimer,
+    navigateToSetList,
+  } = useNavigation();
 
   const handleNavigation = (href: string) => {
     const normalizedPath = path.startsWith("/") ? path : `/${path}`;
@@ -78,9 +90,11 @@ export function FooterMenu({ path, scrollContainerRef }: BottomMenuProps) {
       case "/notification":
         navigateToNotification();
         break;
+      case "/timer":
+        navigateToTimer();
+        break;
       case "/set-list":
-        // セトリページは現在SPA navigationに未対応のため、従来通りの遷移
-        window.location.href = href;
+        navigateToSetList();
         break;
       default:
         window.location.href = href;
@@ -90,7 +104,7 @@ export function FooterMenu({ path, scrollContainerRef }: BottomMenuProps) {
 
   return (
     <footer className="h-[60px] fixed bottom-0 left-0 right-0 border-t border-border bg-surface z-10">
-      <nav className="flex justify-between items-center max-w-md mx-auto">
+      <nav className="flex justify-between items-center max-w-full mx-auto">
         {items.map((item, index) => {
           const IconComponent = item.icon;
           return (
