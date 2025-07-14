@@ -3,6 +3,7 @@
 import React from "react";
 import { User } from "@/api";
 import { useReplyModal } from "@/hooks/useReplyModal";
+import { useScrollLock } from "@/hooks/useScrollLock";
 
 import ModalHeader from "./components/ModalHeader";
 import OriginalPost from "./components/OriginalPost";
@@ -31,6 +32,8 @@ const ReplyModal = ({
   currentUser,
   onReplySubmit,
 }: ReplyModalProps) => {
+  useScrollLock(isOpen);
+
   const {
     content,
     setContent,

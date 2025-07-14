@@ -24,7 +24,7 @@ const PostActions = ({
 }: PostActionsProps) => {
   return (
     <div className="flex items-center justify-between mt-6 pt-4 border-t border-border-muted">
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-3">
         <button
           onClick={(e) => {
             e.stopPropagation();

@@ -7,6 +7,7 @@ import { useImageUpload } from "@/hooks/useImageUpload";
 import { usePostSubmit } from "@/hooks/usePostSubmit";
 import { useFormValidation } from "@/hooks/useFormValidation";
 import { useNavigation } from "@/hooks/useNavigation";
+import { useScrollLock } from "@/hooks/useScrollLock";
 
 import UserAvatar from "../CreatePost/components/UserAvatar";
 import PostTextArea from "../CreatePost/components/PostTextArea";
@@ -28,6 +29,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   onPostCreated,
   currentUser,
 }) => {
+  useScrollLock(isOpen);
   const [content, setContent] = useState("");
   const [url, setUrl] = useState("");
   const [imagesPublic, setImagesPublic] = useState(false); // デフォルト非公開

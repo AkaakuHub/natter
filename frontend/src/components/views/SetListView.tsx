@@ -1,13 +1,18 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useCharacters } from "@/hooks/queries/useCharacters";
-import { IconUser, IconHash } from "@tabler/icons-react";
+import { IconUser, IconHash, IconEdit } from "@tabler/icons-react";
+import EditCharacterModal from "@/components/EditCharacterModal";
+import type { Character } from "@/api";
 
 const SetListView = () => {
   const { data: session } = useSession();
   const { data: characters, isLoading, error } = useCharacters();
+  const [editingCharacter, setEditingCharacter] = useState<Character | null>(
+    null,
+  );
 
   if (!session) {
     return null;
@@ -77,6 +82,17 @@ const SetListView = () => {
                       </span>
                     </div>
                   </div>
+
+                  {/* 編集ボタン */}
+                  <div className="flex-shrink-0">
+                    <button
+                      onClick={() => setEditingCharacter(character)}
+                      className="p-2 text-text-secondary hover:text-text hover:bg-surface-elevated rounded-full transition-colors"
+                      title="キャラクターを編集"
+                    >
+                      <IconEdit size={20} />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -91,6 +107,16 @@ const SetListView = () => {
           </div>
         )}
       </div>
+
+      {/* キャラクター編集モーダル */}
+      <EditCharacterModal
+        isOpen={!!editingCharacter}
+        character={editingCharacter}
+        onClose={() => setEditingCharacter(null)}
+        onSuccess={() => {
+          // 成功時のトーストやリフレッシュ処理をここに追加可能
+        }}
+      />
     </div>
   );
 };

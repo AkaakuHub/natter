@@ -22,7 +22,7 @@ const NavigationButtons = ({
             e.stopPropagation();
             onPrevious();
           }}
-          className="absolute left-6 top-1/2 -translate-y-1/2 z-20 text-text-inverse hover:text-text-inverse/80 bg-overlay hover:bg-overlay/90 rounded-full p-3 transition-all duration-200"
+          className="absolute left-6 top-1/2 -translate-y-1/2 z-[101] text-text-inverse hover:text-text-inverse/80 bg-overlay hover:bg-overlay/90 rounded-full p-3 transition-all duration-200"
         >
           <IconChevronLeft size={28} />
         </button>
@@ -34,7 +34,7 @@ const NavigationButtons = ({
             e.stopPropagation();
             onNext();
           }}
-          className="absolute right-6 top-1/2 -translate-y-1/2 z-20 text-text-inverse hover:text-text-inverse/80 bg-overlay hover:bg-overlay/90 rounded-full p-3 transition-all duration-200"
+          className="absolute right-6 top-1/2 -translate-y-1/2 z-[101] text-text-inverse hover:text-text-inverse/80 bg-overlay hover:bg-overlay/90 rounded-full p-3 transition-all duration-200"
         >
           <IconChevronRight size={28} />
         </button>

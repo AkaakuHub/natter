@@ -84,6 +84,11 @@ export const useUpdateCharacter = () => {
       queryClient.invalidateQueries({
         queryKey: ["characters"],
       });
+
+      // キャラクター名が変更された場合、関連するPostsキャッシュも無効化
+      queryClient.invalidateQueries({
+        queryKey: ["posts"],
+      });
     },
   });
 };

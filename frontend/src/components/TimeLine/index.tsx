@@ -11,16 +11,19 @@ import { usePosts } from "@/hooks/queries/usePosts";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS, type PostWithUser } from "@/hooks/queries/usePosts";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { useScrollContainer } from "@/hooks/useScrollContainer";
 import { audioPlayer } from "@/utils/audioUtils";
 
 interface TimeLineProps {
   session?: ExtendedSession;
   currentUser?: User | null;
+  scrollContainerRef?: React.RefObject<HTMLDivElement>;
 }
 
-const TimeLine = ({ currentUser }: TimeLineProps) => {
+const TimeLine = ({ currentUser, scrollContainerRef }: TimeLineProps) => {
   const { data: posts, isLoading, error, refetch } = usePosts();
   const queryClient = useQueryClient();
+  const autoScrollContainerRef = useScrollContainer();
 
   const handlePostUpdate = () => {
     // usePostActionsで楽観的更新済みのため、再取得は不要
@@ -44,6 +47,7 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
       onRefresh: handleRefresh,
       threshold: 80,
       enableSound: true,
+      scrollContainerRef: scrollContainerRef || autoScrollContainerRef,
     });
 
   // グローバルな投稿作成イベントを監視
@@ -100,9 +104,7 @@ const TimeLine = ({ currentUser }: TimeLineProps) => {
             ? `translateY(${Math.min(pullDistance, 40)}px)`
             : "none",
           transition: isPulling ? "none" : "transform 0.2s ease-out",
-          overscrollBehaviorY: "none",
-          WebkitOverflowScrolling: "touch",
-          touchAction: "pan-x pan-down pinch-zoom",
+          touchAction: "pan-y", // 垂直スクロールを許可
         }}
       >
         {/* プルトゥリフレッシュインジケーター */}

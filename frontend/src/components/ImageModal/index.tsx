@@ -2,6 +2,8 @@
 
 import React from "react";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
+import { useScrollLock } from "@/hooks/useScrollLock";
+import { useModalState } from "@/hooks/useModalState";
 
 import ImageDisplay from "./components/ImageDisplay";
 import NavigationButtons from "./components/NavigationButtons";
@@ -24,6 +26,8 @@ const ImageModal = ({
   onNext,
 }: ImageModalProps) => {
   useKeyboardNavigation({ isOpen, onClose, onPrevious, onNext });
+  useScrollLock(isOpen);
+  useModalState("image-modal", isOpen);
 
   if (!isOpen || images.length === 0) return null;
 
@@ -37,7 +41,7 @@ const ImageModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-overlay">
       <div
         className="relative w-full h-full flex items-center justify-center"
         onClick={handleBackdropClick}
@@ -48,7 +52,7 @@ const ImageModal = ({
         {/* バツボタン */}
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 z-30 text-text-inverse hover:text-text-inverse/80 bg-special-white/80 hover:bg-special-white/50 backdrop-blur-sm rounded-full p-3 transition-all duration-200"
+          className="absolute top-6 right-6 z-[101] text-text-inverse hover:text-text-inverse/80 bg-special-white/80 hover:bg-special-white/50 backdrop-blur-sm rounded-full p-3 transition-all duration-200"
         >
           <svg
             width="24"

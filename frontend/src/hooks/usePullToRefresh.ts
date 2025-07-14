@@ -6,6 +6,8 @@ interface PullToRefreshOptions {
   threshold?: number;
   maxPullDistance?: number;
   enableSound?: boolean;
+  disabled?: boolean;
+  scrollContainerRef?: React.RefObject<HTMLDivElement>;
 }
 
 interface PullToRefreshResult {
@@ -20,6 +22,8 @@ export const usePullToRefresh = ({
   threshold = 80,
   maxPullDistance = 120,
   enableSound = true,
+  disabled = false,
+  scrollContainerRef: externalScrollContainerRef,
 }: PullToRefreshOptions): PullToRefreshResult => {
   const [isPulling, setIsPulling] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
@@ -38,22 +42,54 @@ export const usePullToRefresh = ({
     hasPlayedSound.current = true;
   }, [enableSound]);
 
-  const handleTouchStart = useCallback((e: TouchEvent) => {
-    const element = containerRef.current;
-    if (!element) return;
+  const handleTouchStart = useCallback(
+    (e: TouchEvent) => {
+      if (disabled) return;
 
-    // 最上部にいるかチェック
-    if (element.scrollTop > 0) return;
+      // 外部から渡されたスクロールコンテナがあればそれを使用、なければ内部のcontainerRefを使用
+      const scrollElement =
+        externalScrollContainerRef?.current || containerRef.current;
+      if (!scrollElement) return;
 
-    startY.current = e.touches[0].clientY;
-    currentY.current = startY.current;
-    hasPlayedSound.current = false;
-  }, []);
+      // シンプルな最上部チェック：スクロールコンテナが一番上にスクロールされているかどうか
+      const isAtTop = scrollElement.scrollTop === 0;
+
+      console.log(
+        "Touch start - scrollElement.scrollTop:",
+        scrollElement.scrollTop,
+      );
+      console.log(
+        "scrollElement type:",
+        externalScrollContainerRef?.current ? "external" : "internal",
+      );
+      console.log("isAtTop:", isAtTop);
+
+      if (!isAtTop) {
+        console.log("Pull-to-refresh disabled: not at top");
+        return;
+      }
+
+      console.log("Pull-to-refresh enabled");
+      startY.current = e.touches[0].clientY;
+      currentY.current = startY.current;
+      hasPlayedSound.current = false;
+    },
+    [disabled, externalScrollContainerRef],
+  );
 
   const handleTouchMove = useCallback(
     (e: TouchEvent) => {
-      const element = containerRef.current;
-      if (!element || element.scrollTop > 0) {
+      if (disabled) return;
+
+      // 外部から渡されたスクロールコンテナがあればそれを使用、なければ内部のcontainerRefを使用
+      const scrollElement =
+        externalScrollContainerRef?.current || containerRef.current;
+      if (!scrollElement) return;
+
+      // シンプルな最上部チェック：スクロールコンテナが一番上にスクロールされているかどうか
+      const isAtTop = scrollElement.scrollTop === 0;
+
+      if (!isAtTop) {
         if (isPulling) {
           setIsPulling(false);
           setPullDistance(0);
@@ -65,14 +101,17 @@ export const usePullToRefresh = ({
       const deltaY = currentY.current - startY.current;
 
       if (deltaY > 0) {
-        // 引っ張り動作
-        e.preventDefault(); // デフォルトのスクロールを防止
-
+        // 引っ張り動作（最上部でのみ）
         const distance = Math.min(deltaY * 0.5, maxPullDistance); // 抵抗感を演出
         setPullDistance(distance);
 
         if (distance > 20 && !isPulling) {
           setIsPulling(true);
+        }
+
+        // プルダウンが開始されている場合のみpreventDefault
+        if (isPulling || distance > 10) {
+          e.preventDefault(); // デフォルトのスクロールを防止
         }
 
         // 閾値を超えたら音を鳴らす
@@ -81,13 +120,29 @@ export const usePullToRefresh = ({
         }
       }
     },
-    [isPulling, threshold, maxPullDistance, enableSound, playRefreshSound],
+    [
+      disabled,
+      externalScrollContainerRef,
+      isPulling,
+      threshold,
+      maxPullDistance,
+      enableSound,
+      playRefreshSound,
+    ],
   );
 
   const handleTouchEnd = useCallback(async () => {
-    if (!isPulling) return;
+    if (disabled || !isPulling) return;
+
+    console.log(
+      "Touch end - pullDistance:",
+      pullDistance,
+      "threshold:",
+      threshold,
+    );
 
     if (pullDistance >= threshold) {
+      console.log("REFRESH TRIGGERED!");
       // リフレッシュ実行
       setIsRefreshing(true);
       try {
@@ -103,18 +158,22 @@ export const usePullToRefresh = ({
     setIsPulling(false);
     setPullDistance(0);
     hasPlayedSound.current = false;
-  }, [isPulling, pullDistance, threshold, onRefresh]);
+  }, [disabled, isPulling, pullDistance, threshold, onRefresh]);
 
   // ネイティブイベントリスナーの設定
   useEffect(() => {
+    // イベントリスナーは常に内部のcontainerRefにアタッチ（外部スクロールコンテナには影響しない）
     const element = containerRef.current;
     if (!element) return;
+
+    console.log("Attaching event listeners to internal container");
 
     element.addEventListener("touchstart", handleTouchStart, { passive: true });
     element.addEventListener("touchmove", handleTouchMove, { passive: false });
     element.addEventListener("touchend", handleTouchEnd, { passive: true });
 
     return () => {
+      console.log("Removing event listeners from internal container");
       element.removeEventListener("touchstart", handleTouchStart);
       element.removeEventListener("touchmove", handleTouchMove);
       element.removeEventListener("touchend", handleTouchEnd);
