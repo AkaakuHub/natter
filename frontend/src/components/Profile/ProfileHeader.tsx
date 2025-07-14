@@ -9,7 +9,7 @@ import EditProfileModal from "./EditProfileModal";
 import FollowButton from "@/components/FollowButton";
 import { useFollowing, useFollowers } from "@/hooks/queries/useFollows";
 import { useUser } from "@/hooks/queries/useUsers";
-import { useNavigation } from "@/hooks/useNavigation";
+import { useSPANavigation } from "@/core/spa";
 
 interface ProfileHeaderProps {
   session: ExtendedSession | null;
@@ -28,9 +28,9 @@ const ProfileHeader = ({
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const { navigateToFollowing, navigateToFollowers } = useNavigation();
 
-  const isOwnProfile = !userId || userId === session?.user?.id;
+  // 文字列として比較（userIdとsession.user.idの型が異なる可能性がある）
+  const isOwnProfile = !userId || String(userId) === String(session?.user?.id);
   const targetUserId = userId || session?.user?.id;
 
   // React Query hooks for user data
@@ -46,23 +46,21 @@ const ProfileHeader = ({
   const effectiveTargetUser = fetchedTargetUser || targetUser;
   const displayUser = effectiveTargetUser || effectiveCurrentUser;
 
+  const { navigateToFollowing, navigateToFollowers } = useSPANavigation();
+
   const followCounts = {
     followingCount: following.length,
     followersCount: followers.length,
   };
 
   const handleFollowingClick = () => {
-    if (isOwnProfile) {
-      navigateToFollowing();
-    } else {
+    if (targetUserId) {
       navigateToFollowing(targetUserId);
     }
   };
 
   const handleFollowersClick = () => {
-    if (isOwnProfile) {
-      navigateToFollowers();
-    } else {
+    if (targetUserId) {
       navigateToFollowers(targetUserId);
     }
   };

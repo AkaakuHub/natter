@@ -1,13 +1,13 @@
 "use client";
 
 import React from "react";
-import { useNavigation } from "@/hooks/useNavigation";
 import { useDropdown } from "@/hooks/useDropdown";
 import { performCompleteLogout } from "@/utils/logout";
 
 import ProfileDropdown from "./Header/components/ProfileDropdown";
 import DropdownMenu from "./Header/components/DropdownMenu";
 import Logo from "./Header/components/Logo";
+import { useSPANavigation } from "@/core/spa";
 
 interface HeaderProps {
   profileImage?: string;
@@ -24,7 +24,7 @@ const Header = ({
   userId,
   scrollContainerRef,
 }: HeaderProps) => {
-  const { navigateToProfile } = useNavigation();
+  const { navigateToProfile } = useSPANavigation();
   const { isOpen, toggle, close, ref } = useDropdown();
 
   const handleNavigateToProfile = () => {

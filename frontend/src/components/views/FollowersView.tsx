@@ -4,10 +4,10 @@ import React from "react";
 import { useSession } from "next-auth/react";
 import FollowList from "@/components/FollowList";
 import { ExtendedSession } from "@/types";
-import { useTrueSPARouter } from "@/core/router/TrueSPARouter";
+import { usePathname } from "next/navigation";
 
 const FollowersView = () => {
-  const { currentRoute } = useTrueSPARouter();
+  const pathname = usePathname();
   const { data: session, status } = useSession();
 
   if (status === "loading") {
@@ -18,15 +18,13 @@ const FollowersView = () => {
     );
   }
 
-  // URL判定ロジック: /profile/followers の場合は自分、/profile/:id/followers の場合は他人
+  // URL判定ロジック: /profile/:id/followers の形式からuserIdを抽出
   let targetUserId: string | undefined;
 
-  if (currentRoute?.path === "/profile/followers") {
-    // 自分のフォロワーページ
-    targetUserId = session?.user?.id;
-  } else if (currentRoute?.path?.match(/^\/profile\/\d+\/followers$/)) {
-    // 他人のフォロワーページ (/profile/:id/followers)
-    targetUserId = currentRoute.params?.id;
+  if (pathname?.match(/^\/profile\/[^/]+\/followers$/)) {
+    // フォロワーページ (/profile/:id/followers)
+    const match = pathname.match(/^\/profile\/([^/]+)\/followers$/);
+    targetUserId = match?.[1];
   }
 
   if (!targetUserId) {

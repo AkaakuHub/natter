@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, lazy, Suspense } from "react";
-import { useNavigation } from "@/hooks/useNavigation";
 import { usePostActions } from "@/hooks/usePostActions";
 import { useImageModal } from "@/hooks/useImageModal";
 import { getImageUrl } from "@/utils/postUtils";
 import { usePostShare } from "@/hooks/usePostShare";
 import { useToast } from "@/hooks/useToast";
 import { Post, PostsApi } from "@/api";
+import { useSPANavigation } from "@/core/spa";
 
 // 遅延読み込みモーダル
 const ImageModal = lazy(() => import("@/components/ImageModal"));
@@ -46,10 +46,10 @@ const PostComponent = ({
   onPostDelete,
 }: PostComponentProps) => {
   const [currentPost, setCurrentPost] = useState<Post>(post);
-  const { navigateToPost, navigateToProfile } = useNavigation();
   const currentUserId = currentUser?.id;
   const { sharePost } = usePostShare();
   const { showToast } = useToast();
+  const { navigateToPost, navigateToProfile } = useSPANavigation();
 
   const handlePostUpdateCallback = () => {
     if (onPostUpdate) {

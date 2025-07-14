@@ -11,7 +11,7 @@ import {
 } from "@tabler/icons-react";
 import { Notification } from "@/api/notifications";
 import { useMarkAsRead } from "@/hooks/queries/useNotifications";
-import { useNavigation } from "@/hooks/useNavigation";
+import { useSPANavigation } from "@/core/spa";
 
 interface NotificationItemProps {
   notification: Notification;
@@ -20,7 +20,7 @@ interface NotificationItemProps {
 const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
 }) => {
-  const { navigateToPost } = useNavigation();
+  const { navigateToPost } = useSPANavigation();
   const markAsReadMutation = useMarkAsRead();
 
   const handleClick = () => {

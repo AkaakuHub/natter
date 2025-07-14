@@ -6,134 +6,23 @@ import { HybridSPAAuthProvider } from "./auth/HybridSPAAuth";
 import { ViewRenderer } from "./router/ViewRenderer";
 import { RouteDefinition } from "./router/RouteEngine";
 import { useSearchParams } from "next/navigation";
+import { ALL_ROUTES } from "./spa/SPARoutes";
 
 // 既存のBaseLayoutを保護・活用
 import BaseLayout from "@/components/layout/BaseLayout";
 import HybridBaseLayout from "@/components/layout/HybridBaseLayout";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 
-// ルート定義（既存機能完全保護）
-const routes: RouteDefinition[] = [
-  {
-    pattern: "/",
-    component: () => import("@/components/views/HomeView"),
-    title: "Natter - Home",
-    meta: {
-      description: "Natter social media timeline",
-    },
-    authRequired: true,
+// ルート定義を一元管理されたデータから生成
+const routes: RouteDefinition[] = ALL_ROUTES.map((route) => ({
+  pattern: route.path,
+  component: route.component,
+  title: route.title,
+  meta: {
+    description: route.description,
   },
-  {
-    pattern: "/search",
-    component: () => import("@/components/views/SearchView"),
-    title: "Natter - Search",
-    meta: {
-      description: "Search posts and users on Natter",
-    },
-    authRequired: true,
-  },
-  {
-    pattern: "/login",
-    component: () => import("@/components/views/LoginView"),
-    title: "Natter - Login",
-    meta: {
-      description: "Login to Natter",
-    },
-    authRequired: false,
-  },
-  {
-    pattern: "/notification",
-    component: () => import("@/components/views/NotificationView"),
-    title: "Natter - Notifications",
-    meta: {
-      description: "Your notifications on Natter",
-    },
-    authRequired: true,
-  },
-  {
-    pattern: "/post/:id",
-    component: () => import("@/components/views/PostView"),
-    title: "Natter - Post",
-    meta: {
-      description: "View post on Natter",
-    },
-    authRequired: false, // MAXDEPTHGODULTRADEEPTHINK: OGPとログインなしアクセスのため
-  },
-  {
-    pattern: "/profile",
-    component: () => import("@/components/views/ProfileView"),
-    title: "Natter - My Profile",
-    meta: {
-      description: "Your profile on Natter",
-    },
-    authRequired: false, // MAXDEPTHGODULTRADEEPTHINK: OGPとログインなしアクセスのため
-  },
-  // 🔥 静的ルートを動的ルートより先に配置！
-  {
-    pattern: "/profile/following",
-    component: () => import("@/components/views/FollowingView"),
-    title: "Natter - Following",
-    meta: {
-      description: "People you follow on Natter",
-    },
-    authRequired: false, // MAXDEPTHGODULTRADEEPTHINK: OGPとログインなしアクセスのため
-  },
-  {
-    pattern: "/profile/followers",
-    component: () => import("@/components/views/FollowersView"),
-    title: "Natter - Followers",
-    meta: {
-      description: "Your followers on Natter",
-    },
-    authRequired: false, // MAXDEPTHGODULTRADEEPTHINK: OGPとログインなしアクセスのため
-  },
-  // 🔥 動的ルートは静的ルートの後に配置
-  {
-    pattern: "/profile/:id",
-    component: () => import("@/components/views/ProfileView"),
-    title: "Natter - Profile",
-    meta: {
-      description: "User profile on Natter",
-    },
-    authRequired: false, // MAXDEPTHGODULTRADEEPTHINK: OGPとログインなしアクセスのため
-  },
-  {
-    pattern: "/profile/:id/following",
-    component: () => import("@/components/views/FollowingView"),
-    title: "Natter - Following",
-    meta: {
-      description: "People this user follows on Natter",
-    },
-    authRequired: true,
-  },
-  {
-    pattern: "/profile/:id/followers",
-    component: () => import("@/components/views/FollowersView"),
-    title: "Natter - Followers",
-    meta: {
-      description: "This user&apos;s followers on Natter",
-    },
-    authRequired: true,
-  },
-  {
-    pattern: "/timer",
-    component: () => import("@/components/views/TimerView"),
-    title: "Natter - Timer",
-    meta: {
-      description: "Timer functionality on Natter",
-    },
-    authRequired: false,
-  },
-  {
-    pattern: "/set-list",
-    component: () => import("@/components/views/SetListView"),
-    title: "Natter - Characters",
-    meta: {
-      description: "Your characters on Natter",
-    },
-    authRequired: true,
-  },
-];
+  authRequired: route.authRequired ?? false,
+}));
 
 interface HybridSPAProps {
   children?: React.ReactNode;

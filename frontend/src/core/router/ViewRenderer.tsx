@@ -10,20 +10,7 @@ import React, {
 } from "react";
 import { useTrueSPARouter } from "./TrueSPARouter";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-
-// 動的インポートによるコード分割
-const HomeView = lazy(() => import("@/components/views/HomeView"));
-const SearchView = lazy(() => import("@/components/views/SearchView"));
-const LoginView = lazy(() => import("@/components/views/LoginView"));
-const NotificationView = lazy(
-  () => import("@/components/views/NotificationView"),
-);
-const PostView = lazy(() => import("@/components/views/PostView"));
-const ProfileView = lazy(() => import("@/components/views/ProfileView"));
-const FollowersView = lazy(() => import("@/components/views/FollowersView"));
-const FollowingView = lazy(() => import("@/components/views/FollowingView"));
-const SetListView = lazy(() => import("@/components/views/SetListView"));
-const TimerView = lazy(() => import("@/components/views/TimerView"));
+import { generateViewRendererComponentMap, matchPattern } from "@/core/spa";
 
 // 404ページ
 const NotFoundView = lazy(() => import("@/components/views/NotFoundView"));
@@ -41,34 +28,16 @@ export const ViewRenderer: React.FC<ViewRendererProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // プリロード用のコンポーネントマップ
-  // 注意: より具体的なパターンを先に配置して、曖昧なマッチングを避ける
-  const componentMap = useMemo(
-    () => [
-      { pattern: "/", component: HomeView },
-      { pattern: "/search", component: SearchView },
-      { pattern: "/login", component: LoginView },
-      { pattern: "/notification", component: NotificationView },
-      { pattern: "/timer", component: TimerView },
-      { pattern: "/set-list", component: SetListView },
-      { pattern: "/profile/following", component: FollowingView },
-      { pattern: "/profile/followers", component: FollowersView },
-      { pattern: "/profile/:id/following", component: FollowingView },
-      { pattern: "/profile/:id/followers", component: FollowersView },
-      { pattern: "/profile/:id", component: ProfileView },
-      { pattern: "/profile", component: ProfileView },
-      { pattern: "/post/:id", component: PostView },
-    ],
-    [],
-  );
+  // プリロード用のコンポーネントマップを一元管理から生成
+  const componentMap = useMemo(() => generateViewRendererComponentMap(), []);
 
   // パスベースでコンポーネントを解決
   const resolveComponentByPath = useCallback(
     async (pathname: string): Promise<React.ComponentType> => {
       for (const item of componentMap) {
         if (matchPattern(item.pattern, pathname)) {
-          const ComponentLoader = item.component;
-          return ComponentLoader;
+          const { default: Component } = await item.component();
+          return Component;
         }
       }
 
@@ -108,27 +77,7 @@ export const ViewRenderer: React.FC<ViewRendererProps> = ({
     [routeEngine, resolveComponentByPath],
   );
 
-  // パターンマッチング
-  const matchPattern = (pattern: string, pathname: string): boolean => {
-    if (pattern === pathname) {
-      return true;
-    }
-
-    const patternParts = pattern.split("/").filter(Boolean);
-    const pathParts = pathname.split("/").filter(Boolean);
-
-    if (patternParts.length !== pathParts.length) {
-      return false;
-    }
-
-    const match = patternParts.every((part, index) => {
-      const isParamMatch = part.startsWith(":");
-      const isExactMatch = part === pathParts[index];
-      return isParamMatch || isExactMatch;
-    });
-
-    return match;
-  };
+  // パターンマッチングは一元管理から使用
 
   // ルート変更時にコンポーネントを解決
   useEffect(() => {

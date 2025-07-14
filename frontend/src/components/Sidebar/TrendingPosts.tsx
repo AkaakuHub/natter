@@ -4,11 +4,11 @@ import React from "react";
 import Image from "next/image";
 import { IconHeart, IconMessageCircle } from "@tabler/icons-react";
 import { transformPostToPostComponent } from "@/utils/postTransformers";
-import { useNavigation } from "@/hooks/useNavigation";
 import { useTrendingPosts } from "@/hooks/queries/usePosts";
+import { useSPANavigation } from "@/core/spa";
 
 const TrendingPosts: React.FC = () => {
-  const { navigateToPost } = useNavigation();
+  const { navigateToPost } = useSPANavigation();
   const { data: posts = [], isLoading: loading, error } = useTrendingPosts();
 
   const handlePostClick = (postId: number) => {

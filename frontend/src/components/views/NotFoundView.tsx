@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { useTrueSPARouter } from "@/core/router/TrueSPARouter";
+import { useSPANavigation } from "@/core/spa";
 
 const NotFoundView: React.FC = () => {
-  const { navigate } = useTrueSPARouter();
+  const { navigateToPath, goBack } = useSPANavigation();
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -18,13 +18,13 @@ const NotFoundView: React.FC = () => {
         </p>
         <div className="space-x-4">
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigateToPath("/")}
             className="px-6 py-3 bg-interactive text-text-inverse rounded-lg hover:bg-interactive-hover transition-colors"
           >
             Go Home
           </button>
           <button
-            onClick={() => window.history.back()}
+            onClick={goBack}
             className="px-6 py-3 border border-border text-text rounded-lg hover:bg-surface-variant transition-colors"
           >
             Go Back

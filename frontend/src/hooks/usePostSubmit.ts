@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { User } from "@/api";
 import { useToast } from "@/hooks/useToast";
-import { useNavigation } from "@/hooks/useNavigation";
 import { ApiClient } from "@/api/client";
 import { getSession } from "next-auth/react";
+import { useSPANavigation } from "@/core/spa";
 
 interface UsePostSubmitResult {
   isSubmitting: boolean;
@@ -27,7 +27,7 @@ export const usePostSubmit = (
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { showToast } = useToast();
-  const { navigateToPost } = useNavigation();
+  const { navigateToPost } = useSPANavigation();
   const queryClient = useQueryClient();
 
   const handleSubmit = async (

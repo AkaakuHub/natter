@@ -5,7 +5,7 @@ import {
   IconShare,
   IconLogin,
 } from "@tabler/icons-react";
-import { useNavigation } from "@/hooks/useNavigation";
+import { useSPANavigation } from "@/core/spa";
 
 interface PostActionsProps {
   isLiked: boolean;
@@ -28,10 +28,10 @@ const PostActions = ({
   onShare,
   canInteract,
 }: PostActionsProps) => {
-  const navigation = useNavigation();
+  const { navigateToLogin } = useSPANavigation();
 
   const handleLoginClick = () => {
-    navigation.navigateToLogin();
+    navigateToLogin();
   };
 
   if (!canInteract) {

@@ -6,8 +6,8 @@ import { User, Character } from "@/api";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { usePostSubmit } from "@/hooks/usePostSubmit";
 import { useFormValidation } from "@/hooks/useFormValidation";
-import { useNavigation } from "@/hooks/useNavigation";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import { useSPANavigation } from "@/core/spa";
 
 import UserAvatar from "../CreatePost/components/UserAvatar";
 import PostTextArea from "../CreatePost/components/PostTextArea";
@@ -37,7 +37,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     null,
   );
   const characterLimit = 280;
-  const navigation = useNavigation();
+  const { navigateToLogin } = useSPANavigation();
 
   const {
     images,
@@ -112,7 +112,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
               閉じる
             </button>
             <button
-              onClick={() => navigation.navigateToLogin()}
+              onClick={() => navigateToLogin()}
               className="px-4 py-2 bg-interactive text-text-inverse rounded-lg hover:bg-interactive-hover"
             >
               ログイン

@@ -3,7 +3,6 @@
 import React from "react";
 import { User, Post } from "@/api";
 import { ApiClient } from "@/api/client";
-import { useNavigation } from "@/hooks/useNavigation";
 import { useEffect } from "react";
 import { useDetailedPost } from "@/hooks/useDetailedPost";
 import { usePostActions } from "@/hooks/usePostActions";
@@ -11,6 +10,7 @@ import { useImageModal } from "@/hooks/useImageModal";
 import { useToast } from "@/hooks/useToast";
 import { usePostShare } from "@/hooks/usePostShare";
 import { getImageUrl } from "@/utils/postUtils";
+import { useSPANavigation } from "@/core/spa";
 
 import BackButton from "./components/BackButton";
 import LoadingState from "./components/LoadingState";
@@ -34,7 +34,7 @@ const DetailedPostComponent = ({
   currentUser,
 }: DetailedPostComponentProps) => {
   const { goBack, navigateToProfile, navigateToPost, navigateToTimeline } =
-    useNavigation();
+    useSPANavigation();
   const { showToast } = useToast();
   const { sharePost } = usePostShare();
 

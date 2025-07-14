@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from "react";
-import { useNavigation } from "@/hooks/useNavigation";
+import { useSPANavigation } from "@/core/spa";
 
 interface UseGlobalKeyboardShortcutsProps {
   onCreatePost?: () => void;
@@ -27,7 +27,7 @@ export const useGlobalKeyboardShortcuts = ({
     navigateToProfile,
     navigateToNotification,
     navigateToSearch,
-  } = useNavigation();
+  } = useSPANavigation();
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {

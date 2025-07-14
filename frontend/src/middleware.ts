@@ -1,18 +1,13 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@/auth";
+import { getMiddlewarePaths } from "@/core/spa/SPARoutes";
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // SLEEPANDMAXDEPTHTHINK: 最も単純な解決策
   // ステップ1: SPAルートの判定とリライト処理を最初に実行
-  const spaRoutes = [
-    "/login",
-    "/search",
-    "/notification",
-    "/timer",
-    "/set-list",
-  ];
+  const spaRoutes = getMiddlewarePaths();
   const isPostDetail = pathname.match(/^\/post\/\d+$/);
   const isProfile =
     pathname === "/profile" || pathname.match(/^\/profile\/\d+/);

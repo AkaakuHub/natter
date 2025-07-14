@@ -8,7 +8,7 @@ import OptimizedImage from "@/components/common/OptimizedImage";
 import FollowButton from "@/components/FollowButton";
 import SkeletonCard from "@/components/common/SkeletonCard";
 import { ExtendedSession } from "@/types";
-import { useNavigation } from "@/hooks/useNavigation";
+import { useSPANavigation } from "@/core/spa";
 
 interface FollowListProps {
   userId: string;
@@ -17,7 +17,7 @@ interface FollowListProps {
 }
 
 const FollowList: React.FC<FollowListProps> = ({ userId, type, session }) => {
-  const { navigateToProfile } = useNavigation();
+  const { navigateToProfile } = useSPANavigation();
   const { data: targetUser } = useUser(userId);
 
   const isOwnProfile = userId === session?.user?.id;

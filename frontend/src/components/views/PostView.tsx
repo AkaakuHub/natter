@@ -3,13 +3,14 @@
 import React from "react";
 import { useSession } from "next-auth/react";
 import DetailedPostComponent from "@/components/DetailedPost";
-import { useTrueSPARouter } from "@/core/router/TrueSPARouter";
+import { usePathname } from "next/navigation";
 
 const PostView = () => {
-  const { currentRoute } = useTrueSPARouter();
+  const pathname = usePathname();
   const { data: session, status } = useSession();
 
-  const postId = currentRoute?.params.id;
+  // パスから postId を抽出: /post/:id の形式
+  const postId = pathname.match(/^\/post\/([^/]+)$/)?.[1];
 
   // セッションから直接ユーザー情報を取得
   const currentUser =

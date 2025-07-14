@@ -4,13 +4,17 @@ import React from "react";
 import { useSession } from "next-auth/react";
 import ProfileComponent from "@/components/Profile";
 import { ExtendedSession } from "@/types";
-import { useTrueSPARouter } from "@/core/router/TrueSPARouter";
+import { usePathname } from "next/navigation";
 
 const ProfileView = () => {
-  const { currentRoute } = useTrueSPARouter();
+  const pathname = usePathname();
   const { data: session, status } = useSession();
 
-  const userId = currentRoute?.params.id;
+  // パスから userId を抽出: /profile/:id の形式
+  const userId =
+    pathname === "/profile"
+      ? undefined
+      : pathname.match(/^\/profile\/([^/]+)$/)?.[1];
 
   // Post IDが間違ってuserIdとして使用されることを防ぐ
   if (userId && !isNaN(Number(userId)) && Number(userId) < 10000) {
