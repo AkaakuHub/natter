@@ -115,7 +115,7 @@ const EditCharacterModal = ({
             <button
               type="submit"
               disabled={isSubmitting || !name.trim()}
-              className="flex-1 px-4 py-2 bg-primary text-text-inverse rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 bg-interactive text-text-inverse rounded-lg hover:bg-interactive-hover disabled:bg-interactive-disabled disabled:cursor-not-allowed transition-colors"
             >
               {isSubmitting ? "更新中..." : "更新"}
             </button>
