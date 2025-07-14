@@ -7,7 +7,7 @@ interface PullToRefreshOptions {
   maxPullDistance?: number;
   enableSound?: boolean;
   disabled?: boolean;
-  scrollContainerRef?: React.RefObject<HTMLDivElement>;
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 interface PullToRefreshResult {
