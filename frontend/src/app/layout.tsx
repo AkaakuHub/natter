@@ -13,6 +13,8 @@ import { ServerStatusProvider } from "@/contexts/ServerStatusContext";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap", // フォントの読み込み戦略を最適化
+  preload: true, // 明示的にプリロードを有効化
 });
 
 // export const metadata: Metadata = {
