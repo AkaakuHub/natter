@@ -13,6 +13,7 @@ import { QUERY_KEYS, type PostWithUser } from "@/hooks/queries/usePosts";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useScrollContainer } from "@/hooks/useScrollContainer";
 import { audioPlayer } from "@/utils/audioUtils";
+import { useAppState } from "@/contexts/AppStateContext";
 
 interface TimeLineProps {
   session?: ExtendedSession;
@@ -24,6 +25,7 @@ const TimeLine = ({ currentUser, scrollContainerRef }: TimeLineProps) => {
   const { data: posts, isLoading, error, refetch } = usePosts();
   const queryClient = useQueryClient();
   const autoScrollContainerRef = useScrollContainer();
+  const { timelineScrollPosition, setTimelineScrollPosition } = useAppState();
 
   const handlePostUpdate = () => {
     // usePostActionsで楽観的更新済みのため、再取得は不要
@@ -75,6 +77,73 @@ const TimeLine = ({ currentUser, scrollContainerRef }: TimeLineProps) => {
       document.removeEventListener("click", handleUserInteraction);
     };
   }, [queryClient]);
+
+  // スクロール位置を監視して保存（スロットリング付き）
+  useEffect(() => {
+    const currentScrollContainer =
+      scrollContainerRef?.current || autoScrollContainerRef.current;
+    if (!currentScrollContainer) return;
+
+    let timeoutId: NodeJS.Timeout;
+
+    const handleScroll = () => {
+      // 前回のタイムアウトをクリア
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      // 100ms後にスクロール位置を保存
+      timeoutId = setTimeout(() => {
+        const scrollTop = currentScrollContainer.scrollTop;
+        setTimelineScrollPosition(scrollTop);
+      }, 100);
+    };
+
+    currentScrollContainer.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      currentScrollContainer.removeEventListener("scroll", handleScroll);
+    };
+  }, [scrollContainerRef, autoScrollContainerRef, setTimelineScrollPosition]);
+
+  // コンポーネントマウント時にスクロール位置を復元
+  useEffect(() => {
+    if (!posts || timelineScrollPosition === 0) return;
+
+    const currentScrollContainer =
+      scrollContainerRef?.current || autoScrollContainerRef.current;
+    if (!currentScrollContainer) return;
+
+    // 一度だけ実行するため、フラグを設定
+    let hasRestored = false;
+
+    const restoreScroll = () => {
+      if (hasRestored) return;
+      hasRestored = true;
+
+      // スムーズなスクロール復元を無効化し、即座に移動
+      currentScrollContainer.style.scrollBehavior = "auto";
+      currentScrollContainer.scrollTop = timelineScrollPosition;
+
+      // 少し後でスクロール動作を元に戻す
+      setTimeout(() => {
+        currentScrollContainer.style.scrollBehavior = "";
+      }, 50);
+    };
+
+    // DOM更新後にスクロール位置を復元
+    requestAnimationFrame(restoreScroll);
+  }, [
+    posts,
+    timelineScrollPosition,
+    scrollContainerRef,
+    autoScrollContainerRef,
+  ]);
 
   if (isLoading) {
     return (

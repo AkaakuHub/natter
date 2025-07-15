@@ -6,6 +6,7 @@ import { Post } from "@/api/types";
 import { usePostEdit } from "@/hooks/usePostEdit";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { useFormValidation } from "@/hooks/useFormValidation";
+import { decodeContentForEditing } from "@/utils/decodeContent";
 
 import ModalHeader from "./components/ModalHeader";
 import EditForm from "./components/EditForm";
@@ -23,7 +24,9 @@ const EditPostModal = ({
   onClose,
   onEditSuccess,
 }: EditPostModalProps) => {
-  const [content, setContent] = useState(post.content || "");
+  const [content, setContent] = useState(
+    decodeContentForEditing(post.content || ""),
+  );
   const characterLimit = 280;
 
   const { isEditing, editPost } = usePostEdit();
@@ -44,7 +47,7 @@ const EditPostModal = ({
   // モーダルが開かれた時に初期値を設定
   useEffect(() => {
     if (isOpen) {
-      setContent(post.content || "");
+      setContent(decodeContentForEditing(post.content || ""));
       clearImages();
     }
   }, [isOpen, post.id, post.content, clearImages]);
@@ -52,7 +55,10 @@ const EditPostModal = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isValid || content.trim() === (post.content || "").trim()) {
+    if (
+      !isValid ||
+      content.trim() === decodeContentForEditing(post.content || "").trim()
+    ) {
       return;
     }
 
@@ -64,7 +70,7 @@ const EditPostModal = ({
   };
 
   const handleClose = () => {
-    setContent(post.content || "");
+    setContent(decodeContentForEditing(post.content || ""));
     clearImages();
     onClose();
   };
@@ -98,7 +104,9 @@ const EditPostModal = ({
           isSubmitting={isEditing}
           isValid={isValid}
           hasChanges={
-            content.trim() !== (post.content || "").trim() || images.length > 0
+            content.trim() !==
+              decodeContentForEditing(post.content || "").trim() ||
+            images.length > 0
           }
           characterLimit={characterLimit}
           autoFocus={true}

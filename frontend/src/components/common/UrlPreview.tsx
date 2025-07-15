@@ -62,7 +62,6 @@ const UrlPreview: React.FC<UrlPreviewProps> = ({ url, className = "" }) => {
         const hasValidMetadata =
           data.title || data.description || data.image || data.siteName;
         if (!hasValidMetadata) {
-          console.log("No valid metadata found, skipping display:", data);
           setError("No metadata available");
           return;
         }

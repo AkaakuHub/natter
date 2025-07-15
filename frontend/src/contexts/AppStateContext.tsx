@@ -10,6 +10,8 @@ interface AppStateContextType {
   openedModals: Set<string>;
   openModal: (modalId: string) => void;
   closeModal: (modalId: string) => void;
+  timelineScrollPosition: number;
+  setTimelineScrollPosition: (position: number) => void;
 }
 
 const AppStateContext = createContext<AppStateContextType | undefined>(
@@ -22,6 +24,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isModalOpen, setModalOpen] = useState(false);
   const [isInputFocused, setInputFocused] = useState(false);
   const [openedModals, setOpenedModals] = useState<Set<string>>(new Set());
+  const [timelineScrollPosition, setTimelineScrollPosition] = useState(0);
 
   const openModal = useCallback((modalId: string) => {
     setOpenedModals((prev) => {
@@ -51,6 +54,8 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({
         openedModals,
         openModal,
         closeModal,
+        timelineScrollPosition,
+        setTimelineScrollPosition,
       }}
     >
       {children}
