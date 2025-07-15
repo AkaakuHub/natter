@@ -59,9 +59,10 @@ const PostContent = ({
       )}
 
       <div className="prose prose-lg max-w-none">
-        <p className="text-text text-lg leading-relaxed whitespace-pre-wrap font-medium break-words selectable-text break-long-words cursor-text">
+        <div className="text-text text-lg leading-relaxed whitespace-pre-wrap font-medium break-words selectable-text break-long-words cursor-text">
           <RichText
             className="whitespace-pre-wrap"
+            showUrlPreviews={true}
             onTextSelect={(e) => {
               // テキスト選択のイベント処理
               const selection = window.getSelection();
@@ -72,7 +73,7 @@ const PostContent = ({
           >
             {processedContent}
           </RichText>
-        </p>
+        </div>
       </div>
 
       {/* URL表示 */}

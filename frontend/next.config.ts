@@ -12,18 +12,26 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   
   images: {
-    // X(Twitter)のプロフィール画像を表示するために追加
+    // X(Twitter)のプロフィール画像とURL メタデータ画像を表示するために追加
     remotePatterns: [
       { hostname: "pbs.twimg.com" },
       { hostname: "images.unsplash.com" },
       { hostname: "localhost" },
       { hostname: "api-demo-natter.akaaku.net" },
+      // URL メタデータ用の画像ホスト (HTTPS のみ)
+      { 
+        protocol: "https",
+        hostname: "**", // 任意のHTTPSホストを許可
+      },
     ],
     // 画像最適化設定
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // 外部画像の読み込みでエラーが発生した場合のフォールバック
+    dangerouslyAllowSVG: false,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
   // Webpack最適化

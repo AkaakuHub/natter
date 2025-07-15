@@ -18,16 +18,21 @@ export interface TextSegment {
  * @returns ParsedText オブジェクト
  */
 export const parseTextWithUrls = (text: string): ParsedText => {
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  // まず、テキスト内のゼロ幅文字を除去してからURL検出を行う
+  const cleanText = text.replace(/[\u200B-\u200D\u2060\uFEFF]/g, "");
+
+  // より厳密なURL正規表現（少なくとも2文字以上のTLDを含む完全なドメイン名のみ検出）
+  const urlRegex =
+    /(https?:\/\/[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}[^\s]*)/g;
   const segments: TextSegment[] = [];
   let lastIndex = 0;
   let match;
   let effectiveLength = 0;
 
-  while ((match = urlRegex.exec(text)) !== null) {
+  while ((match = urlRegex.exec(cleanText)) !== null) {
     // URL前のテキスト部分
     if (match.index > lastIndex) {
-      const textContent = text.slice(lastIndex, match.index);
+      const textContent = cleanText.slice(lastIndex, match.index);
       segments.push({
         type: "text",
         content: textContent,
@@ -52,13 +57,13 @@ export const parseTextWithUrls = (text: string): ParsedText => {
   }
 
   // 残りのテキスト部分
-  if (lastIndex < text.length) {
-    const textContent = text.slice(lastIndex);
+  if (lastIndex < cleanText.length) {
+    const textContent = cleanText.slice(lastIndex);
     segments.push({
       type: "text",
       content: textContent,
       start: lastIndex,
-      end: text.length,
+      end: cleanText.length,
     });
     effectiveLength += textContent.length;
   }

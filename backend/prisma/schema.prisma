@@ -120,3 +120,20 @@ model Notification {
   @@index([userId, read])
   @@index([userId, createdAt])
 }
+
+model UrlMetadataCache {
+  id          Int      @id @default(autoincrement())
+  url         String   @unique // キャッシュキーとなるURL
+  title       String?
+  description String?
+  image       String?
+  siteName    String?
+  type        String?
+  favicon     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  expiresAt   DateTime // キャッシュの有効期限
+  
+  @@index([url])
+  @@index([expiresAt])
+}

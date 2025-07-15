@@ -57,7 +57,11 @@ const PostTextArea = ({
       ref={inputRef}
       value={value}
       onChange={(e) => {
-        const newValue = e.target.value;
+        let newValue = e.target.value;
+
+        // 問題のあるゼロ幅文字を削除
+        newValue = newValue.replace(/[\u200B\u2060\uFEFF]/g, "");
+
         // URL特殊カウントを考慮した文字数制限チェック
         const effectiveLength = calculateEffectiveLength(newValue);
         if (effectiveLength <= characterLimit) {

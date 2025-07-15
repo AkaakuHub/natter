@@ -3,8 +3,6 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function updateCharacterPostsCount() {
-  console.log('Updating character posts count...');
-
   try {
     // 全てのキャラクターを取得
     const characters = await prisma.character.findMany({
@@ -30,14 +28,8 @@ async function updateCharacterPostsCount() {
           where: { id: character.id },
           data: { postsCount: actualPostsCount },
         });
-        
-        console.log(
-          `Updated character "${character.name}" (ID: ${character.id}): ${character.postsCount} -> ${actualPostsCount}`,
-        );
       }
     }
-
-    console.log('Character posts count update completed!');
   } catch (error) {
     console.error('Error updating character posts count:', error);
   } finally {

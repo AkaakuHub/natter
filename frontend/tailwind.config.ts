@@ -8,6 +8,9 @@ const config: Config = {
     "./src/hooks/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/utils/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  plugins: [
+    require('@tailwindcss/line-clamp'),
+  ],
 };
 
 export default config;

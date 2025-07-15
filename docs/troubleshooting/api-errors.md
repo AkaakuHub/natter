@@ -45,7 +45,7 @@
 
 **frontend/.env.local**:
 ```diff
-- NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+- NEXT_PUBLIC_API_URL=http://localhost:8000
 - NEXT_PUBLIC_BACKEND_KEY=1234
 + NEXT_PUBLIC_API_URL=http://localhost:8000
 + NEXT_PUBLIC_PASSKEY=1234
