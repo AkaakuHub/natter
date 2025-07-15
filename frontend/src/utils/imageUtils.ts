@@ -48,7 +48,7 @@ const getJWTToken = async (): Promise<string | null> => {
  * @param imageUrl 画像のURL
  * @returns 画像のBlob URL
  */
-export const fetchImageWithAuth = async (imageUrl: string): Promise<string> => {
+const fetchImageWithAuth = async (imageUrl: string): Promise<string> => {
   try {
     const jwtToken = await getJWTToken();
     const response = await fetch(imageUrl, {
@@ -94,14 +94,4 @@ export const getCachedImageWithAuth = async (
   const blobUrl = await fetchImageWithAuth(imageUrl);
   imageCache.set(imageUrl, blobUrl);
   return blobUrl;
-};
-
-/**
- * 画像キャッシュをクリア
- */
-export const clearImageCache = () => {
-  imageCache.forEach((blobUrl) => {
-    URL.revokeObjectURL(blobUrl);
-  });
-  imageCache.clear();
 };

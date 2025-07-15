@@ -27,7 +27,7 @@ const COLOR_PALETTE = [
  * @param name キャラクター名（自分のものは実名、他人のものは"???"形式）
  * @returns RGB色文字列
  */
-export function getCharacterColor(name: string): string {
+function getCharacterColor(name: string): string {
   // 文字列の長さを取得
   const length = name.length;
 

@@ -92,33 +92,3 @@ export const useUpdateCharacter = () => {
     },
   });
 };
-
-// キャラクター削除ミューテーション
-export const useDeleteCharacter = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: number) => CharactersApi.deleteCharacter(id),
-    onSuccess: (_, deletedId) => {
-      // キャラクター一覧のキャッシュから削除
-      queryClient.setQueryData(
-        CHARACTER_QUERY_KEYS.characters,
-        (oldCharacters: Character[] | undefined) => {
-          return oldCharacters?.filter(
-            (character) => character.id !== deletedId,
-          );
-        },
-      );
-
-      // 特定のキャラクターキャッシュを削除
-      queryClient.removeQueries({
-        queryKey: CHARACTER_QUERY_KEYS.character(deletedId),
-      });
-
-      // キャラクター一覧のキャッシュを無効化
-      queryClient.invalidateQueries({
-        queryKey: ["characters"],
-      });
-    },
-  });
-};

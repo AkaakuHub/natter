@@ -1,7 +1,7 @@
 // SPA Routes Configuration - 一元管理
 // 新しいルートを追加する場合はここに追加するだけで全体に反映される
 
-export interface SPARouteConfig {
+interface SPARouteConfig {
   path: string;
   label: string;
   icon: string; // Tabler icon name
@@ -121,24 +121,9 @@ const OTHER_ROUTES: SPARouteConfig[] = [
 // 全てのルート定義を統合
 export const ALL_ROUTES = [...MAIN_NAVIGATION_ROUTES, ...OTHER_ROUTES];
 
-// パスのリストを取得するヘルパー関数
-export const getAllPaths = (): string[] => {
-  return ALL_ROUTES.map((route) => route.path);
-};
-
 // middleware用のパスリストを取得
 export const getMiddlewarePaths = (): string[] => {
   return ALL_ROUTES.map((route) => route.path).filter(
     (path) => !path.includes(":"),
   );
-};
-
-// 特定のパスのルート設定を取得
-export const getRouteConfig = (path: string): SPARouteConfig | undefined => {
-  return ALL_ROUTES.find((route) => route.path === path);
-};
-
-// フッターメニューに表示するルートを取得
-export const getFooterMenuRoutes = (): SPARouteConfig[] => {
-  return MAIN_NAVIGATION_ROUTES;
 };
