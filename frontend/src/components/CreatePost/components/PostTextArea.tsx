@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useAppState } from "@/contexts/AppStateContext";
+import { calculateEffectiveLength } from "@/utils/textUtils";
 
 interface PostTextAreaProps {
   value: string;
@@ -55,12 +56,19 @@ const PostTextArea = ({
     <textarea
       ref={inputRef}
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => {
+        const newValue = e.target.value;
+        // URL特殊カウントを考慮した文字数制限チェック
+        const effectiveLength = calculateEffectiveLength(newValue);
+        if (effectiveLength <= characterLimit) {
+          onChange(newValue);
+        }
+        // 制限を超えた場合は更新しない（入力を拒否）
+      }}
       onKeyDown={handleKeyDown}
       placeholder={placeholder}
       className="w-full resize-none border-none outline-none text-xl placeholder-gray-400 bg-transparent leading-relaxed font-medium focus:placeholder-gray-300 transition-all duration-300"
       rows={3}
-      maxLength={characterLimit}
       disabled={disabled}
     />
   );

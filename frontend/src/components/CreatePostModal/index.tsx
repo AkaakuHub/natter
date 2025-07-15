@@ -51,12 +51,13 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     error,
     handleSubmit: submitPost,
   } = usePostSubmit(currentUser, onPostCreated);
-  const { remainingChars, isValid } = useFormValidation(
-    content,
-    images.length,
-    characterLimit,
-    !!selectedCharacter,
-  );
+  const { remainingChars, isValid, effectiveLength, actualLength } =
+    useFormValidation(
+      content,
+      images.length,
+      characterLimit,
+      !!selectedCharacter,
+    );
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) {
@@ -224,6 +225,8 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   isValid={isValid}
                   imageCount={images.length}
                   maxImages={10}
+                  effectiveLength={effectiveLength}
+                  actualLength={actualLength}
                 />
               </div>
             </div>

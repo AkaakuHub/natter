@@ -9,6 +9,8 @@ interface PostActionsProps {
   isValid: boolean;
   imageCount: number;
   maxImages: number;
+  effectiveLength?: number;
+  actualLength?: number;
 }
 
 const PostActions = ({
@@ -19,6 +21,8 @@ const PostActions = ({
   isValid,
   imageCount,
   maxImages,
+  effectiveLength,
+  actualLength,
 }: PostActionsProps) => {
   return (
     <div className="flex items-center justify-between mt-4 pt-4 border-t border-border-muted">
@@ -39,17 +43,29 @@ const PostActions = ({
         </button>
 
         {/* 文字数カウンター */}
-        <span
-          className={`text-sm font-medium ${
-            remainingChars < 20
-              ? remainingChars < 0
-                ? "text-error"
-                : "text-warning"
-              : "text-text-muted"
-          }`}
-        >
-          {remainingChars}
-        </span>
+        <div className="flex items-center gap-2">
+          <span
+            className={`text-sm font-medium ${
+              remainingChars < 20
+                ? remainingChars < 0
+                  ? "text-error"
+                  : "text-warning"
+                : "text-text-muted"
+            }`}
+          >
+            {remainingChars}
+          </span>
+          {effectiveLength !== undefined &&
+            actualLength !== undefined &&
+            effectiveLength !== actualLength && (
+              <span
+                className="text-xs text-text-muted"
+                title={`実際の文字数: ${actualLength}文字\n有効文字数: ${effectiveLength}文字 (URLは1/5でカウント)`}
+              >
+                ({effectiveLength}/{actualLength})
+              </span>
+            )}
+        </div>
       </div>
 
       {/* 投稿ボタン */}

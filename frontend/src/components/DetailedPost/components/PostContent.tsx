@@ -6,6 +6,7 @@ import { getCharacterColorStyle } from "@/utils/characterColorUtils";
 import { Character } from "@/api";
 import { useImagePreload } from "@/hooks/useImagePreload";
 import AuthenticatedImage from "@/components/common/AuthenticatedImage";
+import RichText from "@/components/common/RichText";
 
 interface PostContentProps {
   content: string;
@@ -59,7 +60,18 @@ const PostContent = ({
 
       <div className="prose prose-lg max-w-none">
         <p className="text-text text-lg leading-relaxed whitespace-pre-wrap font-medium break-words selectable-text break-long-words cursor-text">
-          {processedContent}
+          <RichText
+            className="whitespace-pre-wrap"
+            onTextSelect={(e) => {
+              // テキスト選択のイベント処理
+              const selection = window.getSelection();
+              if (selection && selection.toString().length > 0) {
+                e.stopPropagation();
+              }
+            }}
+          >
+            {processedContent}
+          </RichText>
         </p>
       </div>
 

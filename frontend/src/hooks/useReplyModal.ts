@@ -12,6 +12,8 @@ interface UseReplyModalResult {
   clearImages: () => void;
   remainingChars: number;
   isValid: boolean;
+  effectiveLength: number;
+  actualLength: number;
   handleSubmit: (
     e: React.FormEvent,
     onReplySubmit: (content: string, images: File[]) => Promise<void>,
@@ -33,11 +35,8 @@ export const useReplyModal = (): UseReplyModalResult => {
     clearImages,
   } = useImageUpload(10);
 
-  const { remainingChars, isValid } = useFormValidation(
-    content,
-    images.length,
-    characterLimit,
-  );
+  const { remainingChars, isValid, effectiveLength, actualLength } =
+    useFormValidation(content, images.length, characterLimit);
 
   const handleSubmit = async (
     e: React.FormEvent,
@@ -71,6 +70,8 @@ export const useReplyModal = (): UseReplyModalResult => {
     clearImages,
     remainingChars,
     isValid,
+    effectiveLength,
+    actualLength,
     handleSubmit,
     isSubmitting,
   };

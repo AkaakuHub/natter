@@ -6,6 +6,7 @@ import { getCharacterColorStyle } from "@/utils/characterColorUtils";
 import { Character } from "@/api";
 import { useImagePreload } from "@/hooks/useImagePreload";
 import AuthenticatedImage from "@/components/common/AuthenticatedImage";
+import RichText from "@/components/common/RichText";
 
 interface PostContentProps {
   content: string;
@@ -73,28 +74,19 @@ const PostContent = ({
       )}
 
       <div className="prose prose-lg max-w-none">
-        <p
-          className="text-text leading-relaxed text-lg whitespace-pre-wrap mb-4 break-words selectable-text break-long-words cursor-text"
-          onMouseDown={(e) => {
-            // テキスト選択を開始する場合は親のクリックイベントを無効化
-            e.stopPropagation();
-          }}
-          onMouseUp={(e) => {
-            // テキストが選択されている場合は親のクリックイベントを無効化
-            const selection = window.getSelection();
-            if (selection && selection.toString().length > 0) {
-              e.stopPropagation();
-            }
-          }}
-          onClick={(e) => {
-            // テキストが選択されている場合は親のクリックイベントを無効化
-            const selection = window.getSelection();
-            if (selection && selection.toString().length > 0) {
-              e.stopPropagation();
-            }
-          }}
-        >
-          {processedContent}
+        <p className="text-text leading-relaxed text-lg whitespace-pre-wrap mb-4 break-words selectable-text break-long-words cursor-text">
+          <RichText
+            className="whitespace-pre-wrap"
+            onTextSelect={(e) => {
+              // テキスト選択のイベント処理
+              const selection = window.getSelection();
+              if (selection && selection.toString().length > 0) {
+                e.stopPropagation();
+              }
+            }}
+          >
+            {processedContent}
+          </RichText>
         </p>
       </div>
 

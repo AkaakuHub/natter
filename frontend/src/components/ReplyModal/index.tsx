@@ -42,6 +42,8 @@ const ReplyModal = ({
     handleImageRemove,
     remainingChars,
     isValid,
+    effectiveLength,
+    actualLength,
     handleSubmit,
     isSubmitting,
   } = useReplyModal();
@@ -83,6 +85,8 @@ const ReplyModal = ({
           remainingChars={remainingChars}
           isSubmitting={isSubmitting}
           isValid={isValid}
+          effectiveLength={effectiveLength}
+          actualLength={actualLength}
         />
       </div>
     </div>

@@ -16,6 +16,8 @@ interface ReplyFormProps {
   remainingChars: number;
   isSubmitting: boolean;
   isValid: boolean;
+  effectiveLength?: number;
+  actualLength?: number;
 }
 
 const ReplyForm = ({
@@ -29,6 +31,8 @@ const ReplyForm = ({
   remainingChars,
   isSubmitting,
   isValid,
+  effectiveLength,
+  actualLength,
 }: ReplyFormProps) => {
   const handleKeyboardSubmit = () => {
     if (isValid && !isSubmitting) {
@@ -75,17 +79,29 @@ const ReplyForm = ({
           >
             <IconPhoto size={20} />
           </button>
-          <span
-            className={`text-sm ${
-              remainingChars < 20
-                ? remainingChars < 0
-                  ? "text-error"
-                  : "text-warning"
-                : "text-text-muted"
-            }`}
-          >
-            {remainingChars}
-          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className={`text-sm ${
+                remainingChars < 20
+                  ? remainingChars < 0
+                    ? "text-error"
+                    : "text-warning"
+                  : "text-text-muted"
+              }`}
+            >
+              {remainingChars}
+            </span>
+            {effectiveLength !== undefined &&
+              actualLength !== undefined &&
+              effectiveLength !== actualLength && (
+                <span
+                  className="text-xs text-text-muted"
+                  title={`実際の文字数: ${actualLength}文字\n有効文字数: ${effectiveLength}文字 (URLは1/5でカウント)`}
+                >
+                  ({effectiveLength}/{actualLength})
+                </span>
+              )}
+          </div>
         </div>
 
         <button

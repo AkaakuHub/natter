@@ -1,10 +1,13 @@
 import { useMemo } from "react";
+import { calculateEffectiveLength } from "@/utils/textUtils";
 
 interface UseFormValidationResult {
   remainingChars: number;
   isValid: boolean;
   hasContent: boolean;
   isOverLimit: boolean;
+  effectiveLength: number;
+  actualLength: number;
 }
 
 export const useFormValidation = (
@@ -13,7 +16,9 @@ export const useFormValidation = (
   characterLimit: number = 280,
   hasCharacter: boolean = false,
 ): UseFormValidationResult => {
-  const remainingChars = characterLimit - content.length;
+  const effectiveLength = calculateEffectiveLength(content);
+  const actualLength = content.length;
+  const remainingChars = characterLimit - effectiveLength;
   const hasContent =
     content.trim().length > 0 || imageCount > 0 || hasCharacter;
   const isOverLimit = remainingChars < 0;
@@ -25,7 +30,16 @@ export const useFormValidation = (
       isValid,
       hasContent,
       isOverLimit,
+      effectiveLength,
+      actualLength,
     }),
-    [remainingChars, isValid, hasContent, isOverLimit],
+    [
+      remainingChars,
+      isValid,
+      hasContent,
+      isOverLimit,
+      effectiveLength,
+      actualLength,
+    ],
   );
 };
