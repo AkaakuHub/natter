@@ -78,6 +78,20 @@ const TimeLine = ({ currentUser, scrollContainerRef }: TimeLineProps) => {
     };
   }, [queryClient]);
 
+  // タイムラインデータの読み込み完了を通知
+  useEffect(() => {
+    console.log("🗂️ Timeline state:", {
+      isLoading,
+      posts: !!posts,
+      error: !!error,
+    });
+    if (!isLoading && (posts || error)) {
+      console.log("📡 Dispatching timelineLoaded event");
+      // データの読み込みが完了したことを通知
+      window.dispatchEvent(new CustomEvent("timelineLoaded"));
+    }
+  }, [isLoading, posts, error]);
+
   // スクロール位置を監視して保存（スロットリング付き）
   useEffect(() => {
     const currentScrollContainer =

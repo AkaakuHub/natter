@@ -9,6 +9,7 @@ import { auth } from "@/auth";
 import { ToastProvider } from "@/hooks/useToast";
 import { AppStateProvider } from "@/contexts/AppStateContext";
 import { ServerStatusProvider } from "@/contexts/ServerStatusContext";
+import ClientLayout from "@/components/ClientLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,14 +58,31 @@ export default async function RootLayout({
           href="/manifest.json"
           crossOrigin="use-credentials"
         />
+        {/* スプラッシュスクリーン用ロゴを最優先で読み込み */}
+        <link
+          rel="preload"
+          as="image"
+          href="/images/logo.png"
+          fetchPriority="high"
+        />
       </head>
       <body
         className={`${geistSans.variable} antialiased bg-surface text-text`}
       >
+        {/* CSS版のスプラッシュスクリーン（即座に表示） */}
+        <div id="initial-splash" className="initial-splash">
+          <div className="initial-splash-content">
+            <div className="initial-splash-logo"></div>
+            <h1 className="initial-splash-title">Natter</h1>
+            <p className="initial-splash-subtitle">Connect & Share</p>
+          </div>
+        </div>
         <NextAuthProvider>
           <ServerStatusProvider>
             <AppStateProvider>
-              <ToastProvider>{children}</ToastProvider>
+              <ToastProvider>
+                <ClientLayout>{children}</ClientLayout>
+              </ToastProvider>
             </AppStateProvider>
           </ServerStatusProvider>
         </NextAuthProvider>
