@@ -2,50 +2,57 @@ import { useEffect, useRef } from "react";
 
 export const useScrollLock = (isLocked: boolean) => {
   const scrollPosition = useRef<number>(0);
-  const bodyElement = useRef<HTMLElement | null>(null);
+  const scrollContainer = useRef<HTMLElement | null>(null);
   const wasLocked = useRef<boolean>(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    bodyElement.current = document.body;
+    // 実際のスクロールコンテナを取得
+    scrollContainer.current = document.querySelector(
+      ".flex-1.overflow-y-auto",
+    ) as HTMLElement;
 
-    if (isLocked && !wasLocked.current) {
+    if (isLocked && !wasLocked.current && scrollContainer.current) {
       // 現在のスクロール位置を保存
-      scrollPosition.current =
-        window.pageYOffset || document.documentElement.scrollTop;
+      scrollPosition.current = scrollContainer.current.scrollTop;
       console.log("Saving scroll position:", scrollPosition.current);
 
-      // bodyのスクロールを無効化
-      bodyElement.current.style.position = "fixed";
-      bodyElement.current.style.top = `-${scrollPosition.current}px`;
-      bodyElement.current.style.width = "100%";
-      bodyElement.current.style.overflow = "hidden";
+      // スクロールコンテナのスクロールを無効化
+      scrollContainer.current.classList.add("scroll-locked");
+
+      // bodyも念のためオーバーフローを無効化（position:fixedは使わない）
+      document.body.classList.add("scroll-locked");
 
       wasLocked.current = true;
-    } else if (!isLocked && wasLocked.current) {
+    } else if (!isLocked && wasLocked.current && scrollContainer.current) {
       // スクロールを復元
-      if (bodyElement.current) {
-        bodyElement.current.style.position = "";
-        bodyElement.current.style.top = "";
-        bodyElement.current.style.width = "";
-        bodyElement.current.style.overflow = "";
+      scrollContainer.current.classList.remove("scroll-locked");
+      document.body.classList.remove("scroll-locked");
 
-        console.log("Restoring scroll position:", scrollPosition.current);
+      console.log("Restoring scroll position:", scrollPosition.current);
 
-        // 次のフレームでスクロール位置を復元（DOMの更新を待つ）
-        requestAnimationFrame(() => {
-          window.scrollTo(0, scrollPosition.current);
+      // 次のフレームでスクロール位置を復元
+      requestAnimationFrame(() => {
+        if (scrollContainer.current) {
+          scrollContainer.current.scrollTop = scrollPosition.current;
           // 確認のため再度実行
           setTimeout(() => {
-            console.log("Final scroll position check:", window.pageYOffset);
-            if (window.pageYOffset !== scrollPosition.current) {
-              console.log("Scroll position mismatch, retrying...");
-              window.scrollTo(0, scrollPosition.current);
+            if (scrollContainer.current) {
+              console.log(
+                "Final scroll position check:",
+                scrollContainer.current.scrollTop,
+              );
+              if (
+                scrollContainer.current.scrollTop !== scrollPosition.current
+              ) {
+                console.log("Scroll position mismatch, retrying...");
+                scrollContainer.current.scrollTop = scrollPosition.current;
+              }
             }
           }, 50);
-        });
-      }
+        }
+      });
 
       wasLocked.current = false;
     }
@@ -54,17 +61,12 @@ export const useScrollLock = (isLocked: boolean) => {
   // コンポーネントのアンマウント時にもスクロールを復元
   useEffect(() => {
     return () => {
-      if (wasLocked.current && bodyElement.current) {
-        bodyElement.current.style.position = "";
-        bodyElement.current.style.top = "";
-        bodyElement.current.style.width = "";
-        bodyElement.current.style.overflow = "";
-
-        // スクロール位置を復元
-        if (scrollPosition.current > 0) {
-          window.scrollTo(0, scrollPosition.current);
+      if (wasLocked.current) {
+        if (scrollContainer.current) {
+          scrollContainer.current.classList.remove("scroll-locked");
+          scrollContainer.current.scrollTop = scrollPosition.current;
         }
-
+        document.body.classList.remove("scroll-locked");
         wasLocked.current = false;
       }
     };

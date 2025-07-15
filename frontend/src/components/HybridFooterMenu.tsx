@@ -43,7 +43,7 @@ export function HybridFooterMenu({
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-surface border-t border-border h-[60px] backdrop-blur-sm">
-      <div className="flex justify-around items-center h-full px-4">
+      <div className="flex items-center h-full">
         {items.map((item) => {
           const IconComponent = getIconComponent(item.icon);
           return (
@@ -51,12 +51,18 @@ export function HybridFooterMenu({
               key={item.label}
               onClick={() => handleNavigation(item.href)}
               className={clsx(
-                "flex flex-col items-center justify-center p-2 transition-colors duration-200 h-full",
+                "flex flex-col items-center justify-center h-full transition-colors duration-200",
                 getPathColor(path, item.href),
               )}
+              style={{
+                flex: "1 1 0%", // 均等幅
+                minWidth: 0, // テキストの長さに関係なく均等に
+              }}
             >
               <IconComponent size={20} className="mb-1" />
-              <span className="text-xs">{item.label}</span>
+              <span className="text-xs truncate max-w-full px-1">
+                {item.label}
+              </span>
             </button>
           );
         })}

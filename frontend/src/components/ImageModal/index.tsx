@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { createPortal } from "react-dom";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { useModalState } from "@/hooks/useModalState";
@@ -40,10 +41,21 @@ const ImageModal = ({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-overlay">
+  const modalContent = (
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center"
+      style={{
+        backgroundColor: "rgba(0, 0, 0, 0.9)",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        zIndex: 9999,
+      }}
+    >
       <div
-        className="relative w-full h-full flex items-center justify-center"
+        className="relative w-full h-full flex items-center justify-center p-4"
         onClick={handleBackdropClick}
       >
         {/* 画像表示 */}
@@ -52,7 +64,7 @@ const ImageModal = ({
         {/* バツボタン */}
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 z-[101] text-text-inverse hover:text-text-inverse/80 bg-special-white/80 hover:bg-special-white/50 backdrop-blur-sm rounded-full p-3 transition-all duration-200"
+          className="absolute top-4 right-4 sm:top-6 sm:right-6 z-[10000] text-text-inverse hover:text-text-inverse/80 bg-overlay hover:bg-overlay/90 backdrop-blur-sm rounded-full p-3 transition-all duration-200"
         >
           <svg
             width="24"
@@ -80,6 +92,11 @@ const ImageModal = ({
       </div>
     </div>
   );
+
+  // body直下にポータルでレンダリング
+  return typeof window !== "undefined"
+    ? createPortal(modalContent, document.body)
+    : null;
 };
 
 export default ImageModal;

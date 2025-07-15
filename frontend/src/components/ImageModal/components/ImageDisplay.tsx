@@ -16,14 +16,13 @@ const ImageDisplay = ({ currentImage, currentIndex }: ImageDisplayProps) => {
     <AuthenticatedImage
       src={currentImage}
       alt={`画像 ${currentIndex + 1}`}
-      className="max-w-[90vw] max-h-[90vh] min-w-[400px] min-h-[300px] object-contain cursor-default"
+      className="max-w-[calc(100vw-4rem)] max-h-[calc(100vh-4rem)] w-auto h-auto object-contain cursor-default"
       style={{
-        maxWidth: "90vw",
-        maxHeight: "90vh",
-        minWidth: "400px",
-        minHeight: "300px",
+        maxWidth: "calc(100vw - 4rem)",
+        maxHeight: "calc(100vh - 4rem)",
         width: "auto",
         height: "auto",
+        display: "block",
       }}
       onClick={handleImageClick}
       loading="eager"

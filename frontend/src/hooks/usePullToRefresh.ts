@@ -109,8 +109,8 @@ export const usePullToRefresh = ({
           setIsPulling(true);
         }
 
-        // プルダウンが開始されている場合のみpreventDefault
-        if (isPulling || distance > 10) {
+        // iOS Safari対策: より早い段階でpreventDefaultを呼び出し、一貫性を保つ
+        if (distance > 5) {
           e.preventDefault(); // デフォルトのスクロールを防止
         }
 

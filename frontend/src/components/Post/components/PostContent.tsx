@@ -172,10 +172,10 @@ const PostContent = ({
                   alt="Post Image"
                   className={`rounded-2xl ${
                     visibleImages.length === 1
-                      ? "w-full h-auto max-h-96 min-h-[200px] min-w-[200px] object-cover"
+                      ? "w-full h-auto max-h-96 object-cover"
                       : visibleImages.length === 3 && index === 0
-                        ? "w-full h-full min-h-[200px] min-w-[100px] object-cover"
-                        : "w-full h-auto aspect-square min-h-[150px] min-w-[150px] object-cover"
+                        ? "w-full h-full object-cover"
+                        : "w-full h-auto aspect-square object-cover"
                   }`}
                   width={200}
                   height={200}

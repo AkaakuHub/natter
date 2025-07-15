@@ -33,7 +33,7 @@ export function FooterMenu({ path, scrollContainerRef }: BottomMenuProps) {
 
   return (
     <footer className="h-[60px] fixed bottom-0 left-0 right-0 border-t border-border bg-surface z-10">
-      <nav className="flex justify-between items-center max-w-full mx-auto">
+      <nav className="flex items-center h-full">
         {items.map((item, index) => {
           const IconComponent = getIconComponent(item.icon);
           return (
@@ -41,13 +41,18 @@ export function FooterMenu({ path, scrollContainerRef }: BottomMenuProps) {
               key={index}
               onClick={() => handleNavigation(item.href)}
               className={clsx(
-                "flex flex-col items-center justify-center w-full text-center transition-all duration-300 py-2 px-1 active:bg-surface-hover touch-manipulation",
+                "flex flex-col items-center justify-center h-full transition-all duration-300 active:bg-surface-hover touch-manipulation",
                 getPathColor(path, item.href),
               )}
-              style={{ minHeight: "48px" }}
+              style={{
+                flex: "1 1 0%", // 均等幅
+                minWidth: 0, // テキストの長さに関係なく均等に
+              }}
             >
-              <IconComponent className="h-6 w-6" />
-              <span className="text-xs mt-1">{item.label}</span>
+              <IconComponent className="h-5 w-5 sm:h-6 sm:w-6" />
+              <span className="text-xs mt-1 truncate max-w-full px-1">
+                {item.label}
+              </span>
             </button>
           );
         })}

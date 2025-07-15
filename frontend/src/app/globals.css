@@ -75,6 +75,8 @@ body {
   /* iOS Safari pull-to-refresh無効化 */
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
+  /* iOS Safariでのタッチ動作最適化 */
+  touch-action: pan-x pan-y;
 }
 
 .dark {
@@ -184,6 +186,11 @@ html {
   -webkit-user-select: text;
   -moz-user-select: text;
   -ms-user-select: text;
+}
+
+/* スクロールロック用ユーティリティ */
+.scroll-locked {
+  overflow: hidden !important;
 }
 
 /* ボタンや画像などの非テキスト要素は選択を無効にする */

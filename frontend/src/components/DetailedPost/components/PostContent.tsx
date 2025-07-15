@@ -114,7 +114,7 @@ const PostContent = ({
                   alt={`Post image ${idx + 1}`}
                   width={512}
                   height={512}
-                  className="w-full h-auto min-h-[250px] min-w-[250px] object-cover cursor-pointer rounded-3xl"
+                  className="w-full h-auto object-cover cursor-pointer rounded-3xl"
                   loading="lazy"
                   decoding="async"
                 />

@@ -27,7 +27,8 @@ const Timer: React.FC<TimerProps> = ({ className = "" }) => {
       startTimeRef.current = Date.now() - pausedTimeRef.current * 1000;
       intervalRef.current = setInterval(() => {
         if (startTimeRef.current) {
-          setTime((Date.now() - startTimeRef.current) / 1000);
+          const elapsed = (Date.now() - startTimeRef.current) / 1000;
+          setTime(elapsed);
         }
       }, 16);
     } else {
@@ -35,7 +36,6 @@ const Timer: React.FC<TimerProps> = ({ className = "" }) => {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-      pausedTimeRef.current = time;
     }
 
     return () => {
@@ -43,6 +43,13 @@ const Timer: React.FC<TimerProps> = ({ className = "" }) => {
         clearInterval(intervalRef.current);
       }
     };
+  }, [isRunning]);
+
+  // 一時停止時の時間を保存
+  useEffect(() => {
+    if (!isRunning) {
+      pausedTimeRef.current = time;
+    }
   }, [isRunning, time]);
 
   const formatTime = (seconds: number): string => {
