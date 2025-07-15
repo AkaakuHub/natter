@@ -24,7 +24,33 @@ export class PostsService {
     if (!content) return content;
 
     // HTMLエンティティをエスケープし、XSS攻撃を防ぐ
+    // ただし、URLは適切に保持する
     return validator.escape(content);
+  }
+
+  private sanitizeContentPreservingUrls(content: string): string {
+    if (!content) return content;
+
+    // URL検出の正規表現パターン
+    const urlPattern = /(https?:\/\/[^\s<>"{}|\\^`[\]]+)/g;
+
+    // URLを一時的にプレースホルダーに置換
+    const urls: string[] = [];
+    const contentWithPlaceholders = content.replace(urlPattern, (match) => {
+      urls.push(match);
+      return `__URL_PLACEHOLDER_${urls.length - 1}__`;
+    });
+
+    // プレースホルダーを含むコンテンツをサニタイズ
+    const sanitizedContent = validator.escape(contentWithPlaceholders);
+
+    // プレースホルダーを元のURLに戻す
+    return sanitizedContent.replace(
+      /__URL_PLACEHOLDER_(\d+)__/g,
+      (match, index: string) => {
+        return urls[parseInt(index, 10)] || match;
+      },
+    );
   }
 
   async create(createPostDto: CreatePostDto) {
@@ -37,12 +63,12 @@ export class PostsService {
       imagesPublic,
       ...postData
     } = createPostDto;
-    // コンテンツをサニタイズ
+    // コンテンツをサニタイズ（URLを保護）
     const sanitizedPostData = {
       ...postData,
       title: postData.title ? this.sanitizeContent(postData.title) : undefined,
       content: postData.content
-        ? this.sanitizeContent(postData.content)
+        ? this.sanitizeContentPreservingUrls(postData.content)
         : undefined,
       url: url ? this.sanitizeContent(url) : undefined,
       imagesPublic: imagesPublic || false, // デフォルトは非公開
@@ -496,12 +522,12 @@ export class PostsService {
 
     const { images, ...postData } = updatePostDto;
 
-    // コンテンツをサニタイズ
+    // コンテンツをサニタイズ（URLを保護）
     const sanitizedPostData = {
       ...postData,
       title: postData.title ? this.sanitizeContent(postData.title) : undefined,
       content: postData.content
-        ? this.sanitizeContent(postData.content)
+        ? this.sanitizeContentPreservingUrls(postData.content)
         : undefined,
     };
     return this.prisma.post.update({
