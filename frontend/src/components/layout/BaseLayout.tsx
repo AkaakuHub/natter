@@ -4,11 +4,13 @@ import React, { useRef, useState, lazy, Suspense } from "react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useGlobalKeyboardShortcuts } from "@/hooks/useGlobalKeyboardShortcuts";
 import { useAppState } from "@/contexts/AppStateContext";
+import { useServerStatus } from "@/contexts/ServerStatusContext";
 import Header from "./Header";
 import { FooterMenu } from "../FooterMenu";
 import Welcome from "../Welcome";
 import { usePathname, useRouter } from "next/navigation";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import ServerErrorBanner from "../common/ServerErrorBanner";
 
 // 遅延読み込みコンポーネント
 const CreatePostModal = lazy(() => import("../CreatePostModal"));
@@ -23,6 +25,15 @@ interface BaseLayoutProps {
 const BaseLayout = ({ children }: BaseLayoutProps) => {
   const { session, userExists, isLoading, createUserAndRefresh } =
     useCurrentUser();
+  const { isOnline } = useServerStatus();
+
+  // デバッグ情報
+  console.log("🏗️ BaseLayout state:", {
+    isOnline,
+    userExists,
+    isLoading,
+    hasSession: !!session,
+  });
   const pathname = usePathname();
   const router = useRouter();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -51,8 +62,38 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
     isInputFocused,
   });
 
-  // ローディング状態
+  // 【最優先】サーバーがオフラインの場合はエラーメッセージを表示
+  if (isOnline === false) {
+    console.log("🚨 Showing server error screen (isOnline === false)");
+    return (
+      <div className="w-full h-screen flex flex-col">
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="max-w-md w-full">
+            <ServerErrorBanner />
+            <div className="mt-4 text-center">
+              <p className="text-sm text-text-secondary">
+                サーバーが復旧するまでお待ちください
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // サーバーステータスチェック中
+  if (isOnline === null) {
+    console.log("⏳ Showing loading (server status check)");
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-interactive"></div>
+      </div>
+    );
+  }
+
+  // セッションローディング中
   if (isLoading) {
+    console.log("⏳ Showing loading (session/user loading)");
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-interactive"></div>
@@ -61,6 +102,7 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
   }
 
   if (!session) {
+    console.log("👤 No session - showing public content");
     return (
       <div className="w-full h-screen flex flex-col">
         <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
@@ -71,8 +113,11 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
   }
 
   if (userExists === false && session) {
+    console.log("👋 Showing Welcome (new user)");
     return <Welcome session={session} onUserCreated={createUserAndRefresh} />;
   }
+
+  console.log("🏠 Showing main app (timeline)");
 
   return (
     <div className="w-full h-screen flex flex-col">

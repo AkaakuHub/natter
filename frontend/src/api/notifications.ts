@@ -30,7 +30,7 @@ export interface Notification {
   };
 }
 
-export interface CreateNotificationDto {
+interface CreateNotificationDto {
   type: string;
   message?: string;
   userId: string;
@@ -39,7 +39,7 @@ export interface CreateNotificationDto {
   read?: boolean;
 }
 
-export interface UpdateNotificationDto {
+interface UpdateNotificationDto {
   type?: string;
   message?: string;
   read?: boolean;

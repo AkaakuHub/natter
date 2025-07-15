@@ -1,4 +1,5 @@
 import { getSession } from "next-auth/react";
+import { NetworkError } from "./errors";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -330,6 +331,21 @@ export class ApiClient {
         throw new Error("Invalid JSON response");
       }
     } catch (error) {
+      // ネットワークエラー（サーバーダウン等）の場合は NetworkError を投げる
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      const isNetworkError =
+        errorMessage.includes("Failed to fetch") ||
+        errorMessage.includes("ERR_CONNECTION_REFUSED") ||
+        errorMessage.includes("ECONNREFUSED") ||
+        error instanceof TypeError;
+
+      if (isNetworkError) {
+        // ネットワークエラーの場合はコンソールエラーを出力せずにNetworkErrorを投げる
+        throw new NetworkError("サーバーに接続できません");
+      }
+
+      // その他のエラーの場合のみコンソール出力
       console.error("API request failed:", error);
       throw error;
     }
@@ -447,6 +463,21 @@ export class ApiClient {
         throw new Error("Invalid JSON response");
       }
     } catch (error) {
+      // ネットワークエラー（サーバーダウン等）の場合は NetworkError を投げる
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      const isNetworkError =
+        errorMessage.includes("Failed to fetch") ||
+        errorMessage.includes("ERR_CONNECTION_REFUSED") ||
+        errorMessage.includes("ECONNREFUSED") ||
+        error instanceof TypeError;
+
+      if (isNetworkError) {
+        // ネットワークエラーの場合はコンソールエラーを出力せずにNetworkErrorを投げる
+        throw new NetworkError("サーバーに接続できません");
+      }
+
+      // その他のエラーの場合のみコンソール出力
       console.error("API request failed:", error);
       throw error;
     }
@@ -531,6 +562,21 @@ export class ApiClient {
         throw new Error("Invalid JSON response");
       }
     } catch (error) {
+      // ネットワークエラー（サーバーダウン等）の場合は NetworkError を投げる
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      const isNetworkError =
+        errorMessage.includes("Failed to fetch") ||
+        errorMessage.includes("ERR_CONNECTION_REFUSED") ||
+        errorMessage.includes("ECONNREFUSED") ||
+        error instanceof TypeError;
+
+      if (isNetworkError) {
+        // ネットワークエラーの場合はコンソールエラーを出力せずにNetworkErrorを投げる
+        throw new NetworkError("サーバーに接続できません");
+      }
+
+      // その他のエラーの場合のみコンソール出力
       console.error("API request failed:", error);
       throw error;
     }

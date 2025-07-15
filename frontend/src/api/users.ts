@@ -45,7 +45,10 @@ export class UsersApi {
       ) {
         return null;
       }
-      console.error("Error fetching user by Twitter ID:", error);
+      // NetworkErrorの場合はログを出力しない（サーバーダウン時の騒音を防ぐ）
+      if (!errorMessage.includes("サーバーに接続できません")) {
+        console.error("Error fetching user by Twitter ID:", error);
+      }
       throw error; // 他のエラーはそのまま投げる
     }
   }

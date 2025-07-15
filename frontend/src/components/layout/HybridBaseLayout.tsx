@@ -6,10 +6,12 @@ import { useGlobalKeyboardShortcuts } from "@/hooks/useGlobalKeyboardShortcuts";
 import { useAppState } from "@/contexts/AppStateContext";
 import { useTrueSPARouter } from "@/core/router/TrueSPARouter";
 import { useHybridSPAAuth } from "@/core/auth/HybridSPAAuth";
+import { useServerStatus } from "@/contexts/ServerStatusContext";
 import Header from "./Header";
 import { HybridFooterMenu } from "../HybridFooterMenu";
 import Welcome from "../Welcome";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import ServerErrorBanner from "../common/ServerErrorBanner";
 
 // 遅延読み込みコンポーネント（既存の優れた実装保護）
 const CreatePostModal = lazy(() => import("../CreatePostModal"));
@@ -25,8 +27,10 @@ interface HybridBaseLayoutProps {
 const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
   const { session, userExists, isLoading, createUserAndRefresh } =
     useCurrentUser();
+  const { isOnline } = useServerStatus();
   const { currentRoute, navigate } = useTrueSPARouter();
   const { isHydrated, isInitialLoad } = useHybridSPAAuth();
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { isModalOpen, isInputFocused } = useAppState();
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
@@ -58,7 +62,34 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
     isInputFocused,
   });
 
-  // ローディング状態（既存実装保護）
+  // 【最優先】サーバーがオフラインの場合はエラーメッセージを表示
+  if (isOnline === false) {
+    return (
+      <div className="w-full h-screen flex flex-col">
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="max-w-md w-full">
+            <ServerErrorBanner />
+            <div className="mt-4 text-center">
+              <p className="text-sm text-text-secondary">
+                サーバーが復旧するまでお待ちください
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // サーバーステータスチェック中
+  if (isOnline === null) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-interactive"></div>
+      </div>
+    );
+  }
+
+  // セッションローディング中
   if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">

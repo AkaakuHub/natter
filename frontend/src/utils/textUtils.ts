@@ -1,6 +1,6 @@
 // テキスト処理ユーティリティ
 
-export interface ParsedText {
+interface ParsedText {
   segments: TextSegment[];
   effectiveLength: number;
 }

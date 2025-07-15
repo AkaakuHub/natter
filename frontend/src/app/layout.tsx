@@ -8,6 +8,7 @@ import NextAuthProvider from "@/app/providers";
 import { auth } from "@/auth";
 import { ToastProvider } from "@/hooks/useToast";
 import { AppStateProvider } from "@/contexts/AppStateContext";
+import { ServerStatusProvider } from "@/contexts/ServerStatusContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,9 +60,11 @@ export default async function RootLayout({
         className={`${geistSans.variable} antialiased bg-surface text-text`}
       >
         <NextAuthProvider>
-          <AppStateProvider>
-            <ToastProvider>{children}</ToastProvider>
-          </AppStateProvider>
+          <ServerStatusProvider>
+            <AppStateProvider>
+              <ToastProvider>{children}</ToastProvider>
+            </AppStateProvider>
+          </ServerStatusProvider>
         </NextAuthProvider>
       </body>
     </html>
