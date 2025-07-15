@@ -36,6 +36,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
   );
+  const [showDiscardDialog, setShowDiscardDialog] = useState(false);
   const characterLimit = 280;
   const { navigateToLogin } = useSPANavigation();
 
@@ -83,13 +84,40 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     }
   };
 
+  // 入力内容があるかどうかをチェック
+  const hasContent = () => {
+    return (
+      content.trim() !== "" ||
+      url.trim() !== "" ||
+      images.length > 0 ||
+      selectedCharacter !== null
+    );
+  };
+
   const handleClose = () => {
+    if (hasContent()) {
+      setShowDiscardDialog(true);
+    } else {
+      clearFormAndClose();
+    }
+  };
+
+  const clearFormAndClose = () => {
     setContent("");
     setUrl("");
     setImagesPublic(false);
     setSelectedCharacter(null);
     clearImages();
+    setShowDiscardDialog(false);
     onClose();
+  };
+
+  const handleDiscardConfirm = () => {
+    clearFormAndClose();
+  };
+
+  const handleDiscardCancel = () => {
+    setShowDiscardDialog(false);
   };
 
   if (!isOpen) return null;
@@ -233,6 +261,34 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
           </form>
         </div>
       </div>
+
+      {/* 破棄確認ダイアログ */}
+      {showDiscardDialog && (
+        <div className="fixed inset-0 bg-overlay flex items-center justify-center z-[60] p-4">
+          <div className="bg-surface rounded-lg max-w-sm w-full p-6 border border-border">
+            <h3 className="text-lg font-semibold text-text mb-4">
+              投稿を破棄しますか？
+            </h3>
+            <p className="text-text-secondary mb-6 text-sm">
+              入力した内容は保存されません。本当に破棄してもよろしいですか？
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={handleDiscardCancel}
+                className="px-4 py-2 border border-border rounded-lg text-text hover:bg-surface-hover transition-colors"
+              >
+                いいえ
+              </button>
+              <button
+                onClick={handleDiscardConfirm}
+                className="px-4 py-2 bg-error text-text-inverse rounded-lg hover:bg-error/90 transition-colors"
+              >
+                はい
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

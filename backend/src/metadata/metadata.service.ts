@@ -12,7 +12,7 @@ export class MetadataService {
 
   async getUrlMetadata(url: string): Promise<UrlMetadataResponseDto> {
     try {
-      // キャッシュから検索
+      // キャッシュから検索（元のURLで）
       const cached = await this.getCachedMetadata(url);
       if (cached) {
         return cached;
@@ -21,10 +21,11 @@ export class MetadataService {
       // キャッシュにない場合は新規取得
       const metadata = await this.fetchMetadata(url);
 
-      // キャッシュに保存
-      await this.saveToCache(url, metadata);
+      // キャッシュに保存（元のURLで保存し、メタデータのurlも元のものに戻す）
+      const cacheMetadata = { ...metadata, url };
+      await this.saveToCache(url, cacheMetadata);
 
-      return metadata;
+      return cacheMetadata;
     } catch (error) {
       this.logger.error(`Failed to get metadata for URL: ${url}`, error);
       throw error;
@@ -111,6 +112,16 @@ export class MetadataService {
 
       if (!['http:', 'https:'].includes(validUrl.protocol)) {
         throw new Error(`Invalid protocol: ${validUrl.protocol}`);
+      }
+
+      // TwitterやX.comのURLをfxtwitter.comに変換（メタデータ専用）
+      if (
+        validUrl.hostname === 'twitter.com' ||
+        validUrl.hostname === 'x.com' ||
+        validUrl.hostname === 'www.twitter.com' ||
+        validUrl.hostname === 'www.x.com'
+      ) {
+        validUrl.hostname = 'fxtwitter.com';
       }
 
       // ホスト名の妥当性チェック
