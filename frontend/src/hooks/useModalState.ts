@@ -16,21 +16,11 @@ class ModalStateManager {
 
   openModal(id: string) {
     this.openModals.add(id);
-    console.log(
-      `Modal opened: ${id}, total open modals:`,
-      this.openModals.size,
-    );
   }
 
   closeModal(id: string) {
     this.openModals.delete(id);
     this.lastClosedTime = Date.now();
-    console.log(
-      `Modal closed: ${id}, total open modals:`,
-      this.openModals.size,
-      "at:",
-      this.lastClosedTime,
-    );
   }
 
   hasOpenModals(): boolean {
@@ -40,11 +30,6 @@ class ModalStateManager {
   wasRecentlyClosed(): boolean {
     const timeSinceClose = Date.now() - this.lastClosedTime;
     const isInCooldown = timeSinceClose < this.COOLDOWN_PERIOD;
-    if (isInCooldown) {
-      console.log(
-        `Modal recently closed ${timeSinceClose}ms ago, still in cooldown`,
-      );
-    }
     return isInCooldown;
   }
 

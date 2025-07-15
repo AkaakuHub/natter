@@ -16,7 +16,6 @@ export const useScrollLock = (isLocked: boolean) => {
     if (isLocked && !wasLocked.current && scrollContainer.current) {
       // 現在のスクロール位置を保存
       scrollPosition.current = scrollContainer.current.scrollTop;
-      console.log("Saving scroll position:", scrollPosition.current);
 
       // スクロールコンテナのスクロールを無効化
       scrollContainer.current.classList.add("scroll-locked");
@@ -30,8 +29,6 @@ export const useScrollLock = (isLocked: boolean) => {
       scrollContainer.current.classList.remove("scroll-locked");
       document.body.classList.remove("scroll-locked");
 
-      console.log("Restoring scroll position:", scrollPosition.current);
-
       // 次のフレームでスクロール位置を復元
       requestAnimationFrame(() => {
         if (scrollContainer.current) {
@@ -39,14 +36,9 @@ export const useScrollLock = (isLocked: boolean) => {
           // 確認のため再度実行
           setTimeout(() => {
             if (scrollContainer.current) {
-              console.log(
-                "Final scroll position check:",
-                scrollContainer.current.scrollTop,
-              );
               if (
                 scrollContainer.current.scrollTop !== scrollPosition.current
               ) {
-                console.log("Scroll position mismatch, retrying...");
                 scrollContainer.current.scrollTop = scrollPosition.current;
               }
             }

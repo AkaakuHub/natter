@@ -12,9 +12,6 @@ export const useScrollContainer = () => {
       ) as HTMLDivElement;
       if (scrollElement) {
         scrollContainerRef.current = scrollElement;
-        console.log("Found scroll container:", scrollElement);
-      } else {
-        console.log("Scroll container not found");
       }
     };
 

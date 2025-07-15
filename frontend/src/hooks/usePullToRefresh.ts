@@ -53,23 +53,9 @@ export const usePullToRefresh = ({
 
       // シンプルな最上部チェック：スクロールコンテナが一番上にスクロールされているかどうか
       const isAtTop = scrollElement.scrollTop === 0;
-
-      console.log(
-        "Touch start - scrollElement.scrollTop:",
-        scrollElement.scrollTop,
-      );
-      console.log(
-        "scrollElement type:",
-        externalScrollContainerRef?.current ? "external" : "internal",
-      );
-      console.log("isAtTop:", isAtTop);
-
       if (!isAtTop) {
-        console.log("Pull-to-refresh disabled: not at top");
         return;
       }
-
-      console.log("Pull-to-refresh enabled");
       startY.current = e.touches[0].clientY;
       currentY.current = startY.current;
       hasPlayedSound.current = false;
@@ -134,15 +120,7 @@ export const usePullToRefresh = ({
   const handleTouchEnd = useCallback(async () => {
     if (disabled || !isPulling) return;
 
-    console.log(
-      "Touch end - pullDistance:",
-      pullDistance,
-      "threshold:",
-      threshold,
-    );
-
     if (pullDistance >= threshold) {
-      console.log("REFRESH TRIGGERED!");
       // リフレッシュ実行
       setIsRefreshing(true);
       try {
@@ -166,14 +144,11 @@ export const usePullToRefresh = ({
     const element = containerRef.current;
     if (!element) return;
 
-    console.log("Attaching event listeners to internal container");
-
     element.addEventListener("touchstart", handleTouchStart, { passive: true });
     element.addEventListener("touchmove", handleTouchMove, { passive: false });
     element.addEventListener("touchend", handleTouchEnd, { passive: true });
 
     return () => {
-      console.log("Removing event listeners from internal container");
       element.removeEventListener("touchstart", handleTouchStart);
       element.removeEventListener("touchmove", handleTouchMove);
       element.removeEventListener("touchend", handleTouchEnd);
