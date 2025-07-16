@@ -14,8 +14,28 @@ export async function middleware(req: NextRequest) {
   const needsRewrite =
     spaRoutes.includes(pathname) || isPostDetail || isProfile;
 
-  // SPAルートの場合は即座にリライト（認証チェックなし）
+  // SPAルートの場合は認証チェック後にリライト
   if (needsRewrite) {
+    // 公開ページかチェック
+    const publicRoutes = ["/login"];
+    const isPostDetail = pathname.match(/^\/post\/\d+$/);
+    const isProfile = pathname === "/profile" || pathname.match(/^\/profile\/\d+/);
+    const isPublicPage = publicRoutes.includes(pathname) || isPostDetail || isProfile;
+
+    if (!isPublicPage) {
+      // 認証が必要なページ
+      try {
+        const session = await auth();
+        if (!session) {
+          console.log(`🚫 [MIDDLEWARE] Unauthenticated access to ${pathname} -> /login`);
+          return NextResponse.redirect(new URL("/login", req.url));
+        }
+      } catch (error) {
+        console.error(`🚫 [MIDDLEWARE] Auth error for ${pathname}:`, error);
+        return NextResponse.redirect(new URL("/login", req.url));
+      }
+    }
+
     const url = req.nextUrl.clone();
     url.pathname = "/";
     url.searchParams.set("spa-path", pathname);

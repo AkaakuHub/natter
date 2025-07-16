@@ -105,26 +105,20 @@ export const HybridSPAAuthProvider: React.FC<HybridSPAAuthProviderProps> = ({
       setRedirectAfterAuth(currentRoute.path);
     }
 
-    // 初回ロードの場合は通常のリダイレクト
-    if (isInitialLoad || !authState.isHydrated) {
-      window.location.href = "/login";
-    } else {
-      navigate("/login", { replace: true });
-    }
-  }, [currentRoute, navigate, isInitialLoad, authState.isHydrated]);
+    console.log("🚪 Redirecting to login page");
+    // 常にSPAナビゲーションを使用
+    navigate("/login", { replace: true });
+  }, [currentRoute, navigate]);
 
   // ログイン後のリダイレクト
   const redirectAfterLogin = useCallback(() => {
     const destination = redirectAfterAuth || "/";
     setRedirectAfterAuth(null);
 
-    // 初回ロードの場合は通常のリダイレクト
-    if (isInitialLoad || !authState.isHydrated) {
-      window.location.href = destination;
-    } else {
-      navigate(destination, { replace: true });
-    }
-  }, [redirectAfterAuth, navigate, isInitialLoad, authState.isHydrated]);
+    console.log("✅ Redirecting after login to:", destination);
+    // 常にSPAナビゲーションを使用
+    navigate(destination, { replace: true });
+  }, [redirectAfterAuth, navigate]);
 
   // ログアウト
   const logout = useCallback(async () => {
@@ -134,22 +128,38 @@ export const HybridSPAAuthProvider: React.FC<HybridSPAAuthProviderProps> = ({
 
   // 認証状態変化時の自動リダイレクト（hydration後のみ）
   useEffect(() => {
-    if (authState.isLoading || !authState.isHydrated || isInitialLoad) return;
+    if (authState.isLoading || !authState.isHydrated) return;
 
     const needsAuth = requireAuth();
 
+    console.log("🔐 Auth check:", {
+      path: currentRoute?.path,
+      needsAuth,
+      isAuthenticated: authState.isAuthenticated,
+      isInitialLoad,
+    });
+
     if (needsAuth && !authState.isAuthenticated) {
       // 認証が必要だが未認証の場合
+      console.log(
+        "🚪 Redirecting to login - auth required but not authenticated",
+      );
       redirectToLogin();
     } else if (authState.isAuthenticated && currentRoute?.path === "/login") {
       // 認証済みだがログインページにいる場合
+      console.log(
+        "✅ Redirecting after login - authenticated but on login page",
+      );
       redirectAfterLogin();
+    } else if (!authState.isAuthenticated && currentRoute?.path === "/") {
+      // 未認証でホームページにいる場合は強制的にログインページに
+      console.log("🏠 Redirecting from home to login - not authenticated");
+      redirectToLogin();
     }
   }, [
     authState.isAuthenticated,
     authState.isLoading,
     authState.isHydrated,
-    isInitialLoad,
     requireAuth,
     redirectToLogin,
     redirectAfterLogin,

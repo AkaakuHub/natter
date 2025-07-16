@@ -146,17 +146,16 @@ export const useAppInitialization = () => {
 
   // タイムラインデータの読み込み状況を追跡
   useEffect(() => {
-    // タイムラインデータの読み込み完了を監視するイベントリスナーを追加
-    const handleTimelineLoaded = () => {
-      console.log("🎯 Timeline loaded event received");
+    // ログインしていない場合はタイムラインデータをスキップ
+    if (status !== "loading" && !session) {
+      console.log("👤 Not logged in, skipping timeline data");
       setLoadingState((prev) => ({
         ...prev,
         steps: { ...prev.steps, timelineData: true },
         currentStep: "Loading timeline...",
       }));
-    };
-
-    window.addEventListener("timelineLoaded", handleTimelineLoaded);
+      return;
+    }
 
     // サーバーがオフラインの場合はタイムラインデータをスキップ
     if (isOnline === false) {
@@ -166,12 +165,28 @@ export const useAppInitialization = () => {
         steps: { ...prev.steps, timelineData: true },
         currentStep: "Loading timeline...",
       }));
+      return;
     }
 
-    return () => {
-      window.removeEventListener("timelineLoaded", handleTimelineLoaded);
-    };
-  }, [isOnline]);
+    // ログイン済みでサーバーがオンラインの場合のみタイムラインデータを待つ
+    if (session && isOnline === true) {
+      // タイムラインデータの読み込み完了を監視するイベントリスナーを追加
+      const handleTimelineLoaded = () => {
+        console.log("🎯 Timeline loaded event received");
+        setLoadingState((prev) => ({
+          ...prev,
+          steps: { ...prev.steps, timelineData: true },
+          currentStep: "Loading timeline...",
+        }));
+      };
+
+      window.addEventListener("timelineLoaded", handleTimelineLoaded);
+
+      return () => {
+        window.removeEventListener("timelineLoaded", handleTimelineLoaded);
+      };
+    }
+  }, [isOnline, session, status]);
 
   // 進捗状況を計算
   useEffect(() => {

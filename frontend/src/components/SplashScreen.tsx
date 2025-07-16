@@ -15,13 +15,19 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   // ReactのSplashScreenが読み込まれたら初期スプラッシュを隠す
   useEffect(() => {
     const initialSplash = document.getElementById("initial-splash");
-    if (initialSplash) {
+    if (initialSplash && initialSplash.parentNode) {
       console.log("🎭 Hiding initial splash, showing React splash");
       initialSplash.classList.add("hidden");
 
-      // 少し遅延を入れてから完全に削除
+      // 少し遅延を入れてから安全に削除
       setTimeout(() => {
-        initialSplash.remove();
+        if (initialSplash.parentNode) {
+          try {
+            initialSplash.parentNode.removeChild(initialSplash);
+          } catch (error) {
+            console.warn("Failed to remove initial splash:", error);
+          }
+        }
       }, 300);
     }
 

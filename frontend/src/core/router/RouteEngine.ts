@@ -124,9 +124,12 @@ export class RouteEngine extends EventEmitter {
   private parseCurrentURL(): ParsedRoute {
     const url = new URL(window.location.href);
 
-    // MAXDEPTHGODULTRADEEPTHINK: SPA パスを考慮
-    const spaPath = url.searchParams.get("spa-path");
-    const actualPath = spaPath || url.pathname;
+    // 通常のSPAルーティング: pathnameを使用
+    const actualPath = url.pathname;
+
+    console.log(
+      `🔍 [ROUTE ENGINE] Parsing URL: ${url.href}, path: ${actualPath}`,
+    );
 
     const route: ParsedRoute = {
       path: actualPath,
@@ -138,8 +141,9 @@ export class RouteEngine extends EventEmitter {
     const match = this.matchRoute(actualPath);
     if (match) {
       route.params = match.params;
+      console.log(`✅ [ROUTE ENGINE] Route matched: ${match.route.pattern}`);
     } else {
-      console.log(`🔍 [ROUTE ENGINE] No route match found for: ${actualPath}`);
+      console.log(`❌ [ROUTE ENGINE] No route match found for: ${actualPath}`);
     }
 
     this.currentRoute = route;
@@ -154,6 +158,8 @@ export class RouteEngine extends EventEmitter {
     options: { replace?: boolean; state?: unknown } = {},
   ): void {
     const url = new URL(to, window.location.origin);
+
+    console.log(`🔄 [ROUTE ENGINE] Navigating to: ${url.href}`);
 
     if (options.replace) {
       window.history.replaceState(options.state || null, "", url.href);

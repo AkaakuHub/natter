@@ -72,6 +72,7 @@ export const TrueSPARouterProvider: React.FC<TrueSPARouterProviderProps> = ({
 
     // 初期パスが指定されている場合は使用
     if (initialPath && initialPath !== window.location.pathname) {
+      console.log(`🔧 [SPA ROUTER] Initializing with path: ${initialPath}`);
       // URLを実際に変更
       window.history.replaceState(null, "", initialPath);
       routeEngine.navigate(initialPath, { replace: true });
