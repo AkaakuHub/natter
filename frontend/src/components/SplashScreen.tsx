@@ -14,26 +14,44 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
 
   // ReactのSplashScreenが読み込まれたら初期スプラッシュを隠す
   useEffect(() => {
-    const initialSplash = document.getElementById("initial-splash");
-    if (initialSplash && initialSplash.parentNode) {
-      console.log("🎭 Hiding initial splash, showing React splash");
-      initialSplash.classList.add("hidden");
+    // React StrictModeでの重複実行を防ぐ
+    let mounted = true;
 
-      // 少し遅延を入れてから安全に削除
-      setTimeout(() => {
-        if (initialSplash.parentNode) {
-          try {
-            initialSplash.parentNode.removeChild(initialSplash);
-          } catch (error) {
-            console.warn("Failed to remove initial splash:", error);
+    const handleInitialSplash = () => {
+      const initialSplash = document.getElementById("initial-splash");
+      if (initialSplash && initialSplash.parentNode && mounted) {
+        console.log("🎭 Hiding initial splash, showing React splash");
+
+        // Reactのバッチ更新を避けるため、非同期で実行
+        requestAnimationFrame(() => {
+          if (mounted && initialSplash.parentNode) {
+            initialSplash.style.opacity = "0";
+            initialSplash.style.pointerEvents = "none";
+
+            // 遅延削除もより安全に
+            setTimeout(() => {
+              if (mounted && initialSplash && initialSplash.parentNode) {
+                try {
+                  initialSplash.parentNode.removeChild(initialSplash);
+                } catch (error) {
+                  console.warn("Failed to remove initial splash:", error);
+                }
+              }
+            }, 500);
           }
-        }
-      }, 300);
-    }
+        });
+      }
+    };
+
+    handleInitialSplash();
 
     // 初期スプラッシュで既に画像が表示されているので、即座に読み込み完了とする
     console.log("🖼️ Logo already displayed in initial splash");
     setLogoLoaded(true);
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   useEffect(() => {

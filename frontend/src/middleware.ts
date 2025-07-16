@@ -19,15 +19,19 @@ export async function middleware(req: NextRequest) {
     // 公開ページかチェック
     const publicRoutes = ["/login"];
     const isPostDetail = pathname.match(/^\/post\/\d+$/);
-    const isProfile = pathname === "/profile" || pathname.match(/^\/profile\/\d+/);
-    const isPublicPage = publicRoutes.includes(pathname) || isPostDetail || isProfile;
+    const isProfile =
+      pathname === "/profile" || pathname.match(/^\/profile\/\d+/);
+    const isPublicPage =
+      publicRoutes.includes(pathname) || isPostDetail || isProfile;
 
     if (!isPublicPage) {
       // 認証が必要なページ
       try {
         const session = await auth();
         if (!session) {
-          console.log(`🚫 [MIDDLEWARE] Unauthenticated access to ${pathname} -> /login`);
+          console.log(
+            `🚫 [MIDDLEWARE] Unauthenticated access to ${pathname} -> /login`,
+          );
           return NextResponse.redirect(new URL("/login", req.url));
         }
       } catch (error) {
