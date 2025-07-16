@@ -69,12 +69,50 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} antialiased bg-surface text-text`}
       >
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // 初期スプラッシュ用のダークモード早期検出（Hydration前）
+              (function() {
+                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches ||
+                              localStorage.getItem('theme') === 'dark';
+                if (isDark) {
+                  document.documentElement.classList.add('dark');
+                }
+              })();
+            `,
+          }}
+        />
         {/* CSS版のスプラッシュスクリーン（即座に表示） */}
         <div id="initial-splash" className="initial-splash">
           <div className="initial-splash-content">
-            <div className="initial-splash-logo"></div>
-            <h1 className="initial-splash-title">Natter</h1>
-            <p className="initial-splash-subtitle">Connect & Share</p>
+            {/* ロゴ */}
+            <div className="initial-splash-logo-container">
+              <img
+                src="/images/logo.png"
+                alt="Natter Logo"
+                className="initial-splash-logo-image"
+              />
+            </div>
+
+            {/* アプリ名 */}
+            <div style={{ textAlign: "center" }}>
+              <h1 className="initial-splash-title">Natter</h1>
+              <p className="initial-splash-subtitle">Connect & Share</p>
+            </div>
+
+            {/* プログレスバー用のスペース確保（非表示） */}
+            <div
+              style={{
+                width: "20rem",
+                maxWidth: "24rem",
+                height: "3rem",
+                opacity: 0,
+              }}
+            ></div>
+
+            {/* ローディングドット用のスペース確保（非表示） */}
+            <div style={{ height: "0.5rem", opacity: 0 }}></div>
           </div>
         </div>
         <NextAuthProvider>

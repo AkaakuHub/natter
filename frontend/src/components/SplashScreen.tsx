@@ -56,28 +56,48 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
 
   useEffect(() => {
     console.log("🖼️ Splash screen state:", { isLoading, logoLoaded });
-    // 実際の読み込み完了時に即座に切り替え
-    if (!isLoading && logoLoaded) {
+    // 実際の読み込み完了時にフェードアウトアニメーション付きで切り替え
+    if (!isLoading && logoLoaded && isVisible) {
       console.log("🎉 Splash screen completing!");
-      setIsVisible(false);
-      onComplete?.();
+
+      // アニメーション用のクラスを追加
+      const splashElement = document.querySelector(".splash-screen");
+      if (splashElement) {
+        splashElement.classList.add("fade-out");
+
+        // アニメーション完了を待ってからコンポーネントを非表示
+        splashElement.addEventListener(
+          "transitionend",
+          () => {
+            setIsVisible(false);
+            onComplete?.();
+          },
+          { once: true },
+        );
+      }
     }
-  }, [isLoading, logoLoaded, onComplete]);
+  }, [isLoading, logoLoaded, isVisible, onComplete]);
 
   if (!isVisible) return null;
 
   return (
     <div className="splash-screen">
       <div className="flex flex-col items-center justify-center space-y-8">
-        {/* ロゴ（CSS版で既に表示されているので、スペースのみ確保） */}
-        <div className="w-32 h-32 md:w-40 md:h-40"></div>
+        {/* ロゴ */}
+        <div className="w-32 h-32 md:w-40 md:h-40">
+          <img
+            src="/images/logo.png"
+            alt="Natter Logo"
+            className="w-full h-full object-contain"
+          />
+        </div>
 
-        {/* アプリ名（CSS版で既に表示されているので、スペースのみ確保） */}
+        {/* アプリ名 */}
         <div className="text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-transparent mb-2 tracking-wide">
+          <h1 className="text-4xl md:text-5xl font-bold mb-2 tracking-wide text-text">
             Natter
           </h1>
-          <p className="text-transparent text-lg md:text-xl font-light">
+          <p className="text-lg md:text-xl font-light text-text-secondary">
             Connect & Share
           </p>
         </div>
@@ -86,17 +106,17 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         <div className="w-80 max-w-sm mx-auto">
           <div className="mb-4">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-text-inverse/90 text-sm font-medium">
+              <span className="text-sm font-medium text-text-secondary">
                 {currentStep}
               </span>
-              <span className="text-text-inverse/70 text-sm font-mono">
+              <span className="text-sm font-mono text-text-secondary">
                 {progress}%
               </span>
             </div>
-            <div className="w-full bg-text-inverse/20 rounded-full h-2 overflow-hidden">
+            <div className="w-full rounded-full h-2 overflow-hidden bg-surface-secondary">
               <div
-                className="h-2 bg-gradient-to-r from-text-inverse/70 to-text-inverse/90 rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${progress}%` }}
+                className="h-2 rounded-full transition-all duration-500 ease-out bg-interactive"
               />
             </div>
           </div>
@@ -104,9 +124,9 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
 
         {/* ローディングドット */}
         <div className="flex space-x-2">
-          <div className="w-2 h-2 bg-text-inverse/60 rounded-full bounce-dot"></div>
-          <div className="w-2 h-2 bg-text-inverse/60 rounded-full bounce-dot"></div>
-          <div className="w-2 h-2 bg-text-inverse/60 rounded-full bounce-dot"></div>
+          <div className="w-2 h-2 rounded-full bounce-dot bg-text-secondary"></div>
+          <div className="w-2 h-2 rounded-full bounce-dot bg-text-secondary"></div>
+          <div className="w-2 h-2 rounded-full bounce-dot bg-text-secondary"></div>
         </div>
       </div>
     </div>
