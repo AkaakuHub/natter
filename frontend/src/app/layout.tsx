@@ -33,7 +33,8 @@ export default async function RootLayout({
   await auth();
 
   return (
-    <html lang="ja">
+    // 読み込み時のスプラッシュスクリーンのため
+    <html lang="ja" suppressHydrationWarning={true}>
       <head>
         <title>Natter</title>
         <meta name="description" content="A simple post app" />
