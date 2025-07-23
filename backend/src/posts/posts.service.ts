@@ -9,6 +9,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { ImageProcessingService } from '../services/image-processing.service';
+import { SecurityService } from '../services/security.service';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 
@@ -18,6 +19,7 @@ export class PostsService {
     private prisma: PrismaService,
     private notificationsService: NotificationsService,
     private imageProcessingService: ImageProcessingService,
+    private securityService: SecurityService,
   ) {}
 
   private sanitizeContent(content: string): string {
@@ -222,19 +224,18 @@ export class PostsService {
         }
 
         // キャラクター情報の隠蔽処理
-        let character = post.character;
-        if (character && currentUserId !== post.authorId) {
-          character = {
-            ...character,
-            name: '?'.repeat(character.name.length),
-          };
-        }
+        const character = this.securityService.hideCharacterNameIfNeeded(
+          post.character,
+          currentUserId,
+          post.authorId,
+        );
 
         // URL隠蔽処理（他人の投稿のURLは隠蔽）
-        let url = post.url;
-        if (url && currentUserId !== post.authorId) {
-          url = '???';
-        }
+        const url = this.securityService.hideUrlIfNeeded(
+          post.url,
+          currentUserId,
+          post.authorId,
+        );
 
         // 画像処理は動的にエンドポイントで行うため、ここでは元のファイル名のまま返す
         const images = post.images ? (JSON.parse(post.images) as string[]) : [];
@@ -294,19 +295,18 @@ export class PostsService {
     }
 
     // キャラクター情報の隠蔽処理
-    let character = post.character;
-    if (character && currentUserId !== post.authorId) {
-      character = {
-        ...character,
-        name: '?'.repeat(character.name.length),
-      };
-    }
+    const character = this.securityService.hideCharacterNameIfNeeded(
+      post.character,
+      currentUserId,
+      post.authorId,
+    );
 
     // URL隠蔽処理（他人の投稿のURLは隠蔽）
-    let url = post.url;
-    if (url && currentUserId !== post.authorId) {
-      url = '???';
-    }
+    const url = this.securityService.hideUrlIfNeeded(
+      post.url,
+      currentUserId,
+      post.authorId,
+    );
 
     // 画像処理は動的にエンドポイントで行うため、ここでは元のファイル名のまま返す
     const images = post.images ? (JSON.parse(post.images) as string[]) : [];
@@ -353,13 +353,11 @@ export class PostsService {
 
     return posts.map((post) => {
       // キャラクター情報の隠蔽処理
-      let character = post.character;
-      if (character && currentUserId !== post.authorId) {
-        character = {
-          ...character,
-          name: '?'.repeat(character.name.length),
-        };
-      }
+      const character = this.securityService.hideCharacterNameIfNeeded(
+        post.character,
+        currentUserId,
+        post.authorId,
+      );
 
       return {
         ...post,
@@ -409,13 +407,11 @@ export class PostsService {
       )
       .map((post) => {
         // キャラクター情報の隠蔽処理
-        let character = post.character;
-        if (character && currentUserId !== post.authorId) {
-          character = {
-            ...character,
-            name: '?'.repeat(character.name.length),
-          };
-        }
+        const character = this.securityService.hideCharacterNameIfNeeded(
+          post.character,
+          currentUserId,
+          post.authorId,
+        );
 
         return {
           ...post,
@@ -453,13 +449,11 @@ export class PostsService {
 
     return likedPosts.map((like) => {
       // キャラクター情報の隠蔽処理
-      let character = like.post.character;
-      if (character && currentUserId !== like.post.authorId) {
-        character = {
-          ...character,
-          name: '?'.repeat(character.name.length),
-        };
-      }
+      const character = this.securityService.hideCharacterNameIfNeeded(
+        like.post.character,
+        currentUserId,
+        like.post.authorId,
+      );
 
       return {
         ...like.post,
@@ -729,13 +723,11 @@ export class PostsService {
 
     return replies.map((reply) => {
       // キャラクター情報の隠蔽処理
-      let character = reply.character;
-      if (character && currentUserId !== reply.authorId) {
-        character = {
-          ...character,
-          name: '?'.repeat(character.name.length),
-        };
-      }
+      const character = this.securityService.hideCharacterNameIfNeeded(
+        reply.character,
+        currentUserId,
+        reply.authorId,
+      );
 
       return {
         ...reply,
@@ -785,13 +777,11 @@ export class PostsService {
 
     return posts.map((post) => {
       // キャラクター情報の隠蔽処理
-      let character = post.character;
-      if (character && currentUserId !== post.authorId) {
-        character = {
-          ...character,
-          name: '?'.repeat(character.name.length),
-        };
-      }
+      const character = this.securityService.hideCharacterNameIfNeeded(
+        post.character,
+        currentUserId,
+        post.authorId,
+      );
 
       return {
         ...post,
@@ -876,13 +866,11 @@ export class PostsService {
       )
       .map((post) => {
         // キャラクター情報の隠蔽処理
-        let character = post.character;
-        if (character && currentUserId !== post.authorId) {
-          character = {
-            ...character,
-            name: '?'.repeat(character.name.length),
-          };
-        }
+        const character = this.securityService.hideCharacterNameIfNeeded(
+          post.character,
+          currentUserId,
+          post.authorId,
+        );
 
         return {
           ...post,
@@ -915,7 +903,7 @@ export class PostsService {
 
       // 元画像を返す条件を統合
       const shouldReturnOriginal =
-        process.env.IS_REVEADED_SECRETS === 'true' ||
+        this.securityService.shouldRevealSecrets() ||
         (post && currentUserId && currentUserId === post.authorId) ||
         (post && post.imagesPublic);
 
@@ -929,7 +917,7 @@ export class PostsService {
     } catch (error) {
       console.error('🔒 [IMAGE BUFFER] ERROR:', error);
       // エラー時の処理もIS_REVEADED_SECRETSを考慮
-      if (process.env.IS_REVEADED_SECRETS === 'true') {
+      if (this.securityService.shouldRevealSecrets()) {
         try {
           const originalPath = path.join(process.cwd(), 'uploads', filename);
           return await fs.readFile(originalPath);
@@ -967,7 +955,7 @@ export class PostsService {
 
       // 元画像パスを返す条件を統合
       const shouldReturnOriginal =
-        process.env.IS_REVEADED_SECRETS === 'true' ||
+        this.securityService.shouldRevealSecrets() ||
         (post && currentUserId && currentUserId === post.authorId) ||
         (post && post.imagesPublic);
 
@@ -989,7 +977,7 @@ export class PostsService {
     } catch (error) {
       console.error('Failed to process image request:', error);
       // エラー時の処理もIS_REVEADED_SECRETSを考慮
-      if (process.env.IS_REVEADED_SECRETS === 'true') {
+      if (this.securityService.shouldRevealSecrets()) {
         return filename;
       }
       // エラー時も処理済み画像を返す（セキュリティのため）

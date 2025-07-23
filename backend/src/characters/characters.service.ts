@@ -4,13 +4,17 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { SecurityService } from '../services/security.service';
 import { CreateCharacterDto } from './dto/create-character.dto';
 import { UpdateCharacterDto } from './dto/update-character.dto';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CharactersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private securityService: SecurityService,
+  ) {}
 
   // ユーザーのキャラクター一覧を取得（投稿数付き）
   async findAllByUser(userId: string, currentUserId?: string) {
@@ -25,11 +29,14 @@ export class CharactersService {
     });
 
     return characters.map((character) => {
-      // 自分のキャラクターの場合は実名を表示、他人のキャラクターは文字数分の「?」で隠蔽
-      const shouldHide = currentUserId !== userId;
+      const processedCharacter =
+        this.securityService.hideCharacterInListIfNeeded(
+          character,
+          currentUserId,
+          userId,
+        );
       return {
-        ...character,
-        name: shouldHide ? '?'.repeat(character.name.length) : character.name,
+        ...processedCharacter,
         postsCount: character.postsCount, // DBのpostsCountフィールドを使用
       };
     });

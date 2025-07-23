@@ -6,6 +6,7 @@ import { AuthModule } from '../auth/auth.module';
 import { PostOwnerGuard } from '../auth/post-owner.guard';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { ImageProcessingService } from '../services/image-processing.service';
+import { SecurityService } from '../services/security.service';
 import { OgImageService } from '../services/og-image.service';
 
 @Module({
@@ -15,6 +16,7 @@ import { OgImageService } from '../services/og-image.service';
     PostsService,
     PostOwnerGuard,
     ImageProcessingService,
+    SecurityService,
     OgImageService,
   ],
   exports: [PostsService],
