@@ -924,8 +924,8 @@ export class PostsService {
         return await fs.readFile(originalPath);
       }
 
-      // 🔒 SECURITY RULE 2: 画像が公開設定で認証済みの場合のみ元画像
-      if (post.imagesPublic && currentUserId) {
+      // 🔒 SECURITY RULE 2: 画像が公開設定の場合は誰でも元画像を表示
+      if (post.imagesPublic) {
         const originalPath = path.join(process.cwd(), 'uploads', filename);
         return await fs.readFile(originalPath);
       }
@@ -971,8 +971,8 @@ export class PostsService {
         return filename;
       }
 
-      // 2. 画像が公開設定で投稿者が確認できる場合のみ元画像
-      if (post.imagesPublic && currentUserId) {
+      // 2. 画像が公開設定の場合は誰でも元画像を表示
+      if (post.imagesPublic) {
         return filename;
       }
 
