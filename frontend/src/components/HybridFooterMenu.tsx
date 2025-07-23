@@ -60,7 +60,7 @@ export function HybridFooterMenu({
               }}
             >
               <IconComponent size={20} className="mb-1" />
-              <span className="text-xs truncate max-w-full px-1">
+              <span className="text-xs break-words word-break-break-all whitespace-normal max-w-full px-1">
                 {item.label}
               </span>
             </button>

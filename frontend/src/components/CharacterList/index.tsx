@@ -161,8 +161,8 @@ const CharacterList: React.FC<CharacterListProps> = ({
               key={character.id}
               className="p-4 bg-surface-secondary rounded-lg border border-border hover:border-primary/50 transition-colors"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0 overflow-hidden">
                   {isOwnProfile && editingCharacter?.id === character.id ? (
                     <div className="flex items-center gap-2">
                       <input
@@ -195,8 +195,8 @@ const CharacterList: React.FC<CharacterListProps> = ({
                       </button>
                     </div>
                   ) : (
-                    <div>
-                      <h4 className="font-medium text-text break-words overflow-wrap-anywhere">
+                    <div className="min-w-0 w-full">
+                      <h4 className="font-medium text-text break-all whitespace-normal overflow-wrap-anywhere hyphens-auto">
                         {character.name}
                       </h4>
                       <p className="text-sm text-text-muted">

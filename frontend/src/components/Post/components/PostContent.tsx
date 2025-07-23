@@ -67,7 +67,7 @@ const PostContent = ({
           style={getCharacterColorStyle(character.name, 0.5)}
         >
           <IconUser size={16} className="text-text" />
-          <span className="text-sm font-medium text-text">
+          <span className="text-sm font-medium text-text break-words word-break-break-all whitespace-normal min-w-0 flex-1">
             {character.name}
           </span>
         </div>

@@ -179,7 +179,7 @@ const FollowList: React.FC<FollowListProps> = ({ userId, type, session }) => {
                   className="flex-1 min-w-0 cursor-pointer"
                   onClick={() => handleUserClick(user.id)}
                 >
-                  <p className="text-base font-medium text-text truncate">
+                  <p className="text-base font-medium text-text break-words word-break-break-all whitespace-normal">
                     {user.name}
                   </p>
                   <p className="text-sm text-text-muted">

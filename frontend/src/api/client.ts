@@ -315,6 +315,31 @@ export class ApiClient {
           console.warn("Access forbidden - insufficient permissions");
           throw new Error("Access forbidden");
         }
+
+        // 400エラー（バリデーションエラー等）の詳細メッセージを取得
+        if (response.status === 400) {
+          try {
+            const errorText = await response.text();
+            let errorData;
+            try {
+              errorData = JSON.parse(errorText);
+            } catch {
+              errorData = { message: errorText };
+            }
+
+            // NestJSのValidationエラー形式を処理
+            if (errorData.message && Array.isArray(errorData.message)) {
+              throw new Error(errorData.message.join(", "));
+            } else if (errorData.message) {
+              throw new Error(errorData.message);
+            } else {
+              throw new Error(`Validation error: ${errorText}`);
+            }
+          } catch {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        }
+
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -448,6 +473,30 @@ export class ApiClient {
           console.warn("Access forbidden for FormData request");
           throw new Error("Access forbidden");
         }
+
+        // 400エラー（バリデーションエラー等）の詳細メッセージを取得
+        if (response.status === 400) {
+          try {
+            let errorData;
+            try {
+              errorData = JSON.parse(errorText);
+            } catch {
+              errorData = { message: errorText };
+            }
+
+            // NestJSのValidationエラー形式を処理
+            if (errorData.message && Array.isArray(errorData.message)) {
+              throw new Error(errorData.message.join(", "));
+            } else if (errorData.message) {
+              throw new Error(errorData.message);
+            } else {
+              throw new Error(`Validation error: ${errorText}`);
+            }
+          } catch {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        }
+
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -547,6 +596,30 @@ export class ApiClient {
           console.warn("Access forbidden for FormData request");
           throw new Error("Access forbidden");
         }
+
+        // 400エラー（バリデーションエラー等）の詳細メッセージを取得
+        if (response.status === 400) {
+          try {
+            let errorData;
+            try {
+              errorData = JSON.parse(errorText);
+            } catch {
+              errorData = { message: errorText };
+            }
+
+            // NestJSのValidationエラー形式を処理
+            if (errorData.message && Array.isArray(errorData.message)) {
+              throw new Error(errorData.message.join(", "));
+            } else if (errorData.message) {
+              throw new Error(errorData.message);
+            } else {
+              throw new Error(`Validation error: ${errorText}`);
+            }
+          } catch {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        }
+
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 

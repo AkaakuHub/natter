@@ -86,7 +86,7 @@ const RecommendedUsers: React.FC<RecommendedUsersProps> = ({
                 className="w-10 h-10 rounded-full"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-text truncate">
+                <p className="text-sm font-medium text-text break-words word-break-break-all whitespace-normal">
                   {user.name}
                 </p>
                 <p className="text-xs text-text-muted">

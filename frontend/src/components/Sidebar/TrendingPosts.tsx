@@ -64,7 +64,7 @@ const TrendingPosts: React.FC = () => {
                   height={24}
                   className="w-6 h-6 rounded-full"
                 />
-                <span className="text-sm font-medium text-text truncate">
+                <span className="text-sm font-medium text-text break-words word-break-break-all whitespace-normal min-w-0 flex-1">
                   {transformedUser.name}
                 </span>
               </div>
