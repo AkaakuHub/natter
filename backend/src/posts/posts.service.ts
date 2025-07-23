@@ -901,12 +901,6 @@ export class PostsService {
     currentUserId?: string,
   ): Promise<Buffer> {
     try {
-      // IS_REVEADED_SECRETSがtrueの場合、モザイク処理を無効化
-      if (process.env.IS_REVEADED_SECRETS === 'true') {
-        const originalPath = path.join(process.cwd(), 'uploads', filename);
-        return await fs.readFile(originalPath);
-      }
-
       // ファイル名から画像を含む投稿を検索
       const post = await this.prisma.post.findFirst({
         where: {
@@ -919,24 +913,18 @@ export class PostsService {
         },
       });
 
-      if (!post) {
-        return await this.imageProcessingService.getBlurredImageBuffer(
-          filename,
-        );
-      }
-      // 🔒 SECURITY RULE 1: 自分の投稿で認証済みの場合のみ元画像
-      if (currentUserId && currentUserId === post.authorId) {
+      // 元画像を返す条件を統合
+      const shouldReturnOriginal =
+        process.env.IS_REVEADED_SECRETS === 'true' ||
+        (post && currentUserId && currentUserId === post.authorId) ||
+        (post && post.imagesPublic);
+
+      if (shouldReturnOriginal) {
         const originalPath = path.join(process.cwd(), 'uploads', filename);
         return await fs.readFile(originalPath);
       }
 
-      // 🔒 SECURITY RULE 2: 画像が公開設定の場合は誰でも元画像を表示
-      if (post.imagesPublic) {
-        const originalPath = path.join(process.cwd(), 'uploads', filename);
-        return await fs.readFile(originalPath);
-      }
-
-      // 🔒 SECURITY RULE 3: その他の場合（未認証、他人、非公開）は必ず処理済み画像
+      // その他の場合は処理済み画像を返す
       return await this.imageProcessingService.getBlurredImageBuffer(filename);
     } catch (error) {
       console.error('🔒 [IMAGE BUFFER] ERROR:', error);
@@ -965,11 +953,6 @@ export class PostsService {
     currentUserId?: string,
   ): Promise<string> {
     try {
-      // 🚨 ADMIN OVERRIDE: IS_REVEADED_SECRETSがtrueの場合、モザイク処理を無効化
-      if (process.env.IS_REVEADED_SECRETS === 'true') {
-        return filename;
-      }
-
       // ファイル名から画像を含む投稿を検索
       const post = await this.prisma.post.findFirst({
         where: {
@@ -982,6 +965,17 @@ export class PostsService {
         },
       });
 
+      // 元画像パスを返す条件を統合
+      const shouldReturnOriginal =
+        process.env.IS_REVEADED_SECRETS === 'true' ||
+        (post && currentUserId && currentUserId === post.authorId) ||
+        (post && post.imagesPublic);
+
+      if (shouldReturnOriginal) {
+        return filename;
+      }
+
+      // その他の場合は処理済み画像パスを返す
       if (!post) {
         // 投稿が見つからない場合は処理済み画像を返す（セキュリティのため）
         const processedImagePath =
@@ -989,17 +983,6 @@ export class PostsService {
         return processedImagePath;
       }
 
-      // 1. 自分の投稿で認証済みの場合のみ元画像
-      if (currentUserId && currentUserId === post.authorId) {
-        return filename;
-      }
-
-      // 2. 画像が公開設定の場合は誰でも元画像を表示
-      if (post.imagesPublic) {
-        return filename;
-      }
-
-      // 3. その他の場合（未認証、他人、非公開）は必ず処理済み画像
       const processedImagePath =
         await this.imageProcessingService.applyBlurAndMosaic(filename);
       return processedImagePath;
