@@ -901,6 +901,12 @@ export class PostsService {
     currentUserId?: string,
   ): Promise<Buffer> {
     try {
+      // IS_REVEADED_SECRETSがtrueの場合、モザイク処理を無効化
+      if (process.env.IS_REVEADED_SECRETS === 'true') {
+        const originalPath = path.join(process.cwd(), 'uploads', filename);
+        return await fs.readFile(originalPath);
+      }
+
       // ファイル名から画像を含む投稿を検索
       const post = await this.prisma.post.findFirst({
         where: {
@@ -934,6 +940,18 @@ export class PostsService {
       return await this.imageProcessingService.getBlurredImageBuffer(filename);
     } catch (error) {
       console.error('🔒 [IMAGE BUFFER] ERROR:', error);
+      // エラー時の処理もIS_REVEADED_SECRETSを考慮
+      if (process.env.IS_REVEADED_SECRETS === 'true') {
+        try {
+          const originalPath = path.join(process.cwd(), 'uploads', filename);
+          return await fs.readFile(originalPath);
+        } catch (readError) {
+          console.error(
+            'Failed to read original image on error fallback:',
+            readError,
+          );
+        }
+      }
       // エラー時も処理済み画像を返す（セキュリティ重要）
       return await this.imageProcessingService.getBlurredImageBuffer(filename);
     }
@@ -947,6 +965,11 @@ export class PostsService {
     currentUserId?: string,
   ): Promise<string> {
     try {
+      // 🚨 ADMIN OVERRIDE: IS_REVEADED_SECRETSがtrueの場合、モザイク処理を無効化
+      if (process.env.IS_REVEADED_SECRETS === 'true') {
+        return filename;
+      }
+
       // ファイル名から画像を含む投稿を検索
       const post = await this.prisma.post.findFirst({
         where: {
@@ -982,6 +1005,10 @@ export class PostsService {
       return processedImagePath;
     } catch (error) {
       console.error('Failed to process image request:', error);
+      // エラー時の処理もIS_REVEADED_SECRETSを考慮
+      if (process.env.IS_REVEADED_SECRETS === 'true') {
+        return filename;
+      }
       // エラー時も処理済み画像を返す（セキュリティのため）
       try {
         const processedImagePath =
