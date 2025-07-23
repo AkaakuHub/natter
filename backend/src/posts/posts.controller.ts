@@ -20,7 +20,6 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { PostsService } from './posts.service';
-import { OgImageService } from '../services/og-image.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -29,10 +28,7 @@ import { Request, Response } from 'express';
 
 @Controller('posts')
 export class PostsController {
-  constructor(
-    private readonly postsService: PostsService,
-    private readonly ogImageService: OgImageService,
-  ) {}
+  constructor(private readonly postsService: PostsService) {}
 
   private extractUserIdFromRequest(
     req: Request & { user?: { id: string } },
