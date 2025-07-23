@@ -162,7 +162,7 @@ const UrlPreview: React.FC<UrlPreviewProps> = ({ url, className = "" }) => {
                 unoptimized={true} // 小さなファビコンは最適化をスキップ
               />
             )}
-            <span className="truncate">
+            <span className="break-words overflow-wrap-anywhere flex-1 min-w-0">
               {metadata.siteName || new URL(metadata.url).hostname}
             </span>
             <IconExternalLink size={12} />

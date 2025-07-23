@@ -25,6 +25,15 @@ export const useImageUpload = (
     input.accept = "image/*";
     input.multiple = true;
 
+    // iOS Safari対応: input要素を画面外に配置して非表示にする（display:noneではなく）
+    input.style.position = "fixed";
+    input.style.top = "-100px";
+    input.style.left = "-100px";
+    input.style.width = "1px";
+    input.style.height = "1px";
+    input.style.opacity = "0";
+    input.style.pointerEvents = "none";
+
     input.onchange = (e) => {
       const files = (e.target as HTMLInputElement).files;
       if (files) {
@@ -60,9 +69,18 @@ export const useImageUpload = (
           );
         }
       }
+
+      // iOS Safari対応: 使用後にDOMから削除
+      document.body.removeChild(input);
     };
 
-    input.click();
+    // iOS Safari対応: input要素をDOMに追加してからクリック
+    document.body.appendChild(input);
+
+    // iOS Safari対応: わずかな遅延を設けてからクリックイベントを発火
+    setTimeout(() => {
+      input.click();
+    }, 10);
   }, [images.length, maxImages]);
 
   const handleImageRemove = useCallback((index: number) => {

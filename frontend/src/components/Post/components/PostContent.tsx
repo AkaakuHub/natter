@@ -100,7 +100,7 @@ const PostContent = ({
               href={processedUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-interactive hover:text-interactive-hover underline break-all"
+              className="text-sm text-interactive hover:text-interactive-hover underline break-all overflow-wrap-anywhere"
               onClick={(e) => e.stopPropagation()}
             >
               {processedUrl}

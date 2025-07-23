@@ -196,7 +196,7 @@ const CharacterList: React.FC<CharacterListProps> = ({
                     </div>
                   ) : (
                     <div>
-                      <h4 className="font-medium text-text">
+                      <h4 className="font-medium text-text break-words overflow-wrap-anywhere">
                         {character.name}
                       </h4>
                       <p className="text-sm text-text-muted">

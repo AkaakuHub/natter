@@ -31,7 +31,7 @@ const RichText: React.FC<RichTextProps> = ({
           href={segment.content}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-interactive hover:text-interactive-hover underline decoration-interactive/50 hover:decoration-interactive break-all transition-colors"
+          className="text-interactive hover:text-interactive-hover underline decoration-interactive/50 hover:decoration-interactive break-all transition-colors overflow-wrap-anywhere"
           onClick={(e) => e.stopPropagation()}
         >
           {segment.content}

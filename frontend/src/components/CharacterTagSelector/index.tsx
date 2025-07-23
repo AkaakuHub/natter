@@ -182,7 +182,7 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
               style={getCharacterColorStyle(selectedCharacter.name, 0.5)}
             >
               <span
-                className="text-sm font-medium"
+                className="text-sm font-medium break-words overflow-wrap-anywhere"
                 style={{ color: getCharacterTextColor(selectedCharacter.name) }}
               >
                 {selectedCharacter.name}
@@ -258,7 +258,7 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
                         className="w-full px-3 py-2 text-left hover:bg-surface-hover transition-colors border-b border-border last:border-b-0"
                       >
                         <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium text-text">
+                          <span className="text-sm font-medium text-text break-words overflow-wrap-anywhere">
                             {character.name}
                           </span>
                           <span className="text-xs text-text-muted">
