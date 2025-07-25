@@ -106,9 +106,7 @@ export default function AdminView() {
 
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1">
-            <h3 className="font-medium text-lg text-text">
-              シークレット表示設定
-            </h3>
+            <h3 className="font-medium text-lg text-text">ネタバラシモード</h3>
             <p className="text-sm text-text-secondary mt-1">
               他のユーザーの隠し情報（URL、キャラクター名など）を表示するかどうか
             </p>
