@@ -92,12 +92,9 @@ export const HybridSPAAuthProvider: React.FC<HybridSPAAuthProviderProps> = ({
     // ログインページは認証不要
     if (currentRoute.path === "/login") return false;
 
-    // 初回ロードの場合はSSRで処理済み
-    if (isInitialLoad) return false;
-
     // ルートエンジンから認証要件を取得
     return routeEngine.isAuthRequired(currentRoute.path);
-  }, [currentRoute, routeEngine, isInitialLoad]);
+  }, [currentRoute, routeEngine]);
 
   // ログインページにリダイレクト
   const redirectToLogin = useCallback(() => {
@@ -105,13 +102,22 @@ export const HybridSPAAuthProvider: React.FC<HybridSPAAuthProviderProps> = ({
       setRedirectAfterAuth(currentRoute.path);
     }
 
-    // 初回ロードの場合は通常のリダイレクト
-    if (isInitialLoad || !authState.isHydrated) {
+    // 未認証で / にアクセスした場合のみページ全体をリロード
+    // これにより真っ白な画面を防ぐ
+    if (!authState.isAuthenticated && currentRoute?.path === "/") {
+      window.location.href = "/login";
+    } else if (isInitialLoad || !authState.isHydrated) {
       window.location.href = "/login";
     } else {
       navigate("/login", { replace: true });
     }
-  }, [currentRoute, navigate, isInitialLoad, authState.isHydrated]);
+  }, [
+    currentRoute,
+    navigate,
+    isInitialLoad,
+    authState.isHydrated,
+    authState.isAuthenticated,
+  ]);
 
   // ログイン後のリダイレクト
   const redirectAfterLogin = useCallback(() => {
@@ -134,7 +140,7 @@ export const HybridSPAAuthProvider: React.FC<HybridSPAAuthProviderProps> = ({
 
   // 認証状態変化時の自動リダイレクト（hydration後のみ）
   useEffect(() => {
-    if (authState.isLoading || !authState.isHydrated || isInitialLoad) return;
+    if (authState.isLoading || !authState.isHydrated) return;
 
     const needsAuth = requireAuth();
 
@@ -149,7 +155,6 @@ export const HybridSPAAuthProvider: React.FC<HybridSPAAuthProviderProps> = ({
     authState.isAuthenticated,
     authState.isLoading,
     authState.isHydrated,
-    isInitialLoad,
     requireAuth,
     redirectToLogin,
     redirectAfterLogin,

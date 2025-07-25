@@ -5,7 +5,6 @@ import { TrueSPARouterProvider } from "./router/TrueSPARouter";
 import { HybridSPAAuthProvider } from "./auth/HybridSPAAuth";
 import { ViewRenderer } from "./router/ViewRenderer";
 import { RouteDefinition } from "./router/RouteEngine";
-import { useSearchParams } from "next/navigation";
 import { ALL_ROUTES } from "./spa/SPARoutes";
 
 // 既存のBaseLayoutを保護・活用
@@ -35,23 +34,26 @@ export const HybridSPA: React.FC<HybridSPAProps> = ({
   initialPath,
   ssrMode = false,
 }) => {
-  const searchParams = useSearchParams();
   const [isHydrated, setIsHydrated] = useState(false);
   const [currentPath, setCurrentPath] = useState(initialPath || "/");
 
   // URL パラメータから初期パスを取得
   useEffect(() => {
-    const spaPath = searchParams.get("spa-path");
-    const ssrPath = searchParams.get("ssr-path");
+    // ブラウザ環境でのみ実行
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const spaPath = params.get("spa-path");
+      const ssrPath = params.get("ssr-path");
 
-    if (spaPath) {
-      setCurrentPath(spaPath);
-    } else if (ssrPath) {
-      setCurrentPath(ssrPath);
+      if (spaPath) {
+        setCurrentPath(spaPath);
+      } else if (ssrPath) {
+        setCurrentPath(ssrPath);
+      }
     }
 
     setIsHydrated(true);
-  }, [searchParams]);
+  }, []);
 
   // ルート定義をメモ化して再レンダリングを防ぐ
   const memoizedRoutes = useMemo(() => routes, []);

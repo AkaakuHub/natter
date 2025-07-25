@@ -8,13 +8,23 @@ import EditCharacterModal from "@/components/EditCharacterModal";
 import type { Character } from "@/api";
 
 const SetListView = () => {
-  const { data: session } = useSession();
+  const { status } = useSession();
   const { data: characters, isLoading, error } = useCharacters();
   const [editingCharacter, setEditingCharacter] = useState<Character | null>(
     null,
   );
 
-  if (!session) {
+  // 認証チェック中はローディング表示
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div>読み込み中...</div>
+      </div>
+    );
+  }
+
+  // 未認証の場合は何も表示しない（HybridSPAAuthがリダイレクトを処理）
+  if (status === "unauthenticated") {
     return null;
   }
 

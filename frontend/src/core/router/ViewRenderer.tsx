@@ -9,6 +9,7 @@ import React, {
   useMemo,
 } from "react";
 import { useTrueSPARouter } from "./TrueSPARouter";
+import { useHybridSPAAuth } from "@/core/auth/HybridSPAAuth";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { generateViewRendererComponentMap, matchPattern } from "@/core/spa";
 
@@ -23,6 +24,7 @@ export const ViewRenderer: React.FC<ViewRendererProps> = ({
   fallback: Fallback = LoadingSpinner,
 }) => {
   const { currentRoute, routeEngine } = useTrueSPARouter();
+  const { isAuthenticated, isLoading: authLoading } = useHybridSPAAuth();
   const [ViewComponent, setViewComponent] =
     useState<React.ComponentType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -112,12 +114,23 @@ export const ViewRenderer: React.FC<ViewRendererProps> = ({
   }, [preloadView]);
 
   // ローディング状態
-  if (isLoading) {
+  if (isLoading || authLoading) {
     return (
       <Suspense fallback={<Fallback />}>
         <Fallback />
       </Suspense>
     );
+  }
+
+  // 認証チェック
+  if (
+    currentRoute &&
+    routeEngine.isAuthRequired(currentRoute.path) &&
+    !isAuthenticated
+  ) {
+    // 認証が必要なルートで未認証の場合は何も表示しない
+    // HybridSPAAuthがリダイレクトを処理する
+    return null;
   }
 
   // エラー状態
