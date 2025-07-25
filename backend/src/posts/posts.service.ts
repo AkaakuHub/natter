@@ -224,14 +224,14 @@ export class PostsService {
         }
 
         // キャラクター情報の隠蔽処理
-        const character = this.securityService.hideCharacterNameIfNeeded(
+        const character = await this.securityService.hideCharacterNameIfNeeded(
           post.character,
           currentUserId,
           post.authorId,
         );
 
         // URL隠蔽処理（他人の投稿のURLは隠蔽）
-        const url = this.securityService.hideUrlIfNeeded(
+        const url = await this.securityService.hideUrlIfNeeded(
           post.url,
           currentUserId,
           post.authorId,
@@ -295,14 +295,14 @@ export class PostsService {
     }
 
     // キャラクター情報の隠蔽処理
-    const character = this.securityService.hideCharacterNameIfNeeded(
+    const character = await this.securityService.hideCharacterNameIfNeeded(
       post.character,
       currentUserId,
       post.authorId,
     );
 
     // URL隠蔽処理（他人の投稿のURLは隠蔽）
-    const url = this.securityService.hideUrlIfNeeded(
+    const url = await this.securityService.hideUrlIfNeeded(
       post.url,
       currentUserId,
       post.authorId,
@@ -351,20 +351,22 @@ export class PostsService {
       },
     });
 
-    return posts.map((post) => {
-      // キャラクター情報の隠蔽処理
-      const character = this.securityService.hideCharacterNameIfNeeded(
-        post.character,
-        currentUserId,
-        post.authorId,
-      );
+    return Promise.all(
+      posts.map(async (post) => {
+        // キャラクター情報の隠蔽処理
+        const character = await this.securityService.hideCharacterNameIfNeeded(
+          post.character,
+          currentUserId,
+          post.authorId,
+        );
 
-      return {
-        ...post,
-        character,
-        images: post.images ? (JSON.parse(post.images) as string[]) : [],
-      };
-    });
+        return {
+          ...post,
+          character,
+          images: post.images ? (JSON.parse(post.images) as string[]) : [],
+        };
+      }),
+    );
   }
 
   async findMediaPosts(currentUserId?: string) {
@@ -400,25 +402,30 @@ export class PostsService {
       },
     });
 
-    return posts
+    const filteredPosts = posts
       .filter(
         (post) =>
           post.images && (JSON.parse(post.images) as string[]).length > 0,
       )
-      .map((post) => {
-        // キャラクター情報の隠蔽処理
-        const character = this.securityService.hideCharacterNameIfNeeded(
-          post.character,
-          currentUserId,
-          post.authorId,
-        );
+      .map((post) =>
+        (async () => {
+          // キャラクター情報の隠蔽処理
+          const character =
+            await this.securityService.hideCharacterNameIfNeeded(
+              post.character,
+              currentUserId,
+              post.authorId,
+            );
 
-        return {
-          ...post,
-          character,
-          images: post.images ? (JSON.parse(post.images) as string[]) : [],
-        };
-      });
+          return {
+            ...post,
+            character,
+            images: post.images ? (JSON.parse(post.images) as string[]) : [],
+          };
+        })(),
+      );
+
+    return Promise.all(filteredPosts);
   }
 
   async findLikedPosts(userId: string, currentUserId?: string) {
@@ -447,22 +454,24 @@ export class PostsService {
       },
     });
 
-    return likedPosts.map((like) => {
-      // キャラクター情報の隠蔽処理
-      const character = this.securityService.hideCharacterNameIfNeeded(
-        like.post.character,
-        currentUserId,
-        like.post.authorId,
-      );
+    return Promise.all(
+      likedPosts.map(async (like) => {
+        // キャラクター情報の隠蔽処理
+        const character = await this.securityService.hideCharacterNameIfNeeded(
+          like.post.character,
+          currentUserId,
+          like.post.authorId,
+        );
 
-      return {
-        ...like.post,
-        character,
-        images: like.post.images
-          ? (JSON.parse(like.post.images) as string[])
-          : [],
-      };
-    });
+        return {
+          ...like.post,
+          character,
+          images: like.post.images
+            ? (JSON.parse(like.post.images) as string[])
+            : [],
+        };
+      }),
+    );
   }
 
   async update(id: number, updatePostDto: UpdatePostDto) {
@@ -721,20 +730,22 @@ export class PostsService {
       },
     });
 
-    return replies.map((reply) => {
-      // キャラクター情報の隠蔽処理
-      const character = this.securityService.hideCharacterNameIfNeeded(
-        reply.character,
-        currentUserId,
-        reply.authorId,
-      );
+    return Promise.all(
+      replies.map(async (reply) => {
+        // キャラクター情報の隠蔽処理
+        const character = await this.securityService.hideCharacterNameIfNeeded(
+          reply.character,
+          currentUserId,
+          reply.authorId,
+        );
 
-      return {
-        ...reply,
-        character,
-        images: reply.images ? (JSON.parse(reply.images) as string[]) : [],
-      };
-    });
+        return {
+          ...reply,
+          character,
+          images: reply.images ? (JSON.parse(reply.images) as string[]) : [],
+        };
+      }),
+    );
   }
 
   async getTrendingPosts(limit: number = 5, currentUserId?: string) {
@@ -775,20 +786,22 @@ export class PostsService {
       take: limit,
     });
 
-    return posts.map((post) => {
-      // キャラクター情報の隠蔽処理
-      const character = this.securityService.hideCharacterNameIfNeeded(
-        post.character,
-        currentUserId,
-        post.authorId,
-      );
+    return Promise.all(
+      posts.map(async (post) => {
+        // キャラクター情報の隠蔽処理
+        const character = await this.securityService.hideCharacterNameIfNeeded(
+          post.character,
+          currentUserId,
+          post.authorId,
+        );
 
-      return {
-        ...post,
-        character,
-        images: post.images ? (JSON.parse(post.images) as string[]) : [],
-      };
-    });
+        return {
+          ...post,
+          character,
+          images: post.images ? (JSON.parse(post.images) as string[]) : [],
+        };
+      }),
+    );
   }
 
   async searchPosts(searchTerm: string, type?: string, currentUserId?: string) {
@@ -858,26 +871,31 @@ export class PostsService {
       },
     });
 
-    return posts
+    const filteredPosts = posts
       .filter(
         (post) =>
           type !== 'media' ||
           (post.images && (JSON.parse(post.images) as string[]).length > 0),
       )
-      .map((post) => {
-        // キャラクター情報の隠蔽処理
-        const character = this.securityService.hideCharacterNameIfNeeded(
-          post.character,
-          currentUserId,
-          post.authorId,
-        );
+      .map((post) =>
+        (async () => {
+          // キャラクター情報の隠蔽処理
+          const character =
+            await this.securityService.hideCharacterNameIfNeeded(
+              post.character,
+              currentUserId,
+              post.authorId,
+            );
 
-        return {
-          ...post,
-          character,
-          images: post.images ? (JSON.parse(post.images) as string[]) : [],
-        };
-      });
+          return {
+            ...post,
+            character,
+            images: post.images ? (JSON.parse(post.images) as string[]) : [],
+          };
+        })(),
+      );
+
+    return Promise.all(filteredPosts);
   }
 
   /**
@@ -903,7 +921,7 @@ export class PostsService {
 
       // 元画像を返す条件を統合
       const shouldReturnOriginal =
-        this.securityService.shouldRevealSecrets() ||
+        (await this.securityService.shouldRevealSecrets()) ||
         (post && currentUserId && currentUserId === post.authorId) ||
         (post && post.imagesPublic);
 
@@ -917,7 +935,7 @@ export class PostsService {
     } catch (error) {
       console.error('🔒 [IMAGE BUFFER] ERROR:', error);
       // エラー時の処理もIS_REVEADED_SECRETSを考慮
-      if (this.securityService.shouldRevealSecrets()) {
+      if (await this.securityService.shouldRevealSecrets()) {
         try {
           const originalPath = path.join(process.cwd(), 'uploads', filename);
           return await fs.readFile(originalPath);
@@ -955,7 +973,7 @@ export class PostsService {
 
       // 元画像パスを返す条件を統合
       const shouldReturnOriginal =
-        this.securityService.shouldRevealSecrets() ||
+        (await this.securityService.shouldRevealSecrets()) ||
         (post && currentUserId && currentUserId === post.authorId) ||
         (post && post.imagesPublic);
 
@@ -977,7 +995,7 @@ export class PostsService {
     } catch (error) {
       console.error('Failed to process image request:', error);
       // エラー時の処理もIS_REVEADED_SECRETSを考慮
-      if (this.securityService.shouldRevealSecrets()) {
+      if (await this.securityService.shouldRevealSecrets()) {
         return filename;
       }
       // エラー時も処理済み画像を返す（セキュリティのため）

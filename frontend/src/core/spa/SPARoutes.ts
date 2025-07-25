@@ -63,6 +63,15 @@ export const MAIN_NAVIGATION_ROUTES: SPARouteConfig[] = [
 // その他のルート定義
 const OTHER_ROUTES: SPARouteConfig[] = [
   {
+    path: "/admin",
+    label: "管理者",
+    icon: "IconSettings",
+    authRequired: true,
+    component: () => import("@/components/views/AdminView"),
+    title: "Natter - Admin",
+    description: "Admin settings on Natter",
+  },
+  {
     path: "/login",
     label: "ログイン",
     icon: "IconLogin",

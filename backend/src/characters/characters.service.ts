@@ -28,18 +28,20 @@ export class CharactersService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return characters.map((character) => {
-      const processedCharacter =
-        this.securityService.hideCharacterInListIfNeeded(
-          character,
-          currentUserId,
-          userId,
-        );
-      return {
-        ...processedCharacter,
-        postsCount: character.postsCount, // DBのpostsCountフィールドを使用
-      };
-    });
+    return Promise.all(
+      characters.map(async (character) => {
+        const processedCharacter =
+          await this.securityService.hideCharacterInListIfNeeded(
+            character,
+            currentUserId,
+            userId,
+          );
+        return {
+          ...processedCharacter,
+          postsCount: character.postsCount, // DBのpostsCountフィールドを使用
+        };
+      }),
+    );
   }
 
   // 特定のキャラクターを取得

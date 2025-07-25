@@ -12,6 +12,7 @@ import { FollowsModule } from './follows/follows.module';
 import { CharactersModule } from './characters/characters.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { MetadataModule } from './metadata/metadata.module';
+import { AdminModule } from './admin/admin.module';
 import { DbBackupService } from './services/db-backup.service';
 import { BackupTask } from './tasks/backup.task';
 import { MetadataTask } from './tasks/metadata.task';
@@ -31,6 +32,7 @@ import { MetadataTask } from './tasks/metadata.task';
     CharactersModule,
     NotificationsModule,
     MetadataModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService, DbBackupService, BackupTask, MetadataTask],
