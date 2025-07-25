@@ -77,7 +77,7 @@ const SetListView = () => {
                   {/* キャラクター情報 */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-lg font-medium text-text break-words word-break-break-all whitespace-normal">
+                      <h3 className="text-lg font-medium text-text break-all overflow-wrap-anywhere">
                         {character.name}
                       </h3>
                     </div>
