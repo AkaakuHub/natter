@@ -9,7 +9,8 @@
     "dev:clean": "pkill -f 'next\\|nest' || true && pnpm run dev",
     "stop": "pkill -f 'next\\|nest' || true",
     "start:prod": "cd backend && pnpm run build && pnpm run start:prod",
-    "backup": "cd backend && cp prisma/dev.db backups/dev-$(date +%Y-%m-%dT%H-%M-%S).db && echo \"✅ Database backup created: backups/dev-$(date +%Y-%m-%dT%H-%M-%S).db\""
+    "backup": "cd backend && cp prisma/dev.db backups/dev-$(date +%Y-%m-%dT%H-%M-%S).db && echo \"✅ Database backup created: backups/dev-$(date +%Y-%m-%dT%H-%M-%S).db\"",
+    "postinstall": "lefthook install"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
