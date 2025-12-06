@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 interface NewPostNotificationState {
   hasNewPosts: boolean;
@@ -11,6 +12,7 @@ interface NewPostNotificationState {
 
 export const useNewPostNotification = () => {
   const queryClient = useQueryClient();
+  const { currentUser } = useCurrentUser();
   const [state, setState] = useState<NewPostNotificationState>({
     hasNewPosts: false,
     newPostCount: 0,
@@ -37,8 +39,10 @@ export const useNewPostNotification = () => {
       }
 
       const posts = timelineData as Array<{
-        id: string;
+        id: string | number;
         createdAt: string;
+        authorId?: string;
+        author?: { id?: string | number | null } | null;
         [key: string]: unknown;
       }>;
 
@@ -47,7 +51,7 @@ export const useNewPostNotification = () => {
       }
 
       const latestPost = posts[0];
-      const latestPostId = latestPost.id;
+      const latestPostId = String(latestPost.id);
       // 初回設定
       if (!state.lastPostId) {
         setState((prev) => ({ ...prev, lastPostId: latestPostId }));
@@ -61,29 +65,49 @@ export const useNewPostNotification = () => {
         const newPosts = posts.filter(
           (post) => new Date(post.createdAt) > new Date(lastCheckTime),
         );
+        const currentUserId = currentUser?.id;
+        const relevantNewPosts = newPosts.filter((post) => {
+          if (!currentUserId) return true;
+          const postAuthorId =
+            post.authorId ??
+            (post.author && post.author.id
+              ? String(post.author.id)
+              : undefined);
+          return postAuthorId !== currentUserId;
+        });
 
-        if (newPosts.length > 0) {
+        if (relevantNewPosts.length > 0) {
           setState((prev) => ({
             ...prev,
             hasNewPosts: true,
-            newPostCount: newPosts.length,
+            newPostCount: relevantNewPosts.length,
             lastPostId: latestPostId,
           }));
 
           // 非アクティブタブの場合、ブラウザ通知も表示
-          if (!isTabActive && Notification.permission === "granted") {
+          if (
+            relevantNewPosts.length > 0 &&
+            !isTabActive &&
+            Notification.permission === "granted"
+          ) {
             new Notification("Natter", {
-              body: `${newPosts.length}件の新しい投稿があります`,
+              body: `${relevantNewPosts.length}件の新しい投稿があります`,
               icon: "/icon.png",
               tag: "new-posts",
             });
           }
+        } else {
+          // 自分の投稿など通知対象がない場合でも最新IDは更新しておく
+          setState((prev) => ({
+            ...prev,
+            lastPostId: latestPostId,
+          }));
         }
       }
     } catch (error) {
       console.error("Failed to check for new posts:", error);
     }
-  }, [state.lastPostId, isTabActive, queryClient]);
+  }, [state.lastPostId, isTabActive, queryClient, currentUser?.id]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
