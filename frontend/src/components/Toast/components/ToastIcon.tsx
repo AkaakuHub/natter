@@ -1,5 +1,9 @@
 import React from "react";
-import { toastIcons, ToastType } from "@/utils/toastConfig";
+import {
+  toastIcons,
+  toastIconBackground,
+  ToastType,
+} from "@/utils/toastConfig";
 
 interface ToastIconProps {
   type: ToastType;
@@ -10,8 +14,10 @@ const ToastIcon = ({ type }: ToastIconProps) => {
   const iconProps = type === "success" ? { className: "animate-scale-in" } : {};
 
   return (
-    <div className="flex-shrink-0 bg-surface/20 rounded-full p-2">
-      <IconComponent size={24} {...iconProps} />
+    <div
+      className={`flex-shrink-0 rounded-full p-2 ${toastIconBackground[type]}`}
+    >
+      <IconComponent size={20} {...iconProps} />
     </div>
   );
 };

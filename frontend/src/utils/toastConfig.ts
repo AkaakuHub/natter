@@ -14,12 +14,16 @@ export const toastIcons = {
   info: IconInfoCircle,
 };
 
-export const toastColors = {
-  success:
-    "bg-gradient-to-r from-success to-success-hover text-text-inverse shadow-success/30",
-  error:
-    "bg-gradient-to-r from-error to-error-hover text-text-inverse shadow-error/30",
-  warning:
-    "bg-gradient-to-r from-warning to-warning-hover text-text-inverse shadow-warning/30",
-  info: "bg-gradient-to-r from-interactive to-interactive-hover text-text-inverse shadow-interactive/30",
+export const toastContainerColors: Record<ToastType, string> = {
+  success: "border-success/40",
+  error: "border-error/40",
+  warning: "border-warning/40",
+  info: "border-interactive/40",
+};
+
+export const toastIconBackground: Record<ToastType, string> = {
+  success: "bg-success/10 text-success",
+  error: "bg-error/10 text-error",
+  warning: "bg-warning/10 text-warning",
+  info: "bg-interactive/10 text-interactive",
 };

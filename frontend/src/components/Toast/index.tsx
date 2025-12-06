@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useToastAnimation } from "@/hooks/useToastAnimation";
-import { toastColors, ToastType } from "@/utils/toastConfig";
+import { toastContainerColors, ToastType } from "@/utils/toastConfig";
 
 import ToastIcon from "./components/ToastIcon";
 import ToastMessage from "./components/ToastMessage";
@@ -34,18 +34,18 @@ const Toast = ({
 
   return (
     <div
-      className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ${
-        isLeaving ? "opacity-0 -translate-y-4" : "opacity-100 translate-y-0"
+      className={`fixed top-5 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${
+        isLeaving ? "opacity-0 -translate-y-2" : "opacity-100 translate-y-0"
       }`}
       onClick={onClick}
     >
       <div
-        className={`flex items-center gap-4 px-6 py-4 rounded-2xl shadow-2xl ${toastColors[type]} min-w-[350px] max-w-[600px] backdrop-blur-lg transform transition-all duration-300 hover:scale-105 ${
+        className={`flex items-center gap-3 rounded-2xl bg-surface text-text border shadow-md min-w-[280px] max-w-[420px] px-4 py-3 ${toastContainerColors[type]} ${
           onClick ? "cursor-pointer" : ""
         }`}
       >
         <ToastIcon type={type} />
-        <ToastMessage message={message} type={type} />
+        <ToastMessage message={message} />
         <CloseButton onClose={handleClose} />
       </div>
     </div>

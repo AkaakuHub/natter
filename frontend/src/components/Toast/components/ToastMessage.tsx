@@ -1,23 +1,13 @@
 import React from "react";
-import { IconSparkles } from "@tabler/icons-react";
-import { ToastType } from "@/utils/toastConfig";
-
 interface ToastMessageProps {
   message: string;
-  type: ToastType;
 }
 
-const ToastMessage = ({ message, type }: ToastMessageProps) => {
+const ToastMessage = ({ message }: ToastMessageProps) => {
   return (
-    <>
-      <p className="flex-1 text-base font-semibold tracking-wide">{message}</p>
-      {type === "success" && (
-        <IconSparkles
-          size={20}
-          className="text-text-inverse/60 animate-pulse"
-        />
-      )}
-    </>
+    <p className="flex-1 text-sm font-medium text-text leading-snug">
+      {message}
+    </p>
   );
 };
 
