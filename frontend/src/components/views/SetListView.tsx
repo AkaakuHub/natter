@@ -58,7 +58,7 @@ const SetListView = () => {
       </div>
 
       {/* キャラクター一覧 */}
-      <div className="min-h-screen">
+      <div>
         {characters && characters.length > 0 ? (
           <div>
             {characters.map((character) => (

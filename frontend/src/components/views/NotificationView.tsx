@@ -78,7 +78,7 @@ const NotificationView = () => {
       </div>
 
       {/* 通知一覧 */}
-      <div className="min-h-screen">
+      <div>
         {notifications && notifications.length > 0 ? (
           <div>
             {notifications.map((notification) => (

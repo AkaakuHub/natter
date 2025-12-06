@@ -136,7 +136,7 @@ const Search: React.FC<SearchProps> = ({ currentUser }) => {
       </div>
 
       {/* 検索結果 */}
-      <div className="min-h-screen">
+      <div>
         {loading && (
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-interactive"></div>
