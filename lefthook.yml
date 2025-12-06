@@ -4,6 +4,7 @@ pre-commit:
     frontend-tailwind-colors-check:
       glob: "frontend/src/**/*.{ts,tsx,js,jsx}"
       run: cd frontend && ./scripts/check-tailwind-colors.sh
+      stage_fixed: true
     frontend-lint:
       glob: "frontend/{src,app}/**/*.{ts,tsx}"
       run: cd frontend && pnpm run lint

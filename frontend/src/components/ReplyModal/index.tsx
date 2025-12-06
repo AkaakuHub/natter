@@ -97,4 +97,4 @@ const ReplyModal = ({
 };
 
 export default ReplyModal;
-  const maxImages = 10;
+const maxImages = 10;

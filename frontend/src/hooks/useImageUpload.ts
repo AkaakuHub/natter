@@ -69,7 +69,9 @@ export const useImageUpload = (
       });
 
       if (filesToPreview.length > 0) {
-        const previewUrls = filesToPreview.map((file) => URL.createObjectURL(file));
+        const previewUrls = filesToPreview.map((file) =>
+          URL.createObjectURL(file),
+        );
         setImagePreviewUrls((prev) => [...prev, ...previewUrls]);
       }
 

@@ -183,11 +183,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
         {/* Form */}
         <div className="flex-1 overflow-y-auto">
-          <form
-            ref={formRef}
-            onSubmit={handleSubmit}
-            className="p-4 sm:p-4"
-          >
+          <form ref={formRef} onSubmit={handleSubmit} className="p-4 sm:p-4">
             <div className="flex gap-3 sm:gap-4">
               <div className="hidden sm:block flex-shrink-0">
                 <UserAvatar user={currentUser} />
