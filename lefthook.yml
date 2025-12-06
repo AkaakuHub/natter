@@ -13,6 +13,10 @@ pre-commit:
       glob: "frontend/{src,app}/**/*.{ts,tsx,js,jsx,json,css}"
       run: cd frontend && pnpm run format
       stage_fixed: true
+    frontend-typecheck:
+      glob: "frontend/{src,app}/**/*.{ts,tsx}"
+      run: cd frontend && pnpm run typecheck
+      stage_fixed: true
     backend-lint:
       glob: "backend/src/**/*.ts"
       run: cd backend && pnpm run lint

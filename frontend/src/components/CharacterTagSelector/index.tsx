@@ -80,7 +80,7 @@ const CharacterTagSelector = forwardRef<
     // 文字数制限チェック（50文字）
     if (trimmedName.length > 50) {
       alert("キャラクター名は50文字以内で入力してください");
-      return;
+      return null;
     }
 
     // 既存のキャラクターに同じ名前があるかチェック

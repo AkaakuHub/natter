@@ -16,7 +16,8 @@
     "knip": "knip",
     "clean": "rm -rf .next node_modules pnpm-lock.yaml && pnpm install",
     "clean:cache": "rm -rf .next node_modules/.cache",
-    "dev:clean": "rm -rf .next && pnpm dev"
+    "dev:clean": "rm -rf .next && pnpm dev",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
