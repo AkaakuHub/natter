@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
-import { IconPhoto } from "@tabler/icons-react";
 import ImagePreview from "@/components/CreatePost/components/ImagePreview";
+import ImageDropZone from "@/components/CreatePost/components/ImageDropZone";
+import { useClipboardImagePaste } from "@/hooks/useClipboardImagePaste";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 interface EditFormProps {
@@ -9,6 +10,7 @@ interface EditFormProps {
   imagePreviewUrls: string[];
   onImageRemove: (index: number) => void;
   onImageAdd: () => void;
+  onFilesAdd: (files: File[]) => void;
   onSubmit: (e: React.FormEvent) => void;
   remainingChars: number;
   isSubmitting: boolean;
@@ -16,6 +18,7 @@ interface EditFormProps {
   hasChanges: boolean;
   characterLimit: number;
   autoFocus?: boolean;
+  maxImages: number;
 }
 
 const EditForm = ({
@@ -24,6 +27,7 @@ const EditForm = ({
   imagePreviewUrls,
   onImageRemove,
   onImageAdd,
+  onFilesAdd,
   onSubmit,
   remainingChars,
   isSubmitting,
@@ -31,8 +35,17 @@ const EditForm = ({
   hasChanges,
   characterLimit,
   autoFocus = false,
+  maxImages,
 }: EditFormProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const canAddMore = imagePreviewUrls.length < maxImages;
+
+  useClipboardImagePaste({
+    enabled: canAddMore && !isSubmitting,
+    onPasteImages: onFilesAdd,
+    containerRef: formRef,
+  });
 
   const { handleKeyDown } = useKeyboardShortcuts({
     onSubmit: () => {
@@ -58,7 +71,7 @@ const EditForm = ({
   }, [autoFocus]);
 
   return (
-    <form onSubmit={onSubmit} className="p-4">
+    <form ref={formRef} onSubmit={onSubmit} className="p-4">
       <div className="flex flex-col gap-4">
         {/* テキストエリア */}
         <textarea
@@ -75,23 +88,17 @@ const EditForm = ({
 
         {/* 画像プレビュー */}
         <ImagePreview imageUrls={imagePreviewUrls} onRemove={onImageRemove} />
+        <ImageDropZone
+          onFilesAdd={onFilesAdd}
+          onRequestFileDialog={onImageAdd}
+          disabled={isSubmitting}
+          canAddMore={canAddMore}
+          maxImages={maxImages}
+        />
 
         {/* ボタンエリア */}
         <div className="flex items-center justify-between pt-4 border-t border-border-muted">
           <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={onImageAdd}
-              disabled={isSubmitting || imagePreviewUrls.length >= 10}
-              className="text-interactive hover:text-interactive-hover disabled:opacity-50 p-2 rounded-full hover:bg-interactive-bg transition-all duration-300 cursor-pointer"
-              title={
-                imagePreviewUrls.length >= 10
-                  ? "画像は最大10枚まで"
-                  : "画像を追加"
-              }
-            >
-              <IconPhoto size={20} />
-            </button>
             <span
               className={`text-sm ${
                 remainingChars < 20

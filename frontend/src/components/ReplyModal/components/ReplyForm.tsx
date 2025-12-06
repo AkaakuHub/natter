@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useRef } from "react";
 import Image from "next/image";
-import { IconPhoto } from "@tabler/icons-react";
 import { User } from "@/api";
 import PostTextArea from "@/components/CreatePost/components/PostTextArea";
 import ImagePreview from "@/components/CreatePost/components/ImagePreview";
+import ImageDropZone from "@/components/CreatePost/components/ImageDropZone";
+import { useClipboardImagePaste } from "@/hooks/useClipboardImagePaste";
 
 interface ReplyFormProps {
   currentUser?: User | null;
@@ -12,12 +13,14 @@ interface ReplyFormProps {
   imagePreviewUrls: string[];
   onImageRemove: (index: number) => void;
   onImageAdd: () => void;
+  onFilesAdd: (files: File[]) => void;
   onSubmit: (e: React.FormEvent) => void;
   remainingChars: number;
   isSubmitting: boolean;
   isValid: boolean;
   effectiveLength?: number;
   actualLength?: number;
+  maxImages: number;
 }
 
 const ReplyForm = ({
@@ -27,13 +30,23 @@ const ReplyForm = ({
   imagePreviewUrls,
   onImageRemove,
   onImageAdd,
+  onFilesAdd,
   onSubmit,
   remainingChars,
   isSubmitting,
   isValid,
   effectiveLength,
   actualLength,
+  maxImages,
 }: ReplyFormProps) => {
+  const canAddMore = imagePreviewUrls.length < maxImages;
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useClipboardImagePaste({
+    enabled: canAddMore && !isSubmitting,
+    onPasteImages: onFilesAdd,
+    containerRef: formRef,
+  });
   const handleKeyboardSubmit = () => {
     if (isValid && !isSubmitting) {
       const syntheticEvent = {
@@ -44,7 +57,7 @@ const ReplyForm = ({
   };
 
   return (
-    <form onSubmit={onSubmit} className="p-4">
+    <form ref={formRef} onSubmit={onSubmit} className="p-4">
       <div className="flex gap-3">
         <Image
           src={currentUser?.image || "/no_avatar_image_128x128.png"}
@@ -65,43 +78,40 @@ const ReplyForm = ({
           />
 
           <ImagePreview imageUrls={imagePreviewUrls} onRemove={onImageRemove} />
+          <ImageDropZone
+            onFilesAdd={onFilesAdd}
+            onRequestFileDialog={onImageAdd}
+            disabled={isSubmitting}
+            canAddMore={canAddMore}
+            maxImages={maxImages}
+          />
         </div>
       </div>
 
       {/* ボタンエリア */}
       <div className="flex items-center justify-between mt-4 pt-4 border-t border-border-muted">
-        <div className="flex items-center gap-4">
-          <button
-            type="button"
-            onClick={onImageAdd}
-            disabled={isSubmitting}
-            className="text-interactive hover:text-interactive-hover disabled:text-interactive-disabled transition-colors duration-200"
+        <div className="flex items-center gap-2">
+          <span
+            className={`text-sm ${
+              remainingChars < 20
+                ? remainingChars < 0
+                  ? "text-error"
+                  : "text-warning"
+                : "text-text-muted"
+            }`}
           >
-            <IconPhoto size={20} />
-          </button>
-          <div className="flex items-center gap-2">
-            <span
-              className={`text-sm ${
-                remainingChars < 20
-                  ? remainingChars < 0
-                    ? "text-error"
-                    : "text-warning"
-                  : "text-text-muted"
-              }`}
-            >
-              {remainingChars}
-            </span>
-            {effectiveLength !== undefined &&
-              actualLength !== undefined &&
-              effectiveLength !== actualLength && (
-                <span
-                  className="text-xs text-text-muted"
-                  title={`実際の文字数: ${actualLength}文字\n有効文字数: ${effectiveLength}文字 (URLは1/5でカウント)`}
-                >
-                  ({effectiveLength}/{actualLength})
-                </span>
-              )}
-          </div>
+            {remainingChars}
+          </span>
+          {effectiveLength !== undefined &&
+            actualLength !== undefined &&
+            effectiveLength !== actualLength && (
+              <span
+                className="text-xs text-text-muted"
+                title={`実際の文字数: ${actualLength}文字\n有効文字数: ${effectiveLength}文字 (URLは1/5でカウント)`}
+              >
+                ({effectiveLength}/{actualLength})
+              </span>
+            )}
         </div>
 
         <button

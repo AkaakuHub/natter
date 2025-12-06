@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { IconX } from "@tabler/icons-react";
 import { User, Character } from "@/api";
 import { useImageUpload } from "@/hooks/useImageUpload";
+import { useClipboardImagePaste } from "@/hooks/useClipboardImagePaste";
 import { usePostSubmit } from "@/hooks/usePostSubmit";
 import { useFormValidation } from "@/hooks/useFormValidation";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -12,6 +13,7 @@ import { useSPANavigation } from "@/core/spa";
 import UserAvatar from "../CreatePost/components/UserAvatar";
 import PostTextArea from "../CreatePost/components/PostTextArea";
 import ImagePreview from "../CreatePost/components/ImagePreview";
+import ImageDropZone from "../CreatePost/components/ImageDropZone";
 import ErrorMessage from "../CreatePost/components/ErrorMessage";
 import PostActions from "../CreatePost/components/PostActions";
 import CharacterTagSelector from "../CharacterTagSelector";
@@ -39,14 +41,18 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   const [showDiscardDialog, setShowDiscardDialog] = useState(false);
   const characterLimit = 280;
   const { navigateToLogin } = useSPANavigation();
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const maxImages = 10;
 
   const {
     images,
     imagePreviewUrls,
     handleImageAdd,
+    handleFilesAdd,
     handleImageRemove,
     clearImages,
-  } = useImageUpload(10);
+  } = useImageUpload(maxImages);
   const {
     isSubmitting,
     error,
@@ -59,6 +65,12 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
       characterLimit,
       !!selectedCharacter,
     );
+
+  useClipboardImagePaste({
+    enabled: isOpen && images.length < maxImages && !isSubmitting,
+    onPasteImages: handleFilesAdd,
+    containerRef: formRef,
+  });
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) {
@@ -171,7 +183,11 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
         {/* Form */}
         <div className="flex-1 overflow-y-auto">
-          <form onSubmit={handleSubmit} className="p-4 sm:p-4">
+          <form
+            ref={formRef}
+            onSubmit={handleSubmit}
+            className="p-4 sm:p-4"
+          >
             <div className="flex gap-3 sm:gap-4">
               <div className="hidden sm:block flex-shrink-0">
                 <UserAvatar user={currentUser} />
@@ -221,6 +237,13 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   imageUrls={imagePreviewUrls}
                   onRemove={handleImageRemove}
                 />
+                <ImageDropZone
+                  onFilesAdd={handleFilesAdd}
+                  onRequestFileDialog={handleImageAdd}
+                  disabled={isSubmitting}
+                  canAddMore={images.length < maxImages}
+                  maxImages={maxImages}
+                />
 
                 {/* 画像公開設定（画像がある場合のみ表示） */}
                 {images.length > 0 && (
@@ -246,13 +269,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 <ErrorMessage error={error} />
 
                 <PostActions
-                  onImageAdd={handleImageAdd}
                   onSubmit={() => handleSubmit()}
                   remainingChars={remainingChars}
                   isSubmitting={isSubmitting}
                   isValid={isValid}
-                  imageCount={images.length}
-                  maxImages={10}
                   effectiveLength={effectiveLength}
                   actualLength={actualLength}
                 />

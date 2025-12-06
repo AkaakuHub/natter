@@ -39,6 +39,7 @@ const ReplyModal = ({
     setContent,
     imagePreviewUrls,
     handleImageAdd,
+    handleFilesAdd,
     handleImageRemove,
     remainingChars,
     isValid,
@@ -81,12 +82,14 @@ const ReplyModal = ({
           imagePreviewUrls={imagePreviewUrls}
           onImageRemove={handleImageRemove}
           onImageAdd={handleImageAdd}
+          onFilesAdd={handleFilesAdd}
           onSubmit={onFormSubmit}
           remainingChars={remainingChars}
           isSubmitting={isSubmitting}
           isValid={isValid}
           effectiveLength={effectiveLength}
           actualLength={actualLength}
+          maxImages={maxImages}
         />
       </div>
     </div>
@@ -94,3 +97,4 @@ const ReplyModal = ({
 };
 
 export default ReplyModal;
+  const maxImages = 10;

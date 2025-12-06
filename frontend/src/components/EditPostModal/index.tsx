@@ -30,13 +30,16 @@ const EditPostModal = ({
   const characterLimit = 280;
 
   const { isEditing, editPost } = usePostEdit();
+  const maxImages = 10;
+
   const {
     images,
     imagePreviewUrls,
     handleImageAdd,
+    handleFilesAdd,
     handleImageRemove,
     clearImages,
-  } = useImageUpload(10);
+  } = useImageUpload(maxImages);
   const { remainingChars, isValid } = useFormValidation(
     content,
     images.length,
@@ -99,6 +102,7 @@ const EditPostModal = ({
           imagePreviewUrls={imagePreviewUrls}
           onImageRemove={handleImageRemove}
           onImageAdd={handleImageAdd}
+          onFilesAdd={handleFilesAdd}
           onSubmit={handleSubmit}
           remainingChars={remainingChars}
           isSubmitting={isEditing}
@@ -110,6 +114,7 @@ const EditPostModal = ({
           }
           characterLimit={characterLimit}
           autoFocus={true}
+          maxImages={maxImages}
         />
       </div>
     </div>

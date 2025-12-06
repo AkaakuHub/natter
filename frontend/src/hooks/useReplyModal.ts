@@ -8,6 +8,7 @@ interface UseReplyModalResult {
   images: File[];
   imagePreviewUrls: string[];
   handleImageAdd: () => void;
+  handleFilesAdd: (files: File[] | FileList | null) => void;
   handleImageRemove: (index: number) => void;
   clearImages: () => void;
   remainingChars: number;
@@ -31,6 +32,7 @@ export const useReplyModal = (): UseReplyModalResult => {
     images,
     imagePreviewUrls,
     handleImageAdd,
+    handleFilesAdd,
     handleImageRemove,
     clearImages,
   } = useImageUpload(10);
@@ -66,6 +68,7 @@ export const useReplyModal = (): UseReplyModalResult => {
     images,
     imagePreviewUrls,
     handleImageAdd,
+    handleFilesAdd,
     handleImageRemove,
     clearImages,
     remainingChars,
