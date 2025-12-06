@@ -16,7 +16,9 @@ import ImagePreview from "../CreatePost/components/ImagePreview";
 import ImageDropZone from "../CreatePost/components/ImageDropZone";
 import ErrorMessage from "../CreatePost/components/ErrorMessage";
 import PostActions from "../CreatePost/components/PostActions";
-import CharacterTagSelector from "../CharacterTagSelector";
+import CharacterTagSelector, {
+  CharacterTagSelectorHandle,
+} from "../CharacterTagSelector";
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -42,6 +44,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   const characterLimit = 280;
   const { navigateToLogin } = useSPANavigation();
   const formRef = useRef<HTMLFormElement>(null);
+  const characterSelectorRef = useRef<CharacterTagSelectorHandle>(null);
 
   const maxImages = 10;
 
@@ -76,13 +79,16 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     if (e) {
       e.preventDefault();
     }
+    const ensuredCharacter =
+      await characterSelectorRef.current?.ensureCharacterSelection();
+
     await submitPost(
       content,
       images,
       url,
       imagesPublic,
       undefined,
-      selectedCharacter?.id || undefined,
+      (ensuredCharacter ?? selectedCharacter)?.id || undefined,
     );
 
     // 成功時にフォームをクリアしてモーダルを閉じる
@@ -202,6 +208,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
                 <div className="mt-4 sm:mt-4 relative z-50">
                   <CharacterTagSelector
+                    ref={characterSelectorRef}
                     selectedCharacter={selectedCharacter}
                     onCharacterChange={setSelectedCharacter}
                   />

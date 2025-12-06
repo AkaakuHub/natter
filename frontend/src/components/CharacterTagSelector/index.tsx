@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { createPortal } from "react-dom";
 import { IconPlus, IconX } from "@tabler/icons-react";
 import {
@@ -19,10 +25,14 @@ interface CharacterTagSelectorProps {
   onCharacterChange: (character: Character | null) => void;
 }
 
-const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
-  selectedCharacter,
-  onCharacterChange,
-}) => {
+export interface CharacterTagSelectorHandle {
+  ensureCharacterSelection: () => Promise<Character | null>;
+}
+
+const CharacterTagSelector = forwardRef<
+  CharacterTagSelectorHandle,
+  CharacterTagSelectorProps
+>(({ selectedCharacter, onCharacterChange }, ref) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,9 +73,9 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
   }, []);
 
   // 新規キャラクター作成
-  const handleCreateCharacter = async () => {
+  const handleCreateCharacter = async (): Promise<Character | null> => {
     const trimmedName = inputValue.trim();
-    if (!trimmedName) return;
+    if (!trimmedName) return null;
 
     // 文字数制限チェック（50文字）
     if (trimmedName.length > 50) {
@@ -80,7 +90,7 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
 
     if (existingCharacter) {
       alert("同じ名前のキャラクターが既に存在します");
-      return;
+      return null;
     }
 
     try {
@@ -90,12 +100,14 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
       onCharacterChange(newCharacter);
       setInputValue("");
       setIsDropdownOpen(false);
+      return newCharacter;
     } catch (error) {
       console.error("Failed to create character:", error);
       alert(
         "キャラクターの作成に失敗しました: " +
           (error instanceof Error ? error.message : "不明なエラー"),
       );
+      return null;
     }
   };
 
@@ -173,6 +185,30 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
       }
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    async ensureCharacterSelection() {
+      if (selectedCharacter) {
+        return selectedCharacter;
+      }
+
+      const trimmedName = inputValue.trim();
+      if (!trimmedName) {
+        return null;
+      }
+
+      const existingCharacter = characters.find(
+        (char) => char.name.toLowerCase() === trimmedName.toLowerCase(),
+      );
+
+      if (existingCharacter) {
+        handleSelectCharacter(existingCharacter);
+        return existingCharacter;
+      }
+
+      return await handleCreateCharacter();
+    },
+  }));
 
   return (
     <div className="w-full">
@@ -311,6 +347,8 @@ const CharacterTagSelector: React.FC<CharacterTagSelectorProps> = ({
       </div>
     </div>
   );
-};
+});
+
+CharacterTagSelector.displayName = "CharacterTagSelector";
 
 export default CharacterTagSelector;
