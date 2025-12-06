@@ -5,7 +5,6 @@ import {
   IconPlayerPlay,
   IconPlayerPause,
   IconRefresh,
-  IconClock,
 } from "@tabler/icons-react";
 
 interface TimerProps {
@@ -82,7 +81,7 @@ const Timer: React.FC<TimerProps> = ({ className = "" }) => {
 
   return (
     <div
-      className={`flex flex-col items-center justify-center min-h-[calc(100vh-120px)] bg-gradient-to-br from-surface via-surface-variant to-surface p-4 sm:p-6 ${className}`}
+      className={`flex flex-col items-center justify-center min-h-[calc(100vh-124px)] bg-gradient-to-br from-surface via-surface-variant to-surface p-4 sm:p-6 ${className}`}
     >
       {/* メインタイマー表示 */}
       <div className="relative mb-8">
@@ -136,18 +135,9 @@ const Timer: React.FC<TimerProps> = ({ className = "" }) => {
         {/* 時間表示 */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
-            <div className="text-4xl sm:text-5xl font-mono font-bold text-text mb-2">
+            <div className="text-4xl sm:text-5xl font-mono font-bold text-text">
               {formatTime(time)}
             </div>
-            <div className="text-sm text-text-muted flex items-center justify-center gap-1">
-              <IconClock size={16} />
-              <span>経過時間</span>
-            </div>
-            {cycleCount > 0 && (
-              <div className="text-xs text-text-muted mt-1">
-                {cycleCount}周目
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -181,28 +171,6 @@ const Timer: React.FC<TimerProps> = ({ className = "" }) => {
         >
           <IconRefresh size={24} />
         </button>
-      </div>
-
-      {/* 状態表示 */}
-      <div className="text-center">
-        <div
-          className={`
-          inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-          ${
-            isRunning
-              ? "bg-interactive/10 text-interactive border border-interactive/20"
-              : "bg-surface-hover text-text-muted border border-border"
-          }
-        `}
-        >
-          <div
-            className={`
-            w-2 h-2 rounded-full transition-all duration-200
-            ${isRunning ? "bg-interactive animate-pulse" : "bg-text-muted"}
-          `}
-          />
-          <span>{isRunning ? "実行中" : "停止中"}</span>
-        </div>
       </div>
 
       {/* 装飾的な要素 */}
