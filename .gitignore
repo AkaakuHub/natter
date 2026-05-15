@@ -42,3 +42,9 @@ next-env.d.ts
 
 # uploads
 backend/uploads/
+
+# cloudflare migration artifacts
+cloudflare/import/*.sql
+
+# terraform
+.terraform/

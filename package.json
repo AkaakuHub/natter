@@ -10,10 +10,24 @@
     "stop": "pkill -f 'next\\|nest' || true",
     "start:prod": "cd backend && pnpm run build && pnpm run start:prod",
     "backup": "cd backend && cp prisma/dev.db backups/dev-$(date +%Y-%m-%dT%H-%M-%S).db && echo \"✅ Database backup created: backups/dev-$(date +%Y-%m-%dT%H-%M-%S).db\"",
+    "cf:export:d1": "scripts/cloudflare/export-d1-sql.sh",
+    "cf:import:d1": "scripts/cloudflare/import-d1-sql.sh",
+    "cf:validate:images": "scripts/cloudflare/validate-image-refs.mjs",
+    "cf:upload:r2": "scripts/cloudflare/upload-r2-images.sh",
+    "cf:api:typecheck": "tsc --noEmit -p workers/api/tsconfig.json",
+    "cf:api:dry-run": "wrangler deploy --dry-run --config workers/api/wrangler.toml",
+    "cf:api:deploy": "wrangler deploy --config workers/api/wrangler.toml",
+    "tf:fmt": "terraform fmt infra/*.tf",
+    "tf:fmt:check": "terraform fmt -check infra/*.tf",
+    "tf:init": "terraform -chdir=infra init",
+    "tf:validate": "terraform -chdir=infra validate",
     "postinstall": "lefthook install"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260515.1",
     "concurrently": "^9.1.2",
-    "lefthook": "^1.11.16"
+    "lefthook": "^1.11.16",
+    "typescript": "^6.0.3",
+    "wrangler": "^4.91.0"
   }
 }
