@@ -1,6 +1,7 @@
 import { allRows, firstRow, requireRow, run } from "./db";
 import type { Env } from "./env";
 import {
+  corsHeaders,
   emptyResponse,
   errorResponse,
   getBoolean,
@@ -54,6 +55,12 @@ async function route(request: Request, env: Env): Promise<Response> {
   const path = url.pathname.replace(/\/+$/, "") || "/";
   const method = request.method;
   const parts = path.split("/").filter(Boolean);
+
+  if (method === "GET" && path === "/") {
+    return new Response("Hello World!", {
+      headers: corsHeaders(env, request),
+    });
+  }
 
   if (method === "HEAD" && path === "/users") {
     return emptyResponse(env, request, 200);
@@ -150,9 +157,9 @@ async function handleUsers(
   }
 
   if (method === "GET" && parts[1] === "recommended") {
-    await requireAuthUser(request, env.JWT_SECRET);
+    const authUser = await requireAuthUser(request, env.JWT_SECRET);
     const limit = parseLimit(url.searchParams.get("limit"), 5);
-    const users = await getRecommendedUsers(env.DB, limit);
+    const users = await getRecommendedUsers(env.DB, limit, authUser.id);
     return jsonResponse(env, request, users);
   }
 
@@ -1309,15 +1316,21 @@ async function getSettings(db: D1Database): Promise<Record<string, unknown>> {
   return row;
 }
 
-async function getRecommendedUsers(db: D1Database, limit: number): Promise<User[]> {
+async function getRecommendedUsers(
+  db: D1Database,
+  limit: number,
+  excludeUserId: string,
+): Promise<User[]> {
   const rows = await allRows(
     db,
     `SELECT u.*, COUNT(p."id") AS "posts"
      FROM "User" u
      LEFT JOIN "Post" p ON p."authorId" = u."id" AND p."deletedAt" IS NULL
+     WHERE u."id" != ?
      GROUP BY u."id"
      ORDER BY COUNT(p."id") DESC, u."createdAt" DESC
      LIMIT ?`,
+    excludeUserId,
     limit,
   );
   return rows.map((row) => ({
