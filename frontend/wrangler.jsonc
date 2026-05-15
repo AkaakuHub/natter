@@ -1,0 +1,29 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "natter-frontend",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-05-15",
+  "workers_dev": true,
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "routes": [
+    {
+      "pattern": "natter.akaaku.net/*",
+      "zone_name": "akaaku.net"
+    }
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "vars": {
+    "NEXTAUTH_URL": "https://natter.akaaku.net",
+    "NEXT_PUBLIC_API_URL": "https://api.natter.akaaku.net",
+    "NEXT_PUBLIC_BASE_URL": "https://natter.akaaku.net"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "natter-frontend"
+    }
+  ]
+}
