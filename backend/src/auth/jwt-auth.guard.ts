@@ -10,7 +10,7 @@ import { Request } from 'express';
 
 export interface JwtPayload {
   id: string;
-  twitterId: string;
+  discordId: string;
   name: string;
   image?: string;
   validated?: boolean;
@@ -48,7 +48,7 @@ export class JwtAuthGuard implements CanActivate {
       if (this.isValidJwtPayload(rawPayload)) {
         const payload: JwtPayload = {
           id: rawPayload.id as string,
-          twitterId: rawPayload.twitterId as string,
+          discordId: rawPayload.discordId as string,
           name: rawPayload.name as string,
           image: rawPayload.image as string | undefined,
           validated: rawPayload.validated as boolean | undefined,
@@ -75,7 +75,7 @@ export class JwtAuthGuard implements CanActivate {
     const obj = payload as Record<string, unknown>;
     return (
       typeof obj.id === 'string' &&
-      typeof obj.twitterId === 'string' &&
+      typeof obj.discordId === 'string' &&
       typeof obj.name === 'string'
     );
   }

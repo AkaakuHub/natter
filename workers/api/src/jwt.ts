@@ -2,7 +2,7 @@ import { HttpError } from "./http";
 
 export interface AuthUser {
   id: string;
-  twitterId: string;
+  discordId: string;
   name: string;
   image?: string;
   validated?: boolean;
@@ -70,7 +70,7 @@ export async function verifyJwt(
 
   return {
     id: payload.id,
-    twitterId: payload.twitterId,
+    discordId: payload.discordId,
     name: payload.name,
     image: payload.image,
     validated: payload.validated,
@@ -155,7 +155,7 @@ function isJwtPayload(value: unknown): value is JwtPayload {
   const record = value as Record<string, unknown>;
   return (
     typeof record.id === "string" &&
-    typeof record.twitterId === "string" &&
+    typeof record.discordId === "string" &&
     typeof record.name === "string" &&
     (record.image === undefined || typeof record.image === "string") &&
     (record.validated === undefined || typeof record.validated === "boolean") &&

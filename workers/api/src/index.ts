@@ -98,7 +98,7 @@ async function route(request: Request, env: Env): Promise<Response> {
 async function handleCreateToken(request: Request, env: Env): Promise<Response> {
   const body = await readJsonObject(request);
   const userId = requireString(body.userId, "userId");
-  const user = await findUserByTwitterId(env.DB, userId);
+  const user = await findUserByDiscordId(env.DB, userId);
   if (!user) {
     throw new HttpError(401, "User not found");
   }
@@ -106,7 +106,7 @@ async function handleCreateToken(request: Request, env: Env): Promise<Response> 
   const authUser = {
     id: user.id,
     name: user.name,
-    twitterId: user.twitterId,
+    discordId: user.discordId,
     image: user.image ?? undefined,
     validated: true,
     timestamp: new Date().toISOString(),
@@ -129,26 +129,34 @@ async function handleUsers(
 
   if (method === "POST" && parts.length === 1) {
     const body = await readJsonObject(request);
-    const twitterId = requireString(body.twitterId, "twitterId");
+    const discordId = requireString(body.discordId, "discordId");
     const name = requireString(body.name, "name");
     const image = getString(body.image) ?? null;
-    const existing = await findUserByTwitterId(env.DB, twitterId);
+    const existing = await findUserByDiscordId(env.DB, discordId);
     if (existing) {
-      return jsonResponse(env, request, existing);
+      await run(
+        env.DB,
+        `UPDATE "User" SET "name" = ?, "image" = ?, "updatedAt" = ? WHERE "discordId" = ?`,
+        name,
+        image,
+        new Date().toISOString(),
+        discordId,
+      );
+      return jsonResponse(env, request, requireRow(await getUserRowById(env.DB, existing.id), parseUser, "User not found"));
     }
     const now = new Date().toISOString();
     await run(
       env.DB,
-      `INSERT INTO "User" ("id", "name", "tel", "image", "twitterId", "isAdmin", "createdAt", "updatedAt")
+      `INSERT INTO "User" ("id", "name", "tel", "image", "discordId", "isAdmin", "createdAt", "updatedAt")
        VALUES (?, ?, NULL, ?, ?, false, ?, ?)`,
-      twitterId,
+      discordId,
       name,
       image,
-      twitterId,
+      discordId,
       now,
       now,
     );
-    return jsonResponse(env, request, requireRow(await getUserRowById(env.DB, twitterId), parseUser, "User not found"));
+    return jsonResponse(env, request, requireRow(await getUserRowById(env.DB, discordId), parseUser, "User not found"));
   }
 
   if (method === "GET" && parts.length === 1) {
@@ -163,8 +171,8 @@ async function handleUsers(
     return jsonResponse(env, request, users);
   }
 
-  if (method === "GET" && parts[1] === "twitter" && parts[2]) {
-    const user = await findUserByTwitterId(env.DB, decodeURIComponent(parts[2]));
+  if (method === "GET" && parts[1] === "discord" && parts[2]) {
+    const user = await findUserByDiscordId(env.DB, decodeURIComponent(parts[2]));
     if (!user) {
       throw new HttpError(404, "User not found");
     }
@@ -1370,8 +1378,8 @@ function characterWithCount(row: Record<string, unknown>): Character {
   };
 }
 
-async function findUserByTwitterId(db: D1Database, twitterId: string): Promise<User | undefined> {
-  const row = await firstRow(db, `SELECT * FROM "User" WHERE "twitterId" = ?`, twitterId);
+async function findUserByDiscordId(db: D1Database, discordId: string): Promise<User | undefined> {
+  const row = await firstRow(db, `SELECT * FROM "User" WHERE "discordId" = ?`, discordId);
   return row ? parseUser(row) : undefined;
 }
 

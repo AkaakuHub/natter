@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 interface CreateUserData {
-  twitterId: string;
+  discordId: string;
   name: string;
-  image?: string;
+  image?: string | null;
 }
 
 interface UpdateUserData {
   name?: string;
-  image?: string;
+  image?: string | null;
 }
 
 @Injectable()
@@ -19,17 +19,17 @@ export class UsersService {
   async create(userData: CreateUserData) {
     return this.prisma.user.create({
       data: {
-        id: userData.twitterId,
+        id: userData.discordId,
         name: userData.name,
         image: userData.image,
-        twitterId: userData.twitterId,
+        discordId: userData.discordId,
       },
     });
   }
 
-  async findByTwitterId(twitterId: string) {
+  async findByDiscordId(discordId: string) {
     const user = await this.prisma.user.findUnique({
-      where: { twitterId },
+      where: { discordId },
     });
 
     if (!user) {
@@ -39,35 +39,27 @@ export class UsersService {
     return user;
   }
 
-  async findOrCreateByTwitterId(
-    twitterId: string,
+  async findOrCreateByDiscordId(
+    discordId: string,
     name: string,
-    image?: string,
+    image?: string | null,
   ) {
-    // 名前の検証: フォールバック名の場合は警告
-    if (name.startsWith('User_')) {
-      console.warn('⚠️  Warning: Using fallback name pattern:', name);
-    }
-
-    let user = await this.findByTwitterId(twitterId);
+    let user = await this.findByDiscordId(discordId);
 
     if (!user) {
       user = await this.create({
-        twitterId,
+        discordId,
         name,
         image,
       });
     } else {
-      // 既存ユーザーの名前がフォールバック名で、新しい名前が実際の名前の場合、更新
-      if (user.name.startsWith('User_') && !name.startsWith('User_')) {
-        user = await this.prisma.user.update({
-          where: { twitterId },
-          data: {
-            name,
-            image: image || user.image,
-          },
-        });
-      }
+      user = await this.prisma.user.update({
+        where: { discordId },
+        data: {
+          name,
+          image,
+        },
+      });
     }
 
     return user;

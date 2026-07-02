@@ -12,7 +12,7 @@ export interface User {
   name: string;
   tel: string | null;
   image: string | null;
-  twitterId: string;
+  discordId: string;
   isAdmin: boolean;
   createdAt: string;
   updatedAt: string;
@@ -93,7 +93,7 @@ export function parseUser(row: Row): User {
     name: stringValue(row, "name"),
     tel: optionalStringValue(row, "tel"),
     image: optionalStringValue(row, "image"),
-    twitterId: stringValue(row, "twitterId"),
+    discordId: stringValue(row, "discordId"),
     isAdmin: booleanValue(row, "isAdmin"),
     createdAt: dateValue(row, "createdAt"),
     updatedAt: dateValue(row, "updatedAt"),

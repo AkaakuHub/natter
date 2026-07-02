@@ -12,7 +12,7 @@ async function seedBot() {
         id: 'bot_user_001',
         name: 'Natter Bot',
         image: '/no_avatar_image_128x128.png',
-        twitterId: 'bot_user_001',
+        discordId: 'bot_user_001',
       },
     });
 

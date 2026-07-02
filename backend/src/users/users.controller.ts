@@ -6,24 +6,20 @@ import {
   Param,
   Patch,
   NotFoundException,
-  Headers,
-  UnauthorizedException,
   UseGuards,
   Query,
   Req,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
-import * as jwt from 'jsonwebtoken';
 import { Request } from 'express';
 
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
-  twitterId: string;
+  discordId: string;
 
   @IsString()
   @IsNotEmpty()
@@ -31,7 +27,7 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsString()
-  image?: string;
+  image?: string | null;
 }
 
 export class UpdateUserDto {
@@ -42,20 +38,17 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
-  image?: string;
+  image?: string | null;
 }
 
 @Controller('users')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.findOrCreateByTwitterId(
-      createUserDto.twitterId,
+    return this.usersService.findOrCreateByDiscordId(
+      createUserDto.discordId,
       createUserDto.name,
       createUserDto.image,
     );
@@ -90,12 +83,12 @@ export class UsersController {
     return user;
   }
 
-  @Get('twitter/:twitterId')
-  async findByTwitterId(@Param('twitterId') twitterId: string) {
-    const user = await this.usersService.findByTwitterId(twitterId);
+  @Get('discord/:discordId')
+  async findByDiscordId(@Param('discordId') discordId: string) {
+    const user = await this.usersService.findByDiscordId(discordId);
     if (!user) {
       throw new NotFoundException(
-        `User with Twitter ID ${twitterId} not found`,
+        `User with Discord ID ${discordId} not found`,
       );
     }
     return user;
@@ -112,70 +105,5 @@ export class UsersController {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
     return updatedUser;
-  }
-
-  @Post('verify-session')
-  async verifySession(
-    @Body() body: { twitterId: string },
-    @Headers('authorization') authHeader?: string,
-  ) {
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedException('Bearer token required');
-    }
-
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    const jwtSecret = this.configService.get<string>('NEXTAUTH_SECRET');
-
-    if (!jwtSecret) {
-      throw new UnauthorizedException('JWT secret not configured');
-    }
-
-    try {
-      // NextAuth.jsのJWTトークンを検証
-      const decoded = jwt.verify(token, jwtSecret) as {
-        exp?: number;
-        iat?: number;
-        twitterId?: string;
-        name?: string;
-      };
-
-      // トークンの有効期限をチェック
-      const now = Math.floor(Date.now() / 1000);
-      if (decoded.exp && decoded.exp < now) {
-        throw new UnauthorizedException('Token expired');
-      }
-
-      // TwitterIDが一致するかチェック
-      if (decoded.twitterId !== body.twitterId) {
-        throw new UnauthorizedException('Token TwitterID mismatch');
-      }
-
-      // ユーザー情報を取得
-      const user = await this.usersService.findByTwitterId(body.twitterId);
-      if (!user) {
-        throw new UnauthorizedException('User not found');
-      }
-
-      return {
-        id: user.id,
-        twitterId: user.twitterId,
-        name: user.name,
-        verified: true,
-        tokenValid: true,
-      };
-    } catch (error) {
-      if (error instanceof jwt.JsonWebTokenError) {
-        throw new UnauthorizedException('Invalid JWT token');
-      }
-      if (error instanceof jwt.TokenExpiredError) {
-        throw new UnauthorizedException('JWT token expired');
-      }
-      if (error instanceof jwt.NotBeforeError) {
-        throw new UnauthorizedException('JWT token not active');
-      }
-
-      console.error('JWT verification error:', error);
-      throw new UnauthorizedException('Session verification failed');
-    }
   }
 }

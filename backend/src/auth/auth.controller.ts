@@ -23,10 +23,10 @@ export class AuthController {
       throw new UnauthorizedException('User ID is required');
     }
 
-    // ユーザーが存在するかチェック（userIdはtwitterIdとして扱う）
+    // ユーザーが存在するかチェック（userIdはdiscordIdとして扱う）
     const userInfo = await this.prisma.user.findUnique({
-      where: { twitterId: userId },
-      select: { id: true, name: true, twitterId: true, image: true },
+      where: { discordId: userId },
+      select: { id: true, name: true, discordId: true, image: true },
     });
 
     if (!userInfo) {
@@ -37,7 +37,7 @@ export class AuthController {
     const payload = {
       id: userInfo.id,
       name: userInfo.name,
-      twitterId: userInfo.twitterId,
+      discordId: userInfo.discordId,
       image: userInfo.image ?? undefined,
       validated: true,
       timestamp: new Date().toISOString(),

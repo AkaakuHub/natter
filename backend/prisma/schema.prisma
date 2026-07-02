@@ -18,7 +18,7 @@ model User {
   name      String
   tel       String?
   image     String?
-  twitterId String   @unique
+  discordId String   @unique
   isAdmin   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
