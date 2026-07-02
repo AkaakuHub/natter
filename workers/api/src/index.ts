@@ -35,7 +35,11 @@ import {
   shouldRevealSecrets,
 } from "./security";
 import { sanitizeContent, sanitizeContentPreservingUrls } from "./sanitize";
-import { createMosaicImageResponse } from "./images/mosaic";
+import {
+  createMosaicImage,
+  createMosaicImageResponse,
+  mosaicImageFilename,
+} from "./images/mosaic";
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -677,7 +681,17 @@ async function saveImages(env: Env, values: Array<File | string>): Promise<strin
       throw new HttpError(400, "File size exceeds 10MB limit");
     }
     const filename = `images-${Date.now()}-${crypto.randomUUID()}${extensionForFile(value)}`;
-    await env.ASSETS.put(filename, value.stream(), {
+    const imageData = await value.arrayBuffer();
+    const mosaic = createMosaicImage({
+      data: imageData,
+      contentType: value.type,
+    });
+    await env.ASSETS.put(mosaicImageFilename(filename), mosaic.body, {
+      httpMetadata: {
+        contentType: mosaic.contentType,
+      },
+    });
+    await env.ASSETS.put(filename, imageData, {
       httpMetadata: {
         contentType: value.type,
       },
@@ -917,6 +931,13 @@ async function handleImage(
     throw new HttpError(404, "Image not found");
   }
   const canReadOriginal = canReadOriginalImage(await shouldRevealSecrets(env.DB), post, authUser.id);
+  if (!canReadOriginal) {
+    const mosaic = await env.ASSETS.get(mosaicImageFilename(filename));
+    if (!mosaic) {
+      throw new HttpError(500, "Mosaic image is missing");
+    }
+    return createMosaicImageResponse({ mosaic });
+  }
   const object = await env.ASSETS.get(filename);
   if (!object) {
     throw new HttpError(404, "Image not found");
@@ -924,9 +945,6 @@ async function handleImage(
   const contentType = object.httpMetadata?.contentType ?? contentTypeForImageFilename(filename);
   if (!contentType) {
     throw new HttpError(500, "Image content type is missing");
-  }
-  if (!canReadOriginal) {
-    return createMosaicImageResponse({ object, contentType });
   }
   return new Response(object.body, {
     headers: {

@@ -12,11 +12,20 @@ type DecodedRgbaImage = {
   rgba: Uint8Array;
 };
 
-export async function createMosaicImageResponse(input: {
-  object: R2ObjectBody;
+export type MosaicImage = {
+  body: Uint8Array;
+  contentType: "image/png";
+};
+
+export function mosaicImageFilename(filename: string): string {
+  return `mosaics/${filename}.png`;
+}
+
+export function createMosaicImage(input: {
+  data: ArrayBuffer;
   contentType: string;
-}): Promise<Response> {
-  const image = decodeImage(await input.object.arrayBuffer(), input.contentType);
+}): MosaicImage {
+  const image = decodeImage(input.data, input.contentType);
   const mosaic = applyAverageColorMosaic(image.rgba, image.width, image.height);
   const png = encodePng({
     width: image.width,
@@ -25,7 +34,16 @@ export async function createMosaicImageResponse(input: {
     channels: RGBA_CHANNELS,
     depth: 8,
   });
-  return new Response(png, {
+  return {
+    body: png,
+    contentType: "image/png",
+  };
+}
+
+export function createMosaicImageResponse(input: {
+  mosaic: R2ObjectBody;
+}): Response {
+  return new Response(input.mosaic.body, {
     headers: {
       "Content-Type": "image/png",
       "Cache-Control": "no-cache, no-store, must-revalidate",
