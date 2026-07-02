@@ -85,6 +85,14 @@ const ProfileHeader = ({
     );
   }
 
+  if (!displayUser) {
+    return (
+      <div className="flex min-h-40 items-center justify-center text-text-muted">
+        ユーザーが見つかりません
+      </div>
+    );
+  }
+
   return (
     <div>
       <div
@@ -99,8 +107,8 @@ const ProfileHeader = ({
       />
       <div className="relative w-full flex flex-row items-center justify-center gap-2">
         <Image
-          src={displayUser?.image ?? "/no_avatar_image_128x128.png"}
-          alt={displayUser?.name ?? "no_avatar"}
+          src={displayUser.image ?? "/no_avatar_image_128x128.png"}
+          alt={displayUser.name}
           width={96}
           height={96}
           className="rounded-full border-4 border-surface absolute w-16 h-16 sm:w-24 sm:h-24 -top-8 sm:-top-12"
@@ -119,9 +127,7 @@ const ProfileHeader = ({
                 isCompact ? "text-sm sm:text-lg" : "text-lg sm:text-2xl",
               )}
             >
-              {displayUser?.name ?? (
-                <div className="h-6 sm:h-8 w-24 sm:w-32 bg-surface-variant animate-pulse rounded" />
-              )}
+              {displayUser.name}
             </div>
             {isOwnProfile && displayUser && (
               <a
@@ -144,7 +150,7 @@ const ProfileHeader = ({
               isCompact ? "text-xs" : "text-xs sm:text-sm",
             )}
           >
-            @{displayUser?.id ?? "no_id"}
+            @{displayUser.id}
           </div>
 
           {/* フォロー数表示 */}

@@ -35,7 +35,7 @@ export class PostsApi {
 
   static async getPostById(id: number): Promise<Post> {
     try {
-      return await ApiClient.get<Post>(`/posts/${id}`); // Allow both authenticated and unauthenticated access
+      return await ApiClient.get<Post>(`/posts/${id}`);
     } catch (error) {
       console.error("Error fetching post by ID:", error);
       throw error;

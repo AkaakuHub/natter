@@ -1,86 +1,63 @@
-import { NextResponse, NextRequest } from "next/server";
 import { getLocalAuthSession } from "@/auth";
 import { getMiddlewarePaths } from "@/core/spa/SPARoutes";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  if (
-    pathname.startsWith("/_auth/") ||
-    (pathname === "/login" && req.method === "POST")
-  ) {
+  if (pathname.startsWith("/_auth/") || pathname === "/login") {
     return NextResponse.next();
   }
 
-  // SLEEPANDMAXDEPTHTHINK: 最も単純な解決策
-  // ステップ1: SPAルートの判定とリライト処理を最初に実行
-  const spaRoutes = getMiddlewarePaths();
-  const isPostDetail = pathname.match(/^\/post\/\d+$/);
-  const isProfile =
-    pathname === "/profile" || pathname.match(/^\/profile\/\d+/);
-  const needsRewrite =
-    spaRoutes.includes(pathname) || isPostDetail || isProfile;
+  const routePath =
+    pathname === "/" ? req.nextUrl.searchParams.get("spa-path") : pathname;
+  if (routePath === "/login") {
+    return NextResponse.next();
+  }
 
-  // SPAルートの場合は即座にリライト（認証チェックなし）
-  if (needsRewrite) {
+  const session = await getRequiredSession(req, routePath ?? pathname);
+  if (!session) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  if (routePath === "/profile") {
+    return NextResponse.redirect(
+      new URL(`/profile/${session.user.id}`, req.url),
+    );
+  }
+
+  if (pathname !== "/" && isSpaRoute(pathname)) {
     const url = req.nextUrl.clone();
     url.pathname = "/";
     url.searchParams.set("spa-path", pathname);
-
     return NextResponse.rewrite(url);
   }
 
-  // ステップ2: 非SPAルートの認証チェック
-  // "/" へのリクエストは認証チェック（SPAページがロードされる）
-  if (pathname === "/") {
-    const spaPath = req.nextUrl.searchParams.get("spa-path");
-
-    if (spaPath) {
-      // 公開ページの判定
-      const publicRoutes = ["/login"];
-      const isSpaPostDetail = spaPath.match(/^\/post\/\d+$/);
-      const isSpaProfile =
-        spaPath === "/profile" || spaPath.match(/^\/profile\/\d+/);
-      const isPublicSpaPage =
-        publicRoutes.includes(spaPath) || isSpaPostDetail || isSpaProfile;
-
-      if (!isPublicSpaPage) {
-        // 認証が必要なSPAページ
-        try {
-          const session = await getLocalAuthSession(req);
-
-          if (!session) {
-            console.log(`💀 [AUTH REQUIRED] ${spaPath} -> /login`);
-            return NextResponse.redirect(new URL("/login", req.url));
-          }
-        } catch (error) {
-          console.error(`💀 [AUTH ERROR] ${spaPath}:`, error);
-          return NextResponse.redirect(new URL("/login", req.url));
-        }
-      } else {
-        console.log(`💀 [PUBLIC SPA PAGE] ${spaPath} - No auth required`);
-      }
-    } else {
-      // 通常のトップページ（認証が必要）
-      try {
-        const session = await getLocalAuthSession(req);
-
-        if (!session) {
-          console.log(`💀 [AUTH REQUIRED] / -> /login`);
-          return NextResponse.redirect(new URL("/login", req.url));
-        }
-      } catch (error) {
-        console.error(`💀 [AUTH ERROR] /:`, error);
-        return NextResponse.redirect(new URL("/login", req.url));
-      }
-    }
-  }
   return NextResponse.next();
+}
+
+async function getRequiredSession(
+  req: NextRequest,
+  path: string,
+): Promise<Awaited<ReturnType<typeof getLocalAuthSession>>> {
+  try {
+    return await getLocalAuthSession(req);
+  } catch (error) {
+    console.error(`Auth error for ${path}:`, error);
+    return null;
+  }
+}
+
+function isSpaRoute(pathname: string): boolean {
+  return (
+    getMiddlewarePaths().includes(pathname) ||
+    /^\/post\/\d+$/.test(pathname) ||
+    /^\/profile\/\d+(?:\/(?:following|followers))?$/.test(pathname)
+  );
 }
 
 export const config = {
   matcher: [
-    // 全てのパスにマッチ（静的アセット以外）
     "/((?!_next/static|_next/image|favicon.ico|manifest.json|api|sounds).*)",
   ],
 };
