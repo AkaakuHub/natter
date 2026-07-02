@@ -200,7 +200,8 @@ async function handlePosts(
     const userId = url.searchParams.get("userId");
     const search = url.searchParams.get("search");
     const posts = await findPosts(env.DB, { type, userId, search });
-    return jsonResponse(env, request, await enrichPosts(env.DB, posts, authUser.id));
+    const enrichedPosts = await enrichPosts(env.DB, posts, authUser.id);
+    return jsonResponse(env, request, type === "media" ? enrichedPosts.filter((post) => post.images.length > 0) : enrichedPosts);
   }
 
   if (method === "POST" && parts.length === 1) {
@@ -887,6 +888,7 @@ async function enrichPosts(
   posts: Post[],
   currentUserId?: string,
 ): Promise<Post[]> {
+  const revealSecrets = await shouldRevealSecrets(db);
   return Promise.all(
     posts.map(async (post) => {
       const author = post.authorId ? await findUserById(db, post.authorId) : null;
@@ -896,10 +898,16 @@ async function enrichPosts(
       const repliesCount = parseCount(await firstRow(db, `SELECT COUNT(*) AS "count" FROM "Post" WHERE "replyToId" = ? AND "deletedAt" IS NULL`, post.id));
       return {
         ...post,
+        images: canReadPostImages(revealSecrets, post, currentUserId) ? post.images : [],
         author,
         character: await hideCharacterNameIfNeeded(db, character, currentUserId, post.authorId),
         url: await hideUrlIfNeeded(db, post.url, currentUserId, post.authorId),
-        replyTo,
+        replyTo: replyTo
+          ? {
+              ...replyTo,
+              images: canReadPostImages(revealSecrets, replyTo, currentUserId) ? replyTo.images : [],
+            }
+          : null,
         likes,
         _count: {
           likes: likes.length,
@@ -908,6 +916,14 @@ async function enrichPosts(
       };
     }),
   );
+}
+
+function canReadPostImages(
+  revealSecrets: boolean,
+  post: Post,
+  currentUserId?: string,
+): boolean {
+  return revealSecrets || post.imagesPublic || (currentUserId !== undefined && post.authorId === currentUserId);
 }
 
 async function handleImage(
@@ -922,10 +938,7 @@ async function handleImage(
     `%${filename}%`,
   );
   const post = row ? parsePost(row) : undefined;
-  const canReadOriginal =
-    (await shouldRevealSecrets(env.DB)) ||
-    (post !== undefined && authUser.id === post.authorId) ||
-    post?.imagesPublic === true;
+  const canReadOriginal = post !== undefined && canReadPostImages(await shouldRevealSecrets(env.DB), post, authUser.id);
   if (!canReadOriginal) {
     throw new HttpError(403, "Access forbidden");
   }
