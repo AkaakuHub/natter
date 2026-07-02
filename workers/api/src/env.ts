@@ -7,4 +7,5 @@ export interface Env {
   APP_SESSION_HMAC_SECRET: string;
   SESSION_KID: string;
   FRONTEND_URLS?: string;
+  AUTH_MODE: "link-auth" | "local-header";
 }

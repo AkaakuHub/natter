@@ -45,6 +45,8 @@ backend/uploads/
 
 # cloudflare migration artifacts
 cloudflare/import/*.sql
+.wrangler/
+**/.wrangler/
 
 # terraform
 .terraform/

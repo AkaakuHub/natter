@@ -19,11 +19,45 @@ export async function requireAuthUser(
   request: Request,
   env: Env,
 ): Promise<AuthUser> {
-  const authUser = await authenticateLinkAuthUser(request, env);
+  const authUser = await authenticateConfiguredAuthUser(request, env);
   if (!authUser) {
     throw new HttpError(401, "Unauthorized");
   }
   return authUser;
+}
+
+async function authenticateConfiguredAuthUser(
+  request: Request,
+  env: Env,
+): Promise<AuthUser | undefined> {
+  if (env.AUTH_MODE === "link-auth") {
+    return authenticateLinkAuthUser(request, env);
+  }
+  if (env.AUTH_MODE === "local-header") {
+    return authenticateLocalHeaderUser(request);
+  }
+  throw new HttpError(500, "Invalid auth mode");
+}
+
+function authenticateLocalHeaderUser(request: Request): AuthUser | undefined {
+  const url = new URL(request.url);
+  if (!isLocalHostname(url.hostname)) {
+    throw new HttpError(403, "Local auth is only available on localhost");
+  }
+  const discordId = request.headers.get("x-natter-dev-discord-id");
+  if (!discordId) {
+    return undefined;
+  }
+  return {
+    id: discordId,
+    discordId,
+    name: request.headers.get("x-natter-dev-name") ?? "Local Dev User",
+    image: request.headers.get("x-natter-dev-image") ?? undefined,
+  };
+}
+
+function isLocalHostname(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
 }
 
 async function authenticateLinkAuthUser(

@@ -17,6 +17,7 @@
     "cf:api:typecheck": "tsc --noEmit -p workers/api/tsconfig.json",
     "cf:api:dry-run": "wrangler deploy --dry-run --config workers/api/wrangler.toml",
     "cf:api:deploy": "wrangler deploy --config workers/api/wrangler.toml",
+    "dev:api:local": "wrangler dev --config workers/api/wrangler.local.toml --port 8787",
     "tf:fmt": "terraform fmt infra/*.tf",
     "tf:fmt:check": "terraform fmt -check infra/*.tf",
     "tf:init": "terraform -chdir=infra init",
