@@ -64,7 +64,7 @@ const nextConfig: NextConfig = {
     
     return [
       {
-        source: '/(.*)',
+        source: '/_next/static/(.*)',
         headers: [
           {
             key: 'X-Content-Type-Options',
@@ -80,9 +80,30 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Cache-Control',
-            value: isDev 
+            value: isDev
               ? 'no-cache, no-store, must-revalidate, max-age=0'
               : 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/((?!_next/static|api).*)',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate, max-age=0',
           },
         ],
       },
