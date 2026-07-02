@@ -916,7 +916,7 @@ async function handleImage(
   if (!object) {
     throw new HttpError(404, "Image not found");
   }
-  const contentType = object.httpMetadata?.contentType;
+  const contentType = object.httpMetadata?.contentType ?? contentTypeForImageFilename(filename);
   if (!contentType) {
     throw new HttpError(500, "Image content type is missing");
   }
@@ -1428,4 +1428,24 @@ function extensionForFile(file: File): string {
     return ".avif";
   }
   throw new HttpError(400, "Unsupported image type");
+}
+
+function contentTypeForImageFilename(filename: string): string | undefined {
+  const lowerFilename = filename.toLowerCase();
+  if (lowerFilename.endsWith(".jpg") || lowerFilename.endsWith(".jpeg")) {
+    return "image/jpeg";
+  }
+  if (lowerFilename.endsWith(".png")) {
+    return "image/png";
+  }
+  if (lowerFilename.endsWith(".gif")) {
+    return "image/gif";
+  }
+  if (lowerFilename.endsWith(".webp")) {
+    return "image/webp";
+  }
+  if (lowerFilename.endsWith(".avif")) {
+    return "image/avif";
+  }
+  return undefined;
 }
