@@ -904,8 +904,8 @@ async function handleImage(
   const authUser = await requireAuthUser(request, env);
   const row = await firstRow(
     env.DB,
-    `SELECT * FROM "Post" WHERE "images" LIKE ? LIMIT 1`,
-    `%${filename}%`,
+    `SELECT * FROM "Post" WHERE instr("images", ?) > 0 LIMIT 1`,
+    JSON.stringify(filename),
   );
   const post = row ? parsePost(row) : undefined;
   const canReadOriginal = post !== undefined && canReadPostImages(await shouldRevealSecrets(env.DB), post, authUser.id);
