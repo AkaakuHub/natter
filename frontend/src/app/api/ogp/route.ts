@@ -29,6 +29,9 @@ export async function GET(request: NextRequest) {
   const type = request.nextUrl.searchParams.get("type");
   const postId = request.nextUrl.searchParams.get("postId");
   const appSessionCookie = getAppSessionCookieHeader(request);
+  if (!appSessionCookie) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
 
   if (type === "top") {
     const data = await fetchApiJson<OgpImageResponse>(
