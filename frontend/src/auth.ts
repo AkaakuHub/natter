@@ -24,7 +24,9 @@ export function loadAuthConfig() {
   });
 }
 
-export async function getAuthSession(request: Request): Promise<AuthSession | null> {
+export async function getAuthSession(
+  request: Request,
+): Promise<AuthSession | null> {
   const user = await getLinkAuthUser({
     config: loadAuthConfig(),
     request,
@@ -54,10 +56,11 @@ export async function handleAuthRoute(request: Request): Promise<Response> {
     authFailedResponse: (url) =>
       Response.redirect(new URL("/login?error=AuthFailed", url.origin), 302),
     config: loadAuthConfig(),
-    handleRequest: ({ url }) => Response.redirect(new URL("/", url.origin), 302),
+    handleRequest: ({ url }) =>
+      Response.redirect(new URL("/", url.origin), 302),
     loginResponse: (request) =>
       Response.redirect(new URL("/_auth/account", request.url), 302),
-    request,
+    request: normalizeLinkAuthRouteRequest(request),
   });
 }
 
@@ -77,4 +80,13 @@ function requireEnv(name: string): string {
     throw new Error(`${name} is required`);
   }
   return value;
+}
+
+function normalizeLinkAuthRouteRequest(request: Request): Request {
+  const url = new URL(request.url);
+  if (!url.pathname.startsWith("/%5Fauth/")) {
+    return request;
+  }
+  url.pathname = url.pathname.replace(/^\/%5Fauth\//, "/_auth/");
+  return new Request(url, request);
 }
