@@ -47,9 +47,7 @@ const PostHeader = ({
               {user?.name}
             </h1>
           </button>
-          <p className="text-text-muted text-sm mb-2">
-            @{user?.id}
-          </p>
+          <p className="text-text-muted text-sm mb-2">@{user?.id}</p>
           <time className="text-xs text-text-muted">
             {formatDate(
               post?.updatedAt && post.updatedAt !== post.createdAt
