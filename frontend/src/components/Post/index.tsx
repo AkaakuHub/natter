@@ -7,6 +7,7 @@ import { getImageUrl } from "@/utils/postUtils";
 import { usePostShare } from "@/hooks/usePostShare";
 import { useToast } from "@/hooks/useToast";
 import { Post, PostsApi } from "@/api";
+import type { User as ApiUser } from "@/api/types";
 import { useSPANavigation } from "@/core/spa";
 
 // 遅延読み込みモーダル
@@ -26,14 +27,7 @@ interface PostComponentProps {
     image: string;
   };
   post: Post;
-  currentUser?: {
-    id: string;
-    name: string;
-    image?: string;
-    twitterId: string;
-    createdAt: string;
-    updatedAt: string;
-  } | null;
+  currentUser?: ApiUser | null;
   onPostUpdate?: () => void;
   onPostDelete?: () => void;
 }

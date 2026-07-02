@@ -155,7 +155,7 @@ const DetailedPostComponent = ({
                   images: post.replyTo.images || [],
                   author: {
                     name: post.replyTo.author?.name,
-                    image: post.replyTo.author?.image,
+                    image: post.replyTo.author?.image ?? undefined,
                   },
                 }}
                 onParentPostClick={() => {
@@ -241,7 +241,7 @@ const DetailedPostComponent = ({
             images: post.images || [],
             author: {
               name: post.author?.name || "Unknown User",
-              image: post.author?.image,
+              image: post.author?.image ?? undefined,
             },
           }}
           currentUser={currentUser}

@@ -1,4 +1,3 @@
-import { getSession } from "next-auth/react";
 import { NetworkError } from "./errors";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -14,9 +13,12 @@ export class ApiClient {
     if (typeof window === "undefined") return null;
 
     try {
-      const session = await getSession();
+      const sessionResponse = await fetch("/api/auth/session", {
+        cache: "no-store",
+        credentials: "include",
+      });
 
-      if (session?.user?.id) {
+      if (sessionResponse.ok) {
         // JWTトークンをローカルストレージから取得を試みる
         let jwtToken = localStorage.getItem("jwt_token");
 
@@ -47,7 +49,7 @@ export class ApiClient {
           // 古いトークンをクリア
           localStorage.removeItem("jwt_token");
 
-          const authResponse = await this.requestJWTToken(session.user.id);
+          const authResponse = await this.requestJWTToken();
 
           if (authResponse?.token) {
             jwtToken = authResponse.token;
@@ -62,13 +64,15 @@ export class ApiClient {
         }
 
         return jwtToken;
-      } else {
+      } else if (sessionResponse.status === 401) {
         console.warn("No session found - user may need to log in");
         if (window.location.pathname !== "/login") {
           console.warn(
             "Warning: User appears to be logged in but no valid session found",
           );
         }
+      } else {
+        console.error("Failed to load auth session:", sessionResponse.status);
       }
     } catch (error) {
       console.error("Failed to get auth token:", error);
@@ -165,7 +169,7 @@ export class ApiClient {
       }
 
       const payload = JSON.parse(decodedPayload);
-      const hasRequired = payload.id && payload.name && payload.twitterId;
+      const hasRequired = payload.id && payload.name;
       return hasRequired;
     } catch (error) {
       console.error("❌ Error checking token structure:", error);
@@ -173,18 +177,11 @@ export class ApiClient {
     }
   }
 
-  private static async requestJWTToken(
-    userId: string,
-  ): Promise<{ token?: string } | null> {
+  private static async requestJWTToken(): Promise<{ token?: string } | null> {
     try {
-      const response = await fetch(`${this.baseURL}/auth/token`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: userId,
-        }),
+      const response = await fetch("/api/auth/token", {
+        cache: "no-store",
+        credentials: "include",
       });
 
       if (!response.ok) {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSPANavigation } from "@/core/spa/SPANavigation";
-import { useSession } from "next-auth/react";
+import { useAuthSession } from "@/auth-client";
 import { ApiClient } from "@/api/client";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 
@@ -16,7 +16,7 @@ interface AdminStatusResponse {
 
 export default function AdminView() {
   const { navigateToPath } = useSPANavigation();
-  const { data: session, status } = useSession();
+  const { data: session, status } = useAuthSession();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [settings, setSettings] = useState<AdminSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -52,8 +52,7 @@ export default function AdminView() {
 
       checkAdminStatus();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, navigateToPath]);
+  }, [status, session, navigateToPath]);
 
   const toggleRevealedSecrets = async () => {
     if (!settings) return;

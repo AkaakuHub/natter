@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import { useSession } from "next-auth/react";
+import { useAuthSession } from "@/auth-client";
 import FollowList from "@/components/FollowList";
 import { ExtendedSession } from "@/types";
 import { usePathname } from "next/navigation";
 
 const FollowingView = () => {
   const pathname = usePathname();
-  const { data: session, status } = useSession();
+  const { data: session, status } = useAuthSession();
 
   if (status === "loading") {
     return (

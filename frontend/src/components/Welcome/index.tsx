@@ -54,7 +54,7 @@ const Welcome = ({ session, onUserCreated }: WelcomeProps) => {
 
         <div className="mb-6">
           <p className="text-text-secondary text-sm">
-            Twitterアカウントでログインが完了しました。
+            ログインが完了しました。
             <br />
             アカウントを作成して今すぐ始めましょう！
           </p>

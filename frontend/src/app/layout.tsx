@@ -4,8 +4,7 @@
 import { Geist } from "next/font/google";
 import "./globals.css";
 
-import NextAuthProvider from "@/app/providers";
-import { auth } from "@/auth";
+import AppProviders from "@/app/providers";
 import { ToastProvider } from "@/hooks/useToast";
 import { AppStateProvider } from "@/contexts/AppStateContext";
 import { ServerStatusProvider } from "@/contexts/ServerStatusContext";
@@ -29,8 +28,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await auth();
-
   return (
     <html lang="ja">
       <head>
@@ -61,13 +58,13 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} antialiased bg-surface text-text`}
       >
-        <NextAuthProvider>
+        <AppProviders>
           <ServerStatusProvider>
             <AppStateProvider>
               <ToastProvider>{children}</ToastProvider>
             </AppStateProvider>
           </ServerStatusProvider>
-        </NextAuthProvider>
+        </AppProviders>
       </body>
     </html>
   );

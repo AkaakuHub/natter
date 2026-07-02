@@ -4,8 +4,8 @@ import { ExtendedSession } from "@/types";
 
 interface UseUserCreationProps {
   session: ExtendedSession | null;
-  checkUserExists: (twitterId: string) => Promise<void>;
-  clearUserCache: (twitterId: string) => void;
+  checkUserExists: (userId: string) => Promise<void>;
+  clearUserCache: (userId: string) => void;
 }
 
 interface UseUserCreationResult {
@@ -21,31 +21,19 @@ export const useUserCreation = ({
     if (!session?.user?.id) {
       throw new Error("Session not available");
     }
-    // セッションのトークンから直接名前を取得
-    const extendedSession = session as ExtendedSession;
-    const tokenName =
-      extendedSession.accessToken?.name || extendedSession.jwtToken?.name;
-    const tokenUsername =
-      extendedSession.accessToken?.username ||
-      extendedSession.jwtToken?.username;
+    if (!session.user.name) {
+      throw new Error("Authenticated user name is missing");
+    }
 
     const userData = {
-      twitterId: session.user.id,
-      name:
-        session.user.name ||
-        tokenName ||
-        tokenUsername ||
-        session.user.email?.split("@")[0] ||
-        `User_${session.user.id.slice(-8)}`,
-      image: session.user.image || undefined,
+      userId: session.user.id,
+      name: session.user.name,
+      image: session.user.image ?? null,
     };
     await UsersApi.createUser(userData);
-    // キャッシュをクリアして新しいユーザー情報を取得
-    const twitterId = session.user.id;
-    clearUserCache(twitterId);
-
-    // ユーザー作成後、再度チェック
-    await checkUserExists(twitterId);
+    const userId = session.user.id;
+    clearUserCache(userId);
+    await checkUserExists(userId);
   }, [session, checkUserExists, clearUserCache]);
 
   return {

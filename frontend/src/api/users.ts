@@ -2,14 +2,14 @@ import { ApiClient } from "./client";
 import { User } from "./types";
 
 interface CreateUserData {
-  twitterId: string;
+  userId: string;
   name: string;
-  image?: string;
+  image?: string | null;
 }
 
 interface UpdateUserData {
   name?: string;
-  image?: string;
+  image?: string | null;
 }
 
 export class UsersApi {
@@ -28,12 +28,20 @@ export class UsersApi {
   }
 
   static async createUser(userData: CreateUserData): Promise<User> {
-    return ApiClient.post<User>("/users", userData, true); // skipAuth = true
+    return ApiClient.post<User>(
+      "/users",
+      {
+        discordId: userData.userId,
+        name: userData.name,
+        image: userData.image,
+      },
+      true,
+    );
   }
 
-  static async getUserByTwitterId(twitterId: string): Promise<User | null> {
+  static async getUserByAuthId(userId: string): Promise<User | null> {
     try {
-      return await ApiClient.get<User>(`/users/twitter/${twitterId}`, true); // skipAuth = true
+      return await ApiClient.get<User>(`/users/discord/${userId}`, true);
     } catch (error: unknown) {
       // 404エラー（ユーザーが存在しない）の場合はnullを返す
       const errorMessage =
@@ -47,9 +55,9 @@ export class UsersApi {
       }
       // NetworkErrorの場合はログを出力しない（サーバーダウン時の騒音を防ぐ）
       if (!errorMessage.includes("サーバーに接続できません")) {
-        console.error("Error fetching user by Twitter ID:", error);
+        console.error("Error fetching user by auth ID:", error);
       }
-      throw error; // 他のエラーはそのまま投げる
+      throw error;
     }
   }
 

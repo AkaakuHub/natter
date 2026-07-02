@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useSession } from "next-auth/react";
+import { useAuthSession } from "@/auth-client";
 import NotificationItem from "@/components/NotificationItem";
 import {
   useNotifications,
@@ -10,7 +10,7 @@ import {
 import { IconBell, IconBellOff } from "@tabler/icons-react";
 
 const NotificationView = () => {
-  const { status } = useSession();
+  const { status } = useAuthSession();
   const { data: notifications, isLoading, error } = useNotifications();
   const markAllAsReadMutation = useMarkAllAsRead();
 

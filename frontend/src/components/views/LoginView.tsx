@@ -1,13 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { useHybridSPAAuth } from "@/core/auth/HybridSPAAuth";
 
 const LoginView = () => {
-  const { redirectAfterLogin } = useHybridSPAAuth();
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -17,33 +14,10 @@ const LoginView = () => {
 
     if (error) {
       switch (error) {
-        case "OAuthSignin":
+        case "AuthFailed":
           setAuthError(
-            "Twitter認証でエラーが発生しました。しばらく時間をあけて再度お試しください。",
+            "認証でエラーが発生しました。しばらく時間をあけて再度お試しください。",
           );
-          break;
-        case "OAuthCallback":
-          setAuthError("Twitter認証のコールバックでエラーが発生しました。");
-          break;
-        case "OAuthCreateAccount":
-          setAuthError("アカウント作成でエラーが発生しました。");
-          break;
-        case "EmailCreateAccount":
-          setAuthError(
-            "メールアドレスでのアカウント作成でエラーが発生しました。",
-          );
-          break;
-        case "Callback":
-          setAuthError("認証コールバックでエラーが発生しました。");
-          break;
-        case "OAuthAccountNotLinked":
-          setAuthError("このアカウントは既に別の方法でリンクされています。");
-          break;
-        case "EmailSignin":
-          setAuthError("メールサインインでエラーが発生しました。");
-          break;
-        case "CredentialsSignin":
-          setAuthError("認証情報が正しくありません。");
           break;
         case "SessionRequired":
           setAuthError("セッションが必要です。ログインしてください。");
@@ -53,27 +27,6 @@ const LoginView = () => {
       }
     }
   }, []);
-
-  const handleLogin = async () => {
-    setAuthError(null);
-
-    try {
-      const result = await signIn("twitter", {
-        callbackUrl: "/",
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setAuthError(`認証エラー: ${result.error}`);
-      } else if (result?.ok) {
-        // SPAルーターでリダイレクト
-        redirectAfterLogin();
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      setAuthError("認証処理中にエラーが発生しました。");
-    }
-  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-surface-variant">
@@ -90,13 +43,15 @@ const LoginView = () => {
             {authError}
           </div>
         )}
-        <Button
-          onClick={handleLogin}
-          type="button"
-          className="w-full bg-interactive text-text-inverse rounded-lg px-4 py-2 hover:bg-interactive-hover"
-        >
-          Twitterでログイン
-        </Button>
+        <form action="/login" method="post" className="w-full">
+          <input type="hidden" name="return_to" value="/" />
+          <Button
+            type="submit"
+            className="w-full bg-interactive text-text-inverse rounded-lg px-4 py-2 hover:bg-interactive-hover"
+          >
+            ログイン
+          </Button>
+        </form>
       </div>
     </div>
   );

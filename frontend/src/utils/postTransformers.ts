@@ -39,7 +39,6 @@ export const transformPostToPostComponent = (post: Post) => {
           author: {
             id: post.replyTo.author?.id || "",
             name: post.replyTo.author?.name || "",
-            twitterId: post.replyTo.author?.twitterId || "",
             image: post.replyTo.author?.image || "/no_avatar_image_128x128.png",
             createdAt: post.replyTo.author?.createdAt || post.createdAt,
             updatedAt:

@@ -1,13 +1,13 @@
 "use client";
 
 import React from "react";
-import { useSession } from "next-auth/react";
+import { useAuthSession } from "@/auth-client";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import SearchComponent from "@/components/Search";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const SearchView = () => {
-  const { status } = useSession();
+  const { status } = useAuthSession();
   const { currentUser } = useCurrentUser();
 
   // 認証チェック中はローディング表示

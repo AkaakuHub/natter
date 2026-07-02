@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
-import { useSession } from "next-auth/react";
+import { useAuthSession } from "@/auth-client";
 import { ExtendedSession } from "@/types";
 import { User } from "@/api";
 import { userCacheManager } from "@/utils/userCache";
 
 interface UseSessionManagementProps {
-  checkUserExists: (twitterId: string) => Promise<void>;
+  checkUserExists: (userId: string) => Promise<void>;
   setCurrentUser: (user: User | null) => void;
   setUserExists: (exists: boolean) => void;
 }
@@ -21,7 +21,7 @@ export const useSessionManagement = ({
   setCurrentUser,
   setUserExists,
 }: UseSessionManagementProps): UseSessionManagementResult => {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useAuthSession();
   const isInitializedRef = useRef(false);
   const lastSessionIdRef = useRef<string | undefined>(undefined);
 

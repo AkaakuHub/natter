@@ -1,9 +1,8 @@
 export interface User {
   id: string;
   name: string;
-  image?: string;
+  image?: string | null;
   tel?: string;
-  twitterId: string;
   createdAt: string;
   updatedAt: string;
   _count?: {

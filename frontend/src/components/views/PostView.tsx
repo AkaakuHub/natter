@@ -1,13 +1,13 @@
 "use client";
 
 import React from "react";
-import { useSession } from "next-auth/react";
+import { useAuthSession } from "@/auth-client";
 import DetailedPostComponent from "@/components/DetailedPost";
 import { usePathname } from "next/navigation";
 
 const PostView = () => {
   const pathname = usePathname();
-  const { data: session, status } = useSession();
+  const { data: session, status } = useAuthSession();
 
   // パスから postId を抽出: /post/:id の形式
   const postId = pathname.match(/^\/post\/([^/]+)$/)?.[1];
@@ -19,7 +19,6 @@ const PostView = () => {
           id: session.user.id,
           name: session.user.name || "",
           image: session.user.image || undefined,
-          twitterId: session.user.id,
           createdAt: "",
           updatedAt: "",
         }

@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { auth } from "@/auth";
+import { getLocalAuthSession } from "@/auth";
 import { getMiddlewarePaths } from "@/core/spa/SPARoutes";
 
 export async function middleware(req: NextRequest) {
@@ -40,7 +40,7 @@ export async function middleware(req: NextRequest) {
       if (!isPublicSpaPage) {
         // 認証が必要なSPAページ
         try {
-          const session = await auth();
+          const session = await getLocalAuthSession(req);
 
           if (!session) {
             console.log(`💀 [AUTH REQUIRED] ${spaPath} -> /login`);
@@ -56,7 +56,7 @@ export async function middleware(req: NextRequest) {
     } else {
       // 通常のトップページ（認証が必要）
       try {
-        const session = await auth();
+        const session = await getLocalAuthSession(req);
 
         if (!session) {
           console.log(`💀 [AUTH REQUIRED] / -> /login`);

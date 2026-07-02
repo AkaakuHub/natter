@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useAuthSession } from "@/auth-client";
 import { useCharacters } from "@/hooks/queries/useCharacters";
 import { IconUser, IconHash, IconEdit } from "@tabler/icons-react";
 import EditCharacterModal from "@/components/EditCharacterModal";
 import type { Character } from "@/api";
 
 const SetListView = () => {
-  const { status } = useSession();
+  const { status } = useAuthSession();
   const { data: characters, isLoading, error } = useCharacters();
   const [editingCharacter, setEditingCharacter] = useState<Character | null>(
     null,

@@ -192,7 +192,6 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
                     id: session.user.id,
                     name: session.user.name || "Unknown User",
                     image: session.user.image || undefined,
-                    twitterId: session.user.id,
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),
                   }

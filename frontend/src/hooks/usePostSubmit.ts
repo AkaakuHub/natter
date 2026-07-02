@@ -3,7 +3,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { User } from "@/api";
 import { useToast } from "@/hooks/useToast";
 import { ApiClient } from "@/api/client";
-import { getSession } from "next-auth/react";
 import { useSPANavigation } from "@/core/spa";
 
 interface UsePostSubmitResult {
@@ -51,14 +50,6 @@ export const usePostSubmit = (
     try {
       setIsSubmitting(true);
       setError(null);
-
-      // セッション確認
-      const session = await getSession();
-      if (!session || !session.user) {
-        setError("ログインが必要です");
-        showToast("ログインが必要です。", "error");
-        return;
-      }
 
       const formData = new FormData();
       if (content.trim()) {

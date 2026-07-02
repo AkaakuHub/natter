@@ -29,7 +29,7 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
           id: session.user.id,
           name: session.user.name || "",
           image: session.user.image || undefined,
-          twitterId: session.user.id,
+          userId: session.user.id,
           createdAt: "",
           updatedAt: "",
         }

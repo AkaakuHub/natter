@@ -1,36 +1,36 @@
 import { User } from "@/api";
 
 class UserCacheManager {
-  private cache: { [twitterId: string]: User | null } = {};
-  private ongoingRequests: { [twitterId: string]: Promise<User | null> } = {};
+  private cache: { [userId: string]: User | null } = {};
+  private ongoingRequests: { [userId: string]: Promise<User | null> } = {};
 
-  get(twitterId: string): User | null | undefined {
-    return this.cache[twitterId];
+  get(userId: string): User | null | undefined {
+    return this.cache[userId];
   }
 
-  set(twitterId: string, user: User | null): void {
-    this.cache[twitterId] = user;
+  set(userId: string, user: User | null): void {
+    this.cache[userId] = user;
   }
 
-  clear(twitterId: string): void {
-    delete this.cache[twitterId];
-    delete this.ongoingRequests[twitterId];
+  clear(userId: string): void {
+    delete this.cache[userId];
+    delete this.ongoingRequests[userId];
   }
 
-  hasOngoingRequest(twitterId: string): boolean {
-    return twitterId in this.ongoingRequests;
+  hasOngoingRequest(userId: string): boolean {
+    return userId in this.ongoingRequests;
   }
 
-  getOngoingRequest(twitterId: string): Promise<User | null> | undefined {
-    return this.ongoingRequests[twitterId];
+  getOngoingRequest(userId: string): Promise<User | null> | undefined {
+    return this.ongoingRequests[userId];
   }
 
-  setOngoingRequest(twitterId: string, promise: Promise<User | null>): void {
-    this.ongoingRequests[twitterId] = promise;
+  setOngoingRequest(userId: string, promise: Promise<User | null>): void {
+    this.ongoingRequests[userId] = promise;
   }
 
-  clearOngoingRequest(twitterId: string): void {
-    delete this.ongoingRequests[twitterId];
+  clearOngoingRequest(userId: string): void {
+    delete this.ongoingRequests[userId];
   }
 
   clearAll(): void {

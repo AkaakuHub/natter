@@ -7,16 +7,16 @@ import React, {
   useState,
   useCallback,
 } from "react";
-import { useSession } from "next-auth/react";
+import { useAuthSession } from "@/auth-client";
 import { useTrueSPARouter } from "@/core/router/TrueSPARouter";
 import { performCompleteLogout } from "@/utils/logout";
-import type { User, Session } from "next-auth";
+import type { AuthSession } from "@/auth";
 
 interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
-  user: User | null;
-  session: Session | null;
+  user: AuthSession["user"] | null;
+  session: AuthSession | null;
   isHydrated: boolean;
 }
 
@@ -49,7 +49,7 @@ interface HybridSPAAuthProviderProps {
 export const HybridSPAAuthProvider: React.FC<HybridSPAAuthProviderProps> = ({
   children,
 }) => {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useAuthSession();
   const { currentRoute, navigate, routeEngine } = useTrueSPARouter();
 
   const [authState, setAuthState] = useState<AuthState>({

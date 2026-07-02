@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import { useSession } from "next-auth/react";
+import { useAuthSession } from "@/auth-client";
 import ProfileComponent from "@/components/Profile";
 import { ExtendedSession } from "@/types";
 import { usePathname } from "next/navigation";
 
 const ProfileView = () => {
   const pathname = usePathname();
-  const { data: session, status } = useSession();
+  const { data: session, status } = useAuthSession();
 
   // パスから userId を抽出: /profile/:id の形式
   const userId =

@@ -67,7 +67,6 @@ export const useUpdateUser = () => {
         queryKey: ["posts"],
       });
 
-      // NextAuthのセッション情報も更新が必要な場合があるため
       queryClient.invalidateQueries({
         queryKey: ["session"],
       });

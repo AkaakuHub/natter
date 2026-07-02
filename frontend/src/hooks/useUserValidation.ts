@@ -6,8 +6,8 @@ import { userCacheManager } from "@/utils/userCache";
 interface UseUserValidationResult {
   currentUser: User | null;
   userExists: boolean | null;
-  checkUserExists: (twitterId: string) => Promise<void>;
-  clearUserCache: (twitterId: string) => void;
+  checkUserExists: (userId: string) => Promise<void>;
+  clearUserCache: (userId: string) => void;
 }
 
 export const useUserValidation = (): UseUserValidationResult => {
@@ -15,16 +15,16 @@ export const useUserValidation = (): UseUserValidationResult => {
   const [userExists, setUserExists] = useState<boolean | null>(null);
   const [isNewUser, setIsNewUser] = useState<boolean>(false);
 
-  const clearUserCache = useCallback((twitterId: string) => {
-    userCacheManager.clear(twitterId);
+  const clearUserCache = useCallback((userId: string) => {
+    userCacheManager.clear(userId);
     setCurrentUser(null);
     setUserExists(null);
     setIsNewUser(false); // 新規ユーザーフラグもリセット
   }, []);
 
   const checkUserExists = useCallback(
-    async (twitterId: string) => {
-      if (!twitterId) {
+    async (userId: string) => {
+      if (!userId) {
         setCurrentUser(null);
         setUserExists(false);
         return;
@@ -38,7 +38,7 @@ export const useUserValidation = (): UseUserValidationResult => {
       }
 
       // キャッシュから取得
-      const cachedUser = userCacheManager.get(twitterId);
+      const cachedUser = userCacheManager.get(userId);
       if (cachedUser !== undefined) {
         setCurrentUser(cachedUser);
         setUserExists(!!cachedUser);
@@ -46,9 +46,9 @@ export const useUserValidation = (): UseUserValidationResult => {
       }
 
       // 進行中のリクエストがある場合は待機
-      if (userCacheManager.hasOngoingRequest(twitterId)) {
+      if (userCacheManager.hasOngoingRequest(userId)) {
         try {
-          const ongoingRequest = userCacheManager.getOngoingRequest(twitterId);
+          const ongoingRequest = userCacheManager.getOngoingRequest(userId);
           if (ongoingRequest) {
             const user = await ongoingRequest;
             setCurrentUser(user);
@@ -83,18 +83,18 @@ export const useUserValidation = (): UseUserValidationResult => {
 
       // 新しいリクエストを開始
       try {
-        const requestPromise = UsersApi.getUserByTwitterId(twitterId);
-        userCacheManager.setOngoingRequest(twitterId, requestPromise);
+        const requestPromise = UsersApi.getUserByAuthId(userId);
+        userCacheManager.setOngoingRequest(userId, requestPromise);
 
         const user = await requestPromise;
 
         // キャッシュに保存
-        userCacheManager.set(twitterId, user);
+        userCacheManager.set(userId, user);
         setCurrentUser(user);
         setUserExists(!!user);
 
         // リクエスト完了後にクリーンアップ
-        userCacheManager.clearOngoingRequest(twitterId);
+        userCacheManager.clearOngoingRequest(userId);
       } catch (error) {
         // NetworkErrorの場合はログを出力しない（サーバーダウン時の騒音を防ぐ）
         const errorMessage =
@@ -123,7 +123,7 @@ export const useUserValidation = (): UseUserValidationResult => {
           setIsNewUser(true);
         }
 
-        userCacheManager.clearOngoingRequest(twitterId);
+        userCacheManager.clearOngoingRequest(userId);
       }
     },
     [isNewUser],
