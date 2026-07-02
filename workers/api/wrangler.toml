@@ -22,6 +22,3 @@ database_id = "4caad066-71dc-49fe-a9e5-2e17f820f947"
 [[r2_buckets]]
 binding = "ASSETS"
 bucket_name = "natter-assets"
-
-[images]
-binding = "IMAGES"

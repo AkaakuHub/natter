@@ -32,6 +32,8 @@
     "wrangler": "^4.91.0"
   },
   "dependencies": {
+    "fast-png": "^8.0.0",
+    "image-js": "^1.6.2",
     "link-auth": "0.1.2"
   }
 }

@@ -1,37 +1,110 @@
+import { decode as decodePng, encode as encodePng, type DecodedPng } from "fast-png";
+import { decode as decodeImageJs } from "image-js";
 import { HttpError } from "../http";
 
 const BLOCKS_PER_ROW = 4;
 const BLOCKS_PER_COLUMN = 4;
 const RGBA_CHANNELS = 4;
 
+type DecodedRgbaImage = {
+  width: number;
+  height: number;
+  rgba: Uint8Array;
+};
+
 export async function createMosaicImageResponse(input: {
-  images: ImagesBinding;
   object: R2ObjectBody;
+  contentType: string;
 }): Promise<Response> {
-  const [infoStream, imageStream] = input.object.body.tee();
-  const info = await input.images.info(infoStream);
-  if (!("width" in info) || !("height" in info)) {
-    throw new HttpError(500, "Image dimensions are missing");
-  }
-
-  const rgbaStream = await input.images
-    .input(imageStream)
-    .output({ format: "rgba", anim: false })
-    .then((result) => result.image());
-  const rgba = await readStream(rgbaStream);
-  const expectedLength = info.width * info.height * RGBA_CHANNELS;
-  if (rgba.length !== expectedLength) {
-    throw new HttpError(500, "Decoded image size is invalid");
-  }
-
-  const mosaic = applyAverageColorMosaic(rgba, info.width, info.height);
-  const png = await encodeRgbaPng(mosaic, info.width, info.height);
+  const image = decodeImage(await input.object.arrayBuffer(), input.contentType);
+  const mosaic = applyAverageColorMosaic(image.rgba, image.width, image.height);
+  const png = encodePng({
+    width: image.width,
+    height: image.height,
+    data: mosaic,
+    channels: RGBA_CHANNELS,
+    depth: 8,
+  });
   return new Response(png, {
     headers: {
       "Content-Type": "image/png",
       "Cache-Control": "no-cache, no-store, must-revalidate",
     },
   });
+}
+
+function decodeImage(data: ArrayBuffer, contentType: string): DecodedRgbaImage {
+  const bytes = new Uint8Array(data);
+  if (contentType === "image/png") {
+    return decodePngImage(bytes);
+  }
+  if (contentType === "image/jpeg") {
+    const decoded = decodeImageJs(bytes)
+      .convertColor("RGBA")
+      .convertBitDepth(8)
+      .getRawImage();
+    if (decoded.channels !== RGBA_CHANNELS || !(decoded.data instanceof Uint8Array)) {
+      throw new HttpError(500, "Decoded JPEG data is invalid");
+    }
+    return {
+      width: decoded.width,
+      height: decoded.height,
+      rgba: decoded.data,
+    };
+  }
+  throw new HttpError(415, "Unsupported image type for mosaic");
+}
+
+function decodePngImage(bytes: Uint8Array): DecodedRgbaImage {
+  const decoded = decodePng(bytes);
+  return {
+    width: decoded.width,
+    height: decoded.height,
+    rgba: pngToRgba(decoded),
+  };
+}
+
+function pngToRgba(decoded: DecodedPng): Uint8Array {
+  if (decoded.depth !== 8 && decoded.depth !== 16) {
+    throw new HttpError(415, "Unsupported PNG bit depth");
+  }
+  if (decoded.channels < 1 || decoded.channels > 4) {
+    throw new HttpError(415, "Unsupported PNG channel count");
+  }
+
+  const pixelCount = decoded.width * decoded.height;
+  const rgba = new Uint8Array(pixelCount * RGBA_CHANNELS);
+  for (let pixelIndex = 0; pixelIndex < pixelCount; pixelIndex++) {
+    const sourceIndex = pixelIndex * decoded.channels;
+    const targetIndex = pixelIndex * RGBA_CHANNELS;
+    if (decoded.channels === 1) {
+      const gray = channelValue(decoded.data, sourceIndex);
+      rgba[targetIndex] = gray;
+      rgba[targetIndex + 1] = gray;
+      rgba[targetIndex + 2] = gray;
+      rgba[targetIndex + 3] = 255;
+      continue;
+    }
+    if (decoded.channels === 2) {
+      const gray = channelValue(decoded.data, sourceIndex);
+      rgba[targetIndex] = gray;
+      rgba[targetIndex + 1] = gray;
+      rgba[targetIndex + 2] = gray;
+      rgba[targetIndex + 3] = channelValue(decoded.data, sourceIndex + 1);
+      continue;
+    }
+    rgba[targetIndex] = channelValue(decoded.data, sourceIndex);
+    rgba[targetIndex + 1] = channelValue(decoded.data, sourceIndex + 1);
+    rgba[targetIndex + 2] = channelValue(decoded.data, sourceIndex + 2);
+    rgba[targetIndex + 3] =
+      decoded.channels === 4 ? channelValue(decoded.data, sourceIndex + 3) : 255;
+  }
+  return rgba;
+}
+
+function channelValue(data: DecodedPng["data"], index: number): number {
+  const value = data[index] ?? 0;
+  return data instanceof Uint16Array ? Math.floor(value / 257) : value;
 }
 
 function applyAverageColorMosaic(
@@ -103,105 +176,3 @@ function fillAverageColorBlock(
     }
   }
 }
-
-async function encodeRgbaPng(
-  rgba: Uint8Array,
-  width: number,
-  height: number,
-): Promise<Uint8Array> {
-  const scanlineLength = width * RGBA_CHANNELS + 1;
-  const scanlines = new Uint8Array(scanlineLength * height);
-  for (let y = 0; y < height; y++) {
-    const sourceStart = y * width * RGBA_CHANNELS;
-    const targetStart = y * scanlineLength;
-    scanlines[targetStart] = 0;
-    scanlines.set(
-      rgba.subarray(sourceStart, sourceStart + width * RGBA_CHANNELS),
-      targetStart + 1,
-    );
-  }
-
-  const compressed = await deflate(scanlines);
-  return concatBytes([
-    new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]),
-    pngChunk("IHDR", ihdrData(width, height)),
-    pngChunk("IDAT", compressed),
-    pngChunk("IEND", new Uint8Array()),
-  ]);
-}
-
-function ihdrData(width: number, height: number): Uint8Array {
-  const data = new Uint8Array(13);
-  const view = new DataView(data.buffer);
-  view.setUint32(0, width);
-  view.setUint32(4, height);
-  data[8] = 8;
-  data[9] = 6;
-  data[10] = 0;
-  data[11] = 0;
-  data[12] = 0;
-  return data;
-}
-
-function pngChunk(type: string, data: Uint8Array): Uint8Array {
-  const typeBytes = new TextEncoder().encode(type);
-  const chunk = new Uint8Array(12 + data.length);
-  const view = new DataView(chunk.buffer);
-  view.setUint32(0, data.length);
-  chunk.set(typeBytes, 4);
-  chunk.set(data, 8);
-  view.setUint32(8 + data.length, crc32(concatBytes([typeBytes, data])));
-  return chunk;
-}
-
-async function deflate(data: Uint8Array): Promise<Uint8Array> {
-  const stream = new Blob([data]).stream().pipeThrough(
-    new CompressionStream("deflate"),
-  );
-  return readStream(stream);
-}
-
-async function readStream(stream: ReadableStream<Uint8Array>): Promise<Uint8Array> {
-  const chunks: Uint8Array[] = [];
-  let length = 0;
-  const reader = stream.getReader();
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) {
-      break;
-    }
-    chunks.push(value);
-    length += value.length;
-  }
-  return concatBytes(chunks, length);
-}
-
-function concatBytes(chunks: Uint8Array[], knownLength?: number): Uint8Array {
-  const length =
-    knownLength ?? chunks.reduce((total, chunk) => total + chunk.length, 0);
-  const output = new Uint8Array(length);
-  let offset = 0;
-  for (const chunk of chunks) {
-    output.set(chunk, offset);
-    offset += chunk.length;
-  }
-  return output;
-}
-
-function crc32(data: Uint8Array): number {
-  let crc = 0xffffffff;
-  for (const byte of data) {
-    crc = (crc >>> 8) ^ CRC_TABLE[(crc ^ byte) & 0xff];
-  }
-  return (crc ^ 0xffffffff) >>> 0;
-}
-
-const CRC_TABLE = new Uint32Array(
-  Array.from({ length: 256 }, (_, index) => {
-    let value = index;
-    for (let bit = 0; bit < 8; bit++) {
-      value = value & 1 ? 0xedb88320 ^ (value >>> 1) : value >>> 1;
-    }
-    return value >>> 0;
-  }),
-);

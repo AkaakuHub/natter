@@ -670,8 +670,8 @@ async function saveImages(env: Env, values: Array<File | string>): Promise<strin
     if (!(value instanceof File)) {
       throw new HttpError(400, "images must be files");
     }
-    if (!value.type.startsWith("image/")) {
-      throw new HttpError(400, "Only image files are allowed");
+    if (!isSupportedPostImageType(value.type)) {
+      throw new HttpError(400, "Only PNG and JPEG images are allowed");
     }
     if (value.size > 10 * 1024 * 1024) {
       throw new HttpError(400, "File size exceeds 10MB limit");
@@ -921,12 +921,12 @@ async function handleImage(
   if (!object) {
     throw new HttpError(404, "Image not found");
   }
-  if (!canReadOriginal) {
-    return createMosaicImageResponse({ images: env.IMAGES, object });
-  }
   const contentType = object.httpMetadata?.contentType ?? contentTypeForImageFilename(filename);
   if (!contentType) {
     throw new HttpError(500, "Image content type is missing");
+  }
+  if (!canReadOriginal) {
+    return createMosaicImageResponse({ object, contentType });
   }
   return new Response(object.body, {
     headers: {
@@ -1436,6 +1436,10 @@ function extensionForFile(file: File): string {
     return ".avif";
   }
   throw new HttpError(400, "Unsupported image type");
+}
+
+function isSupportedPostImageType(contentType: string): boolean {
+  return contentType === "image/png" || contentType === "image/jpeg";
 }
 
 function contentTypeForImageFilename(filename: string): string | undefined {
