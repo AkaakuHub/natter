@@ -23,27 +23,14 @@ const PostContent = ({
   character,
   onImageClick,
 }: PostContentProps) => {
-  // imagesが配列でない場合のチェック
   const imageArray = React.useMemo(() => {
     return Array.isArray(images) ? images : [];
   }, [images]);
 
-  // 隠蔽された画像をフィルタリング
-  const visibleImages = React.useMemo(() => {
-    return imageArray.filter((image) => image !== "HIDDEN_IMAGE");
-  }, [imageArray]);
-
-  // 隠蔽された画像の数
-  const hiddenImageCount = React.useMemo(() => {
-    return imageArray.filter((image) => image === "HIDDEN_IMAGE").length;
-  }, [imageArray]);
-
-  // 画像URLの配列を作成してプリロード
   const imageUrls = React.useMemo(() => {
-    return visibleImages.map((image) => getImageUrl(image));
-  }, [visibleImages]);
+    return imageArray.map((image) => getImageUrl(image));
+  }, [imageArray]);
 
-  // 画像をプリロード
   useImagePreload(imageUrls);
 
   // HTMLエスケープされたコンテンツを復元し、長い単語を改行可能にする
@@ -119,30 +106,19 @@ const PostContent = ({
         </div>
       )}
 
-      {/* 隠蔽された画像の通知 */}
-      {hiddenImageCount > 0 && (
-        <div className="mt-3 p-3 bg-surface-variant rounded-lg border border-border">
-          <div className="flex items-center gap-2 text-text-muted">
-            <span className="text-sm">
-              🔒 {hiddenImageCount}枚の画像が非公開に設定されています
-            </span>
-          </div>
-        </div>
-      )}
-
-      {visibleImages && visibleImages.length > 0 && (
+      {imageArray.length > 0 && (
         <div
           className={`mt-4 gap-3 ${
-            visibleImages.length === 1
+            imageArray.length === 1
               ? "flex justify-center"
-              : visibleImages.length === 2
+              : imageArray.length === 2
                 ? "grid grid-cols-2"
-                : visibleImages.length === 3
+                : imageArray.length === 3
                   ? "grid grid-cols-2 grid-rows-2"
                   : "grid grid-cols-2"
           }`}
         >
-          {visibleImages.map((image, index) => {
+          {imageArray.map((image, index) => {
             const imageSrc = getImageUrl(image);
 
             return (
@@ -153,9 +129,9 @@ const PostContent = ({
                   onImageClick(index);
                 }}
                 className={`relative focus:outline-none focus:ring-2 focus:ring-interactive/30 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200 ${
-                  visibleImages.length === 1
+                  imageArray.length === 1
                     ? "max-w-lg mx-auto"
-                    : visibleImages.length === 3 && index === 0
+                    : imageArray.length === 3 && index === 0
                       ? "row-span-2"
                       : ""
                 }`}
@@ -164,9 +140,9 @@ const PostContent = ({
                   src={imageSrc}
                   alt="Post Image"
                   className={`rounded-2xl ${
-                    visibleImages.length === 1
+                    imageArray.length === 1
                       ? "w-full h-auto max-h-96 object-cover"
-                      : visibleImages.length === 3 && index === 0
+                      : imageArray.length === 3 && index === 0
                         ? "w-full h-full object-cover"
                         : "w-full h-auto aspect-square object-cover"
                   }`}
