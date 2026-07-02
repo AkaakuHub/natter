@@ -1,5 +1,5 @@
 import { decode as decodePng, encode as encodePng, type DecodedPng } from "fast-png";
-import { decode as decodeImageJs } from "image-js";
+import { decode as decodeJpeg } from "jpeg-js";
 import { HttpError } from "../http";
 
 const BLOCKS_PER_ROW = 4;
@@ -39,11 +39,12 @@ function decodeImage(data: ArrayBuffer, contentType: string): DecodedRgbaImage {
     return decodePngImage(bytes);
   }
   if (contentType === "image/jpeg") {
-    const decoded = decodeImageJs(bytes)
-      .convertColor("RGBA")
-      .convertBitDepth(8)
-      .getRawImage();
-    if (decoded.channels !== RGBA_CHANNELS || !(decoded.data instanceof Uint8Array)) {
+    const decoded = decodeJpeg(bytes, {
+      formatAsRGBA: true,
+      tolerantDecoding: true,
+      useTArray: true,
+    });
+    if (!(decoded.data instanceof Uint8Array)) {
       throw new HttpError(500, "Decoded JPEG data is invalid");
     }
     return {
