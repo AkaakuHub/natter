@@ -5,8 +5,19 @@ import { NextRequest, NextResponse } from "next/server";
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  if (pathname.startsWith("/_auth/") || pathname === "/login") {
+  if (pathname.startsWith("/_auth/")) {
     return NextResponse.next();
+  }
+
+  if (pathname === "/login") {
+    if (req.method === "POST") {
+      return NextResponse.next();
+    }
+
+    const url = req.nextUrl.clone();
+    url.pathname = "/";
+    url.searchParams.set("spa-path", "/login");
+    return NextResponse.rewrite(url);
   }
 
   const routePath =
