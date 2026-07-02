@@ -24,7 +24,7 @@ const AuthenticatedImage: React.FC<AuthenticatedImageProps> = ({
   decoding = "async",
   onClick,
 }) => {
-  const [imageSrc, setImageSrc] = useState<string>(src);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
@@ -36,14 +36,12 @@ const AuthenticatedImage: React.FC<AuthenticatedImageProps> = ({
         setIsLoading(true);
         setHasError(false);
 
-        // バックエンドの動的画像エンドポイントの場合のみ認証付きで取得
         if (src.includes("/posts/images/")) {
           const authenticatedSrc = await getCachedImageWithAuth(src);
           if (isMounted) {
             setImageSrc(authenticatedSrc);
           }
         } else {
-          // 外部画像やその他の場合はそのまま使用
           setImageSrc(src);
         }
       } catch (error) {
@@ -66,6 +64,7 @@ const AuthenticatedImage: React.FC<AuthenticatedImageProps> = ({
   }, [src]);
 
   const handleLoad = () => {
+    setHasError(false);
     setIsLoading(false);
   };
 
@@ -88,20 +87,21 @@ const AuthenticatedImage: React.FC<AuthenticatedImageProps> = ({
         </div>
       )}
 
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={imageSrc}
-        alt={alt}
-        className={`${className} ${isLoading ? "opacity-0" : "opacity-100"} transition-opacity duration-200`}
-        style={style}
-        width={width}
-        height={height}
-        loading={loading}
-        decoding={decoding}
-        onClick={onClick}
-        onLoad={handleLoad}
-        onError={handleError}
-      />
+      {imageSrc && (
+        <img
+          src={imageSrc}
+          alt={alt}
+          className={`${className} ${isLoading ? "opacity-0" : "opacity-100"} transition-opacity duration-200`}
+          style={style}
+          width={width}
+          height={height}
+          loading={loading}
+          decoding={decoding}
+          onClick={onClick}
+          onLoad={handleLoad}
+          onError={handleError}
+        />
+      )}
     </div>
   );
 };
