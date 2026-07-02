@@ -35,6 +35,7 @@ import {
   shouldRevealSecrets,
 } from "./security";
 import { sanitizeContent, sanitizeContentPreservingUrls } from "./sanitize";
+import { createMosaicImageResponse } from "./images/mosaic";
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -921,7 +922,7 @@ async function handleImage(
     throw new HttpError(404, "Image not found");
   }
   if (!canReadOriginal) {
-    return mosaicImageResponse(env, object);
+    return createMosaicImageResponse({ images: env.IMAGES, object });
   }
   const contentType = object.httpMetadata?.contentType ?? contentTypeForImageFilename(filename);
   if (!contentType) {
@@ -930,32 +931,6 @@ async function handleImage(
   return new Response(object.body, {
     headers: {
       "Content-Type": contentType,
-      "Cache-Control": "no-cache, no-store, must-revalidate",
-    },
-  });
-}
-
-async function mosaicImageResponse(env: Env, object: R2ObjectBody): Promise<Response> {
-  const [infoStream, imageStream] = object.body.tee();
-  const info = await env.IMAGES.info(infoStream);
-  if (!("width" in info) || !("height" in info)) {
-    throw new HttpError(500, "Image dimensions are missing");
-  }
-  const mosaicWidth = Math.max(1, Math.ceil(info.width / 24));
-  const result = await env.IMAGES
-    .input(imageStream)
-    .transform({ width: mosaicWidth, blur: 20 })
-    .transform({
-      width: info.width,
-      height: info.height,
-      fit: "squeeze",
-      blur: 8,
-    })
-    .output({ format: "image/jpeg", quality: 70, anim: false });
-  const response = result.response();
-  return new Response(response.body, {
-    headers: {
-      "Content-Type": result.contentType(),
       "Cache-Control": "no-cache, no-store, must-revalidate",
     },
   });
