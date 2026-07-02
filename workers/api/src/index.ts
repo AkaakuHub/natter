@@ -871,7 +871,7 @@ async function enrichPosts(
       const repliesCount = parseCount(await firstRow(db, `SELECT COUNT(*) AS "count" FROM "Post" WHERE "replyToId" = ? AND "deletedAt" IS NULL`, post.id));
       return {
         ...post,
-        images: canReadPostImages(revealSecrets, post, currentUserId) ? post.images : [],
+        images: post.images,
         author,
         character: await hideCharacterNameIfNeeded(db, character, currentUserId, post.authorId),
         url: await hideUrlIfNeeded(db, post.url, currentUserId, post.authorId),
@@ -879,7 +879,7 @@ async function enrichPosts(
           ? {
               ...replyTo,
               author: replyToAuthor,
-              images: canReadPostImages(revealSecrets, replyTo, currentUserId) ? replyTo.images : [],
+              images: replyTo.images,
             }
           : null,
         likes,
@@ -892,7 +892,7 @@ async function enrichPosts(
   );
 }
 
-function canReadPostImages(
+function canReadOriginalImage(
   revealSecrets: boolean,
   post: Post,
   currentUserId?: string,
@@ -912,13 +912,16 @@ async function handleImage(
     JSON.stringify(filename),
   );
   const post = row ? parsePost(row) : undefined;
-  const canReadOriginal = post !== undefined && canReadPostImages(await shouldRevealSecrets(env.DB), post, authUser.id);
-  if (!canReadOriginal) {
-    throw new HttpError(403, "Access forbidden");
+  if (!post) {
+    throw new HttpError(404, "Image not found");
   }
+  const canReadOriginal = canReadOriginalImage(await shouldRevealSecrets(env.DB), post, authUser.id);
   const object = await env.ASSETS.get(filename);
   if (!object) {
     throw new HttpError(404, "Image not found");
+  }
+  if (!canReadOriginal) {
+    return mosaicImageResponse(env, object);
   }
   const contentType = object.httpMetadata?.contentType ?? contentTypeForImageFilename(filename);
   if (!contentType) {
@@ -927,6 +930,32 @@ async function handleImage(
   return new Response(object.body, {
     headers: {
       "Content-Type": contentType,
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+    },
+  });
+}
+
+async function mosaicImageResponse(env: Env, object: R2ObjectBody): Promise<Response> {
+  const [infoStream, imageStream] = object.body.tee();
+  const info = await env.IMAGES.info(infoStream);
+  if (!("width" in info) || !("height" in info)) {
+    throw new HttpError(500, "Image dimensions are missing");
+  }
+  const mosaicWidth = Math.max(1, Math.ceil(info.width / 24));
+  const result = await env.IMAGES
+    .input(imageStream)
+    .transform({ width: mosaicWidth, blur: 20 })
+    .transform({
+      width: info.width,
+      height: info.height,
+      fit: "squeeze",
+      blur: 8,
+    })
+    .output({ format: "image/jpeg", quality: 70, anim: false });
+  const response = result.response();
+  return new Response(response.body, {
+    headers: {
+      "Content-Type": result.contentType(),
       "Cache-Control": "no-cache, no-store, must-revalidate",
     },
   });
