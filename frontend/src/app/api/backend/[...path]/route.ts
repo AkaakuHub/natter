@@ -1,4 +1,4 @@
-import { getAppSessionToken } from "@/auth";
+import { getAppSessionCookieHeader } from "@/auth";
 import { NextRequest } from "next/server";
 
 const API_BASE_URL = requireApiBaseUrl();
@@ -55,7 +55,7 @@ async function forwardApiRequest(
     return Response.json({ error: "method_not_allowed" }, { status: 405 });
   }
 
-  const token = getAppSessionToken(request);
+  const appSessionCookie = getAppSessionCookieHeader(request);
   const { path } = await context.params;
   const upstreamUrl = new URL(
     path.map(encodeURIComponent).join("/"),
@@ -67,10 +67,9 @@ async function forwardApiRequest(
   headers.delete("host");
   headers.delete("cookie");
   headers.delete("content-length");
-  if (token) {
-    headers.set("authorization", `Bearer ${token}`);
-  } else {
-    headers.delete("authorization");
+  headers.delete("authorization");
+  if (appSessionCookie) {
+    headers.set("cookie", appSessionCookie);
   }
 
   return fetch(upstreamUrl, {

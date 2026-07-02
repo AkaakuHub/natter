@@ -1,4 +1,4 @@
-import { getAppSessionToken } from "@/auth";
+import { getAppSessionCookieHeader } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -28,12 +28,12 @@ type PostResponse = {
 export async function GET(request: NextRequest) {
   const type = request.nextUrl.searchParams.get("type");
   const postId = request.nextUrl.searchParams.get("postId");
-  const sessionToken = getAppSessionToken(request);
+  const appSessionCookie = getAppSessionCookieHeader(request);
 
   if (type === "top") {
     const data = await fetchApiJson<OgpImageResponse>(
       "/posts/ogp/top",
-      sessionToken,
+      appSessionCookie,
     );
     return NextResponse.json({
       title: "Natter - ソーシャルメディアプラットフォーム",
@@ -45,8 +45,8 @@ export async function GET(request: NextRequest) {
 
   if (type === "post" && postId) {
     const [imageData, post] = await Promise.all([
-      fetchApiJson<OgpImageResponse>(`/posts/ogp/${postId}`, sessionToken),
-      fetchApiJson<PostResponse>(`/posts/${postId}`, sessionToken),
+      fetchApiJson<OgpImageResponse>(`/posts/ogp/${postId}`, appSessionCookie),
+      fetchApiJson<PostResponse>(`/posts/${postId}`, appSessionCookie),
     ]);
     const content = decodeHtml(post.content ?? "");
     const description =
@@ -65,10 +65,10 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ error: "invalid_parameters" }, { status: 400 });
 }
 
-async function fetchApiJson<T>(path: string, sessionToken: string | null) {
+async function fetchApiJson<T>(path: string, appSessionCookie: string | null) {
   const headers = new Headers();
-  if (sessionToken) {
-    headers.set("authorization", `Bearer ${sessionToken}`);
+  if (appSessionCookie) {
+    headers.set("cookie", appSessionCookie);
   }
   const response = await fetch(new URL(path, API_BASE_URL), {
     headers,

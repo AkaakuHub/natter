@@ -1,6 +1,7 @@
 import {
   getLinkAuthSessionUser,
   getLinkAuthSessionToken,
+  getLinkAuthSessionCookieName,
   getLinkAuthUser,
   handleAppAuthRequest,
   loadLinkAuthAppConfig,
@@ -49,6 +50,14 @@ export function getAppSessionToken(request: Request): string | null {
     config: loadAuthConfig(),
     request,
   });
+}
+
+export function getAppSessionCookieHeader(request: Request): string | null {
+  const token = getAppSessionToken(request);
+  if (!token) {
+    return null;
+  }
+  return `${getLinkAuthSessionCookieName(loadAuthConfig().appId)}=${encodeURIComponent(token)}`;
 }
 
 export async function handleAuthRoute(request: Request): Promise<Response> {
