@@ -1,6 +1,8 @@
 import { getAppSessionCookieHeader } from "@/auth";
 import { NextRequest } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 const API_BASE_URL = requireApiBaseUrl();
 
 const forwardedMethods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"];
@@ -74,6 +76,7 @@ async function forwardApiRequest(
 
   return fetch(upstreamUrl, {
     body: bodylessMethod(request.method) ? undefined : request.body,
+    cache: "no-store",
     duplex: bodylessMethod(request.method) ? undefined : "half",
     headers,
     method: request.method,
