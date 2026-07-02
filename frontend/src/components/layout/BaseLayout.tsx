@@ -123,7 +123,7 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
     <div className="w-full h-screen flex flex-col">
       {/* ヘッダー */}
       <Header
-        profileImage={session?.user?.image || "no_avatar_image_128x128.png"}
+        profileImage={session?.user?.image || "/no_avatar_image_128x128.png"}
         progress={1}
         userId={session?.user?.id}
         scrollContainerRef={scrollContainerRef}

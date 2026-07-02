@@ -123,7 +123,7 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
 
       {/* ヘッダー（既存の優れた実装保護） */}
       <Header
-        profileImage={session?.user?.image || "no_avatar_image_128x128.png"}
+        profileImage={session?.user?.image || "/no_avatar_image_128x128.png"}
         progress={1}
         userId={session?.user?.id}
         scrollContainerRef={scrollContainerRef}
