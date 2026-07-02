@@ -52,12 +52,14 @@ async function upsertAuthenticatedUser(
 ): Promise<User> {
   const existing = await findUserByDiscordId(db, linkAuthUser.discord_id);
   const now = new Date().toISOString();
+  const isAdmin = linkAuthUser.role === "admin";
   if (existing) {
     await run(
       db,
-      `UPDATE "User" SET "name" = ?, "image" = ?, "updatedAt" = ? WHERE "discordId" = ?`,
+      `UPDATE "User" SET "name" = ?, "image" = ?, "isAdmin" = ?, "updatedAt" = ? WHERE "discordId" = ?`,
       linkAuthUser.display_name,
       linkAuthUser.avatar_url,
+      isAdmin,
       now,
       linkAuthUser.discord_id,
     );
@@ -71,11 +73,12 @@ async function upsertAuthenticatedUser(
   await run(
     db,
     `INSERT INTO "User" ("id", "name", "tel", "image", "discordId", "isAdmin", "createdAt", "updatedAt")
-     VALUES (?, ?, NULL, ?, ?, false, ?, ?)`,
+     VALUES (?, ?, NULL, ?, ?, ?, ?, ?)`,
     linkAuthUser.discord_id,
     linkAuthUser.display_name,
     linkAuthUser.avatar_url,
     linkAuthUser.discord_id,
+    isAdmin,
     now,
     now,
   );
