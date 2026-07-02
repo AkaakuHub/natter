@@ -5,6 +5,13 @@ import { getMiddlewarePaths } from "@/core/spa/SPARoutes";
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  if (
+    pathname.startsWith("/_auth/") ||
+    (pathname === "/login" && req.method === "POST")
+  ) {
+    return NextResponse.next();
+  }
+
   // SLEEPANDMAXDEPTHTHINK: 最も単純な解決策
   // ステップ1: SPAルートの判定とリライト処理を最初に実行
   const spaRoutes = getMiddlewarePaths();

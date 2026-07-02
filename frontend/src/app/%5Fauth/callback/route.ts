@@ -1,6 +1,8 @@
-import { handleAuthRoute } from "@/auth";
+import { handleAuthRoute, withLinkAuthRoutePath } from "@/auth";
 import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
-  return await handleAuthRoute(request);
+  return await handleAuthRoute(
+    withLinkAuthRoutePath(request, "/_auth/callback"),
+  );
 }

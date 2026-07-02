@@ -64,6 +64,12 @@ export async function handleAuthRoute(request: Request): Promise<Response> {
   });
 }
 
+export function withLinkAuthRoutePath(request: Request, pathname: string): Request {
+  const url = new URL(request.url);
+  url.pathname = pathname;
+  return new Request(url, request);
+}
+
 function authSessionFromLinkAuthUser(user: LinkAuthUser): AuthSession {
   return {
     user: {
