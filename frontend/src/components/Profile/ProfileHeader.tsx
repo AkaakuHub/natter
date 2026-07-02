@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import clsx from "clsx";
 import { IconEdit } from "@tabler/icons-react";
 import { getDominantColor } from "@/utils/colorUtils";
 import { ExtendedSession } from "@/types";
-import { User } from "@/api/types";
-import EditProfileModal from "./EditProfileModal";
 import FollowButton from "@/components/FollowButton";
 import { useFollowing, useFollowers } from "@/hooks/queries/useFollows";
 import { useUser } from "@/hooks/queries/useUsers";
@@ -24,27 +22,26 @@ const ProfileHeader = ({
 }: ProfileHeaderProps) => {
   const [bgColor, setBgColor] = useState("#64748b");
   const [applyAnimation, setApplyAnimation] = useState(false);
-  const [targetUser, setTargetUser] = useState<User | null>(null);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // 文字列として比較（userIdとsession.user.idの型が異なる可能性がある）
   const isOwnProfile = !userId || String(userId) === String(session?.user?.id);
-  const targetUserId = userId || session?.user?.id;
+  const targetUserId = userId ?? session?.user?.id;
+  const sessionUser = session?.user
+    ? {
+        id: session.user.id,
+        name: session.user.name,
+        image: session.user.image,
+      }
+    : null;
 
-  // React Query hooks for user data
-  const { data: fetchedCurrentUser } = useUser(session?.user?.id || "");
-  const { data: fetchedTargetUser } = useUser(userId || "");
+  const profileLookupUserId = isOwnProfile ? "" : (userId ?? "");
+  const { data: fetchedTargetUser, isLoading: isTargetUserLoading } =
+    useUser(profileLookupUserId);
 
-  // React Query hooks for follow data
   const { data: following = [] } = useFollowing(targetUserId || "");
   const { data: followers = [] } = useFollowers(targetUserId || "");
 
-  // Use React Query data if available, fallback to state
-  const effectiveCurrentUser = fetchedCurrentUser || currentUser;
-  const effectiveTargetUser = fetchedTargetUser || targetUser;
-  const displayUser = effectiveTargetUser || effectiveCurrentUser;
+  const displayUser = isOwnProfile ? sessionUser : fetchedTargetUser;
+  const loading = !isOwnProfile && isTargetUserLoading;
 
   const { navigateToFollowing, navigateToFollowers } = useSPANavigation();
 
@@ -64,38 +61,6 @@ const ProfileHeader = ({
       navigateToFollowers(targetUserId);
     }
   };
-
-  const handleUserUpdated = (updatedUser: User) => {
-    if (isOwnProfile) {
-      setCurrentUser(updatedUser);
-    } else {
-      setTargetUser(updatedUser);
-    }
-  };
-
-  // フォールバック用のセッション情報設定（React Queryでデータが取得できない場合）
-  useEffect(() => {
-    if (session?.user?.id && !fetchedCurrentUser && !currentUser) {
-      setCurrentUser({
-        id: session.user.id,
-        name: session.user.name || "Unknown User",
-        image: session.user.image || undefined,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-    }
-  }, [session?.user, fetchedCurrentUser, currentUser]);
-
-  // React Queryでデータが取得されたらローディング状態を更新
-  useEffect(() => {
-    if (userId && userId !== session?.user?.id) {
-      if (fetchedTargetUser) {
-        setLoading(false);
-      }
-    } else {
-      setLoading(false);
-    }
-  }, [userId, session?.user?.id, fetchedTargetUser]);
 
   useEffect(() => {
     const image = displayUser?.image ?? "/no_avatar_image_128x128.png";
@@ -159,17 +124,18 @@ const ProfileHeader = ({
               )}
             </div>
             {isOwnProfile && displayUser && (
-              <button
-                onClick={() => setIsEditModalOpen(true)}
+              <a
+                href="/_auth/account"
                 className="p-1 rounded-full hover:bg-surface-hover transition-colors"
-                title="プロフィールを編集"
+                title="アカウント設定を開く"
+                aria-label="アカウント設定を開く"
               >
                 <IconEdit size={18} className="text-text-muted sm:hidden" />
                 <IconEdit
                   size={20}
                   className="text-text-muted hidden sm:block"
                 />
-              </button>
+              </a>
             )}
           </div>
           <div
@@ -233,16 +199,6 @@ const ProfileHeader = ({
           )}
         </div>
       </div>
-
-      {/* Edit Profile Modal */}
-      {isOwnProfile && displayUser && (
-        <EditProfileModal
-          user={displayUser}
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onUserUpdated={handleUserUpdated}
-        />
-      )}
     </div>
   );
 };

@@ -126,36 +126,6 @@ async function handleUsers(
       }
       return jsonResponse(env, request, user);
     }
-    if (method === "PATCH") {
-      const authUser = await requireAuthUser(request, env);
-      if (authUser.id !== userId) {
-        throw new HttpError(403, "You can only edit your own profile");
-      }
-      const body = await readJsonObject(request);
-      const name = getString(body.name);
-      const image = getString(body.image);
-      if (!name && image === undefined) {
-        throw new HttpError(400, "No update fields");
-      }
-      const updates: string[] = [];
-      const values: unknown[] = [];
-      if (name !== undefined) {
-        updates.push(`"name" = ?`);
-        values.push(name);
-      }
-      if (image !== undefined) {
-        updates.push(`"image" = ?`);
-        values.push(image);
-      }
-      updates.push(`"updatedAt" = ?`);
-      values.push(new Date().toISOString(), userId);
-      await run(
-        env.DB,
-        `UPDATE "User" SET ${updates.join(", ")} WHERE "id" = ?`,
-        ...values,
-      );
-      return jsonResponse(env, request, requireRow(await getUserRowById(env.DB, userId), parseUser, "User not found"));
-    }
   }
 
   throw new HttpError(404, "Not found");

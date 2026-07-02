@@ -1,11 +1,6 @@
 import { ApiClient } from "./client";
 import { User } from "./types";
 
-interface UpdateUserData {
-  name?: string;
-  image?: string | null;
-}
-
 export class UsersApi {
   static async getAllUsers(): Promise<User[]> {
     try {
@@ -43,13 +38,6 @@ export class UsersApi {
       }
       throw error;
     }
-  }
-
-  static async updateUser(
-    id: string,
-    updateData: UpdateUserData,
-  ): Promise<User> {
-    return ApiClient.patch<User>(`/users/${id}`, updateData);
   }
 
   static async getRecommendedUsers(limit?: number): Promise<User[]> {
