@@ -864,6 +864,9 @@ async function enrichPosts(
       const author = post.authorId ? await findUserById(db, post.authorId) : null;
       const character = post.characterId ? await getCharacter(db, post.characterId) : null;
       const replyTo = post.replyToId ? await getPost(db, post.replyToId) : null;
+      const replyToAuthor = replyTo?.authorId
+        ? await findUserById(db, replyTo.authorId)
+        : null;
       const likes = await getLikesForPost(db, post.id);
       const repliesCount = parseCount(await firstRow(db, `SELECT COUNT(*) AS "count" FROM "Post" WHERE "replyToId" = ? AND "deletedAt" IS NULL`, post.id));
       return {
@@ -875,6 +878,7 @@ async function enrichPosts(
         replyTo: replyTo
           ? {
               ...replyTo,
+              author: replyToAuthor,
               images: canReadPostImages(revealSecrets, replyTo, currentUserId) ? replyTo.images : [],
             }
           : null,
