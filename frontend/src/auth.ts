@@ -7,6 +7,7 @@ import {
   loadLinkAuthAppConfig,
   type LinkAuthUser,
 } from "link-auth";
+import { noStoreHeaders } from "./http/noStoreHeaders";
 
 export type AuthSession = {
   user: {
@@ -63,12 +64,11 @@ export function getAppSessionCookieHeader(request: Request): string | null {
 export async function handleAuthRoute(request: Request): Promise<Response> {
   return await handleAppAuthRequest({
     authFailedResponse: (url) =>
-      Response.redirect(new URL("/login?error=AuthFailed", url.origin), 302),
+      noStoreRedirect(new URL("/login?error=AuthFailed", url.origin)),
     config: loadAuthConfig(),
-    handleRequest: ({ url }) =>
-      Response.redirect(new URL("/", url.origin), 302),
+    handleRequest: ({ url }) => noStoreRedirect(new URL("/", url.origin)),
     loginResponse: (request) =>
-      Response.redirect(new URL("/_auth/account", request.url), 302),
+      noStoreRedirect(new URL("/_auth/account", request.url)),
     request: normalizeLinkAuthRouteRequest(request),
   });
 }
@@ -107,4 +107,14 @@ function normalizeLinkAuthRouteRequest(request: Request): Request {
   }
   url.pathname = url.pathname.replace(/^\/%5Fauth\//, "/_auth/");
   return new Request(url, request);
+}
+
+function noStoreRedirect(url: URL): Response {
+  return new Response(null, {
+    headers: {
+      Location: url.toString(),
+      ...noStoreHeaders,
+    },
+    status: 302,
+  });
 }

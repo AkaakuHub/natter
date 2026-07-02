@@ -1,5 +1,6 @@
 import { getLocalAuthSession } from "@/auth";
 import { getMiddlewarePaths } from "@/core/spa/SPARoutes";
+import { noStoreHeaders } from "@/http/noStoreHeaders";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function middleware(req: NextRequest) {
@@ -28,12 +29,15 @@ export async function middleware(req: NextRequest) {
 
   const session = await getRequiredSession(req, routePath ?? pathname);
   if (!session) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/login", req.url), {
+      headers: noStoreHeaders,
+    });
   }
 
   if (routePath === "/profile") {
     return NextResponse.redirect(
       new URL(`/profile/${session.user.id}`, req.url),
+      { headers: noStoreHeaders },
     );
   }
 
