@@ -8,10 +8,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    return NextResponse.json(await createApiTokenForSession(session));
+    const response = await createApiTokenForSession(session);
+    return NextResponse.json(response.user);
   } catch {
     return NextResponse.json(
-      { error: "failed_to_create_api_token" },
+      { error: "failed_to_sync_current_user" },
       { status: 502 },
     );
   }

@@ -14,6 +14,19 @@ export type AuthSession = {
   };
 };
 
+export type ApiAuthTokenResponse = {
+  status: "OK";
+  token: string;
+  user: {
+    id: string;
+    name: string;
+    image?: string | null;
+    tel?: string | null;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
 export function loadAuthConfig() {
   return loadLinkAuthAppConfig({
     ACCOUNT_URL: requireEnv("ACCOUNT_URL"),
@@ -51,6 +64,29 @@ export async function handleAuthRoute(request: Request): Promise<Response> {
       Response.redirect(new URL("/_auth/account", request.url), 302),
     request,
   });
+}
+
+export async function createApiTokenForSession(
+  session: AuthSession,
+): Promise<ApiAuthTokenResponse> {
+  const response = await fetch(`${requireEnv("NEXT_PUBLIC_API_URL")}/auth/token`, {
+    body: JSON.stringify({
+      userId: session.user.id,
+      name: session.user.name,
+      image: session.user.image ?? null,
+    }),
+    headers: {
+      "content-type": "application/json",
+      "x-internal-api-secret": requireEnv("INTERNAL_API_SECRET"),
+    },
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to create API token: ${response.status}`);
+  }
+
+  return (await response.json()) as ApiAuthTokenResponse;
 }
 
 function authSessionFromLinkAuthUser(user: LinkAuthUser): AuthSession {

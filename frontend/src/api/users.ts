@@ -1,12 +1,6 @@
 import { ApiClient } from "./client";
 import { User } from "./types";
 
-interface CreateUserData {
-  userId: string;
-  name: string;
-  image?: string | null;
-}
-
 interface UpdateUserData {
   name?: string;
   image?: string | null;
@@ -27,23 +21,21 @@ export class UsersApi {
     return ApiClient.get<User>(`/users/${id}`);
   }
 
-  static async createUser(userData: CreateUserData): Promise<User> {
-    return ApiClient.post<User>(
-      "/users",
-      {
-        discordId: userData.userId,
-        name: userData.name,
-        image: userData.image,
-      },
-      true,
-    );
+  static async syncCurrentUser(): Promise<User> {
+    const response = await fetch("/api/auth/current-user", {
+      cache: "no-store",
+      credentials: "include",
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to sync current user: ${response.status}`);
+    }
+    return (await response.json()) as User;
   }
 
-  static async getUserByAuthId(userId: string): Promise<User | null> {
+  static async getCurrentAuthenticatedUser(): Promise<User | null> {
     try {
-      return await ApiClient.get<User>(`/users/discord/${userId}`, true);
+      return await this.syncCurrentUser();
     } catch (error: unknown) {
-      // 404エラー（ユーザーが存在しない）の場合はnullを返す
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       if (
@@ -53,9 +45,8 @@ export class UsersApi {
       ) {
         return null;
       }
-      // NetworkErrorの場合はログを出力しない（サーバーダウン時の騒音を防ぐ）
       if (!errorMessage.includes("サーバーに接続できません")) {
-        console.error("Error fetching user by auth ID:", error);
+        console.error("Error fetching current authenticated user:", error);
       }
       throw error;
     }

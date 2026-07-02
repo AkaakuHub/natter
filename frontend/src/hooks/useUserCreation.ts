@@ -21,16 +21,7 @@ export const useUserCreation = ({
     if (!session?.user?.id) {
       throw new Error("Session not available");
     }
-    if (!session.user.name) {
-      throw new Error("Authenticated user name is missing");
-    }
-
-    const userData = {
-      userId: session.user.id,
-      name: session.user.name,
-      image: session.user.image ?? null,
-    };
-    await UsersApi.createUser(userData);
+    await UsersApi.syncCurrentUser();
     const userId = session.user.id;
     clearUserCache(userId);
     await checkUserExists(userId);

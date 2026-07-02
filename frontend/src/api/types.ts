@@ -2,7 +2,7 @@ export interface User {
   id: string;
   name: string;
   image?: string | null;
-  tel?: string;
+  tel?: string | null;
   createdAt: string;
   updatedAt: string;
   _count?: {

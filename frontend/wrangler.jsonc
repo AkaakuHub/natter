@@ -16,7 +16,6 @@
     "binding": "ASSETS"
   },
   "vars": {
-    "NEXTAUTH_URL": "https://natter.akaaku.net",
     "NEXT_PUBLIC_API_URL": "https://api.natter.akaaku.net",
     "NEXT_PUBLIC_BASE_URL": "https://natter.akaaku.net"
   },

@@ -1,10 +1,14 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Post, Req, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
+import { Request } from 'express';
+import { assertInternalRequest } from './internal-request';
 
 export interface GetTokenDto {
   userId: string;
+  name: string;
+  image?: string | null;
 }
 
 @Controller('auth')
@@ -16,24 +20,34 @@ export class AuthController {
   ) {}
 
   @Post('token')
-  async getToken(@Body() getTokenDto: GetTokenDto) {
-    const { userId } = getTokenDto;
+  async getToken(@Req() request: Request, @Body() getTokenDto: GetTokenDto) {
+    assertInternalRequest(request, this.configService);
+    const { userId, name, image } = getTokenDto;
 
-    if (!userId) {
-      throw new UnauthorizedException('User ID is required');
+    if (!userId || !name) {
+      throw new UnauthorizedException('User ID and name are required');
     }
 
-    // ユーザーが存在するかチェック（userIdはdiscordIdとして扱う）
-    const userInfo = await this.prisma.user.findUnique({
+    const userInfo = await this.prisma.user.upsert({
       where: { discordId: userId },
-      select: { id: true, name: true, discordId: true, image: true },
+      update: { image: image ?? null, name },
+      create: {
+        discordId: userId,
+        id: userId,
+        image: image ?? null,
+        name,
+      },
+      select: {
+        createdAt: true,
+        discordId: true,
+        id: true,
+        image: true,
+        name: true,
+        tel: true,
+        updatedAt: true,
+      },
     });
 
-    if (!userInfo) {
-      throw new UnauthorizedException('User not found');
-    }
-
-    // JWTトークンを生成
     const payload = {
       id: userInfo.id,
       name: userInfo.name,

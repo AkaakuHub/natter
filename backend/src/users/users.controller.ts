@@ -10,11 +10,13 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { Request } from 'express';
+import { assertInternalRequest } from '../auth/internal-request';
 
 export class CreateUserDto {
   @IsString()
@@ -43,10 +45,14 @@ export class UpdateUserDto {
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Req() request: Request, @Body() createUserDto: CreateUserDto) {
+    assertInternalRequest(request, this.configService);
     return this.usersService.findOrCreateByDiscordId(
       createUserDto.discordId,
       createUserDto.name,
@@ -66,8 +72,24 @@ export class UsersController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @Get('discord/:discordId')
+  async findByDiscordId(
+    @Req() request: Request,
+    @Param('discordId') discordId: string,
+  ) {
+    assertInternalRequest(request, this.configService);
+    const user = await this.usersService.findByDiscordId(discordId);
+    if (!user) {
+      throw new NotFoundException(
+        `User with Discord ID ${discordId} not found`,
+      );
+    }
+    return user;
   }
 
   @Get(':id')
@@ -80,17 +102,6 @@ export class UsersController {
       throw new NotFoundException('User not found');
     }
 
-    return user;
-  }
-
-  @Get('discord/:discordId')
-  async findByDiscordId(@Param('discordId') discordId: string) {
-    const user = await this.usersService.findByDiscordId(discordId);
-    if (!user) {
-      throw new NotFoundException(
-        `User with Discord ID ${discordId} not found`,
-      );
-    }
     return user;
   }
 

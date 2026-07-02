@@ -96,12 +96,16 @@ async function route(request: Request, env: Env): Promise<Response> {
 }
 
 async function handleCreateToken(request: Request, env: Env): Promise<Response> {
+  requireInternalRequest(request, env);
   const body = await readJsonObject(request);
   const userId = requireString(body.userId, "userId");
-  const user = await findUserByDiscordId(env.DB, userId);
-  if (!user) {
-    throw new HttpError(401, "User not found");
-  }
+  const name = requireString(body.name, "name");
+  const image = getString(body.image) ?? null;
+  const user = await upsertAuthenticatedUser(env.DB, {
+    discordId: userId,
+    image,
+    name,
+  });
 
   const authUser = {
     id: user.id,
@@ -128,38 +132,16 @@ async function handleUsers(
   const url = new URL(request.url);
 
   if (method === "POST" && parts.length === 1) {
+    requireInternalRequest(request, env);
     const body = await readJsonObject(request);
     const discordId = requireString(body.discordId, "discordId");
     const name = requireString(body.name, "name");
     const image = getString(body.image) ?? null;
-    const existing = await findUserByDiscordId(env.DB, discordId);
-    if (existing) {
-      await run(
-        env.DB,
-        `UPDATE "User" SET "name" = ?, "image" = ?, "updatedAt" = ? WHERE "discordId" = ?`,
-        name,
-        image,
-        new Date().toISOString(),
-        discordId,
-      );
-      return jsonResponse(env, request, requireRow(await getUserRowById(env.DB, existing.id), parseUser, "User not found"));
-    }
-    const now = new Date().toISOString();
-    await run(
-      env.DB,
-      `INSERT INTO "User" ("id", "name", "tel", "image", "discordId", "isAdmin", "createdAt", "updatedAt")
-       VALUES (?, ?, NULL, ?, ?, false, ?, ?)`,
-      discordId,
-      name,
-      image,
-      discordId,
-      now,
-      now,
-    );
-    return jsonResponse(env, request, requireRow(await getUserRowById(env.DB, discordId), parseUser, "User not found"));
+    return jsonResponse(env, request, await upsertAuthenticatedUser(env.DB, { discordId, image, name }));
   }
 
   if (method === "GET" && parts.length === 1) {
+    await requireAuthUser(request, env.JWT_SECRET);
     const users = (await allRows(env.DB, `SELECT * FROM "User" ORDER BY "createdAt" DESC`)).map(parseUser);
     return jsonResponse(env, request, users);
   }
@@ -172,6 +154,7 @@ async function handleUsers(
   }
 
   if (method === "GET" && parts[1] === "discord" && parts[2]) {
+    requireInternalRequest(request, env);
     const user = await findUserByDiscordId(env.DB, decodeURIComponent(parts[2]));
     if (!user) {
       throw new HttpError(404, "User not found");
@@ -221,6 +204,15 @@ async function handleUsers(
   }
 
   throw new HttpError(404, "Not found");
+}
+
+function requireInternalRequest(request: Request, env: Env): void {
+  if (!env.INTERNAL_API_SECRET) {
+    throw new HttpError(500, "Internal API secret is not configured");
+  }
+  if (request.headers.get("x-internal-api-secret") !== env.INTERNAL_API_SECRET) {
+    throw new HttpError(401, "Unauthorized internal request");
+  }
 }
 
 async function handlePosts(
@@ -1381,6 +1373,50 @@ function characterWithCount(row: Record<string, unknown>): Character {
 async function findUserByDiscordId(db: D1Database, discordId: string): Promise<User | undefined> {
   const row = await firstRow(db, `SELECT * FROM "User" WHERE "discordId" = ?`, discordId);
   return row ? parseUser(row) : undefined;
+}
+
+async function upsertAuthenticatedUser(
+  db: D1Database,
+  input: {
+    discordId: string;
+    image: string | null;
+    name: string;
+  },
+): Promise<User> {
+  const existing = await findUserByDiscordId(db, input.discordId);
+  const now = new Date().toISOString();
+  if (existing) {
+    await run(
+      db,
+      `UPDATE "User" SET "name" = ?, "image" = ?, "updatedAt" = ? WHERE "discordId" = ?`,
+      input.name,
+      input.image,
+      now,
+      input.discordId,
+    );
+    return requireRow(
+      await getUserRowById(db, existing.id),
+      parseUser,
+      "User not found",
+    );
+  }
+
+  await run(
+    db,
+    `INSERT INTO "User" ("id", "name", "tel", "image", "discordId", "isAdmin", "createdAt", "updatedAt")
+     VALUES (?, ?, NULL, ?, ?, false, ?, ?)`,
+    input.discordId,
+    input.name,
+    input.image,
+    input.discordId,
+    now,
+    now,
+  );
+  return requireRow(
+    await getUserRowById(db, input.discordId),
+    parseUser,
+    "User not found",
+  );
 }
 
 async function findUserById(db: D1Database, id: string): Promise<User | undefined> {

@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 # 重要な開発ノート
 - **ポート使用**: デバッグで3000番や8000番ポートが既に使用されている場合は使用しないでください
-- **フロントエンド URL**: Twitter OAuth を正常に動作させるため、 http://127.0.0.1:3000 を使用してください（localhost ではなく）
+- **フロントエンドURL**: LinkAuthのコールバック設定と一致するURLを使用してください
 - **knip 使用**: コードを書いた後は必ず `pnpm knip` を実行して、未使用の依存関係とエクスポートを確認してください
 
 ## プロジェクト概要
@@ -18,7 +18,7 @@ Natter は Next.js フロントエンドと NestJS バックエンドを持つ�
 
 ### フロントエンド (Next.js + TypeScript)
 - **フレームワーク**: Next.js 15 with App Router
-- **認証**: NextAuth.js with Twitter OAuth
+- **認証**: LinkAuthのDiscord認証セッション
 - **UI**: Tailwind CSS with shadcn/ui パターンのカスタムコンポーネント
 - **状態管理**: レイアウトナビゲーション状態用の Zustand
 - **モバイル UX**: モバイルファーストナビゲーションパターンのための Swiper.js
@@ -35,7 +35,7 @@ Natter は Next.js フロントエンドと NestJS バックエンドを持つ�
 
 **バックエンドモジュール構造**: 各機能領域（auth、users、server）は、controller/service/module パターンで独自の NestJS モジュールにカプセル化されています。 `PrismaService` はデータベースアクセスのためにモジュール間で注入されます。
 
-**認証フロー**: フロントエンドは Twitter OAuth 用に NextAuth.js を使用し、バックエンドは `/check-server` エンドポイント経由の API 認証用に別の PASSKEY システムを使用します。
+**認証フロー**: フロントエンドはLinkAuthのセッションを検証し、サーバー側の内部API経由でアプリ用JWTを発行します。バックエンドのユーザー永続化はDiscord IDを認証プロバイダー境界で受け取り、UIは認証プロバイダー固有のID名に依存しません。
 
 ## よく使用するコマンド
 
@@ -91,8 +91,8 @@ FRONTEND_URLS=http://localhost:3000,http://127.0.0.1:3000
 DATABASE_URL="file:./dev.db"
 ```
 
-### フロントエンド環境 (NextAuth.js)
-認証が正常に動作するために Twitter OAuth 認証情報が必要です。
+### フロントエンド環境
+LinkAuth連携用の`ACCOUNT_URL`、`APP_ID`、`APP_SESSION_HMAC_SECRET`、`SESSION_KID`、内部API用の`INTERNAL_API_SECRET`が必要です。
 
 ## データベーススキーマ
 

@@ -83,7 +83,7 @@ export const useUserValidation = (): UseUserValidationResult => {
 
       // 新しいリクエストを開始
       try {
-        const requestPromise = UsersApi.getUserByAuthId(userId);
+        const requestPromise = UsersApi.getCurrentAuthenticatedUser();
         userCacheManager.setOngoingRequest(userId, requestPromise);
 
         const user = await requestPromise;
