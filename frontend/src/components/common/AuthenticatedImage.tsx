@@ -50,7 +50,6 @@ const AuthenticatedImage: React.FC<AuthenticatedImageProps> = ({
         console.error("Failed to load authenticated image:", error);
         if (isMounted) {
           setHasError(true);
-          setImageSrc(src); // フォールバック
         }
       } finally {
         if (isMounted) {

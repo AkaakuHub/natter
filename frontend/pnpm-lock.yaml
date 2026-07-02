@@ -30,8 +30,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       link-auth:
-        specifier: file:../../LinkAuth
-        version: file:../../LinkAuth
+        specifier: 0.1.2
+        version: 0.1.2
       next:
         specifier: 15.5.18
         version: 15.5.18(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -2753,8 +2753,8 @@ packages:
     resolution: {integrity: sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw==}
     engines: {node: '>=14'}
 
-  link-auth@file:../../LinkAuth:
-    resolution: {directory: ../../LinkAuth, type: directory}
+  link-auth@0.1.2:
+    resolution: {integrity: sha512-x2ej09tL5Xx6zuaisnqi4cK7ULT/3u4cDTsws8CrE0dpUgXTVsODWUnPzUqBvAXVkW0qVBl+5hPlieIDMqAneg==}
 
   locate-path@6.0.0:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
@@ -6644,7 +6644,7 @@ snapshots:
 
   lilconfig@3.1.3: {}
 
-  link-auth@file:../../LinkAuth: {}
+  link-auth@0.1.2: {}
 
   locate-path@6.0.0:
     dependencies:

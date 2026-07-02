@@ -1,7 +1,9 @@
 export interface Env {
   DB: D1Database;
   ASSETS: R2Bucket;
-  JWT_SECRET: string;
-  INTERNAL_API_SECRET: string;
+  ACCOUNT_URL: string;
+  APP_ID: string;
+  APP_SESSION_HMAC_SECRET: string;
+  SESSION_KID: string;
   FRONTEND_URLS?: string;
 }

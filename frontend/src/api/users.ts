@@ -22,14 +22,7 @@ export class UsersApi {
   }
 
   static async syncCurrentUser(): Promise<User> {
-    const response = await fetch("/api/auth/current-user", {
-      cache: "no-store",
-      credentials: "include",
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to sync current user: ${response.status}`);
-    }
-    return (await response.json()) as User;
+    return ApiClient.get<User>("/users/current");
   }
 
   static async getCurrentAuthenticatedUser(): Promise<User | null> {

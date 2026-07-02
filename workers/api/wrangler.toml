@@ -8,7 +8,10 @@ pattern = "api.natter.akaaku.net"
 custom_domain = true
 
 [vars]
+ACCOUNT_URL = "https://account.akaaku.net/"
+APP_ID = "natter"
 FRONTEND_URLS = "http://localhost:3000,http://127.0.0.1:3000,https://natter.akaaku.net"
+SESSION_KID = "2026-04"
 
 [[d1_databases]]
 binding = "DB"

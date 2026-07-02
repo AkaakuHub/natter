@@ -13,7 +13,6 @@ export const performCompleteLogout = async () => {
         localStorage.removeItem(key);
       }
     });
-    localStorage.removeItem("jwt_token");
     sessionStorage.clear();
     window.location.href = "/_auth/logout";
   } catch (error) {

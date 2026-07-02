@@ -34,15 +34,10 @@ export const ServerStatusProvider: React.FC<ServerStatusProviderProps> = ({
 
   const checkStatus = async () => {
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_API_URL;
-      if (!backendUrl) {
-        throw new Error("NEXT_PUBLIC_API_URL が設定されていません");
-      }
-
-      // ヘルスチェックエンドポイントがない場合は、既存のエンドポイントを使用
-      const response = await fetch(`${backendUrl}/users`, {
-        method: "HEAD", // HEADリクエストでレスポンスボディを受信せずにステータスのみ確認
-        signal: AbortSignal.timeout(3000), // 3秒でタイムアウト（より迅速に）
+      const response = await fetch("/api/backend/users", {
+        credentials: "include",
+        method: "HEAD",
+        signal: AbortSignal.timeout(3000),
       });
 
       if (response.ok) {

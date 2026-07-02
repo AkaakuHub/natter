@@ -29,5 +29,8 @@
     "lefthook": "^1.11.16",
     "typescript": "^6.0.3",
     "wrangler": "^4.91.0"
+  },
+  "dependencies": {
+    "link-auth": "0.1.2"
   }
 }

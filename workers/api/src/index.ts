@@ -14,7 +14,7 @@ import {
   readJsonObject,
   requireString,
 } from "./http";
-import { optionalAuthUser, requireAuthUser, signJwt } from "./jwt";
+import { requireAuthUser } from "./auth";
 import {
   Character,
   Like,
@@ -66,10 +66,6 @@ async function route(request: Request, env: Env): Promise<Response> {
     return emptyResponse(env, request, 200);
   }
 
-  if (method === "POST" && path === "/auth/token") {
-    return handleCreateToken(request, env);
-  }
-
   if (parts[0] === "users") {
     return handleUsers(request, env, parts);
   }
@@ -95,34 +91,6 @@ async function route(request: Request, env: Env): Promise<Response> {
   throw new HttpError(404, "Not found");
 }
 
-async function handleCreateToken(request: Request, env: Env): Promise<Response> {
-  requireInternalRequest(request, env);
-  const body = await readJsonObject(request);
-  const userId = requireString(body.userId, "userId");
-  const name = requireString(body.name, "name");
-  const image = getString(body.image) ?? null;
-  const user = await upsertAuthenticatedUser(env.DB, {
-    discordId: userId,
-    image,
-    name,
-  });
-
-  const authUser = {
-    id: user.id,
-    name: user.name,
-    discordId: user.discordId,
-    image: user.image ?? undefined,
-    validated: true,
-    timestamp: new Date().toISOString(),
-  };
-
-  return jsonResponse(env, request, {
-    status: "OK",
-    token: await signJwt(authUser, env.JWT_SECRET),
-    user,
-  });
-}
-
 async function handleUsers(
   request: Request,
   env: Env,
@@ -131,35 +99,22 @@ async function handleUsers(
   const method = request.method;
   const url = new URL(request.url);
 
-  if (method === "POST" && parts.length === 1) {
-    requireInternalRequest(request, env);
-    const body = await readJsonObject(request);
-    const discordId = requireString(body.discordId, "discordId");
-    const name = requireString(body.name, "name");
-    const image = getString(body.image) ?? null;
-    return jsonResponse(env, request, await upsertAuthenticatedUser(env.DB, { discordId, image, name }));
-  }
-
   if (method === "GET" && parts.length === 1) {
-    await requireAuthUser(request, env.JWT_SECRET);
+    await requireAuthUser(request, env);
     const users = (await allRows(env.DB, `SELECT * FROM "User" ORDER BY "createdAt" DESC`)).map(parseUser);
     return jsonResponse(env, request, users);
   }
 
+  if (method === "GET" && parts[1] === "current") {
+    const authUser = await requireAuthUser(request, env);
+    return jsonResponse(env, request, requireRow(await getUserRowById(env.DB, authUser.id), parseUser, "User not found"));
+  }
+
   if (method === "GET" && parts[1] === "recommended") {
-    const authUser = await requireAuthUser(request, env.JWT_SECRET);
+    const authUser = await requireAuthUser(request, env);
     const limit = parseLimit(url.searchParams.get("limit"), 5);
     const users = await getRecommendedUsers(env.DB, limit, authUser.id);
     return jsonResponse(env, request, users);
-  }
-
-  if (method === "GET" && parts[1] === "discord" && parts[2]) {
-    requireInternalRequest(request, env);
-    const user = await findUserByDiscordId(env.DB, decodeURIComponent(parts[2]));
-    if (!user) {
-      throw new HttpError(404, "User not found");
-    }
-    return jsonResponse(env, request, user);
   }
 
   if (parts[1]) {
@@ -172,7 +127,7 @@ async function handleUsers(
       return jsonResponse(env, request, user);
     }
     if (method === "PATCH") {
-      const authUser = await requireAuthUser(request, env.JWT_SECRET);
+      const authUser = await requireAuthUser(request, env);
       if (authUser.id !== userId) {
         throw new HttpError(403, "You can only edit your own profile");
       }
@@ -206,15 +161,6 @@ async function handleUsers(
   throw new HttpError(404, "Not found");
 }
 
-function requireInternalRequest(request: Request, env: Env): void {
-  if (!env.INTERNAL_API_SECRET) {
-    throw new HttpError(500, "Internal API secret is not configured");
-  }
-  if (request.headers.get("x-internal-api-secret") !== env.INTERNAL_API_SECRET) {
-    throw new HttpError(401, "Unauthorized internal request");
-  }
-}
-
 async function handlePosts(
   request: Request,
   env: Env,
@@ -232,7 +178,7 @@ async function handlePosts(
   }
 
   if (method === "GET" && parts[1] === "trending") {
-    const authUser = await optionalAuthUser(request, env.JWT_SECRET);
+    const authUser = await requireAuthUser(request, env);
     const limit = parseLimit(url.searchParams.get("limit"), 5);
     const rows = await allRows(
       env.DB,
@@ -245,20 +191,20 @@ async function handlePosts(
        LIMIT ?`,
       limit,
     );
-    return jsonResponse(env, request, await enrichPosts(env.DB, rows.map(parsePost), authUser?.id));
+    return jsonResponse(env, request, await enrichPosts(env.DB, rows.map(parsePost), authUser.id));
   }
 
   if (method === "GET" && parts.length === 1) {
-    const authUser = await optionalAuthUser(request, env.JWT_SECRET);
+    const authUser = await requireAuthUser(request, env);
     const type = url.searchParams.get("type");
     const userId = url.searchParams.get("userId");
     const search = url.searchParams.get("search");
     const posts = await findPosts(env.DB, { type, userId, search });
-    return jsonResponse(env, request, await enrichPosts(env.DB, posts, authUser?.id));
+    return jsonResponse(env, request, await enrichPosts(env.DB, posts, authUser.id));
   }
 
   if (method === "POST" && parts.length === 1) {
-    const authUser = await requireAuthUser(request, env.JWT_SECRET);
+    const authUser = await requireAuthUser(request, env);
     const input = await readPostInput(request, env, authUser.id);
     const post = await createPost(env.DB, input);
     return jsonResponse(env, request, await getPostResponse(env.DB, post.id, authUser.id));
@@ -268,12 +214,12 @@ async function handlePosts(
     const postId = parseId(parts[1]);
 
     if (method === "GET" && parts.length === 2) {
-      const authUser = await optionalAuthUser(request, env.JWT_SECRET);
-      return jsonResponse(env, request, await getPostResponse(env.DB, postId, authUser?.id));
+      const authUser = await requireAuthUser(request, env);
+      return jsonResponse(env, request, await getPostResponse(env.DB, postId, authUser.id));
     }
 
     if (method === "PATCH" && parts.length === 2) {
-      const authUser = await requireAuthUser(request, env.JWT_SECRET);
+      const authUser = await requireAuthUser(request, env);
       const existing = await getPost(env.DB, postId);
       if (!existing) {
         throw new HttpError(400, "Post not found");
@@ -287,7 +233,7 @@ async function handlePosts(
     }
 
     if (method === "DELETE" && parts.length === 2) {
-      const authUser = await requireAuthUser(request, env.JWT_SECRET);
+      const authUser = await requireAuthUser(request, env);
       const existing = await getPost(env.DB, postId);
       if (!existing) {
         throw new HttpError(400, "Post not found");
@@ -300,7 +246,7 @@ async function handlePosts(
     }
 
     if (method === "POST" && parts[2] === "like") {
-      const authUser = await requireAuthUser(request, env.JWT_SECRET);
+      const authUser = await requireAuthUser(request, env);
       return jsonResponse(env, request, await toggleLike(env.DB, postId, authUser.id));
     }
 
@@ -309,13 +255,13 @@ async function handlePosts(
     }
 
     if (method === "GET" && parts[2] === "replies") {
-      const authUser = await optionalAuthUser(request, env.JWT_SECRET);
+      const authUser = await requireAuthUser(request, env);
       const rows = await allRows(
         env.DB,
         `SELECT * FROM "Post" WHERE "replyToId" = ? AND "deletedAt" IS NULL ORDER BY "createdAt" ASC`,
         postId,
       );
-      return jsonResponse(env, request, await enrichPosts(env.DB, rows.map(parsePost), authUser?.id));
+      return jsonResponse(env, request, await enrichPosts(env.DB, rows.map(parsePost), authUser.id));
     }
   }
 
@@ -331,7 +277,7 @@ async function handleFollows(
   const url = new URL(request.url);
 
   if (method === "POST" && parts[1]) {
-    const authUser = await requireAuthUser(request, env.JWT_SECRET);
+    const authUser = await requireAuthUser(request, env);
     const followingId = decodeURIComponent(parts[1]);
     if (authUser.id === followingId) {
       throw new HttpError(400, "Cannot follow yourself");
@@ -354,7 +300,7 @@ async function handleFollows(
   }
 
   if (method === "DELETE" && parts[1]) {
-    const authUser = await requireAuthUser(request, env.JWT_SECRET);
+    const authUser = await requireAuthUser(request, env);
     const followingId = decodeURIComponent(parts[1]);
     if (!(await getFollow(env.DB, authUser.id, followingId))) {
       throw new HttpError(400, "Not following this user");
@@ -375,8 +321,8 @@ async function handleFollows(
   }
 
   if (method === "GET" && parts[1] === "following") {
-    const authUser = await optionalAuthUser(request, env.JWT_SECRET);
-    const targetUserId = url.searchParams.get("userId") ?? authUser?.id;
+    const authUser = await requireAuthUser(request, env);
+    const targetUserId = url.searchParams.get("userId") ?? authUser.id;
     if (!targetUserId) {
       throw new HttpError(400, "User ID required");
     }
@@ -393,8 +339,8 @@ async function handleFollows(
   }
 
   if (method === "GET" && parts[1] === "followers") {
-    const authUser = await optionalAuthUser(request, env.JWT_SECRET);
-    const targetUserId = url.searchParams.get("userId") ?? authUser?.id;
+    const authUser = await requireAuthUser(request, env);
+    const targetUserId = url.searchParams.get("userId") ?? authUser.id;
     if (!targetUserId) {
       throw new HttpError(400, "User ID required");
     }
@@ -411,7 +357,7 @@ async function handleFollows(
   }
 
   if (method === "GET" && parts[1] === "status" && parts[2]) {
-    const authUser = await requireAuthUser(request, env.JWT_SECRET);
+    const authUser = await requireAuthUser(request, env);
     const follow = await getFollow(env.DB, authUser.id, decodeURIComponent(parts[2]));
     return jsonResponse(env, request, {
       isFollowing: Boolean(follow),
@@ -431,17 +377,17 @@ async function handleCharacters(
   const url = new URL(request.url);
 
   if (method === "GET" && parts.length === 1) {
-    const authUser = await optionalAuthUser(request, env.JWT_SECRET);
-    const userId = url.searchParams.get("userId") ?? authUser?.id;
+    const authUser = await requireAuthUser(request, env);
+    const userId = url.searchParams.get("userId") ?? authUser.id;
     if (!userId) {
       return jsonResponse(env, request, []);
     }
-    const characters = await getCharactersByUser(env.DB, userId, authUser?.id);
+    const characters = await getCharactersByUser(env.DB, userId, authUser.id);
     return jsonResponse(env, request, characters);
   }
 
   if (method === "GET" && parts[1] === "search") {
-    const authUser = await requireAuthUser(request, env.JWT_SECRET);
+    const authUser = await requireAuthUser(request, env);
     const query = url.searchParams.get("query");
     if (!query) {
       return jsonResponse(env, request, []);
@@ -462,7 +408,7 @@ async function handleCharacters(
   }
 
   if (method === "POST" && parts.length === 1) {
-    const authUser = await requireAuthUser(request, env.JWT_SECRET);
+    const authUser = await requireAuthUser(request, env);
     const body = await readJsonObject(request);
     const name = requireString(body.name, "name");
     const now = new Date().toISOString();
@@ -486,7 +432,7 @@ async function handleCharacters(
   if (parts[1]) {
     const id = parseId(parts[1]);
     if (method === "GET") {
-      const authUser = await requireAuthUser(request, env.JWT_SECRET);
+      const authUser = await requireAuthUser(request, env);
       const character = await getOwnedCharacter(env.DB, id, authUser.id);
       if (!character) {
         throw new HttpError(404, "Character not found");
@@ -494,7 +440,7 @@ async function handleCharacters(
       return jsonResponse(env, request, character);
     }
     if (method === "PATCH") {
-      const authUser = await requireAuthUser(request, env.JWT_SECRET);
+      const authUser = await requireAuthUser(request, env);
       if (!(await getOwnedCharacter(env.DB, id, authUser.id))) {
         throw new HttpError(404, "Character not found");
       }
@@ -511,7 +457,7 @@ async function handleCharacters(
       return jsonResponse(env, request, await getOwnedCharacter(env.DB, id, authUser.id));
     }
     if (method === "DELETE") {
-      const authUser = await requireAuthUser(request, env.JWT_SECRET);
+      const authUser = await requireAuthUser(request, env);
       if (!(await getOwnedCharacter(env.DB, id, authUser.id))) {
         throw new HttpError(404, "Character not found");
       }
@@ -530,7 +476,7 @@ async function handleNotifications(
   parts: string[],
 ): Promise<Response> {
   const method = request.method;
-  const authUser = await requireAuthUser(request, env.JWT_SECRET);
+  const authUser = await requireAuthUser(request, env);
 
   if (method === "GET" && parts.length === 1) {
     return jsonResponse(env, request, await getNotifications(env.DB, authUser.id));
@@ -613,7 +559,7 @@ async function handleAdmin(
   env: Env,
   parts: string[],
 ): Promise<Response> {
-  const authUser = await requireAuthUser(request, env.JWT_SECRET);
+  const authUser = await requireAuthUser(request, env);
   const user = await findUserById(env.DB, authUser.id);
   const isAdmin = Boolean(user?.isAdmin);
 
@@ -648,6 +594,7 @@ async function handleAdmin(
 }
 
 async function handleMetadata(request: Request, env: Env): Promise<Response> {
+  await requireAuthUser(request, env);
   const url = new URL(request.url);
   if (request.method === "GET" && url.pathname === "/metadata/clear-cache") {
     await run(env.DB, `DELETE FROM "UrlMetadataCache"`);
@@ -968,7 +915,7 @@ async function handleImage(
   env: Env,
   filename: string,
 ): Promise<Response> {
-  const authUser = await optionalAuthUser(request, env.JWT_SECRET);
+  const authUser = await requireAuthUser(request, env);
   const row = await firstRow(
     env.DB,
     `SELECT * FROM "Post" WHERE "images" LIKE ? LIMIT 1`,
@@ -977,7 +924,7 @@ async function handleImage(
   const post = row ? parsePost(row) : undefined;
   const canReadOriginal =
     (await shouldRevealSecrets(env.DB)) ||
-    (post !== undefined && authUser !== undefined && authUser.id === post.authorId) ||
+    (post !== undefined && authUser.id === post.authorId) ||
     post?.imagesPublic === true;
   if (!canReadOriginal) {
     throw new HttpError(403, "Access forbidden");
@@ -1368,55 +1315,6 @@ function characterWithCount(row: Record<string, unknown>): Character {
     ...character,
     _count: { posts: Number(row.posts ?? 0) },
   };
-}
-
-async function findUserByDiscordId(db: D1Database, discordId: string): Promise<User | undefined> {
-  const row = await firstRow(db, `SELECT * FROM "User" WHERE "discordId" = ?`, discordId);
-  return row ? parseUser(row) : undefined;
-}
-
-async function upsertAuthenticatedUser(
-  db: D1Database,
-  input: {
-    discordId: string;
-    image: string | null;
-    name: string;
-  },
-): Promise<User> {
-  const existing = await findUserByDiscordId(db, input.discordId);
-  const now = new Date().toISOString();
-  if (existing) {
-    await run(
-      db,
-      `UPDATE "User" SET "name" = ?, "image" = ?, "updatedAt" = ? WHERE "discordId" = ?`,
-      input.name,
-      input.image,
-      now,
-      input.discordId,
-    );
-    return requireRow(
-      await getUserRowById(db, existing.id),
-      parseUser,
-      "User not found",
-    );
-  }
-
-  await run(
-    db,
-    `INSERT INTO "User" ("id", "name", "tel", "image", "discordId", "isAdmin", "createdAt", "updatedAt")
-     VALUES (?, ?, NULL, ?, ?, false, ?, ?)`,
-    input.discordId,
-    input.name,
-    input.image,
-    input.discordId,
-    now,
-    now,
-  );
-  return requireRow(
-    await getUserRowById(db, input.discordId),
-    parseUser,
-    "User not found",
-  );
 }
 
 async function findUserById(db: D1Database, id: string): Promise<User | undefined> {

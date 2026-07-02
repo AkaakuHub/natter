@@ -40,13 +40,7 @@ const UrlPreview: React.FC<UrlPreviewProps> = ({ url, className = "" }) => {
           setError("Invalid URL format");
           return;
         }
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL;
-        if (!backendUrl) {
-          throw new Error(
-            "NEXT_PUBLIC_API_URL environment variable is not set",
-          );
-        }
-        const requestUrl = `${backendUrl}/metadata?url=${encodeURIComponent(url)}`;
+        const requestUrl = `/api/backend/metadata?url=${encodeURIComponent(url)}`;
         const response = await fetch(requestUrl);
 
         if (!response.ok) {

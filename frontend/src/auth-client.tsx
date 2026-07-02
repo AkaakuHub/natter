@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refresh = async () => {
     setStatus("loading");
-    const response = await fetch("/api/auth/session", {
+    const response = await fetch("/api/link-auth/session", {
       cache: "no-store",
       credentials: "include",
     });
