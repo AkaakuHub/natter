@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/useToast";
 import { usePostShare } from "@/hooks/usePostShare";
 import { getImageUrl } from "@/utils/postUtils";
 import { useSPANavigation } from "@/core/spa";
+import { appendNormalizedImages } from "@/utils/normalizePostImages";
 
 import BackButton from "./components/BackButton";
 import LoadingState from "./components/LoadingState";
@@ -80,9 +81,7 @@ const DetailedPostComponent = ({
       formData.append("content", content);
       formData.append("replyToId", post.id.toString());
 
-      images.forEach((file) => {
-        formData.append("images", file);
-      });
+      await appendNormalizedImages(formData, images);
 
       const newReply = await ApiClient.postFormData<Post>("/posts", formData);
       setReplies((prev) => [...prev, newReply]);

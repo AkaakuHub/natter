@@ -4,6 +4,7 @@ import { User } from "@/api";
 import { useToast } from "@/hooks/useToast";
 import { ApiClient } from "@/api/client";
 import { useSPANavigation } from "@/core/spa";
+import { appendNormalizedImages } from "@/utils/normalizePostImages";
 
 interface UsePostSubmitResult {
   isSubmitting: boolean;
@@ -72,9 +73,7 @@ export const usePostSubmit = (
         formData.append("characterId", characterId.toString());
       }
 
-      images.forEach((file) => {
-        formData.append("images", file);
-      });
+      await appendNormalizedImages(formData, images);
 
       // ApiClient を使用して認証ヘッダー付きでリクエスト
       const newPost = await ApiClient.postFormData<{ id: number }>(

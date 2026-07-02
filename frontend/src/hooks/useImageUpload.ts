@@ -1,10 +1,11 @@
 import { useState, useCallback } from "react";
+import { normalizePostImages } from "@/utils/normalizePostImages";
 
 interface UseImageUploadResult {
   images: File[];
   imagePreviewUrls: string[];
   handleImageAdd: () => void;
-  handleFilesAdd: (files: File[] | FileList | null) => void;
+  handleFilesAdd: (files: File[] | FileList | null) => Promise<void>;
   handleImageRemove: (index: number) => void;
   clearImages: () => void;
 }
@@ -16,7 +17,7 @@ export const useImageUpload = (
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 
   const handleFilesAdd = useCallback(
-    (fileSource: File[] | FileList | null) => {
+    async (fileSource: File[] | FileList | null) => {
       if (!fileSource) return;
 
       const incomingFiles = Array.from(fileSource).filter((file) =>
@@ -27,18 +28,15 @@ export const useImageUpload = (
         return;
       }
 
-      const maxFileSize = 10 * 1024 * 1024; // 10MB
-      const validFiles: File[] = [];
-
-      incomingFiles.forEach((file) => {
-        if (file.size > maxFileSize) {
-          alert(
-            `ファイル "${file.name}" は10MBを超えています。10MB以下のファイルを選択してください。`,
-          );
-        } else {
-          validFiles.push(file);
-        }
-      });
+      let validFiles: File[];
+      try {
+        validFiles = await normalizePostImages(incomingFiles);
+      } catch (error) {
+        alert(
+          error instanceof Error ? error.message : "画像の変換に失敗しました",
+        );
+        return;
+      }
 
       if (validFiles.length === 0) {
         return;

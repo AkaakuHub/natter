@@ -10,7 +10,7 @@ interface EditFormProps {
   imagePreviewUrls: string[];
   onImageRemove: (index: number) => void;
   onImageAdd: () => void;
-  onFilesAdd: (files: File[]) => void;
+  onFilesAdd: (files: File[]) => void | Promise<void>;
   onSubmit: (e: React.FormEvent) => void;
   remainingChars: number;
   isSubmitting: boolean;

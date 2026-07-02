@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { IconPhoto } from "@tabler/icons-react";
 
 interface ImageDropZoneProps {
-  onFilesAdd: (files: File[]) => void;
+  onFilesAdd: (files: File[]) => void | Promise<void>;
   onRequestFileDialog?: () => void;
   disabled?: boolean;
   canAddMore?: boolean;
@@ -34,7 +34,7 @@ const ImageDropZone = ({
       const files = extractImageFiles(event.dataTransfer.files);
       if (files.length === 0) return;
 
-      onFilesAdd(files);
+      void onFilesAdd(files);
     },
     [extractImageFiles, isInactive, onFilesAdd],
   );

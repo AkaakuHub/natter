@@ -3,6 +3,7 @@ import { PostsApi } from "@/api/posts";
 import { Post } from "@/api/types";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useToast } from "@/hooks/useToast";
+import { appendNormalizedImages } from "@/utils/normalizePostImages";
 
 interface UsePostEditResult {
   isEditing: boolean;
@@ -46,9 +47,7 @@ export const usePostEdit = (): UsePostEditResult => {
         const formData = new FormData();
         formData.append("content", content);
 
-        images.forEach((image) => {
-          formData.append("images", image);
-        });
+        await appendNormalizedImages(formData, images);
 
         updatedPost = await PostsApi.updatePostWithImages(id, formData);
       } else {

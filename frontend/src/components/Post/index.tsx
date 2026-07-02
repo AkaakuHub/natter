@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/useToast";
 import { Post, PostsApi } from "@/api";
 import type { User as ApiUser } from "@/api/types";
 import { useSPANavigation } from "@/core/spa";
+import { appendNormalizedImages } from "@/utils/normalizePostImages";
 
 // 遅延読み込みモーダル
 const ImageModal = lazy(() => import("@/components/ImageModal"));
@@ -93,10 +94,7 @@ const PostComponent = ({
       formData.append("authorId", currentUserId);
       formData.append("replyToId", currentPost.id.toString());
 
-      // 画像を追加
-      images.forEach((image) => {
-        formData.append("images", image);
-      });
+      await appendNormalizedImages(formData, images);
 
       const newReply = await PostsApi.createPostWithImages(formData);
 

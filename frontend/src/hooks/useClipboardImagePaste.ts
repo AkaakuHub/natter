@@ -2,7 +2,7 @@ import { RefObject, useEffect, useRef } from "react";
 
 interface ClipboardImagePasteOptions {
   enabled: boolean;
-  onPasteImages: (files: File[]) => void;
+  onPasteImages: (files: File[]) => void | Promise<void>;
   containerRef?: RefObject<HTMLElement | null>;
 }
 
@@ -50,7 +50,7 @@ export const useClipboardImagePaste = ({
       lastEventTimestampRef.current = event.timeStamp;
       event.preventDefault();
       event.stopPropagation();
-      onPasteImages(files);
+      void onPasteImages(files);
     };
 
     window.addEventListener("paste", handlePaste, { capture: true });
