@@ -6,6 +6,7 @@ import { IconHeart, IconMessageCircle } from "@tabler/icons-react";
 import { transformPostToPostComponent } from "@/utils/postTransformers";
 import { useTrendingPosts } from "@/hooks/queries/usePosts";
 import { useSPANavigation } from "@/core/spa";
+import { avatarImageUrl } from "@/utils/avatarImage";
 
 const TrendingPosts: React.FC = () => {
   const { navigateToPost } = useSPANavigation();
@@ -58,7 +59,7 @@ const TrendingPosts: React.FC = () => {
             >
               <div className="flex items-center gap-2 mb-2">
                 <Image
-                  src={transformedUser.image || "/no_avatar_image_128x128.png"}
+                  src={avatarImageUrl(transformedUser.image)}
                   alt={transformedUser.name}
                   width={24}
                   height={24}

@@ -9,6 +9,7 @@ import FollowButton from "@/components/FollowButton";
 import SkeletonCard from "@/components/common/SkeletonCard";
 import { ExtendedSession } from "@/types";
 import { useSPANavigation } from "@/core/spa";
+import { avatarImageUrl } from "@/utils/avatarImage";
 
 interface FollowListProps {
   userId: string;
@@ -167,7 +168,7 @@ const FollowList: React.FC<FollowListProps> = ({ userId, type, session }) => {
                   onClick={() => handleUserClick(user.id)}
                 >
                   <OptimizedImage
-                    src={user.image || "/no_avatar_image_128x128.png"}
+                    src={avatarImageUrl(user.image)}
                     alt={user.name}
                     width={48}
                     height={48}

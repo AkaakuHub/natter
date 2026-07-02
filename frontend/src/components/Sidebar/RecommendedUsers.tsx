@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import FollowButton from "@/components/FollowButton";
 import { useRecommendedUsers } from "@/hooks/queries/useUsers";
+import { avatarImageUrl } from "@/utils/avatarImage";
 
 interface RecommendedUsersProps {
   currentUserId?: string;
@@ -79,7 +80,7 @@ const RecommendedUsers: React.FC<RecommendedUsersProps> = ({
               className="flex items-center gap-3 cursor-pointer hover:bg-surface p-2 rounded-lg transition-colors"
             >
               <Image
-                src={user.image || "/no_avatar_image_128x128.png"}
+                src={avatarImageUrl(user.image)}
                 alt={user.name}
                 width={40}
                 height={40}

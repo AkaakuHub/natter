@@ -4,6 +4,7 @@ import { formatDate } from "@/utils/postUtils";
 import { Post } from "@/api/types";
 import PostOwnerActions from "@/components/Post/components/PostOwnerActions";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { avatarImageUrl } from "@/utils/avatarImage";
 
 interface PostHeaderProps {
   user?: {
@@ -34,7 +35,7 @@ const PostHeader = ({
       <div className="flex items-start space-x-4">
         <button onClick={onUserClick} className="flex-shrink-0">
           <Image
-            src={user?.image || "/no_avatar_image_128x128.png"}
+            src={avatarImageUrl(user?.image)}
             alt={`${user?.name}'s avatar`}
             width={56}
             height={56}

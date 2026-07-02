@@ -12,6 +12,7 @@ import {
 import { Notification } from "@/api/notifications";
 import { useMarkAsRead } from "@/hooks/queries/useNotifications";
 import { useSPANavigation } from "@/core/spa";
+import { avatarImageUrl } from "@/utils/avatarImage";
 
 interface NotificationItemProps {
   notification: Notification;
@@ -130,7 +131,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         {/* アクターのアバター */}
         <div className="flex-shrink-0">
           <Image
-            src={notification.actor?.image || "/no_avatar_image_128x128.png"}
+            src={avatarImageUrl(notification.actor?.image)}
             alt={notification.actor?.name || "ユーザー"}
             width={48}
             height={48}

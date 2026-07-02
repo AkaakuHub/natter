@@ -3,6 +3,7 @@ import Image from "next/image";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { getImageUrl } from "@/utils/postUtils";
 import AuthenticatedImage from "@/components/common/AuthenticatedImage";
+import { avatarImageUrl } from "@/utils/avatarImage";
 
 interface PostImage {
   id: number;
@@ -97,7 +98,7 @@ const ReplySourcePost = ({
   const content = (
     <div className="flex gap-3">
       <Image
-        src={post.author?.image || "/no_avatar_image_128x128.png"}
+        src={avatarImageUrl(post.author?.image)}
         alt={post.author?.name || "User"}
         className={`rounded-full ${
           variant === "detailed"

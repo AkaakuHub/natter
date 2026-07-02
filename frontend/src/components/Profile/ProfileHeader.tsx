@@ -8,6 +8,7 @@ import FollowButton from "@/components/FollowButton";
 import { useFollowing, useFollowers } from "@/hooks/queries/useFollows";
 import { useUser } from "@/hooks/queries/useUsers";
 import { useSPANavigation } from "@/core/spa";
+import { avatarImageUrl } from "@/utils/avatarImage";
 
 interface ProfileHeaderProps {
   session: ExtendedSession | null;
@@ -63,7 +64,7 @@ const ProfileHeader = ({
   };
 
   useEffect(() => {
-    const image = displayUser?.image ?? "/no_avatar_image_128x128.png";
+    const image = avatarImageUrl(displayUser?.image);
     getDominantColor(image).then((color) => {
       setBgColor(color);
       setApplyAnimation(true);
@@ -107,7 +108,7 @@ const ProfileHeader = ({
       />
       <div className="relative w-full flex flex-row items-center justify-center gap-2">
         <Image
-          src={displayUser.image ?? "/no_avatar_image_128x128.png"}
+          src={avatarImageUrl(displayUser.image)}
           alt={displayUser.name}
           width={96}
           height={96}

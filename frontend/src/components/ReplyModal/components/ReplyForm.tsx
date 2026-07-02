@@ -5,6 +5,7 @@ import PostTextArea from "@/components/CreatePost/components/PostTextArea";
 import ImagePreview from "@/components/CreatePost/components/ImagePreview";
 import ImageDropZone from "@/components/CreatePost/components/ImageDropZone";
 import { useClipboardImagePaste } from "@/hooks/useClipboardImagePaste";
+import { avatarImageUrl } from "@/utils/avatarImage";
 
 interface ReplyFormProps {
   currentUser?: User | null;
@@ -60,7 +61,7 @@ const ReplyForm = ({
     <form ref={formRef} onSubmit={onSubmit} className="p-4">
       <div className="flex gap-3">
         <Image
-          src={currentUser?.image || "/no_avatar_image_128x128.png"}
+          src={avatarImageUrl(currentUser?.image)}
           alt={currentUser?.name || "User"}
           className="w-10 h-10 rounded-full"
           width={40}

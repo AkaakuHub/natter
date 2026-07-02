@@ -12,6 +12,7 @@ import { HybridFooterMenu } from "../HybridFooterMenu";
 import Welcome from "../Welcome";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import ServerErrorBanner from "../common/ServerErrorBanner";
+import { avatarImageUrl } from "@/utils/avatarImage";
 
 // 遅延読み込みコンポーネント（既存の優れた実装保護）
 const CreatePostModal = lazy(() => import("../CreatePostModal"));
@@ -123,7 +124,7 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
 
       {/* ヘッダー（既存の優れた実装保護） */}
       <Header
-        profileImage={session?.user?.image || "/no_avatar_image_128x128.png"}
+        profileImage={avatarImageUrl(session?.user?.image)}
         progress={1}
         userId={session?.user?.id}
         scrollContainerRef={scrollContainerRef}

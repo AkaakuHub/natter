@@ -11,6 +11,7 @@ import Welcome from "../Welcome";
 import { usePathname, useRouter } from "next/navigation";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import ServerErrorBanner from "../common/ServerErrorBanner";
+import { avatarImageUrl } from "@/utils/avatarImage";
 
 // 遅延読み込みコンポーネント
 const CreatePostModal = lazy(() => import("../CreatePostModal"));
@@ -123,7 +124,7 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
     <div className="w-full h-screen flex flex-col">
       {/* ヘッダー */}
       <Header
-        profileImage={session?.user?.image || "/no_avatar_image_128x128.png"}
+        profileImage={avatarImageUrl(session?.user?.image)}
         progress={1}
         userId={session?.user?.id}
         scrollContainerRef={scrollContainerRef}

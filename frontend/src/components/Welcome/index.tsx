@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ExtendedSession } from "@/types";
+import { avatarImageUrl } from "@/utils/avatarImage";
 
 interface WelcomeProps {
   session: ExtendedSession;
@@ -38,7 +39,7 @@ const Welcome = ({ session, onUserCreated }: WelcomeProps) => {
 
         <div className="mb-6">
           <Image
-            src={session.user.image || "/no_avatar_image_128x128.png"}
+            src={avatarImageUrl(session.user.image)}
             alt={session.user.name || "User"}
             width={96}
             height={96}

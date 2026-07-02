@@ -1,4 +1,5 @@
 import { Post } from "@/api";
+import { avatarImageUrl } from "@/utils/avatarImage";
 
 export const transformPostToPostComponent = (post: Post) => {
   if (!post.author) return null;
@@ -6,7 +7,7 @@ export const transformPostToPostComponent = (post: Post) => {
   const transformedUser = {
     id: post.author.id,
     name: post.author.name,
-    image: post.author.image || "/no_avatar_image_128x128.png",
+    image: avatarImageUrl(post.author.image),
   };
 
   const transformedPost = {
@@ -39,7 +40,7 @@ export const transformPostToPostComponent = (post: Post) => {
           author: {
             id: post.replyTo.author?.id || "",
             name: post.replyTo.author?.name || "",
-            image: post.replyTo.author?.image || "/no_avatar_image_128x128.png",
+            image: avatarImageUrl(post.replyTo.author?.image),
             createdAt: post.replyTo.author?.createdAt || post.createdAt,
             updatedAt:
               post.replyTo.author?.updatedAt ||

@@ -22,11 +22,6 @@ export async function appendNormalizedImages(
 }
 
 async function normalizePostImage(file: File): Promise<File> {
-  if (isApiSupportedImage(file)) {
-    assertImageSize(file);
-    return file;
-  }
-
   const sourceBlob = isHeicImage(file)
     ? await convertHeicToJpegBlob(file)
     : file;
@@ -38,10 +33,6 @@ async function normalizePostImage(file: File): Promise<File> {
   });
   assertImageSize(normalizedFile);
   return normalizedFile;
-}
-
-function isApiSupportedImage(file: File): boolean {
-  return file.type === "image/png" || file.type === "image/jpeg";
 }
 
 function isHeicImage(file: File): boolean {
