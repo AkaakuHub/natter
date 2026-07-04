@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { IconHeart, IconMessageCircle } from "@tabler/icons-react";
-import { transformPostToPostComponent } from "@/utils/postTransformers";
+import { transformPostToPostComponent } from "@/domain/posts/postTransformers";
 import { useTrendingPosts } from "@/hooks/queries/usePosts";
 import { useSPANavigation } from "@/core/spa";
 import { avatarImageUrl } from "@/utils/avatarImage";

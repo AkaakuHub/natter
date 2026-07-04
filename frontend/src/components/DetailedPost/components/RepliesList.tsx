@@ -1,7 +1,7 @@
 import React from "react";
 import { Post } from "@/api";
 import PostComponent from "@/components/Post";
-import { transformPostToPostComponent } from "@/utils/postTransformers";
+import { transformPostToPostComponent } from "@/domain/posts/postTransformers";
 
 interface RepliesListProps {
   replies: Post[];

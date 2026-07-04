@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { IconSearch, IconX } from "@tabler/icons-react";
 import { PostsApi, Post, User } from "@/api";
-import { transformPostToPostComponent } from "@/utils/postTransformers";
+import { transformPostToPostComponent } from "@/domain/posts/postTransformers";
 import PostComponent from "@/components/Post";
 import { useInputFocus } from "@/hooks/useInputFocus";
 

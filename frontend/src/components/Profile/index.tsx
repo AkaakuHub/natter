@@ -10,7 +10,7 @@ import CharacterList from "@/components/CharacterList";
 import { PostsApi, Post } from "@/api";
 import ProfileHeader from "./ProfileHeader";
 import TabsComponent, { TabType, TabNames } from "./TabsComponent";
-import { transformPostToPostComponent } from "@/utils/postTransformers";
+import { transformPostToPostComponent } from "@/domain/posts/postTransformers";
 
 import { ExtendedSession } from "@/types";
 

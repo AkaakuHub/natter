@@ -5,7 +5,7 @@ import PostComponent from "../Post";
 import CreatePostButton from "../CreatePostButton";
 import SkeletonCard from "../common/SkeletonCard";
 import { User } from "../../api";
-import { transformPostToPostComponent } from "@/utils/postTransformers";
+import { transformPostToPostComponent } from "@/domain/posts/postTransformers";
 import { ExtendedSession } from "@/types";
 import { usePosts } from "@/hooks/queries/usePosts";
 import { useQueryClient } from "@tanstack/react-query";
