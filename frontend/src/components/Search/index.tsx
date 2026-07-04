@@ -6,6 +6,7 @@ import { PostsApi, Post, User } from "@/api";
 import { transformPostToPostComponent } from "@/domain/posts/postTransformers";
 import PostComponent from "@/components/Post";
 import { useInputFocus } from "@/hooks/useInputFocus";
+import SkeletonCard from "@/components/common/SkeletonCard";
 
 interface SearchProps {
   currentUser?: User | null;
@@ -138,8 +139,9 @@ const Search: React.FC<SearchProps> = ({ currentUser }) => {
       {/* 検索結果 */}
       <div>
         {loading && (
-          <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-interactive"></div>
+          <div>
+            <SkeletonCard />
+            <SkeletonCard />
           </div>
         )}
 

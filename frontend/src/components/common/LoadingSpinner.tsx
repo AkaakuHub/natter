@@ -1,11 +1,14 @@
 "use client";
 
 import React from "react";
+import SkeletonCard from "./SkeletonCard";
 
 const LoadingSpinner = () => {
   return (
-    <div className="w-full h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-interactive"></div>
+    <div className="w-full max-w-md mx-auto py-4">
+      <SkeletonCard />
+      <SkeletonCard />
+      <SkeletonCard />
     </div>
   );
 };

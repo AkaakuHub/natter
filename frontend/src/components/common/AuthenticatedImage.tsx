@@ -76,9 +76,7 @@ const AuthenticatedImage: React.FC<AuthenticatedImageProps> = ({
   return (
     <div className={`relative ${className}`} style={style}>
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-surface-variant animate-pulse">
-          <div className="w-8 h-8 border-2 border-interactive border-t-transparent rounded-full animate-spin"></div>
-        </div>
+        <div className="absolute inset-0 bg-surface-variant animate-pulse" />
       )}
 
       {hasError && (

@@ -8,6 +8,7 @@ import {
   useMarkAllAsRead,
 } from "@/hooks/queries/useNotifications";
 import { IconBell, IconBellOff } from "@tabler/icons-react";
+import SkeletonCard from "@/components/common/SkeletonCard";
 
 const NotificationView = () => {
   const { status } = useAuthSession();
@@ -23,8 +24,9 @@ const NotificationView = () => {
   // 認証チェック中はローディング表示
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div>読み込み中...</div>
+      <div className="max-w-2xl mx-auto">
+        <SkeletonCard />
+        <SkeletonCard />
       </div>
     );
   }
@@ -36,8 +38,9 @@ const NotificationView = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div>通知を読み込み中...</div>
+      <div className="max-w-2xl mx-auto">
+        <SkeletonCard />
+        <SkeletonCard />
       </div>
     );
   }

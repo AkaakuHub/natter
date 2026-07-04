@@ -8,6 +8,7 @@ import {
   useUpdateCharacter,
 } from "@/hooks/queries/useCharacters";
 import type { Character } from "@/api";
+import SkeletonCard from "@/components/common/SkeletonCard";
 
 interface CharacterListProps {
   userId?: string;
@@ -65,9 +66,8 @@ const CharacterList: React.FC<CharacterListProps> = ({
   if (isLoading) {
     return (
       <div className="p-4">
-        <div className="flex items-center justify-center py-8">
-          <div className="text-text-muted">キャラクターを読み込み中...</div>
-        </div>
+        <SkeletonCard />
+        <SkeletonCard />
       </div>
     );
   }

@@ -195,7 +195,7 @@ const TimeLine = ({ currentUser, scrollContainerRef }: TimeLineProps) => {
             <div className="bg-surface rounded-full p-2 shadow-lg border border-border">
               <div
                 className={`w-4 h-4 border-2 border-interactive border-t-transparent rounded-full ${
-                  isRefreshing ? "animate-spin" : ""
+                  isRefreshing ? "animate-pulse bg-interactive/20" : ""
                 }`}
                 style={{
                   transform:

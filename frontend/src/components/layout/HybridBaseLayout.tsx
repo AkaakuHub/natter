@@ -13,6 +13,7 @@ import Welcome from "../Welcome";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import ServerErrorBanner from "../common/ServerErrorBanner";
 import { avatarImageUrl } from "@/utils/avatarImage";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 // 遅延読み込みコンポーネント（既存の優れた実装保護）
 const CreatePostModal = lazy(() => import("../CreatePostModal"));
@@ -83,20 +84,12 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
 
   // サーバーステータスチェック中
   if (isOnline === null) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-interactive"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   // セッションローディング中
   if (isLoading) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-interactive"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!session) {

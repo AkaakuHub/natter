@@ -6,6 +6,7 @@ import { useCharacters } from "@/hooks/queries/useCharacters";
 import { IconUser, IconHash, IconEdit } from "@tabler/icons-react";
 import EditCharacterModal from "@/components/EditCharacterModal";
 import type { Character } from "@/api";
+import SkeletonCard from "@/components/common/SkeletonCard";
 
 const SetListView = () => {
   const { status } = useAuthSession();
@@ -17,8 +18,9 @@ const SetListView = () => {
   // 認証チェック中はローディング表示
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div>読み込み中...</div>
+      <div className="max-w-2xl mx-auto">
+        <SkeletonCard />
+        <SkeletonCard />
       </div>
     );
   }
@@ -30,8 +32,9 @@ const SetListView = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div>キャラクターを読み込み中...</div>
+      <div className="max-w-2xl mx-auto">
+        <SkeletonCard />
+        <SkeletonCard />
       </div>
     );
   }
