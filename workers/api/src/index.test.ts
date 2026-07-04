@@ -56,4 +56,38 @@ describe("worker fetch", () => {
     expect(response.headers.get("Content-Type")).toBe("application/json");
     expect(await response.json()).toEqual({ message: "Not found" });
   });
+
+  it("returns the fixed OGP image path without authentication", async () => {
+    const response = await worker.fetch(
+      new Request("https://api.example.com/posts/ogp"),
+      env,
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ imagePath: "/og-image.png" });
+  });
+
+  it("returns 401 for protected routes on localhost without a local user header", async () => {
+    const response = await worker.fetch(
+      new Request("http://localhost/posts"),
+      env,
+    );
+
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({ message: "Unauthorized" });
+  });
+
+  it("returns 403 when local-header auth is used outside localhost", async () => {
+    const response = await worker.fetch(
+      new Request("https://api.example.com/posts", {
+        headers: { "x-natter-dev-discord-id": "user-1" },
+      }),
+      env,
+    );
+
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({
+      message: "Local auth is only available on localhost",
+    });
+  });
 });
