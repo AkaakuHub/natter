@@ -40,6 +40,15 @@ import {
   createMosaicImageResponse,
   mosaicImageFilename,
 } from "./images/mosaic";
+import {
+  formBoolean,
+  formInteger,
+  formString,
+  getStringArray,
+  isMultipart,
+  type PostInput,
+  type PostUpdateInput,
+} from "./posts/input";
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -584,26 +593,6 @@ async function handleMetadata(request: Request, env: Env): Promise<Response> {
     throw new HttpError(400, "URL parameter is required");
   }
   return jsonResponse(env, request, await getUrlMetadata(env.DB, targetUrl));
-}
-
-interface PostInput {
-  title?: string;
-  content?: string;
-  images: string[];
-  imagesPublic: boolean;
-  url?: string;
-  authorId: string;
-  replyToId?: number;
-  characterId?: number;
-}
-
-interface PostUpdateInput {
-  title?: string;
-  content?: string;
-  images?: string[];
-  imagesPublic?: boolean;
-  url?: string;
-  published?: boolean;
 }
 
 async function readPostInput(
@@ -1387,50 +1376,6 @@ async function getFollow(
     followerId,
     followingId,
   );
-}
-
-function isMultipart(request: Request): boolean {
-  return request.headers.get("Content-Type")?.includes("multipart/form-data") === true;
-}
-
-function formString(formData: FormData, name: string): string | undefined {
-  const value = formData.get(name);
-  return typeof value === "string" && value !== "" ? value : undefined;
-}
-
-function formBoolean(formData: FormData, name: string): boolean | undefined {
-  const value = formData.get(name);
-  if (value === "true") {
-    return true;
-  }
-  if (value === "false") {
-    return false;
-  }
-  return undefined;
-}
-
-function formInteger(formData: FormData, name: string): number | undefined {
-  const value = formData.get(name);
-  if (typeof value !== "string" || value === "") {
-    return undefined;
-  }
-  const parsed = Number(value);
-  return Number.isInteger(parsed) ? parsed : undefined;
-}
-
-function getStringArray(value: unknown): string[] {
-  if (value === undefined) {
-    return [];
-  }
-  if (!Array.isArray(value)) {
-    throw new HttpError(400, "images must be an array");
-  }
-  return value.map((item) => {
-    if (typeof item !== "string") {
-      throw new HttpError(400, "images must be an array of strings");
-    }
-    return item;
-  });
 }
 
 function extensionForFile(file: File): string {
