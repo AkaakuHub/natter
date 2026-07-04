@@ -69,6 +69,26 @@ describe("getCachedImageWithAuth", () => {
     });
   });
 
+  it("shares in-flight requests for the same image URL", async () => {
+    process.env.NEXT_PUBLIC_API_URL = "https://api.example.com";
+    fetchMock.mockResolvedValueOnce(
+      new Response(new Blob(["image"], { type: "image/jpeg" }), {
+        status: 200,
+      }),
+    );
+    const { getCachedImageWithAuth } = await importImageUtils();
+    const imageUrl = "https://api.example.com/posts/images/a.jpg";
+
+    await expect(
+      Promise.all([
+        getCachedImageWithAuth(imageUrl),
+        getCachedImageWithAuth(imageUrl),
+      ]),
+    ).resolves.toEqual(["blob:cached-image", "blob:cached-image"]);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it("throws when image fetch fails", async () => {
     process.env.NEXT_PUBLIC_API_URL = "https://api.example.com";
     fetchMock.mockResolvedValueOnce(new Response("missing", { status: 404 }));

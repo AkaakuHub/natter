@@ -14,6 +14,7 @@ const fetchImageWithAuth = async (imageUrl: string): Promise<string> => {
 };
 
 const imageCache = new Map<string, string>();
+const pendingImageRequests = new Map<string, Promise<string>>();
 
 export const getCachedImageWithAuth = async (
   imageUrl: string,
@@ -21,10 +22,21 @@ export const getCachedImageWithAuth = async (
   if (imageCache.has(imageUrl)) {
     return imageCache.get(imageUrl)!;
   }
+  const pendingImageRequest = pendingImageRequests.get(imageUrl);
+  if (pendingImageRequest) {
+    return pendingImageRequest;
+  }
 
-  const blobUrl = await fetchImageWithAuth(imageUrl);
-  imageCache.set(imageUrl, blobUrl);
-  return blobUrl;
+  const imageRequest = fetchImageWithAuth(imageUrl)
+    .then((blobUrl) => {
+      imageCache.set(imageUrl, blobUrl);
+      return blobUrl;
+    })
+    .finally(() => {
+      pendingImageRequests.delete(imageUrl);
+    });
+  pendingImageRequests.set(imageUrl, imageRequest);
+  return imageRequest;
 };
 
 function toBackendProxyUrl(imageUrl: string): string {
