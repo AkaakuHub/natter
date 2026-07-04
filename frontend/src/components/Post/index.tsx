@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, lazy, Suspense } from "react";
+import React, { useCallback, useMemo, useState, lazy, Suspense } from "react";
 import { usePostActions } from "@/hooks/usePostActions";
 import { useImageModal } from "@/hooks/useImageModal";
 import { getImageUrl } from "@/utils/postUtils";
@@ -46,11 +46,16 @@ const PostComponent = ({
   const { showToast } = useToast();
   const { navigateToPost, navigateToProfile } = useSPANavigation();
 
-  const handlePostUpdateCallback = () => {
+  const imageModalUrls = useMemo(
+    () => currentPost.images.map((image) => getImageUrl(image)),
+    [currentPost.images],
+  );
+
+  const handlePostUpdateCallback = useCallback(() => {
     if (onPostUpdate) {
       onPostUpdate();
     }
-  };
+  }, [onPostUpdate]);
 
   const {
     isLiked,
@@ -73,16 +78,16 @@ const PostComponent = ({
 
   const canInteract = !!currentUserId;
 
-  const handlePostUpdate = (updatedPost: Post) => {
+  const handlePostUpdate = useCallback((updatedPost: Post) => {
     setCurrentPost(updatedPost);
     onPostUpdate?.();
-  };
+  }, [onPostUpdate]);
 
-  const handlePostDelete = () => {
+  const handlePostDelete = useCallback(() => {
     onPostDelete?.();
-  };
+  }, [onPostDelete]);
 
-  const handleReplySubmit = async (content: string, images: File[]) => {
+  const handleReplySubmit = useCallback(async (content: string, images: File[]) => {
     if (!currentUserId || !currentPost) {
       console.error("❌ Cannot reply: missing user or post");
       return;
@@ -112,9 +117,16 @@ const PostComponent = ({
       console.error("❌ Failed to submit reply:", error);
       showToast("返信の送信に失敗しました", "error");
     }
-  };
+  }, [
+    currentPost,
+    currentUserId,
+    navigateToPost,
+    onPostUpdate,
+    setShowReplyModal,
+    showToast,
+  ]);
 
-  const handleShare = async (e: React.MouseEvent) => {
+  const handleShare = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentPost) return;
 
@@ -122,7 +134,7 @@ const PostComponent = ({
     const postContent = currentPost.content || "";
 
     await sharePost(currentPost.id.toString(), postContent, authorName);
-  };
+  }, [currentPost, sharePost, user?.name]);
 
   return (
     <>
@@ -213,7 +225,7 @@ const PostComponent = ({
         <Suspense fallback={<div />}>
           <ImageModal
             isOpen={isModalOpen}
-            images={currentPost.images.map((image) => getImageUrl(image))}
+            images={imageModalUrls}
             currentIndex={selectedImageIndex}
             onClose={closeImageModal}
             onPrevious={

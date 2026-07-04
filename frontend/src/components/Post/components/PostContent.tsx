@@ -118,9 +118,7 @@ const PostContent = ({
                   : "grid grid-cols-2"
           }`}
         >
-          {imageArray.map((image, index) => {
-            const imageSrc = getImageUrl(image);
-
+          {imageUrls.map((imageSrc, index) => {
             return (
               <button
                 key={index}

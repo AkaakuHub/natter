@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import PostComponent from "../Post";
 import CreatePostButton from "../CreatePostButton";
 import SkeletonCard from "../common/SkeletonCard";
@@ -27,22 +27,30 @@ const TimeLine = ({ currentUser, scrollContainerRef }: TimeLineProps) => {
   const autoScrollContainerRef = useScrollContainer();
   const { timelineScrollPosition, setTimelineScrollPosition } = useAppState();
 
-  const handlePostUpdate = () => {
-    // usePostActionsで楽観的更新済みのため、再取得は不要
-  };
+  const transformedPosts = useMemo(() => {
+    return (
+      posts
+        ?.map((post) => {
+          const transformed = transformPostToPostComponent(post);
+          return transformed ? { id: post.id, ...transformed } : null;
+        })
+        .filter((post) => post !== null) ?? []
+    );
+  }, [posts]);
 
-  const handlePostDelete = (postId: number) => {
-    // React Queryのキャッシュを更新
+  const handlePostUpdate = useCallback(() => {}, []);
+
+  const handlePostDelete = useCallback((postId: number) => {
     queryClient.setQueryData(
       QUERY_KEYS.posts,
       (oldPosts: PostWithUser[] | undefined) =>
         oldPosts?.filter((post) => post.id !== postId) || [],
     );
-  };
+  }, [queryClient]);
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     await refetch();
-  };
+  }, [refetch]);
 
   const { isPulling, pullDistance, isRefreshing, containerRef } =
     usePullToRefresh({
@@ -201,21 +209,16 @@ const TimeLine = ({ currentUser, scrollContainerRef }: TimeLineProps) => {
         )}
 
         {/* 投稿一覧 */}
-        {posts && posts.length > 0 ? (
-          posts.map((post) => {
-            const transformed = transformPostToPostComponent(post);
-            if (!transformed) return null;
-
-            const { transformedUser, transformedPost } = transformed;
-
+        {transformedPosts.length > 0 ? (
+          transformedPosts.map(({ id, transformedUser, transformedPost }) => {
             return (
               <PostComponent
-                key={post.id}
+                key={id}
                 user={transformedUser}
                 post={transformedPost}
                 currentUser={currentUser}
                 onPostUpdate={handlePostUpdate}
-                onPostDelete={() => handlePostDelete(post.id)}
+                onPostDelete={() => handlePostDelete(id)}
               />
             );
           })
