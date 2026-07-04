@@ -14,6 +14,8 @@
     "cf:import:d1": "scripts/cloudflare/import-d1-sql.sh",
     "cf:validate:images": "scripts/cloudflare/validate-image-refs.mjs",
     "cf:upload:r2": "scripts/cloudflare/upload-r2-images.sh",
+    "test:frontend": "vitest run --config frontend/vitest.config.ts",
+    "test:cf:api": "vitest run --config workers/api/vitest.config.ts",
     "cf:api:typecheck": "tsc --noEmit -p workers/api/tsconfig.json",
     "cf:api:dry-run": "wrangler deploy --dry-run --config workers/api/wrangler.toml",
     "cf:api:deploy": "wrangler deploy --config workers/api/wrangler.toml",
@@ -29,6 +31,7 @@
     "concurrently": "^9.1.2",
     "lefthook": "^1.11.16",
     "typescript": "^6.0.3",
+    "vitest": "^4.1.9",
     "wrangler": "^4.91.0"
   },
   "dependencies": {
