@@ -36,7 +36,6 @@ import {
 } from "./security";
 import { sanitizeContent, sanitizeContentPreservingUrls } from "./sanitize";
 import {
-  createMosaicImage,
   createMosaicImageResponse,
   mosaicImageFilename,
 } from "./images/mosaic";
@@ -49,6 +48,7 @@ import {
   type PostInput,
   type PostUpdateInput,
 } from "./posts/input";
+import { savePostImages } from "./posts/images";
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -602,7 +602,7 @@ async function readPostInput(
 ): Promise<PostInput> {
   if (isMultipart(request)) {
     const formData = await request.formData();
-    const images = await saveImages(env, formData.getAll("images"));
+    const images = await savePostImages(env, formData.getAll("images"));
     return {
       title: formString(formData, "title"),
       content: formString(formData, "content"),
@@ -635,7 +635,7 @@ async function readPostUpdateInput(
 ): Promise<PostUpdateInput> {
   if (isMultipart(request)) {
     const formData = await request.formData();
-    const uploadedImages = await saveImages(env, formData.getAll("images"));
+    const uploadedImages = await savePostImages(env, formData.getAll("images"));
     return {
       title: formString(formData, "title"),
       content: formString(formData, "content"),
@@ -655,39 +655,6 @@ async function readPostUpdateInput(
     url: getString(body.url),
     published: getBoolean(body.published),
   };
-}
-
-async function saveImages(env: Env, values: Array<File | string>): Promise<string[]> {
-  const images: string[] = [];
-  for (const value of values) {
-    if (!(value instanceof File)) {
-      throw new HttpError(400, "images must be files");
-    }
-    if (!isSupportedPostImageType(value.type)) {
-      throw new HttpError(400, "Only PNG and JPEG images are allowed");
-    }
-    if (value.size > 10 * 1024 * 1024) {
-      throw new HttpError(400, "File size exceeds 10MB limit");
-    }
-    const filename = `images-${Date.now()}-${crypto.randomUUID()}${extensionForFile(value)}`;
-    const imageData = await value.arrayBuffer();
-    const mosaic = createMosaicImage({
-      data: imageData,
-      contentType: value.type,
-    });
-    await env.ASSETS.put(mosaicImageFilename(filename), mosaic.body, {
-      httpMetadata: {
-        contentType: mosaic.contentType,
-      },
-    });
-    await env.ASSETS.put(filename, imageData, {
-      httpMetadata: {
-        contentType: value.type,
-      },
-    });
-    images.push(filename);
-  }
-  return images;
 }
 
 async function createPost(db: D1Database, input: PostInput): Promise<Post> {
@@ -1376,33 +1343,6 @@ async function getFollow(
     followerId,
     followingId,
   );
-}
-
-function extensionForFile(file: File): string {
-  const nameExtension = /\.[a-zA-Z0-9]+$/.exec(file.name)?.[0];
-  if (nameExtension) {
-    return nameExtension.toLowerCase();
-  }
-  if (file.type === "image/jpeg") {
-    return ".jpg";
-  }
-  if (file.type === "image/png") {
-    return ".png";
-  }
-  if (file.type === "image/gif") {
-    return ".gif";
-  }
-  if (file.type === "image/webp") {
-    return ".webp";
-  }
-  if (file.type === "image/avif") {
-    return ".avif";
-  }
-  throw new HttpError(400, "Unsupported image type");
-}
-
-function isSupportedPostImageType(contentType: string): boolean {
-  return contentType === "image/png" || contentType === "image/jpeg";
 }
 
 function contentTypeForImageFilename(filename: string): string | undefined {
