@@ -28,13 +28,6 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
     useCurrentUser();
   const { isOnline } = useServerStatus();
 
-  // デバッグ情報
-  console.log("🏗️ BaseLayout state:", {
-    isOnline,
-    userExists,
-    isLoading,
-    hasSession: !!session,
-  });
   const pathname = usePathname();
   const router = useRouter();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -65,7 +58,6 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
 
   // 【最優先】サーバーがオフラインの場合はエラーメッセージを表示
   if (isOnline === false) {
-    console.log("🚨 Showing server error screen (isOnline === false)");
     return (
       <div className="w-full h-screen flex flex-col">
         <div className="flex-1 flex items-center justify-center p-4">
@@ -84,7 +76,6 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
 
   // サーバーステータスチェック中
   if (isOnline === null) {
-    console.log("⏳ Showing loading (server status check)");
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-interactive"></div>
@@ -94,7 +85,6 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
 
   // セッションローディング中
   if (isLoading) {
-    console.log("⏳ Showing loading (session/user loading)");
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-interactive"></div>
@@ -103,7 +93,6 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
   }
 
   if (!session) {
-    console.log("👤 No session - showing public content");
     return (
       <div className="w-full h-screen flex flex-col">
         <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
@@ -114,11 +103,8 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
   }
 
   if (userExists === false && session) {
-    console.log("👋 Showing Welcome (new user)");
     return <Welcome session={session} onUserCreated={createUserAndRefresh} />;
   }
-
-  console.log("🏠 Showing main app (timeline)");
 
   return (
     <div className="w-full h-screen flex flex-col">
