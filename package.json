@@ -23,13 +23,11 @@
     "tf:fmt": "terraform fmt infra/*.tf",
     "tf:fmt:check": "terraform fmt -check infra/*.tf",
     "tf:init": "terraform -chdir=infra init",
-    "tf:validate": "terraform -chdir=infra validate",
-    "postinstall": "lefthook install"
+    "tf:validate": "terraform -chdir=infra validate"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260515.1",
     "concurrently": "^9.1.2",
-    "lefthook": "^1.11.16",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9",
     "wrangler": "^4.91.0"

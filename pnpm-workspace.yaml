@@ -1,2 +1,7 @@
+packages: []
+
 allowBuilds:
+  esbuild: true
+  sharp: true
   skia-canvas: true
+  workerd: true
