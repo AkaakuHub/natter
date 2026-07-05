@@ -63,9 +63,9 @@ describe("PostsApi list queries", () => {
   it("builds search query parameters in the current order", async () => {
     mockedApiClient.get.mockResolvedValueOnce([post]);
 
-    await expect(PostsApi.searchPosts("hello world", "media")).resolves.toEqual([
-      post,
-    ]);
+    await expect(PostsApi.searchPosts("hello world", "media")).resolves.toEqual(
+      [post],
+    );
     expect(mockedApiClient.get).toHaveBeenCalledWith(
       "/posts?search=hello+world&type=media",
     );

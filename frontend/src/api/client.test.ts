@@ -64,9 +64,9 @@ describe("ApiClient JSON requests", () => {
   it("serializes POST bodies as JSON", async () => {
     fetchMock.mockResolvedValueOnce(mockResponse(null, { status: 204 }));
 
-    await expect(ApiClient.post("/posts", { content: "hello" })).resolves.toEqual(
-      {},
-    );
+    await expect(
+      ApiClient.post("/posts", { content: "hello" }),
+    ).resolves.toEqual({});
 
     expect(latestFetchCall()[1]).toMatchObject({
       method: "POST",
@@ -92,7 +92,9 @@ describe("ApiClient JSON requests", () => {
   });
 
   it("throws fixed authentication and authorization errors", async () => {
-    fetchMock.mockResolvedValueOnce(mockResponse("no session", { status: 401 }));
+    fetchMock.mockResolvedValueOnce(
+      mockResponse("no session", { status: 401 }),
+    );
     await expect(ApiClient.get("/posts")).rejects.toThrow(
       "Authentication required",
     );
@@ -122,8 +124,9 @@ describe("ApiClient FormData requests", () => {
       mockResponse(JSON.stringify({ id: 1 }), { status: 200 }),
     );
 
-    await expect(ApiClient.postFormData<{ id: number }>("/posts", formData))
-      .resolves.toEqual({ id: 1 });
+    await expect(
+      ApiClient.postFormData<{ id: number }>("/posts", formData),
+    ).resolves.toEqual({ id: 1 });
 
     expect(latestFetchCall()).toEqual([
       "/api/backend/posts",
@@ -142,8 +145,9 @@ describe("ApiClient FormData requests", () => {
       mockResponse(JSON.stringify({ id: 1 }), { status: 200 }),
     );
 
-    await expect(ApiClient.patchFormData<{ id: number }>("/posts/1", formData))
-      .resolves.toEqual({ id: 1 });
+    await expect(
+      ApiClient.patchFormData<{ id: number }>("/posts/1", formData),
+    ).resolves.toEqual({ id: 1 });
 
     expect(latestFetchCall()).toEqual([
       "/api/backend/posts/1",

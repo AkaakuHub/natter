@@ -78,63 +78,72 @@ const PostComponent = ({
 
   const canInteract = !!currentUserId;
 
-  const handlePostUpdate = useCallback((updatedPost: Post) => {
-    setCurrentPost(updatedPost);
-    onPostUpdate?.();
-  }, [onPostUpdate]);
+  const handlePostUpdate = useCallback(
+    (updatedPost: Post) => {
+      setCurrentPost(updatedPost);
+      onPostUpdate?.();
+    },
+    [onPostUpdate],
+  );
 
   const handlePostDelete = useCallback(() => {
     onPostDelete?.();
   }, [onPostDelete]);
 
-  const handleReplySubmit = useCallback(async (content: string, images: File[]) => {
-    if (!currentUserId || !currentPost) {
-      console.error("❌ Cannot reply: missing user or post");
-      return;
-    }
-
-    try {
-      const formData = new FormData();
-      formData.append("content", content);
-      formData.append("authorId", currentUserId);
-      formData.append("replyToId", currentPost.id.toString());
-
-      await appendNormalizedImages(formData, images);
-
-      const newReply = await PostsApi.createPostWithImages(formData);
-
-      // 成功トースト通知を表示（クリックで新しい返信ポストに遷移）
-      showToast("返信を投稿しました", "success", 3000, () => {
-        navigateToPost(newReply.id);
-      });
-
-      // リプライ後にタイムラインを更新
-      if (onPostUpdate) {
-        onPostUpdate();
+  const handleReplySubmit = useCallback(
+    async (content: string, images: File[]) => {
+      if (!currentUserId || !currentPost) {
+        console.error("❌ Cannot reply: missing user or post");
+        return;
       }
-      setShowReplyModal(false);
-    } catch (error) {
-      console.error("❌ Failed to submit reply:", error);
-      showToast("返信の送信に失敗しました", "error");
-    }
-  }, [
-    currentPost,
-    currentUserId,
-    navigateToPost,
-    onPostUpdate,
-    setShowReplyModal,
-    showToast,
-  ]);
 
-  const handleShare = useCallback(async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!currentPost) return;
+      try {
+        const formData = new FormData();
+        formData.append("content", content);
+        formData.append("authorId", currentUserId);
+        formData.append("replyToId", currentPost.id.toString());
 
-    const authorName = user?.name || "Unknown User";
-    const postContent = currentPost.content || "";
+        await appendNormalizedImages(formData, images);
 
-    await sharePost(currentPost.id.toString(), postContent, authorName);
-  }, [currentPost, sharePost, user?.name]);
+        const newReply = await PostsApi.createPostWithImages(formData);
+
+        // 成功トースト通知を表示（クリックで新しい返信ポストに遷移）
+        showToast("返信を投稿しました", "success", 3000, () => {
+          navigateToPost(newReply.id);
+        });
+
+        // リプライ後にタイムラインを更新
+        if (onPostUpdate) {
+          onPostUpdate();
+        }
+        setShowReplyModal(false);
+      } catch (error) {
+        console.error("❌ Failed to submit reply:", error);
+        showToast("返信の送信に失敗しました", "error");
+      }
+    },
+    [
+      currentPost,
+      currentUserId,
+      navigateToPost,
+      onPostUpdate,
+      setShowReplyModal,
+      showToast,
+    ],
+  );
+
+  const handleShare = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!currentPost) return;
+
+      const authorName = user?.name || "Unknown User";
+      const postContent = currentPost.content || "";
+
+      await sharePost(currentPost.id.toString(), postContent, authorName);
+    },
+    [currentPost, sharePost, user?.name],
+  );
 
   return (
     <>

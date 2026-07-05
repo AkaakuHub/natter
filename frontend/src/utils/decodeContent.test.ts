@@ -5,9 +5,7 @@ import { decodeContentForEditing, decodeHtmlEntities } from "./decodeContent";
 describe("decodeContent decodeHtmlEntities", () => {
   it("decodes all supported entities for editing", () => {
     expect(
-      decodeHtmlEntities(
-        "&amp;&lt;&gt;&quot;&#x27;&#x2F;&#x5C;&#x60;&#x3D;",
-      ),
+      decodeHtmlEntities("&amp;&lt;&gt;&quot;&#x27;&#x2F;&#x5C;&#x60;&#x3D;"),
     ).toBe("&<>\"'/\\`=");
   });
 

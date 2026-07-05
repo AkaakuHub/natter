@@ -22,7 +22,9 @@ describe("parsePostCreatedEvent", () => {
       ),
     ).toBeUndefined();
     expect(
-      parsePostCreatedEvent(JSON.stringify({ type: "post-created", postId: 1 })),
+      parsePostCreatedEvent(
+        JSON.stringify({ type: "post-created", postId: 1 }),
+      ),
     ).toBeUndefined();
   });
 });

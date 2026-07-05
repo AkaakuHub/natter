@@ -41,7 +41,10 @@ export class ApiClient {
       const response = await fetch(url, config);
       return await parseApiResponse<T>(response, jsonRequestErrorOptions);
     } catch (error) {
-      handleApiRequestError(error, jsonRequestErrorOptions.requestFailurePrefix);
+      handleApiRequestError(
+        error,
+        jsonRequestErrorOptions.requestFailurePrefix,
+      );
     }
   }
 

@@ -99,7 +99,10 @@ async function throwBadRequestError(response: Response): Promise<never> {
   }
 }
 
-function throwBadRequestErrorFromText(status: number, errorText: string): never {
+function throwBadRequestErrorFromText(
+  status: number,
+  errorText: string,
+): never {
   try {
     const parsedError = parseErrorText(errorText);
     if (Array.isArray(parsedError.message)) {
@@ -126,7 +129,9 @@ function parseErrorText(errorText: string): { message?: string | string[] } {
   }
 }
 
-function isErrorObject(value: unknown): value is { message?: string | string[] } {
+function isErrorObject(
+  value: unknown,
+): value is { message?: string | string[] } {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return false;
   }

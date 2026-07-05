@@ -41,13 +41,10 @@ describe("getCachedImageWithAuth", () => {
     ).resolves.toBe("blob:cached-image");
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenCalledWith(
-      "/api/backend/posts/images/a.jpg",
-      {
-        credentials: "include",
-        method: "GET",
-      },
-    );
+    expect(fetchMock).toHaveBeenCalledWith("/api/backend/posts/images/a.jpg", {
+      credentials: "include",
+      method: "GET",
+    });
   });
 
   it("keeps non-API image URLs unchanged when fetching", async () => {
@@ -95,7 +92,9 @@ describe("getCachedImageWithAuth", () => {
     const { getCachedImageWithAuth } = await importImageUtils();
 
     await expect(
-      getCachedImageWithAuth("https://api.example.com/posts/images/missing.jpg"),
+      getCachedImageWithAuth(
+        "https://api.example.com/posts/images/missing.jpg",
+      ),
     ).rejects.toThrow("Failed to fetch image: 404");
   });
 });

@@ -40,13 +40,16 @@ const TimeLine = ({ currentUser, scrollContainerRef }: TimeLineProps) => {
 
   const handlePostUpdate = useCallback(() => {}, []);
 
-  const handlePostDelete = useCallback((postId: number) => {
-    queryClient.setQueryData(
-      QUERY_KEYS.posts,
-      (oldPosts: PostWithUser[] | undefined) =>
-        oldPosts?.filter((post) => post.id !== postId) || [],
-    );
-  }, [queryClient]);
+  const handlePostDelete = useCallback(
+    (postId: number) => {
+      queryClient.setQueryData(
+        QUERY_KEYS.posts,
+        (oldPosts: PostWithUser[] | undefined) =>
+          oldPosts?.filter((post) => post.id !== postId) || [],
+      );
+    },
+    [queryClient],
+  );
 
   const handleRefresh = useCallback(async () => {
     await refetch();
