@@ -13,7 +13,7 @@ import Welcome from "../Welcome";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import ServerErrorBanner from "../common/ServerErrorBanner";
 import { avatarImageUrl } from "@/utils/avatarImage";
-import LoadingSpinner from "../common/LoadingSpinner";
+import SkeletonLoading from "../common/SkeletonLoading";
 
 // 遅延読み込みコンポーネント（既存の優れた実装保護）
 const CreatePostModal = lazy(() => import("../CreatePostModal"));
@@ -84,12 +84,12 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
 
   // サーバーステータスチェック中
   if (isOnline === null) {
-    return <LoadingSpinner />;
+    return <SkeletonLoading />;
   }
 
   // セッションローディング中
   if (isLoading) {
-    return <LoadingSpinner />;
+    return <SkeletonLoading />;
   }
 
   if (!session) {

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSPANavigation } from "@/core/spa/SPANavigation";
 import { useAuthSession } from "@/auth-client";
 import { ApiClient } from "@/api/client";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import SkeletonLoading from "@/components/common/SkeletonLoading";
 
 interface AdminSettings {
   isRevealedSecrets: boolean;
@@ -76,7 +76,7 @@ export default function AdminView() {
   if (loading || status === "loading") {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner />
+        <SkeletonLoading />
       </div>
     );
   }

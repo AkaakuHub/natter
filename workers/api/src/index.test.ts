@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { Env } from "./env";
 import worker from "./index";
@@ -6,6 +6,12 @@ import worker from "./index";
 const env: Env = {
   DB: {} as D1Database,
   ASSETS: {} as R2Bucket,
+  REALTIME: {
+    idFromName: vi.fn(() => "global-id" as DurableObjectId),
+    get: vi.fn(() => ({
+      fetch: vi.fn(async () => new Response("event-stream")),
+    })),
+  } as DurableObjectNamespace,
   ACCOUNT_URL: "https://accounts.example.com",
   APP_ID: "app-id",
   APP_SESSION_HMAC_SECRET: "secret",
@@ -89,5 +95,18 @@ describe("worker fetch", () => {
     expect(await response.json()).toEqual({
       message: "Local auth is only available on localhost",
     });
+  });
+
+  it("forwards authenticated event streams to the realtime hub", async () => {
+    const response = await worker.fetch(
+      new Request("http://localhost/events", {
+        headers: { "x-natter-dev-discord-id": "user-1" },
+      }),
+      env,
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe("event-stream");
+    expect(env.REALTIME.idFromName).toHaveBeenCalledWith("global");
   });
 });

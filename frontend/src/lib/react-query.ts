@@ -13,8 +13,6 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: true,
       // ネットワーク再接続時の再フェッチを有効化
       refetchOnReconnect: true,
-      // バックグラウンドでの再フェッチ間隔を設定（5分）
-      refetchInterval: 5 * 60 * 1000,
     },
     mutations: {
       // ミューテーション失敗時の再試行を無効化

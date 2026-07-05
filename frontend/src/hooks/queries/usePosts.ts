@@ -27,8 +27,6 @@ export const usePosts = () => {
     queryKey: QUERY_KEYS.posts,
     queryFn: () => PostsApi.getAllPosts(),
     staleTime: 0, // 常に最新データを取得
-    refetchInterval: 15 * 1000,
-    refetchIntervalInBackground: true,
     refetchOnWindowFocus: true, // ウィンドウフォーカス時に再取得
     refetchOnMount: true, // マウント時に再取得
   });

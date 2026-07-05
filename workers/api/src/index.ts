@@ -50,6 +50,7 @@ import {
   type PostUpdateInput,
 } from "./posts/input";
 import { savePostImages } from "./posts/images";
+export { RealtimeHub } from "./realtime";
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -79,6 +80,11 @@ async function route(request: Request, env: Env): Promise<Response> {
 
   if (method === "HEAD" && path === "/users") {
     return emptyResponse(env, request, 200);
+  }
+
+  if (method === "GET" && path === "/events") {
+    await requireAuthUser(request, env);
+    return realtimeHub(env).fetch(new Request("https://realtime/events"));
   }
 
   if (parts[0] === "users") {
@@ -193,6 +199,7 @@ async function handlePosts(
     const authUser = await requireAuthUser(request, env);
     const input = await readPostInput(request, env, authUser.id);
     const post = await createPost(env.DB, input);
+    await broadcastPostCreated(env, post.id, authUser.id);
     return jsonResponse(env, request, await getPostResponse(env.DB, post.id, authUser.id));
   }
 
@@ -870,6 +877,29 @@ function canReadOriginalImage(
   currentUserId?: string,
 ): boolean {
   return revealSecrets || post.imagesPublic || (currentUserId !== undefined && post.authorId === currentUserId);
+}
+
+async function broadcastPostCreated(
+  env: Env,
+  postId: number,
+  authorId: string,
+): Promise<void> {
+  try {
+    await realtimeHub(env).fetch(
+      new Request("https://realtime/broadcast", {
+        method: "POST",
+        body: JSON.stringify({ type: "post-created", postId, authorId }),
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+  } catch (error) {
+    console.error("Failed to broadcast post-created event:", error);
+  }
+}
+
+function realtimeHub(env: Env): DurableObjectStub {
+  const id = env.REALTIME.idFromName("global");
+  return env.REALTIME.get(id);
 }
 
 async function handleImage(

@@ -3,7 +3,7 @@
 import React from "react";
 import SkeletonCard from "./SkeletonCard";
 
-const LoadingSpinner = () => {
+const SkeletonLoading = () => {
   return (
     <div className="w-full max-w-md mx-auto py-4">
       <SkeletonCard />
@@ -13,4 +13,4 @@ const LoadingSpinner = () => {
   );
 };
 
-export default LoadingSpinner;
+export default SkeletonLoading;

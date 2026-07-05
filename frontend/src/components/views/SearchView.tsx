@@ -4,7 +4,7 @@ import React from "react";
 import { useAuthSession } from "@/auth-client";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import SearchComponent from "@/components/Search";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import SkeletonLoading from "@/components/common/SkeletonLoading";
 
 const SearchView = () => {
   const { status } = useAuthSession();
@@ -12,7 +12,7 @@ const SearchView = () => {
 
   // 認証チェック中はローディング表示
   if (status === "loading") {
-    return <LoadingSpinner />;
+    return <SkeletonLoading />;
   }
 
   // 未認証の場合は何も表示しない（HybridSPAAuthがリダイレクトを処理）

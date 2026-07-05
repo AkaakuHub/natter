@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import { useTrueSPARouter } from "./TrueSPARouter";
 import { useHybridSPAAuth } from "@/core/auth/HybridSPAAuth";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import SkeletonLoading from "@/components/common/SkeletonLoading";
 import { generateViewRendererComponentMap, matchPattern } from "@/core/spa";
 
 // 404ページ
@@ -21,7 +21,7 @@ interface ViewRendererProps {
 }
 
 export const ViewRenderer: React.FC<ViewRendererProps> = ({
-  fallback: Fallback = LoadingSpinner,
+  fallback: Fallback = SkeletonLoading,
 }) => {
   const { currentRoute, routeEngine } = useTrueSPARouter();
   const { isAuthenticated, isLoading: authLoading } = useHybridSPAAuth();

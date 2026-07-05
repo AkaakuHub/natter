@@ -22,3 +22,11 @@ database_id = "4caad066-71dc-49fe-a9e5-2e17f820f947"
 [[r2_buckets]]
 binding = "ASSETS"
 bucket_name = "natter-assets"
+
+[[durable_objects.bindings]]
+name = "REALTIME"
+class_name = "RealtimeHub"
+
+[[migrations]]
+tag = "v1-realtime-hub"
+new_sqlite_classes = ["RealtimeHub"]

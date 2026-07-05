@@ -10,7 +10,7 @@ import { ALL_ROUTES } from "./spa/SPARoutes";
 // 既存のBaseLayoutを保護・活用
 import BaseLayout from "@/components/layout/BaseLayout";
 import HybridBaseLayout from "@/components/layout/HybridBaseLayout";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import SkeletonLoading from "@/components/common/SkeletonLoading";
 
 // ルート定義を一元管理されたデータから生成
 const routes: RouteDefinition[] = ALL_ROUTES.map((route) => ({
@@ -78,7 +78,7 @@ const HybridSPAApplication: React.FC<{ children?: React.ReactNode }> = ({
 }) => {
   return (
     <HybridBaseLayout>
-      {children || <ViewRenderer fallback={LoadingSpinner} />}
+      {children || <ViewRenderer fallback={SkeletonLoading} />}
     </HybridBaseLayout>
   );
 };

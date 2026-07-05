@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 interface ServerStatusContextType {
   isOnline: boolean | null; // null = 未チェック
@@ -32,7 +38,7 @@ export const ServerStatusProvider: React.FC<ServerStatusProviderProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
 
-  const checkStatus = async () => {
+  const checkStatus = useCallback(async () => {
     try {
       const response = await fetch("/api/backend/users", {
         credentials: "include",
@@ -63,23 +69,19 @@ export const ServerStatusProvider: React.FC<ServerStatusProviderProps> = ({
     } finally {
       setLastChecked(new Date());
     }
-  };
+  }, []);
 
   // 初回チェック
   useEffect(() => {
     checkStatus();
-  }, []);
-
-  // 定期的なヘルスチェック（30秒間隔）
-  useEffect(() => {
-    const interval = setInterval(checkStatus, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  }, [checkStatus]);
 
   // ネットワーク状態の変化を監視
   useEffect(() => {
     const handleOnline = () => {
-      console.log("ネットワークが復旧しました。サーバー状態を確認中...");
+      checkStatus();
+    };
+    const handleFocus = () => {
       checkStatus();
     };
 
@@ -90,12 +92,14 @@ export const ServerStatusProvider: React.FC<ServerStatusProviderProps> = ({
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
+    window.addEventListener("focus", handleFocus);
 
     return () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
+      window.removeEventListener("focus", handleFocus);
     };
-  }, []);
+  }, [checkStatus]);
 
   return (
     <ServerStatusContext.Provider

@@ -12,13 +12,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import ServerErrorBanner from "../common/ServerErrorBanner";
 import { avatarImageUrl } from "@/utils/avatarImage";
-import LoadingSpinner from "../common/LoadingSpinner";
+import SkeletonLoading from "../common/SkeletonLoading";
 
 // 遅延読み込みコンポーネント
 const CreatePostModal = lazy(() => import("../CreatePostModal"));
 const ShortcutHelpModal = lazy(() => import("../ShortcutHelpModal"));
 const TrendingPosts = lazy(() => import("../Sidebar/TrendingPosts"));
 const RecommendedUsers = lazy(() => import("../Sidebar/RecommendedUsers"));
+const NewPostBanner = lazy(() => import("../NewPostBanner"));
 
 interface BaseLayoutProps {
   children?: React.ReactNode;
@@ -77,12 +78,12 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
 
   // サーバーステータスチェック中
   if (isOnline === null) {
-    return <LoadingSpinner />;
+    return <SkeletonLoading />;
   }
 
   // セッションローディング中
   if (isLoading) {
-    return <LoadingSpinner />;
+    return <SkeletonLoading />;
   }
 
   if (!session) {
@@ -101,6 +102,12 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
 
   return (
     <div className="w-full h-screen flex flex-col">
+      {session && userExists && (
+        <Suspense fallback={<div />}>
+          <NewPostBanner />
+        </Suspense>
+      )}
+
       {/* ヘッダー */}
       <Header
         profileImage={avatarImageUrl(session?.user?.image)}
