@@ -10,6 +10,7 @@ import { FooterMenu } from "../FooterMenu";
 import Welcome from "../Welcome";
 import { usePathname, useRouter } from "next/navigation";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useSwipeBackNavigation } from "@/hooks/useSwipeBackNavigation";
 import ServerErrorBanner from "../common/ServerErrorBanner";
 import { avatarImageUrl } from "@/utils/avatarImage";
 import SkeletonLoading from "../common/SkeletonLoading";
@@ -39,6 +40,21 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
 
   // 大画面かどうかを判定
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
+  const isSwipeBackReady =
+    isOnline === true && !isLoading && Boolean(session) && userExists === true;
+
+  useSwipeBackNavigation({
+    disabled:
+      !isSwipeBackReady ||
+      isLargeScreen ||
+      pathname === "/" ||
+      isModalOpen ||
+      isCreatePostModalOpen ||
+      isShortcutHelpModalOpen ||
+      isInputFocused,
+    onBack: () => router.back(),
+    scrollContainerRef,
+  });
 
   // グローバルキーボードショートカット
   useGlobalKeyboardShortcuts({

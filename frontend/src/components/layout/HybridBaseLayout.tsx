@@ -11,6 +11,7 @@ import Header from "./Header";
 import { HybridFooterMenu } from "../HybridFooterMenu";
 import Welcome from "../Welcome";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useSwipeBackNavigation } from "@/hooks/useSwipeBackNavigation";
 import ServerErrorBanner from "../common/ServerErrorBanner";
 import { avatarImageUrl } from "@/utils/avatarImage";
 import SkeletonLoading from "../common/SkeletonLoading";
@@ -40,6 +41,24 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
 
   // 大画面かどうかを判定
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
+  const currentPath = currentRoute?.path || "/";
+  const isSwipeBackReady =
+    isOnline === true && !isLoading && Boolean(session) && userExists === true;
+
+  useSwipeBackNavigation({
+    disabled:
+      !isSwipeBackReady ||
+      isLargeScreen ||
+      currentPath === "/" ||
+      isModalOpen ||
+      isCreatePostModalOpen ||
+      isShortcutHelpModalOpen ||
+      isInputFocused ||
+      isInitialLoad ||
+      !isHydrated,
+    onBack: () => window.history.back(),
+    scrollContainerRef,
+  });
 
   // グローバルキーボードショートカット（既存機能保護）
   useGlobalKeyboardShortcuts({
@@ -164,7 +183,7 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
 
       {/* フッターメニュー（ハイブリッド対応） */}
       <HybridFooterMenu
-        path={currentRoute?.path || "/"}
+        path={currentPath}
         scrollContainerRef={scrollContainerRef}
       />
 

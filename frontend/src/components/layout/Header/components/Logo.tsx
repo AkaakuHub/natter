@@ -33,7 +33,7 @@ const Logo = ({ scrollContainerRef }: LogoProps) => {
   return (
     <button
       onClick={handleLogoClick}
-      className="absolute left-1/2 transform -translate-x-1/2 transition-opacity hover:opacity-80"
+      className="absolute left-1/2 flex h-8 w-8 -translate-x-1/2 items-center justify-center transition-opacity hover:opacity-80"
       aria-label="ホームに戻る"
     >
       <Image

@@ -72,7 +72,5 @@ function isSpaRoute(pathname: string): boolean {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|manifest.json|api|sounds).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|api|.*\\..*).*)"],
 };
