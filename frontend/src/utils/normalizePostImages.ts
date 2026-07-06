@@ -1,10 +1,14 @@
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const MAX_IMAGE_EDGE = 10_000;
-const FALLBACK_IMAGE_EDGE = 4096;
-const MAX_IMAGE_PIXELS = 4096 * 4096;
+const MAX_CANVAS_PIXELS = 4096 * 4096;
 const OUTPUT_TYPE = "image/jpeg";
 const OUTPUT_EXTENSION = ".jpg";
 const OUTPUT_QUALITIES = [0.9, 0.82, 0.72, 0.62] as const;
+
+export type ImageSize = {
+  width: number;
+  height: number;
+};
 
 export async function normalizePostImages(files: File[]): Promise<File[]> {
   const normalizedFiles: File[] = [];
@@ -83,33 +87,27 @@ async function loadImageElement(blob: Blob): Promise<HTMLImageElement> {
 async function drawImageToJpegBlob(
   image: ImageBitmap | HTMLImageElement,
 ): Promise<Blob> {
-  const sizes = normalizedImageSizeCandidates(image.width, image.height);
+  const size = normalizedPostImageSize(image.width, image.height);
   try {
-    for (const size of sizes) {
-      const blob = await tryDrawImageToJpegBlob(image, size);
-      if (blob) {
-        return blob;
-      }
-    }
+    return await drawImageWithSizeToJpegBlob(image, size);
   } finally {
     if ("close" in image) {
       image.close();
     }
   }
-  throw new Error("画像の変換に失敗しました");
 }
 
-async function tryDrawImageToJpegBlob(
+async function drawImageWithSizeToJpegBlob(
   image: ImageBitmap | HTMLImageElement,
-  size: { width: number; height: number },
-): Promise<Blob | null> {
+  size: ImageSize,
+): Promise<Blob> {
   const canvas = document.createElement("canvas");
   canvas.width = size.width;
   canvas.height = size.height;
   const context = canvas.getContext("2d");
   if (!context) {
     releaseCanvas(canvas);
-    return null;
+    throw new Error("この端末では画像を安全に変換できません");
   }
   context.drawImage(image, 0, 0, size.width, size.height);
 
@@ -120,42 +118,24 @@ async function tryDrawImageToJpegBlob(
         return blob;
       }
     }
-    return null;
+    throw new Error("画像変換後のファイルサイズが10MBを超えています");
   } finally {
     releaseCanvas(canvas);
   }
 }
 
-function normalizedImageSizeCandidates(
+export function normalizedPostImageSize(
   width: number,
   height: number,
-): Array<{ width: number; height: number }> {
+): ImageSize {
   if (width <= 0 || height <= 0) {
     throw new Error("画像の寸法を取得できませんでした");
   }
 
-  const preferred = normalizedImageSize(width, height, MAX_IMAGE_EDGE);
-  const fallback = normalizedImageSize(width, height, FALLBACK_IMAGE_EDGE);
-
-  if (
-    preferred.width === fallback.width &&
-    preferred.height === fallback.height
-  ) {
-    return [preferred];
-  }
-
-  return [preferred, fallback];
-}
-
-function normalizedImageSize(
-  width: number,
-  height: number,
-  maxEdge: number,
-): { width: number; height: number } {
-  const edgeScale = Math.min(1, maxEdge / Math.max(width, height));
+  const edgeScale = Math.min(1, MAX_IMAGE_EDGE / Math.max(width, height));
   const pixelScale = Math.min(
     1,
-    Math.sqrt(MAX_IMAGE_PIXELS / (width * height)),
+    Math.sqrt(MAX_CANVAS_PIXELS / (width * height)),
   );
   const scale = Math.min(edgeScale, pixelScale);
 
