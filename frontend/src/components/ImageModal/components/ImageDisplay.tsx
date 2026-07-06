@@ -4,14 +4,9 @@ import AuthenticatedImage from "@/components/common/AuthenticatedImage";
 interface ImageDisplayProps {
   currentImage: string;
   currentIndex: number;
-  fetchWithAuth?: boolean;
 }
 
-const ImageDisplay = ({
-  currentImage,
-  currentIndex,
-  fetchWithAuth = true,
-}: ImageDisplayProps) => {
+const ImageDisplay = ({ currentImage, currentIndex }: ImageDisplayProps) => {
   const handleImageClick = (e: React.MouseEvent) => {
     // 画像要素自体のクリックは無効化
     e.stopPropagation();
@@ -32,7 +27,6 @@ const ImageDisplay = ({
       onClick={handleImageClick}
       loading="eager"
       decoding="async"
-      fetchWithAuth={fetchWithAuth}
     />
   );
 };

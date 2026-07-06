@@ -17,13 +17,11 @@ interface ParentPost {
 interface ParentPostCardProps {
   parentPost: ParentPost;
   onParentPostClick: () => void;
-  currentUserId?: string;
 }
 
 const ParentPostCard = ({
   parentPost,
   onParentPostClick,
-  currentUserId,
 }: ParentPostCardProps) => {
   return (
     <ReplySourcePost
@@ -38,7 +36,6 @@ const ParentPostCard = ({
       variant="detailed"
       onPostClick={onParentPostClick}
       showReplyLabel={true}
-      currentUserId={currentUserId}
     />
   );
 };

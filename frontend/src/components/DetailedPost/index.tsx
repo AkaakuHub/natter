@@ -13,7 +13,6 @@ import { getImageUrl } from "@/utils/postUtils";
 import { useSPANavigation } from "@/core/spa";
 import { appendNormalizedImages } from "@/utils/normalizePostImages";
 import { ui } from "@/styles/ui";
-import { shouldFetchPostImageWithAuth } from "@/domain/posts/imageAccess";
 
 import BackButton from "./components/BackButton";
 import LoadingState from "./components/LoadingState";
@@ -133,10 +132,6 @@ const DetailedPostComponent = ({
     );
   }
   const canInteract = !!currentUser?.id;
-  const fetchImagesWithAuth = post
-    ? shouldFetchPostImageWithAuth(post, currentUser?.id)
-    : true;
-
   return (
     <div className="bg-surface-variant min-h-full">
       <div className="max-w-2xl mx-auto px-4 py-8">
@@ -165,7 +160,6 @@ const DetailedPostComponent = ({
                     image: post.replyTo.author?.image ?? undefined,
                   },
                 }}
-                currentUserId={currentUser?.id}
                 onParentPostClick={() => {
                   if (post.replyTo?.id) {
                     navigateToPost(post.replyTo.id);
@@ -206,7 +200,6 @@ const DetailedPostComponent = ({
             images={post.images}
             url={post.url}
             character={post.character}
-            fetchImagesWithAuth={fetchImagesWithAuth}
             onImageClick={handleImageClick}
           />
 
@@ -230,7 +223,6 @@ const DetailedPostComponent = ({
           isOpen={isModalOpen}
           images={post.images.map((image) => getImageUrl(image))}
           currentIndex={selectedImageIndex}
-          fetchImagesWithAuth={fetchImagesWithAuth}
           onClose={closeImageModal}
           onPrevious={selectedImageIndex > 0 ? handlePreviousImage : undefined}
           onNext={

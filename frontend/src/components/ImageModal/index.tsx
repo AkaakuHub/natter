@@ -15,7 +15,6 @@ interface ImageModalProps {
   isOpen: boolean;
   images: string[];
   currentIndex: number;
-  fetchImagesWithAuth?: boolean;
   onClose: () => void;
   onPrevious?: () => void;
   onNext?: () => void;
@@ -25,7 +24,6 @@ const ImageModal = ({
   isOpen,
   images,
   currentIndex,
-  fetchImagesWithAuth = true,
   onClose,
   onPrevious,
   onNext,
@@ -63,11 +61,7 @@ const ImageModal = ({
         onClick={handleBackdropClick}
       >
         {/* 画像表示 */}
-        <ImageDisplay
-          currentImage={currentImage}
-          currentIndex={currentIndex}
-          fetchWithAuth={fetchImagesWithAuth}
-        />
+        <ImageDisplay currentImage={currentImage} currentIndex={currentIndex} />
 
         {/* バツボタン */}
         <button

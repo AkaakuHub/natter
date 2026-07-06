@@ -14,10 +14,9 @@ interface OriginalPostProps {
       image?: string;
     };
   };
-  currentUserId?: string;
 }
 
-const OriginalPost = ({ replyToPost, currentUserId }: OriginalPostProps) => {
+const OriginalPost = ({ replyToPost }: OriginalPostProps) => {
   return (
     <ReplySourcePost
       post={{
@@ -29,7 +28,6 @@ const OriginalPost = ({ replyToPost, currentUserId }: OriginalPostProps) => {
         author: replyToPost.author,
       }}
       variant="modal"
-      currentUserId={currentUserId}
     />
   );
 };

@@ -10,7 +10,6 @@ import { Post, PostsApi } from "@/api";
 import type { User as ApiUser } from "@/api/types";
 import { useSPANavigation } from "@/core/spa";
 import { appendNormalizedImages } from "@/utils/normalizePostImages";
-import { shouldFetchPostImageWithAuth } from "@/domain/posts/imageAccess";
 
 // 遅延読み込みモーダル
 const ImageModal = lazy(() => import("@/components/ImageModal"));
@@ -51,11 +50,6 @@ const PostComponent = ({
     () => currentPost.images.map((image) => getImageUrl(image)),
     [currentPost.images],
   );
-  const fetchImagesWithAuth = shouldFetchPostImageWithAuth(
-    currentPost,
-    currentUserId,
-  );
-
   const handlePostUpdateCallback = useCallback(() => {
     if (onPostUpdate) {
       onPostUpdate();
@@ -219,7 +213,6 @@ const PostComponent = ({
               images={currentPost.images}
               url={currentPost.url}
               character={currentPost.character}
-              fetchImagesWithAuth={fetchImagesWithAuth}
               onImageClick={handleImageClick}
             />
             <PostActions
@@ -242,7 +235,6 @@ const PostComponent = ({
             isOpen={isModalOpen}
             images={imageModalUrls}
             currentIndex={selectedImageIndex}
-            fetchImagesWithAuth={fetchImagesWithAuth}
             onClose={closeImageModal}
             onPrevious={
               selectedImageIndex > 0 ? handlePreviousImage : undefined

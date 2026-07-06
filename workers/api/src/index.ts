@@ -871,7 +871,7 @@ async function enrichPosts(
   );
 }
 
-function canReadOriginalImage(
+function canReadOriginalPostImage(
   revealSecrets: boolean,
   post: Post,
   currentUserId?: string,
@@ -917,7 +917,7 @@ async function handleImage(
   if (!post) {
     throw new HttpError(404, "Image not found");
   }
-  const canReadOriginal = canReadOriginalImage(await shouldRevealSecrets(env.DB), post, authUser.id);
+  const canReadOriginal = canReadOriginalPostImage(await shouldRevealSecrets(env.DB), post, authUser.id);
   if (!canReadOriginal) {
     const mosaic = await env.ASSETS.get(mosaicImageFilename(filename));
     if (!mosaic) {

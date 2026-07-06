@@ -4,7 +4,6 @@ import { getImageUrl } from "@/utils/postUtils";
 import { decodeHtmlEntities, breakLongWords } from "@/utils/htmlUtils";
 import { getCharacterColorStyle } from "@/utils/characterColorUtils";
 import { Character } from "@/api";
-import { useImagePreload } from "@/hooks/useImagePreload";
 import AuthenticatedImage from "@/components/common/AuthenticatedImage";
 import RichText from "@/components/common/RichText";
 import { ui } from "@/styles/ui";
@@ -14,7 +13,6 @@ interface PostContentProps {
   images?: string[];
   url?: string;
   character?: Character;
-  fetchImagesWithAuth: boolean;
   onImageClick: (index: number) => void;
 }
 
@@ -23,7 +21,6 @@ const PostContent = ({
   images,
   url,
   character,
-  fetchImagesWithAuth,
   onImageClick,
 }: PostContentProps) => {
   const imageArray = React.useMemo(() => {
@@ -33,8 +30,6 @@ const PostContent = ({
   const imageUrls = React.useMemo(() => {
     return imageArray.map((image) => getImageUrl(image));
   }, [imageArray]);
-
-  useImagePreload(imageUrls);
 
   // HTMLエスケープされたコンテンツを復元し、長い単語を改行可能にする
   const processedContent = React.useMemo(() => {
@@ -151,7 +146,6 @@ const PostContent = ({
                   height={200}
                   loading="lazy"
                   decoding="async"
-                  fetchWithAuth={fetchImagesWithAuth}
                 />
               </button>
             );

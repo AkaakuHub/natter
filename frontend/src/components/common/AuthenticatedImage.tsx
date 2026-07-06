@@ -10,7 +10,6 @@ interface AuthenticatedImageProps {
   height?: number;
   loading?: "eager" | "lazy";
   decoding?: "async" | "sync" | "auto";
-  fetchWithAuth?: boolean;
   onClick?: (e: React.MouseEvent) => void;
 }
 
@@ -23,7 +22,6 @@ const AuthenticatedImage: React.FC<AuthenticatedImageProps> = ({
   height,
   loading = "lazy",
   decoding = "async",
-  fetchWithAuth = true,
   onClick,
 }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -38,7 +36,7 @@ const AuthenticatedImage: React.FC<AuthenticatedImageProps> = ({
         setIsLoading(true);
         setHasError(false);
 
-        if (fetchWithAuth && src.includes("/posts/images/")) {
+        if (src.includes("/posts/images/")) {
           const authenticatedSrc = await getCachedImageWithAuth(src);
           if (isMounted) {
             setImageSrc(authenticatedSrc);
@@ -63,7 +61,7 @@ const AuthenticatedImage: React.FC<AuthenticatedImageProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [fetchWithAuth, src]);
+  }, [src]);
 
   const handleLoad = () => {
     setHasError(false);
