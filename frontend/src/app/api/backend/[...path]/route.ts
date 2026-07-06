@@ -1,4 +1,5 @@
-import { applyLocalHeaderAuth, getAppSessionCookieHeader } from "@/auth";
+import { getAppSessionCookieHeader } from "@/auth";
+import { buildBackendProxyHeaders } from "@/api/backendProxyHeaders";
 import { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -65,17 +66,9 @@ async function forwardApiRequest(
   );
   upstreamUrl.search = request.nextUrl.search;
 
-  const headers = new Headers(request.headers);
-  headers.delete("host");
-  headers.delete("cookie");
-  headers.delete("content-length");
-  headers.delete("authorization");
-  if (appSessionCookie) {
-    headers.set("cookie", appSessionCookie);
-  }
-  applyLocalHeaderAuth(headers);
+  const headers = buildBackendProxyHeaders(request.headers, appSessionCookie);
 
-  return fetch(upstreamUrl, {
+  const response = await fetch(upstreamUrl, {
     body: bodylessMethod(request.method) ? undefined : request.body,
     cache: "no-store",
     duplex: bodylessMethod(request.method) ? undefined : "half",
@@ -83,6 +76,14 @@ async function forwardApiRequest(
     method: request.method,
     redirect: "manual",
   } as RequestInit);
+  const responseHeaders = new Headers(response.headers);
+  responseHeaders.delete("content-encoding");
+  responseHeaders.delete("content-length");
+  return new Response(response.body, {
+    headers: responseHeaders,
+    status: response.status,
+    statusText: response.statusText,
+  });
 }
 
 function ensureTrailingSlash(value: string): string {

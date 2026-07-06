@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev:frontend": "cd frontend && pnpm run dev",
-    "dev:api:local": "wrangler dev --config workers/api/wrangler.local.toml --port 8787",
+    "dev:api:init": "wrangler d1 execute natter --local --config workers/api/wrangler.local.toml --file scripts/cloudflare/local-d1-schema.sql",
+    "dev:api:local": "pnpm run dev:api:init && wrangler dev --config workers/api/wrangler.local.toml --port 8787",
     "dev": "concurrently --kill-others-on-fail --prefix-colors \"blue,green\" --prefix \"[{name}]\" --names \"frontend,api\" \"pnpm run dev:frontend\" \"pnpm run dev:api:local\"",
     "dev:clean": "pkill -f 'next\\|wrangler' || true && pnpm run dev",
     "stop": "pkill -f 'next\\|wrangler' || true",

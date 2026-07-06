@@ -1,0 +1,108 @@
+CREATE TABLE IF NOT EXISTS "User" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "name" TEXT NOT NULL,
+  "tel" TEXT,
+  "image" TEXT,
+  "discordId" TEXT NOT NULL UNIQUE,
+  "isAdmin" BOOLEAN NOT NULL DEFAULT false,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "Post" (
+  "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "title" TEXT,
+  "content" TEXT,
+  "images" TEXT,
+  "imagesPublic" BOOLEAN NOT NULL DEFAULT false,
+  "url" TEXT,
+  "published" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "deletedAt" DATETIME,
+  "authorId" TEXT,
+  "characterId" INTEGER,
+  "replyToId" INTEGER,
+  CONSTRAINT "Post_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT "Post_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "Character" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT "Post_replyToId_fkey" FOREIGN KEY ("replyToId") REFERENCES "Post" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "Like" (
+  "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "userId" TEXT NOT NULL,
+  "postId" INTEGER NOT NULL,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "Like_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT "Like_postId_fkey" FOREIGN KEY ("postId") REFERENCES "Post" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "Like_userId_postId_key" ON "Like"("userId", "postId");
+
+CREATE TABLE IF NOT EXISTS "Follow" (
+  "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "followerId" TEXT NOT NULL,
+  "followingId" TEXT NOT NULL,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "Follow_followerId_fkey" FOREIGN KEY ("followerId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT "Follow_followingId_fkey" FOREIGN KEY ("followingId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "Follow_followerId_followingId_key" ON "Follow"("followerId", "followingId");
+
+CREATE TABLE IF NOT EXISTS "Character" (
+  "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "name" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "postsCount" INTEGER NOT NULL DEFAULT 0,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "Character_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "Character_userId_name_key" ON "Character"("userId", "name");
+
+CREATE TABLE IF NOT EXISTS "Notification" (
+  "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "type" TEXT NOT NULL,
+  "message" TEXT,
+  "read" BOOLEAN NOT NULL DEFAULT false,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "userId" TEXT NOT NULL,
+  "actorId" TEXT NOT NULL,
+  "postId" INTEGER,
+  CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT "Notification_actorId_fkey" FOREIGN KEY ("actorId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT "Notification_postId_fkey" FOREIGN KEY ("postId") REFERENCES "Post" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS "Notification_userId_read_idx" ON "Notification"("userId", "read");
+CREATE INDEX IF NOT EXISTS "Notification_userId_createdAt_idx" ON "Notification"("userId", "createdAt");
+
+CREATE TABLE IF NOT EXISTS "UrlMetadataCache" (
+  "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "url" TEXT NOT NULL UNIQUE,
+  "title" TEXT,
+  "description" TEXT,
+  "image" TEXT,
+  "siteName" TEXT,
+  "type" TEXT,
+  "favicon" TEXT,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "expiresAt" DATETIME NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS "UrlMetadataCache_url_idx" ON "UrlMetadataCache"("url");
+CREATE INDEX IF NOT EXISTS "UrlMetadataCache_expiresAt_idx" ON "UrlMetadataCache"("expiresAt");
+
+CREATE TABLE IF NOT EXISTS "Settings" (
+  "id" INTEGER NOT NULL PRIMARY KEY DEFAULT 1,
+  "isRevealedSecrets" BOOLEAN NOT NULL DEFAULT false,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT OR IGNORE INTO "Settings" ("id", "isRevealedSecrets", "createdAt", "updatedAt")
+VALUES (1, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
