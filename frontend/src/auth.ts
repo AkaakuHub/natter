@@ -83,7 +83,7 @@ export function getAppSessionCookieHeader(request: Request): string | null {
 }
 
 export function applyLocalHeaderAuth(headers: Headers): void {
-  if (getAuthMode() !== "local-header") {
+  if (getAuthMode() !== "local-header" || !isLocalApiUrl()) {
     return;
   }
 
@@ -127,7 +127,21 @@ function authSessionFromLinkAuthUser(user: LinkAuthUser): AuthSession {
 }
 
 function getAuthMode(): AuthMode {
-  return process.env.AUTH_MODE === "local-header" ? "local-header" : "link-auth";
+  return process.env.AUTH_MODE === "local-header"
+    ? "local-header"
+    : "link-auth";
+}
+
+function isLocalApiUrl(): boolean {
+  const value = process.env.NEXT_PUBLIC_API_URL;
+  if (!value) {
+    return false;
+  }
+  const url = new URL(value);
+  return (
+    url.protocol === "http:" &&
+    (url.hostname === "localhost" || url.hostname === "127.0.0.1")
+  );
 }
 
 function getLocalHeaderAuthSession(): AuthSession {

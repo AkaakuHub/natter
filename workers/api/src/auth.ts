@@ -34,12 +34,15 @@ async function authenticateConfiguredAuthUser(
     return authenticateLinkAuthUser(request, env);
   }
   if (env.AUTH_MODE === "local-header") {
-    return authenticateLocalHeaderUser(request);
+    return authenticateLocalHeaderUser(request, env);
   }
   throw new HttpError(500, "Invalid auth mode");
 }
 
-function authenticateLocalHeaderUser(request: Request): AuthUser | undefined {
+async function authenticateLocalHeaderUser(
+  request: Request,
+  env: Env,
+): Promise<AuthUser | undefined> {
   const url = new URL(request.url);
   if (!isLocalHostname(url.hostname)) {
     throw new HttpError(403, "Local auth is only available on localhost");
@@ -48,12 +51,13 @@ function authenticateLocalHeaderUser(request: Request): AuthUser | undefined {
   if (!discordId) {
     return undefined;
   }
-  return {
-    id: discordId,
+  const user = await upsertAuthUser(env.DB, {
     discordId,
     name: request.headers.get("x-natter-dev-name") ?? "Local Dev User",
-    image: request.headers.get("x-natter-dev-image") ?? undefined,
-  };
+    image: request.headers.get("x-natter-dev-image"),
+    isAdmin: true,
+  });
+  return authUserFromUser(user);
 }
 
 function isLocalHostname(hostname: string): boolean {
@@ -71,31 +75,37 @@ async function authenticateLinkAuthUser(
   if (!linkAuthUser) {
     return undefined;
   }
-  const user = await upsertAuthenticatedUser(env.DB, linkAuthUser);
-  return {
-    id: user.id,
-    discordId: user.discordId,
-    name: user.name,
-    image: user.image ?? undefined,
-  };
+  const user = await upsertAuthUser(env.DB, {
+    discordId: linkAuthUser.discord_id,
+    name: linkAuthUser.display_name,
+    image: linkAuthUser.avatar_url,
+    isAdmin: linkAuthUser.role === "admin",
+  });
+  return authUserFromUser(user);
 }
 
-async function upsertAuthenticatedUser(
+type UpsertAuthUserInput = {
+  discordId: string;
+  name: string;
+  image: string | null;
+  isAdmin: boolean;
+};
+
+async function upsertAuthUser(
   db: D1Database,
-  linkAuthUser: LinkAuthUser,
+  input: UpsertAuthUserInput,
 ): Promise<User> {
-  const existing = await findUserByDiscordId(db, linkAuthUser.discord_id);
+  const existing = await findUserByDiscordId(db, input.discordId);
   const now = new Date().toISOString();
-  const isAdmin = linkAuthUser.role === "admin";
   if (existing) {
     await run(
       db,
       `UPDATE "User" SET "name" = ?, "image" = ?, "isAdmin" = ?, "updatedAt" = ? WHERE "discordId" = ?`,
-      linkAuthUser.display_name,
-      linkAuthUser.avatar_url,
-      isAdmin,
+      input.name,
+      input.image,
+      input.isAdmin,
       now,
-      linkAuthUser.discord_id,
+      input.discordId,
     );
     return requireRow(
       await getUserRowById(db, existing.id),
@@ -108,19 +118,28 @@ async function upsertAuthenticatedUser(
     db,
     `INSERT INTO "User" ("id", "name", "tel", "image", "discordId", "isAdmin", "createdAt", "updatedAt")
      VALUES (?, ?, NULL, ?, ?, ?, ?, ?)`,
-    linkAuthUser.discord_id,
-    linkAuthUser.display_name,
-    linkAuthUser.avatar_url,
-    linkAuthUser.discord_id,
-    isAdmin,
+    input.discordId,
+    input.name,
+    input.image,
+    input.discordId,
+    input.isAdmin,
     now,
     now,
   );
   return requireRow(
-    await getUserRowById(db, linkAuthUser.discord_id),
+    await getUserRowById(db, input.discordId),
     parseUser,
     "User not found",
   );
+}
+
+function authUserFromUser(user: User): AuthUser {
+  return {
+    id: user.id,
+    discordId: user.discordId,
+    name: user.name,
+    image: user.image ?? undefined,
+  };
 }
 
 async function findUserByDiscordId(

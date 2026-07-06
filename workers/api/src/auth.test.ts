@@ -4,15 +4,57 @@ import { requireAuthUser } from "./auth";
 import type { Env } from "./env";
 import { HttpError } from "./http";
 
-const env: Env = {
-  DB: {} as D1Database,
-  ASSETS: {} as R2Bucket,
-  ACCOUNT_URL: "https://accounts.example.com",
-  APP_ID: "app-id",
-  APP_SESSION_HMAC_SECRET: "secret",
-  SESSION_KID: "kid",
-  AUTH_MODE: "local-header",
-};
+function createLocalHeaderEnv(): Env {
+  let user: Record<string, unknown> | undefined;
+  return {
+    DB: {
+      prepare: (sql: string) => ({
+        bind: (...params: unknown[]) => ({
+          first: async () => {
+            if (sql.includes(`WHERE "discordId" = ?`)) {
+              return user?.discordId === params[0] ? user : null;
+            }
+            if (sql.includes(`WHERE "id" = ?`)) {
+              return user?.id === params[0] ? user : null;
+            }
+            return null;
+          },
+          run: async () => {
+            if (sql.startsWith(`INSERT INTO "User"`)) {
+              const now = String(params[6]);
+              user = {
+                id: params[0],
+                name: params[1],
+                tel: null,
+                image: params[2],
+                discordId: params[3],
+                isAdmin: params[4],
+                createdAt: now,
+                updatedAt: now,
+              };
+            }
+            if (sql.startsWith(`UPDATE "User"`)) {
+              user = {
+                ...user,
+                name: params[0],
+                image: params[1],
+                isAdmin: params[2],
+                updatedAt: params[3],
+              };
+            }
+            return {} as D1Result;
+          },
+        }),
+      }),
+    } as D1Database,
+    ASSETS: {} as R2Bucket,
+    ACCOUNT_URL: "https://accounts.example.com",
+    APP_ID: "app-id",
+    APP_SESSION_HMAC_SECRET: "secret",
+    SESSION_KID: "kid",
+    AUTH_MODE: "local-header",
+  };
+}
 
 describe("requireAuthUser local-header mode", () => {
   it("returns a local auth user from localhost development headers", async () => {
@@ -25,7 +67,7 @@ describe("requireAuthUser local-header mode", () => {
             "x-natter-dev-image": "https://example.com/avatar.png",
           },
         }),
-        env,
+        createLocalHeaderEnv(),
       ),
     ).resolves.toEqual({
       id: "user-1",
@@ -43,7 +85,7 @@ describe("requireAuthUser local-header mode", () => {
             "x-natter-dev-discord-id": "user-1",
           },
         }),
-        env,
+        createLocalHeaderEnv(),
       ),
     ).resolves.toEqual({
       id: "user-1",
@@ -55,7 +97,7 @@ describe("requireAuthUser local-header mode", () => {
 
   it("throws 401 when the local user header is missing", async () => {
     await expect(
-      requireAuthUser(new Request("http://localhost/posts"), env),
+      requireAuthUser(new Request("http://localhost/posts"), createLocalHeaderEnv()),
     ).rejects.toMatchObject({
       status: 401,
       message: "Unauthorized",
@@ -68,7 +110,7 @@ describe("requireAuthUser local-header mode", () => {
         new Request("https://api.example.com/posts", {
           headers: { "x-natter-dev-discord-id": "user-1" },
         }),
-        env,
+        createLocalHeaderEnv(),
       ),
     ).rejects.toMatchObject({
       status: 403,

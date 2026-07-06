@@ -20,6 +20,38 @@ const env: Env = {
   AUTH_MODE: "local-header",
 };
 
+function createAuthenticatedEnv(): Env {
+  return {
+    ...env,
+    DB: {
+      prepare: (sql: string) => ({
+        bind: (...params: unknown[]) => ({
+          first: async () => {
+            const now = new Date().toISOString();
+            if (
+              sql.includes(`WHERE "discordId" = ?`) ||
+              sql.includes(`WHERE "id" = ?`)
+            ) {
+              return {
+                id: params[0],
+                name: "Local Dev User",
+                tel: null,
+                image: null,
+                discordId: params[0],
+                isAdmin: true,
+                createdAt: now,
+                updatedAt: now,
+              };
+            }
+            return null;
+          },
+          run: async () => ({} as D1Result),
+        }),
+      }),
+    } as D1Database,
+  };
+}
+
 describe("worker fetch", () => {
   it("responds to root GET without touching external bindings", async () => {
     const response = await worker.fetch(
@@ -98,15 +130,16 @@ describe("worker fetch", () => {
   });
 
   it("forwards authenticated event streams to the realtime hub", async () => {
+    const authenticatedEnv = createAuthenticatedEnv();
     const response = await worker.fetch(
       new Request("http://localhost/events", {
         headers: { "x-natter-dev-discord-id": "user-1" },
       }),
-      env,
+      authenticatedEnv,
     );
 
     expect(response.status).toBe(200);
     expect(await response.text()).toBe("event-stream");
-    expect(env.REALTIME.idFromName).toHaveBeenCalledWith("global");
+    expect(authenticatedEnv.REALTIME.idFromName).toHaveBeenCalledWith("global");
   });
 });

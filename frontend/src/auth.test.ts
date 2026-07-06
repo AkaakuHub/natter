@@ -34,12 +34,24 @@ describe("local-header auth mode", () => {
 
   it("adds the worker local auth headers to proxied API requests", () => {
     vi.stubEnv("AUTH_MODE", "local-header");
+    vi.stubEnv("NEXT_PUBLIC_API_URL", "http://localhost:8787");
     const headers = new Headers();
 
     applyLocalHeaderAuth(headers);
 
     expect(headers.get("x-natter-dev-discord-id")).toBe("local-dev-user");
     expect(headers.get("x-natter-dev-name")).toBe("Local Dev User");
+  });
+
+  it("does not add local auth headers to non-local API requests", () => {
+    vi.stubEnv("AUTH_MODE", "local-header");
+    vi.stubEnv("NEXT_PUBLIC_API_URL", "https://api.natter.akaaku.net");
+    const headers = new Headers();
+
+    applyLocalHeaderAuth(headers);
+
+    expect(headers.has("x-natter-dev-discord-id")).toBe(false);
+    expect(headers.has("x-natter-dev-name")).toBe(false);
   });
 
   it("keeps auth routes local in local-header mode", async () => {
