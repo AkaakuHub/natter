@@ -11,11 +11,11 @@ const NewPostBanner = () => {
   if (!hasNewPosts) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-interactive to-interactive-hover text-text-inverse shadow-lg animate-slide-down">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-interactive text-text-inverse shadow-md animate-slide-down">
       <div className="max-w-md mx-auto px-4 py-3">
         <button
           onClick={handleNewPostClick}
-          className="w-full flex items-center justify-center gap-2 hover:bg-surface-elevated rounded-lg p-2 transition-colors"
+          className="w-full flex items-center justify-center gap-2 rounded-md p-2 transition-colors hover:bg-interactive-hover"
         >
           <IconBell size={18} className="animate-pulse" />
           <span className="font-medium">

@@ -143,7 +143,7 @@ const ReplySourcePost = ({
       <div className={baseClasses[variant]}>
         <button
           onClick={onPostClick}
-          className="w-full text-left hover:bg-surface-variant transition-all duration-300 p-4 rounded-2xl hover:scale-[1.02]"
+          className="w-full rounded-lg p-4 text-left transition-colors duration-150 hover:bg-surface-hover"
         >
           {content}
         </button>

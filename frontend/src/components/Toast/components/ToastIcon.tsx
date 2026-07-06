@@ -15,7 +15,7 @@ const ToastIcon = ({ type }: ToastIconProps) => {
 
   return (
     <div
-      className={`flex-shrink-0 rounded-full p-2 ${toastIconBackground[type]}`}
+      className={`flex-shrink-0 rounded-md p-2 ${toastIconBackground[type]}`}
     >
       <IconComponent size={20} {...iconProps} />
     </div>

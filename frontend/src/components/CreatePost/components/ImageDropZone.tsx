@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { IconPhoto } from "@tabler/icons-react";
+import { ui } from "@/styles/ui";
 
 interface ImageDropZoneProps {
   onFilesAdd: (files: File[]) => void | Promise<void>;
@@ -83,12 +84,12 @@ const ImageDropZone = ({
       role="button"
       tabIndex={isInactive ? -1 : 0}
       aria-disabled={isInactive}
-      className={`mt-4 rounded-2xl border-2 border-dashed p-4 text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive/70 ${
+      className={`mt-4 rounded-lg border border-dashed p-4 text-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
         isInactive
           ? "border-border-muted text-text-muted opacity-70 cursor-not-allowed"
           : isDragging
-            ? "border-interactive bg-interactive/10 text-text"
-            : "border-border text-text-muted hover:border-interactive cursor-pointer"
+            ? "border-border-focus bg-surface-elevated text-text"
+            : "border-border text-text-muted hover:border-border-focus cursor-pointer"
       }`}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -98,12 +99,12 @@ const ImageDropZone = ({
     >
       <div className="flex items-center gap-3">
         <div
-          className={`rounded-full p-2 ${
+          className={`${ui.surface.subtle} p-2 ${
             isInactive
-              ? "bg-surface"
+              ? "bg-surface text-text-muted"
               : isDragging
-                ? "bg-interactive text-text-inverse"
-                : "bg-surface text-interactive"
+                ? "bg-surface-elevated text-text"
+                : "text-text"
           }`}
         >
           <IconPhoto size={20} />

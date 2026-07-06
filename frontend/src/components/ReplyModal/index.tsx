@@ -4,6 +4,7 @@ import React from "react";
 import { User } from "@/api";
 import { useReplyModal } from "@/hooks/useReplyModal";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import { ui } from "@/styles/ui";
 
 import ModalHeader from "./components/ModalHeader";
 import OriginalPost from "./components/OriginalPost";
@@ -56,7 +57,7 @@ const ReplyModal = ({
     console.log("❌ ReplyModal: No current user, showing login message");
     return (
       <div className="fixed inset-0 z-50 flex items-start justify-center bg-overlay p-4">
-        <div className="bg-surface rounded-3xl shadow-2xl max-w-lg w-full mt-16 border border-border p-6">
+        <div className={`${ui.surface.modal} max-w-lg w-full mt-16 p-6`}>
           <ModalHeader onClose={onClose} />
           <div className="text-center py-8">
             <p className="text-text-muted">返信するにはログインが必要です</p>
@@ -72,7 +73,9 @@ const ReplyModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-overlay p-4">
-      <div className="bg-surface rounded-3xl shadow-2xl max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto border border-border">
+      <div
+        className={`${ui.surface.modal} max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto`}
+      >
         <ModalHeader onClose={onClose} />
         <OriginalPost replyToPost={replyToPost} />
         <ReplyForm

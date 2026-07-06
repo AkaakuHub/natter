@@ -6,6 +6,8 @@ import ImagePreview from "@/components/CreatePost/components/ImagePreview";
 import ImageDropZone from "@/components/CreatePost/components/ImageDropZone";
 import { useClipboardImagePaste } from "@/hooks/useClipboardImagePaste";
 import { avatarImageUrl } from "@/utils/avatarImage";
+import { cn } from "@/lib/utils";
+import { ui } from "@/styles/ui";
 
 interface ReplyFormProps {
   currentUser?: User | null;
@@ -118,11 +120,12 @@ const ReplyForm = ({
         <button
           type="submit"
           disabled={isSubmitting || !isValid}
-          className={`px-6 py-2 rounded-full font-semibold text-sm transition-all duration-200 ${
+          className={cn(
+            ui.button.primary,
             isSubmitting || !isValid
-              ? "bg-interactive-disabled text-text-inverse cursor-not-allowed"
-              : "bg-interactive text-text-inverse hover:bg-interactive-hover"
-          }`}
+              ? "bg-interactive-disabled hover:bg-interactive-disabled"
+              : "",
+          )}
         >
           {isSubmitting ? "送信中..." : "リプライ"}
         </button>

@@ -3,6 +3,8 @@ import ImagePreview from "@/components/CreatePost/components/ImagePreview";
 import ImageDropZone from "@/components/CreatePost/components/ImageDropZone";
 import { useClipboardImagePaste } from "@/hooks/useClipboardImagePaste";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { cn } from "@/lib/utils";
+import { ui } from "@/styles/ui";
 
 interface EditFormProps {
   content: string;
@@ -115,11 +117,12 @@ const EditForm = ({
           <button
             type="submit"
             disabled={isSubmitting || !isValid || !hasChanges}
-            className={`px-6 py-2 rounded-full font-semibold text-sm transition-all duration-200 ${
+            className={cn(
+              ui.button.primary,
               isSubmitting || !isValid || !hasChanges
-                ? "bg-surface-variant text-text-muted cursor-not-allowed"
-                : "bg-interactive text-text-inverse hover:bg-interactive-hover hover:shadow-lg"
-            }`}
+                ? "bg-surface-variant text-text-muted hover:bg-surface-variant"
+                : "",
+            )}
           >
             {isSubmitting ? "更新中..." : "更新"}
           </button>

@@ -39,7 +39,7 @@ const PostHeader = ({
             alt={`${user?.name}'s avatar`}
             width={56}
             height={56}
-            className="rounded-full ring-2 ring-border hover:ring-interactive/30 transition-all duration-300 hover:scale-105"
+            className="rounded-full ring-1 ring-border transition-colors duration-150 hover:ring-border-focus"
           />
         </button>
         <div className="flex-1 min-w-0">

@@ -12,6 +12,7 @@ import { usePostShare } from "@/hooks/usePostShare";
 import { getImageUrl } from "@/utils/postUtils";
 import { useSPANavigation } from "@/core/spa";
 import { appendNormalizedImages } from "@/utils/normalizePostImages";
+import { ui } from "@/styles/ui";
 
 import BackButton from "./components/BackButton";
 import LoadingState from "./components/LoadingState";
@@ -133,11 +134,11 @@ const DetailedPostComponent = ({
   const canInteract = !!currentUser?.id;
 
   return (
-    <div className="bg-gradient-to-br from-surface-variant to-surface-variant/60 min-h-full">
+    <div className="bg-surface-variant min-h-full">
       <div className="max-w-2xl mx-auto px-4 py-8">
         {canInteract && <BackButton onBack={goBack} />}
 
-        <div className="bg-surface/90 backdrop-blur-sm rounded-3xl shadow-soft hover:shadow-glow border border-border/60 transition-all duration-300">
+        <div className={ui.surface.panel}>
           {post.replyTo ? (
             post.replyTo.deletedAt ? (
               <div className="p-6 bg-surface-variant/50 border-b border-border/60">

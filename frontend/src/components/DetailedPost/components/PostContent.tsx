@@ -7,6 +7,7 @@ import { Character } from "@/api";
 import { useImagePreload } from "@/hooks/useImagePreload";
 import AuthenticatedImage from "@/components/common/AuthenticatedImage";
 import RichText from "@/components/common/RichText";
+import { ui } from "@/styles/ui";
 
 interface PostContentProps {
   content: string;
@@ -120,14 +121,14 @@ const PostContent = ({
               <button
                 key={idx}
                 onClick={() => onImageClick(idx)}
-                className="relative overflow-hidden rounded-3xl focus:outline-none focus:ring-2 focus:ring-interactive/50 focus:ring-offset-2 shadow-soft hover:shadow-glow"
+                className={`relative focus:outline-none focus:ring-2 focus:ring-border-focus focus:ring-offset-2 ${ui.surface.media}`}
               >
                 <AuthenticatedImage
                   src={imageSrc}
                   alt={`Post image ${idx + 1}`}
                   width={512}
                   height={512}
-                  className="w-full h-auto object-cover cursor-pointer rounded-3xl"
+                  className="w-full h-auto object-cover cursor-pointer"
                   loading="lazy"
                   decoding="async"
                 />

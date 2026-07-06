@@ -6,6 +6,8 @@ import {
   IconPlayerPause,
   IconRefresh,
 } from "@tabler/icons-react";
+import { cn } from "@/lib/utils";
+import { ui } from "@/styles/ui";
 
 interface TimerProps {
   className?: string;
@@ -81,7 +83,7 @@ const Timer: React.FC<TimerProps> = ({ className = "" }) => {
 
   return (
     <div
-      className={`flex flex-col items-center justify-center min-h-[calc(100vh-124px)] bg-gradient-to-br from-surface via-surface-variant to-surface p-4 sm:p-6 ${className}`}
+      className={`flex flex-col items-center justify-center min-h-[calc(100vh-124px)] bg-surface-variant p-4 sm:p-6 ${className}`}
     >
       {/* メインタイマー表示 */}
       <div className="relative mb-8">
@@ -146,14 +148,13 @@ const Timer: React.FC<TimerProps> = ({ className = "" }) => {
       <div className="flex gap-6 mb-6">
         <button
           onClick={handleStartStop}
-          className={`
-            flex items-center justify-center w-16 h-16 rounded-full transition-all duration-200 transform hover:scale-105 active:scale-95
-            ${
-              isRunning
-                ? "bg-warning hover:bg-warning-hover text-text-inverse shadow-lg shadow-warning/25"
-                : "bg-interactive hover:bg-interactive-hover text-text-inverse shadow-lg shadow-interactive/25"
-            }
-          `}
+          className={cn(
+            ui.button.floating,
+            "h-16 w-16",
+            isRunning
+              ? "bg-warning hover:bg-warning-hover"
+              : "bg-interactive hover:bg-interactive-hover",
+          )}
         >
           {isRunning ? (
             <IconPlayerPause size={24} />
@@ -164,18 +165,11 @@ const Timer: React.FC<TimerProps> = ({ className = "" }) => {
 
         <button
           onClick={handleReset}
-          className="
-            flex items-center justify-center w-16 h-16 rounded-full transition-all duration-200 transform hover:scale-105 active:scale-95
-            bg-surface-hover hover:bg-surface-pressed text-text-muted hover:text-text border-2 border-border hover:border-interactive
-          "
+          className={`${ui.button.secondary} h-16 w-16 p-0`}
         >
           <IconRefresh size={24} />
         </button>
       </div>
-
-      {/* 装飾的な要素 */}
-      <div className="absolute top-8 right-8 w-12 h-12 bg-interactive/10 rounded-full blur-xl"></div>
-      <div className="absolute bottom-8 left-8 w-8 h-8 bg-warning/10 rounded-full blur-lg"></div>
     </div>
   );
 };

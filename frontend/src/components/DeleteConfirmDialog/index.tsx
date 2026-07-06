@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { IconTrash, IconX } from "@tabler/icons-react";
 import { Post } from "@/api/types";
 import { usePostDelete } from "@/hooks/usePostDelete";
+import { ui } from "@/styles/ui";
 
 interface DeleteConfirmDialogProps {
   isOpen: boolean;
@@ -44,13 +45,13 @@ const DeleteConfirmDialog = ({
       onClick={handleBackdropClick}
     >
       <div
-        className="bg-surface rounded-3xl shadow-2xl max-w-md w-full mx-4 border border-border"
+        className={`${ui.surface.modal} max-w-md w-full mx-4`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* ヘッダー */}
         <div className="flex items-center justify-between p-6 border-b border-border-muted">
           <div className="flex items-center gap-3">
-            <div className="bg-error-bg rounded-full p-2">
+            <div className="bg-error-bg rounded-md p-2">
               <IconTrash size={20} className="text-error" />
             </div>
             <h2 className="text-lg font-semibold text-text">投稿を削除</h2>
@@ -58,7 +59,7 @@ const DeleteConfirmDialog = ({
           <button
             onClick={onClose}
             disabled={isDeleting}
-            className="bg-surface-variant hover:bg-surface-hover text-text-muted hover:text-text rounded-full p-2 transition-colors duration-200 disabled:opacity-50"
+            className={ui.button.icon}
           >
             <IconX size={20} />
           </button>
@@ -71,7 +72,7 @@ const DeleteConfirmDialog = ({
           </p>
 
           {/* 投稿のプレビュー */}
-          <div className="bg-surface-variant rounded-2xl p-4 mb-6">
+          <div className={`${ui.surface.subtle} p-4 mb-6`}>
             <p className="text-text text-sm line-clamp-3">{post.content}</p>
             {(() => {
               // imagesの処理を正しく行う
@@ -105,14 +106,14 @@ const DeleteConfirmDialog = ({
             <button
               onClick={onClose}
               disabled={isDeleting}
-              className="flex-1 px-4 py-2 border border-border text-text-secondary rounded-full hover:bg-surface-variant transition-colors duration-200 font-medium disabled:opacity-50"
+              className={`${ui.button.secondary} flex-1`}
             >
               キャンセル
             </button>
             <button
               onClick={handleDelete}
               disabled={isDeleting}
-              className="flex-1 px-4 py-2 bg-error text-text-inverse rounded-full hover:bg-error-hover transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`${ui.button.danger} flex-1`}
             >
               {isDeleting ? "削除中..." : "削除"}
             </button>

@@ -7,6 +7,7 @@ import { usePostEdit } from "@/hooks/usePostEdit";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { useFormValidation } from "@/hooks/useFormValidation";
 import { decodeContentForEditing } from "@/utils/decodeContent";
+import { ui } from "@/styles/ui";
 
 import ModalHeader from "./components/ModalHeader";
 import EditForm from "./components/EditForm";
@@ -91,7 +92,7 @@ const EditPostModal = ({
       }}
     >
       <div
-        className="bg-surface rounded-3xl shadow-2xl max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto border border-border"
+        className={`${ui.surface.modal} max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto`}
         onClick={(e) => e.stopPropagation()}
       >
         <ModalHeader onClose={handleClose} />

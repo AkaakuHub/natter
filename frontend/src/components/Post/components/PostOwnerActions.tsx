@@ -4,6 +4,7 @@ import { useDropdown } from "@/hooks/useDropdown";
 import { Post } from "@/api/types";
 import EditPostModal from "@/components/EditPostModal";
 import DeleteConfirmDialog from "@/components/DeleteConfirmDialog";
+import { ui } from "@/styles/ui";
 
 interface PostOwnerActionsProps {
   post: Post;
@@ -41,7 +42,7 @@ const PostOwnerActions = ({
     <div className="relative" ref={ref}>
       <button
         onClick={handleMenuClick}
-        className="p-2 rounded-full text-text-muted hover:text-text hover:bg-surface-variant transition-colors duration-200"
+        className={ui.button.icon}
         title="投稿のオプション"
       >
         <IconDots size={20} />
@@ -49,7 +50,9 @@ const PostOwnerActions = ({
 
       {/* ドロップダウンメニュー */}
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-48 bg-surface rounded-2xl shadow-2xl border border-border overflow-hidden z-[100]">
+        <div
+          className={`${ui.surface.menu} absolute top-full right-0 mt-2 w-48 z-[100]`}
+        >
           <button
             onClick={handleEdit}
             className="w-full px-4 py-3 text-left hover:bg-surface-variant flex items-center gap-3 transition-colors"

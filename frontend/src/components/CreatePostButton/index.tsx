@@ -2,6 +2,7 @@
 
 import React from "react";
 import { IconPlus } from "@tabler/icons-react";
+import { ui } from "@/styles/ui";
 
 interface CreatePostButtonProps {
   onClick: () => void;
@@ -11,7 +12,7 @@ const CreatePostButton: React.FC<CreatePostButtonProps> = ({ onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="fixed bottom-20 right-4 lg:left-1/2 lg:transform lg:translate-x-[90px] w-14 h-14 bg-interactive hover:bg-interactive-hover text-text-inverse rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 z-40"
+      className={`${ui.button.floating} fixed bottom-20 right-4 z-40 lg:left-1/2 lg:translate-x-[90px]`}
       aria-label="新しい投稿を作成"
     >
       <IconPlus size={24} strokeWidth={2.5} />

@@ -10,12 +10,49 @@ import SkeletonCard from "@/components/common/SkeletonCard";
 import { ExtendedSession } from "@/types";
 import { useSPANavigation } from "@/core/spa";
 import { avatarImageUrl } from "@/utils/avatarImage";
+import { ui } from "@/styles/ui";
 
 interface FollowListProps {
   userId: string;
   type: "following" | "followers";
   session?: ExtendedSession | null;
 }
+
+interface FollowListHeaderProps {
+  title: string;
+  detail?: string;
+  showBackButton: boolean;
+  onBack: () => void;
+  loading?: boolean;
+}
+
+const FollowListHeader = ({
+  title,
+  detail,
+  showBackButton,
+  onBack,
+  loading = false,
+}: FollowListHeaderProps) => {
+  return (
+    <div className="sticky top-0 bg-surface/80 backdrop-blur-md border-b border-surface-variant z-10">
+      <div className="flex items-center gap-3 p-4">
+        {showBackButton && (
+          <button onClick={onBack} className={ui.button.icon} title="戻る">
+            <IconArrowLeft size={20} />
+          </button>
+        )}
+        <div className="flex-1">
+          <h1 className="text-xl font-bold text-text">{title}</h1>
+          {loading ? (
+            <div className="h-4 bg-surface-variant animate-pulse rounded w-32 mt-1"></div>
+          ) : detail ? (
+            <p className="text-sm text-text-muted">{detail}</p>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const FollowList: React.FC<FollowListProps> = ({ userId, type, session }) => {
   const { navigateToProfile } = useSPANavigation();
@@ -43,6 +80,7 @@ const FollowList: React.FC<FollowListProps> = ({ userId, type, session }) => {
   } = useFollowers(userId);
 
   const isFollowing = type === "following";
+  const title = isFollowing ? "フォロー中" : "フォロワー";
   const data = isFollowing ? followingData : followersData;
   const loading = isFollowing ? followingLoading : followersLoading;
   const error = isFollowing ? followingError : followersError;
@@ -54,28 +92,13 @@ const FollowList: React.FC<FollowListProps> = ({ userId, type, session }) => {
   if (loading) {
     return (
       <div className="w-full max-w-md mx-auto">
-        {/* Header with back button */}
-        <div className="sticky top-0 bg-surface/80 backdrop-blur-md border-b border-surface-variant z-10">
-          <div className="flex items-center gap-3 p-4">
-            {session && (
-              <button
-                onClick={handleBackClick}
-                className="p-2 hover:bg-surface-hover rounded-full transition-colors"
-                title="戻る"
-              >
-                <IconArrowLeft size={20} className="text-text" />
-              </button>
-            )}
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-text">
-                {isFollowing ? "フォロー中" : "フォロワー"}
-              </h1>
-              <div className="h-4 bg-surface-variant animate-pulse rounded w-32 mt-1"></div>
-            </div>
-          </div>
-        </div>
+        <FollowListHeader
+          title={title}
+          showBackButton={!!session}
+          onBack={handleBackClick}
+          loading={true}
+        />
 
-        {/* Content */}
         <div className="p-4">
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
@@ -90,27 +113,12 @@ const FollowList: React.FC<FollowListProps> = ({ userId, type, session }) => {
   if (error) {
     return (
       <div className="w-full max-w-md mx-auto">
-        {/* Header with back button */}
-        <div className="sticky top-0 bg-surface/80 backdrop-blur-md border-b border-surface-variant z-10">
-          <div className="flex items-center gap-3 p-4">
-            {session && (
-              <button
-                onClick={handleBackClick}
-                className="p-2 hover:bg-surface-hover rounded-full transition-colors"
-                title="戻る"
-              >
-                <IconArrowLeft size={20} className="text-text" />
-              </button>
-            )}
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-text">
-                {isFollowing ? "フォロー中" : "フォロワー"}
-              </h1>
-            </div>
-          </div>
-        </div>
+        <FollowListHeader
+          title={title}
+          showBackButton={!!session}
+          onBack={handleBackClick}
+        />
 
-        {/* Content */}
         <div className="p-4">
           <div className="text-center py-8">
             <p className="text-error">データの取得に失敗しました</p>
@@ -122,31 +130,13 @@ const FollowList: React.FC<FollowListProps> = ({ userId, type, session }) => {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      {/* Header with back button */}
-      <div className="sticky top-0 bg-surface/80 backdrop-blur-md border-b border-surface-variant z-10">
-        <div className="flex items-center gap-3 p-4">
-          {session && (
-            <button
-              onClick={handleBackClick}
-              className="p-2 hover:bg-surface-hover rounded-full transition-colors"
-              title="戻る"
-            >
-              <IconArrowLeft size={20} className="text-text" />
-            </button>
-          )}
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-text">
-              {isFollowing ? "フォロー中" : "フォロワー"}
-            </h1>
-            <p className="text-sm text-text-muted">
-              {targetUser?.name || "ユーザー"}の
-              {isFollowing ? "フォロー中" : "フォロワー"} ({data.length})
-            </p>
-          </div>
-        </div>
-      </div>
+      <FollowListHeader
+        title={title}
+        detail={`${targetUser?.name || "ユーザー"}の${title} (${data.length})`}
+        showBackButton={!!session}
+        onBack={handleBackClick}
+      />
 
-      {/* Content */}
       <div className="p-4">
         {data.length === 0 ? (
           <div className="text-center py-8">

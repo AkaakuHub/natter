@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { IconX } from "@tabler/icons-react";
 import { useImagePreload } from "@/hooks/useImagePreload";
+import { ui } from "@/styles/ui";
 
 interface ImagePreviewProps {
   imageUrls: string[];
@@ -21,14 +22,14 @@ const ImagePreview = ({ imageUrls, onRemove }: ImagePreviewProps) => {
           <Image
             src={imageUrl}
             alt={`添付画像 ${index + 1}`}
-            className="w-full h-32 object-cover rounded-2xl shadow-soft hover:shadow-glow transition-all duration-300"
+            className="w-full h-32 object-cover rounded-lg border border-border"
             width={200}
             height={128}
           />
           <button
             type="button"
             onClick={() => onRemove(index)}
-            className="absolute top-2 right-2 bg-error/90 backdrop-blur-sm text-text-inverse rounded-full p-2 hover:bg-error-hover transition-all duration-300 hover:scale-110"
+            className={`${ui.button.icon} absolute top-2 right-2 bg-surface text-error hover:bg-error-bg hover:text-error`}
           >
             <IconX size={16} />
           </button>

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { IconX, IconKeyboard } from "@tabler/icons-react";
+import { ui } from "@/styles/ui";
 
 interface ShortcutHelpModalProps {
   isOpen: boolean;
@@ -89,10 +90,7 @@ const ShortcutHelpModal: React.FC<ShortcutHelpModalProps> = ({
               キーボードショートカット
             </h2>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-surface-hover transition-colors"
-          >
+          <button onClick={onClose} className={ui.button.icon}>
             <IconX size={20} className="text-text-muted" />
           </button>
         </div>

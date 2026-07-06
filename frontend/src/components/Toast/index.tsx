@@ -3,6 +3,7 @@
 import React from "react";
 import { useToastAnimation } from "@/hooks/useToastAnimation";
 import { toastContainerColors, ToastType } from "@/utils/toastConfig";
+import { ui } from "@/styles/ui";
 
 import ToastIcon from "./components/ToastIcon";
 import ToastMessage from "./components/ToastMessage";
@@ -40,7 +41,7 @@ const Toast = ({
       onClick={onClick}
     >
       <div
-        className={`flex items-center gap-3 rounded-2xl bg-surface text-text border shadow-md min-w-[280px] max-w-[420px] px-4 py-3 ${toastContainerColors[type]} ${
+        className={`flex items-center gap-3 text-text min-w-[280px] max-w-[420px] px-4 py-3 ${ui.surface.panel} ${toastContainerColors[type]} ${
           onClick ? "cursor-pointer" : ""
         }`}
       >

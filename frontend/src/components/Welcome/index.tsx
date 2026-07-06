@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ExtendedSession } from "@/types";
 import { avatarImageUrl } from "@/utils/avatarImage";
+import { ui } from "@/styles/ui";
 
 interface WelcomeProps {
   session: ExtendedSession;
@@ -30,8 +31,8 @@ const Welcome = ({ session, onUserCreated }: WelcomeProps) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-interactive-bg to-surface-variant p-4">
-      <div className="bg-surface rounded-lg shadow-lg p-8 max-w-md w-full text-center border border-border">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-surface-variant p-4">
+      <div className={`${ui.surface.modal} p-8 max-w-md w-full text-center`}>
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-text mb-2">初めまして！</h1>
           <p className="text-text-secondary">Natterへようこそ🎉</p>
@@ -66,7 +67,7 @@ const Welcome = ({ session, onUserCreated }: WelcomeProps) => {
         <Button
           onClick={handleCreateUser}
           disabled={isCreating}
-          className="w-full bg-interactive hover:bg-interactive-hover text-text-inverse font-bold py-3 px-6 rounded-lg transition-colors"
+          className={`${ui.button.primary} w-full py-3`}
         >
           {isCreating ? "作成中..." : "アカウントを作成"}
         </Button>

@@ -2,9 +2,11 @@
 
 import React from "react";
 import { createPortal } from "react-dom";
+import { IconX } from "@tabler/icons-react";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { useModalState } from "@/hooks/useModalState";
+import { ui } from "@/styles/ui";
 
 import ImageDisplay from "./components/ImageDisplay";
 import NavigationButtons from "./components/NavigationButtons";
@@ -64,21 +66,9 @@ const ImageModal = ({
         {/* バツボタン */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 sm:top-6 sm:right-6 z-[10000] text-text-inverse hover:text-text-inverse/80 bg-overlay hover:bg-overlay/90 backdrop-blur-sm rounded-full p-3 transition-all duration-200"
+          className={`${ui.button.overlayIcon} absolute top-4 right-4 z-[10000] sm:top-6 sm:right-6`}
         >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
+          <IconX size={24} />
         </button>
 
         {/* ナビゲーションボタン（複数画像の場合のみ） */}

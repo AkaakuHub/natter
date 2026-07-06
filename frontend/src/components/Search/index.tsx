@@ -7,6 +7,7 @@ import { transformPostToPostComponent } from "@/domain/posts/postTransformers";
 import PostComponent from "@/components/Post";
 import { useInputFocus } from "@/hooks/useInputFocus";
 import SkeletonCard from "@/components/common/SkeletonCard";
+import { ui } from "@/styles/ui";
 
 interface SearchProps {
   currentUser?: User | null;
@@ -97,13 +98,13 @@ const Search: React.FC<SearchProps> = ({ currentUser }) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="投稿、ユーザーを検索..."
-              className="w-full pl-10 pr-10 py-3 bg-surface-variant border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-interactive focus:border-transparent text-text placeholder-text-muted"
+              className="w-full rounded-lg border border-border bg-surface-variant py-3 pl-10 pr-10 text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-border-focus"
             />
             {searchTerm && (
               <button
                 type="button"
                 onClick={handleClearSearch}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full hover:bg-surface-hover transition-colors"
+                className={`${ui.button.icon} absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2`}
               >
                 <IconX size={16} className="text-text-muted" />
               </button>

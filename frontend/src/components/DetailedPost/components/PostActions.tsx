@@ -6,6 +6,8 @@ import {
   IconLogin,
 } from "@tabler/icons-react";
 import { useSPANavigation } from "@/core/spa";
+import { cn } from "@/lib/utils";
+import { ui } from "@/styles/ui";
 
 interface PostActionsProps {
   isLiked: boolean;
@@ -43,7 +45,7 @@ const PostActions = ({
           </p>
           <button
             onClick={handleLoginClick}
-            className="flex items-center gap-2 mx-auto px-6 py-3 bg-interactive text-text-inverse rounded-full transition-all duration-300 hover:scale-105 hover:bg-interactive-hover"
+            className={`${ui.button.primary} mx-auto`}
           >
             <IconLogin size={20} />
             <span className="font-medium">ログイン</span>
@@ -59,11 +61,12 @@ const PostActions = ({
         <button
           onClick={onLike}
           disabled={isLiking || !canInteract}
-          className={`flex items-center gap-2 px-4 py-3 rounded-full transition-all duration-300 hover:scale-105 ${
+          className={cn(
+            ui.button.action,
             isLiked
               ? "text-error bg-error-bg hover:bg-error-hover"
-              : "text-text-muted hover:text-error hover:bg-error-bg"
-          } ${isLiking || !canInteract ? "opacity-50 cursor-not-allowed" : ""}`}
+              : "hover:text-error hover:bg-error-bg",
+          )}
         >
           <IconHeart size={20} fill={isLiked ? "currentColor" : "none"} />
           <span className="font-medium">{likeCount}</span>
@@ -72,11 +75,12 @@ const PostActions = ({
         <button
           onClick={canInteract ? onReply : undefined}
           disabled={!canInteract}
-          className={`flex items-center gap-2 px-4 py-3 rounded-full transition-all duration-300 ${
+          className={cn(
+            ui.button.action,
             canInteract
-              ? "text-text-muted hover:text-interactive hover:bg-interactive-bg hover:scale-105"
-              : "text-text-muted opacity-50 cursor-not-allowed"
-          }`}
+              ? "hover:text-text hover:bg-surface-hover"
+              : "opacity-50 cursor-not-allowed",
+          )}
         >
           <IconMessageCircle size={20} />
           <span className="font-medium">{repliesCount}</span>
@@ -84,7 +88,7 @@ const PostActions = ({
 
         <button
           onClick={onShare}
-          className="flex items-center gap-2 px-4 py-3 rounded-full text-text-muted hover:text-success hover:bg-success-bg transition-all duration-300 hover:scale-105"
+          className={`${ui.button.action} hover:text-success hover:bg-success-bg`}
         >
           <IconShare size={20} />
           <span className="font-medium">共有</span>

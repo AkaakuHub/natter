@@ -1,5 +1,7 @@
 import React from "react";
 import { IconHeart, IconMessageCircle, IconShare } from "@tabler/icons-react";
+import { cn } from "@/lib/utils";
+import { ui } from "@/styles/ui";
 
 interface PostActionsProps {
   isLiked: boolean;
@@ -31,11 +33,12 @@ const PostActions = ({
             onLike(e);
           }}
           disabled={isLiking || !canInteract}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors duration-200 ${
+          className={cn(
+            ui.button.action,
             isLiked
               ? "text-error bg-error-bg hover:bg-error-hover"
-              : "text-text-muted hover:text-error hover:bg-error-bg"
-          } ${isLiking || !canInteract ? "opacity-50 cursor-not-allowed" : ""}`}
+              : "hover:text-error hover:bg-error-bg",
+          )}
         >
           <IconHeart
             size={18}
@@ -55,11 +58,12 @@ const PostActions = ({
               : undefined
           }
           disabled={!canInteract}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors duration-200 ${
+          className={cn(
+            ui.button.action,
             canInteract
-              ? "text-text-muted hover:text-interactive hover:bg-interactive-bg"
-              : "text-text-muted opacity-50 cursor-not-allowed"
-          }`}
+              ? "hover:text-text hover:bg-surface-hover"
+              : "opacity-50 cursor-not-allowed",
+          )}
         >
           <IconMessageCircle size={18} />
           <span className="font-medium text-sm">{replyCount}</span>
@@ -70,7 +74,7 @@ const PostActions = ({
             e.stopPropagation();
             onShare(e);
           }}
-          className="flex items-center gap-2 px-4 py-2 rounded-full text-text-muted hover:text-success hover:bg-success-bg transition-colors duration-200"
+          className={`${ui.button.action} hover:text-success hover:bg-success-bg`}
         >
           <IconShare size={18} />
           <span className="font-medium text-sm">共有</span>

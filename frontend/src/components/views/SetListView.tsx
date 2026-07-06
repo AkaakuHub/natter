@@ -7,6 +7,7 @@ import { IconUser, IconHash, IconEdit } from "@tabler/icons-react";
 import EditCharacterModal from "@/components/EditCharacterModal";
 import type { Character } from "@/api";
 import SkeletonCard from "@/components/common/SkeletonCard";
+import { ui } from "@/styles/ui";
 
 const SetListView = () => {
   const { status } = useAuthSession();
@@ -100,7 +101,7 @@ const SetListView = () => {
                   <div className="flex-shrink-0">
                     <button
                       onClick={() => setEditingCharacter(character)}
-                      className="p-2 text-text-secondary hover:text-text hover:bg-surface-elevated rounded-full transition-colors"
+                      className={ui.button.icon}
                       title="キャラクターを編集"
                     >
                       <IconEdit size={20} />

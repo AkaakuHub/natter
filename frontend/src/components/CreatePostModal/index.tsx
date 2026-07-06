@@ -9,6 +9,7 @@ import { usePostSubmit } from "@/hooks/usePostSubmit";
 import { useFormValidation } from "@/hooks/useFormValidation";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { useSPANavigation } from "@/core/spa";
+import { ui } from "@/styles/ui";
 
 import UserAvatar from "../CreatePost/components/UserAvatar";
 import PostTextArea from "../CreatePost/components/PostTextArea";
@@ -144,7 +145,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   if (!currentUser) {
     return (
       <div className="fixed inset-0 bg-overlay flex items-center justify-center z-50 p-4">
-        <div className="bg-surface rounded-lg max-w-md w-full p-6 text-center">
+        <div className={`${ui.surface.modal} max-w-md w-full p-6 text-center`}>
           <h2 className="text-xl font-bold text-text mb-4">
             ログインが必要です
           </h2>
@@ -152,15 +153,12 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
             投稿するにはログインしてください。
           </p>
           <div className="flex gap-3 justify-center">
-            <button
-              onClick={handleClose}
-              className="px-4 py-2 border border-border rounded-lg text-text hover:bg-surface-hover"
-            >
+            <button onClick={handleClose} className={ui.button.secondary}>
               閉じる
             </button>
             <button
               onClick={() => navigateToLogin()}
-              className="px-4 py-2 bg-interactive text-text-inverse rounded-lg hover:bg-interactive-hover"
+              className={ui.button.primary}
             >
               ログイン
             </button>
@@ -172,7 +170,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-overlay flex items-start justify-center z-50 p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-surface rounded-lg max-w-lg w-full mt-2 sm:mt-16 border border-border relative max-h-[95vh] sm:max-h-[80vh] flex flex-col">
+      <div
+        className={`${ui.surface.modal} max-w-lg w-full mt-2 sm:mt-16 relative max-h-[95vh] sm:max-h-[80vh] flex flex-col`}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-4 border-b border-border flex-shrink-0">
           <h2 className="text-lg sm:text-lg font-semibold text-text">
@@ -180,7 +180,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
           </h2>
           <button
             onClick={handleClose}
-            className="p-2 rounded-full hover:bg-surface-hover active:bg-surface-hover transition-colors touch-manipulation"
+            className={`${ui.button.icon} touch-manipulation`}
             disabled={isSubmitting}
           >
             <IconX size={20} className="text-text-muted" />
@@ -227,7 +227,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                       }
                     }}
                     placeholder="URL（他の人には見えません）"
-                    className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-surface text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-interactive focus:border-transparent"
+                    className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-border-focus"
                     disabled={isSubmitting}
                     maxLength={500}
                   />
@@ -250,7 +250,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
                 {/* 画像公開設定（画像がある場合のみ表示） */}
                 {images.length > 0 && (
-                  <div className="mt-3 p-3 bg-surface-variant rounded-lg border border-border">
+                  <div className={`${ui.surface.subtle} mt-3 p-3`}>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
@@ -288,7 +288,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
       {/* 破棄確認ダイアログ */}
       {showDiscardDialog && (
         <div className="fixed inset-0 bg-overlay flex items-center justify-center z-[60] p-4">
-          <div className="bg-surface rounded-lg max-w-sm w-full p-6 border border-border">
+          <div className={`${ui.surface.modal} max-w-sm w-full p-6`}>
             <h3 className="text-lg font-semibold text-text mb-4">
               投稿を破棄しますか？
             </h3>
@@ -298,13 +298,13 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
             <div className="flex gap-3 justify-end">
               <button
                 onClick={handleDiscardCancel}
-                className="px-4 py-2 border border-border rounded-lg text-text hover:bg-surface-hover transition-colors"
+                className={ui.button.secondary}
               >
                 いいえ
               </button>
               <button
                 onClick={handleDiscardConfirm}
-                className="px-4 py-2 bg-error text-text-inverse rounded-lg hover:bg-error/90 transition-colors"
+                className={ui.button.danger}
               >
                 はい
               </button>

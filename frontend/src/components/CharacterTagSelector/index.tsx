@@ -19,6 +19,8 @@ import {
   getCharacterTextColor,
 } from "@/utils/characterColorUtils";
 import type { Character } from "@/api";
+import { cn } from "@/lib/utils";
+import { ui } from "@/styles/ui";
 
 interface CharacterTagSelectorProps {
   selectedCharacter?: Character | null;
@@ -221,7 +223,7 @@ const CharacterTagSelector = forwardRef<
           {/* 選択されたキャラクタータグ */}
           {selectedCharacter && (
             <div
-              className="inline-flex items-center gap-2 px-3 py-1 border rounded-full"
+              className="inline-flex items-center gap-2 rounded-md border px-3 py-1"
               style={getCharacterColorStyle(selectedCharacter.name, 0.5)}
             >
               <span
@@ -233,7 +235,7 @@ const CharacterTagSelector = forwardRef<
               <button
                 type="button"
                 onClick={handleRemoveTag}
-                className="p-0.5 hover:bg-surface-hover rounded-full transition-colors"
+                className="rounded-sm p-0.5 transition-colors hover:bg-surface-hover"
               >
                 <IconX
                   size={14}
@@ -259,7 +261,7 @@ const CharacterTagSelector = forwardRef<
                 onKeyDown={handleKeyPress}
                 placeholder="キャラクター名を入力..."
                 maxLength={50}
-                className="w-full px-4 py-3 sm:py-2 pr-12 bg-surface border border-border rounded-lg text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary text-base sm:text-sm transition-colors"
+                className="w-full rounded-lg border border-border bg-surface px-4 py-3 pr-12 text-base text-text placeholder-text-muted transition-colors focus:outline-none focus:ring-2 focus:ring-border-focus sm:py-2 sm:text-sm"
                 style={{ fontSize: "16px" }}
               />
               {/* 文字数カウンター */}
@@ -282,7 +284,10 @@ const CharacterTagSelector = forwardRef<
                   type="button"
                   onClick={handleCreateCharacter}
                   disabled={createCharacterMutation.isPending}
-                  className="inline-flex items-center gap-1 px-3 py-3 sm:py-2 bg-interactive text-text-inverse rounded-lg text-sm hover:bg-interactive-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+                  className={cn(
+                    ui.button.primary,
+                    "whitespace-nowrap px-3 py-3 sm:py-2",
+                  )}
                 >
                   <IconPlus size={14} />
                   <span>追加</span>
@@ -303,7 +308,7 @@ const CharacterTagSelector = forwardRef<
             createPortal(
               <div
                 ref={dropdownRef}
-                className="fixed bg-surface border border-border rounded-lg shadow-lg z-[9999] max-h-48 overflow-hidden transform-gpu"
+                className={`${ui.surface.menu} fixed z-[9999] max-h-48 transform-gpu`}
                 style={{
                   top: dropdownPosition.top + 4,
                   left: dropdownPosition.left,

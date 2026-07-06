@@ -1,5 +1,6 @@
 import React from "react";
 import { IconArrowLeft } from "@tabler/icons-react";
+import { ui } from "@/styles/ui";
 
 interface BackButtonProps {
   onBack: () => void;
@@ -7,14 +8,8 @@ interface BackButtonProps {
 
 const BackButton = ({ onBack }: BackButtonProps) => {
   return (
-    <button
-      onClick={onBack}
-      className="mb-6 flex items-center gap-2 text-text-muted hover:text-interactive transition-all duration-300 group p-2 rounded-full hover:bg-interactive-bg"
-    >
-      <IconArrowLeft
-        size={20}
-        className="group-hover:-translate-x-1 transition-transform"
-      />
+    <button onClick={onBack} className={`${ui.button.action} mb-6`}>
+      <IconArrowLeft size={20} />
       <span className="font-medium">戻る</span>
     </button>
   );

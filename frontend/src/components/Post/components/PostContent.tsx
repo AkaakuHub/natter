@@ -7,6 +7,7 @@ import { Character } from "@/api";
 import { useImagePreload } from "@/hooks/useImagePreload";
 import AuthenticatedImage from "@/components/common/AuthenticatedImage";
 import RichText from "@/components/common/RichText";
+import { ui } from "@/styles/ui";
 
 interface PostContentProps {
   content: string;
@@ -126,7 +127,7 @@ const PostContent = ({
                   e.stopPropagation();
                   onImageClick(index);
                 }}
-                className={`relative focus:outline-none focus:ring-2 focus:ring-interactive/30 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200 ${
+                className={`relative focus:outline-none focus:ring-2 focus:ring-border-focus ${ui.surface.media} ${
                   imageArray.length === 1
                     ? "max-w-lg mx-auto"
                     : imageArray.length === 3 && index === 0
@@ -137,7 +138,7 @@ const PostContent = ({
                 <AuthenticatedImage
                   src={imageSrc}
                   alt="Post Image"
-                  className={`rounded-2xl ${
+                  className={`${
                     imageArray.length === 1
                       ? "w-full h-auto max-h-96 object-cover"
                       : imageArray.length === 3 && index === 0

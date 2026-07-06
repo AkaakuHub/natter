@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { IconChevronDown } from "@tabler/icons-react";
+import { ui } from "@/styles/ui";
 
 interface ProfileDropdownProps {
   profileImage?: string;
@@ -16,10 +17,7 @@ const ProfileDropdown = ({
   onClick,
 }: ProfileDropdownProps) => {
   return (
-    <button
-      onClick={onClick}
-      className="flex items-center gap-2 hover:bg-surface-variant rounded-full p-1 pr-3 transition-colors"
-    >
+    <button onClick={onClick} className={`${ui.button.action} p-1 pr-3`}>
       {profileImage ? (
         <Image
           src={profileImage}

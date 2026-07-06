@@ -8,6 +8,8 @@ import {
   useFollowUser,
   useUnfollowUser,
 } from "@/hooks/queries/useFollows";
+import { cn } from "@/lib/utils";
+import { ui } from "@/styles/ui";
 
 interface FollowButtonProps {
   userId: string;
@@ -65,11 +67,12 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       <button
         onClick={handleFollowToggle}
         disabled={loading}
-        className={`flex items-center justify-center w-8 h-8 rounded-full transition-colors ${
+        className={cn(
+          ui.button.icon,
           isFollowing
-            ? "bg-error text-text-inverse hover:bg-error/90"
-            : "bg-interactive text-text-inverse hover:bg-interactive-hover"
-        } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+            ? "bg-error text-text-inverse hover:bg-error-hover hover:text-text-inverse"
+            : "bg-interactive text-text-inverse hover:bg-interactive-hover hover:text-text-inverse",
+        )}
       >
         {isFollowing ? <IconUserMinus size={16} /> : <IconUserPlus size={16} />}
       </button>
@@ -80,11 +83,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
     <button
       onClick={handleFollowToggle}
       disabled={loading}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-        isFollowing
-          ? "bg-error text-text-inverse hover:bg-error/90"
-          : "bg-interactive text-text-inverse hover:bg-interactive-hover"
-      } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+      className={cn(isFollowing ? ui.button.danger : ui.button.primary)}
     >
       {isFollowing ? (
         <>

@@ -5,6 +5,8 @@ import { IconUser, IconX } from "@tabler/icons-react";
 import { useUpdateCharacter } from "@/hooks/queries/useCharacters";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import type { Character } from "@/api";
+import { cn } from "@/lib/utils";
+import { ui } from "@/styles/ui";
 
 interface EditCharacterModalProps {
   isOpen: boolean;
@@ -64,19 +66,16 @@ const EditCharacterModal = ({
       className="fixed inset-0 z-50 flex items-center justify-center bg-overlay"
       onClick={handleBackdropClick}
     >
-      <div className="bg-surface rounded-xl p-6 w-full max-w-md mx-4 border border-border">
+      <div className={`${ui.surface.modal} p-6 w-full max-w-md mx-4`}>
         {/* ヘッダー */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-surface-variant rounded-md flex items-center justify-center">
               <IconUser size={20} className="text-primary" />
             </div>
             <h2 className="text-xl font-bold text-text">キャラクター編集</h2>
           </div>
-          <button
-            onClick={onClose}
-            className="text-text-secondary hover:text-text transition-colors p-1 rounded-full hover:bg-surface-elevated"
-          >
+          <button onClick={onClose} className={ui.button.icon}>
             <IconX size={20} />
           </button>
         </div>
@@ -96,7 +95,7 @@ const EditCharacterModal = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="キャラクター名を入力"
-              className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-border-focus"
               disabled={isSubmitting}
               required
             />
@@ -107,7 +106,7 @@ const EditCharacterModal = ({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-border rounded-lg text-text-secondary hover:bg-surface-elevated transition-colors"
+              className={`${ui.button.secondary} flex-1`}
               disabled={isSubmitting}
             >
               キャンセル
@@ -115,7 +114,13 @@ const EditCharacterModal = ({
             <button
               type="submit"
               disabled={isSubmitting || !name.trim()}
-              className="flex-1 px-4 py-2 bg-interactive text-text-inverse rounded-lg hover:bg-interactive-hover disabled:bg-interactive-disabled disabled:cursor-not-allowed transition-colors"
+              className={cn(
+                ui.button.primary,
+                "flex-1",
+                isSubmitting || !name.trim()
+                  ? "bg-interactive-disabled hover:bg-interactive-disabled"
+                  : "",
+              )}
             >
               {isSubmitting ? "更新中..." : "更新"}
             </button>
