@@ -5,7 +5,10 @@ interface ParentPost {
   id: number;
   content?: string;
   images?: string[];
+  imagesPublic?: boolean;
+  authorId?: string;
   author?: {
+    id?: string;
     name?: string;
     image?: string;
   };
@@ -14,11 +17,13 @@ interface ParentPost {
 interface ParentPostCardProps {
   parentPost: ParentPost;
   onParentPostClick: () => void;
+  currentUserId?: string;
 }
 
 const ParentPostCard = ({
   parentPost,
   onParentPostClick,
+  currentUserId,
 }: ParentPostCardProps) => {
   return (
     <ReplySourcePost
@@ -26,11 +31,14 @@ const ParentPostCard = ({
         id: parentPost.id,
         content: parentPost.content,
         images: parentPost.images,
+        imagesPublic: parentPost.imagesPublic,
+        authorId: parentPost.authorId,
         author: parentPost.author,
       }}
       variant="detailed"
       onPostClick={onParentPostClick}
       showReplyLabel={true}
+      currentUserId={currentUserId}
     />
   );
 };

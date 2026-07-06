@@ -16,6 +16,7 @@ export const transformPostToPostComponent = (post: Post) => {
     authorId: post.authorId || post.author.id,
     content: post.content || "",
     images: post.images || [],
+    imagesPublic: post.imagesPublic,
     url: post.url || undefined,
     createdAt: post.createdAt,
     updatedAt: post.updatedAt || post.createdAt,
@@ -29,6 +30,7 @@ export const transformPostToPostComponent = (post: Post) => {
           userId: post.replyTo.author?.id || "",
           content: post.replyTo.content || "",
           images: post.replyTo.images || [],
+          imagesPublic: post.replyTo.imagesPublic,
           createdAt: post.replyTo.createdAt || post.createdAt,
           updatedAt:
             post.replyTo.updatedAt || post.replyTo.createdAt || post.createdAt,

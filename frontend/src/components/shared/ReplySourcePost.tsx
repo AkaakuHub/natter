@@ -4,6 +4,7 @@ import { IconArrowLeft } from "@tabler/icons-react";
 import { getImageUrl } from "@/utils/postUtils";
 import AuthenticatedImage from "@/components/common/AuthenticatedImage";
 import { avatarImageUrl } from "@/utils/avatarImage";
+import { shouldFetchPostImageWithAuth } from "@/domain/posts/imageAccess";
 
 interface PostImage {
   id: number;
@@ -14,7 +15,10 @@ interface ReplySourcePost {
   id: number;
   content?: string;
   images?: string[];
+  imagesPublic?: boolean;
+  authorId?: string;
   author?: {
+    id?: string;
     name?: string;
     image?: string;
   };
@@ -25,6 +29,7 @@ interface ReplySourcePostProps {
   variant?: "modal" | "detailed" | "inline";
   onPostClick?: () => void;
   showReplyLabel?: boolean;
+  currentUserId?: string;
 }
 
 const ReplySourcePost = ({
@@ -32,6 +37,7 @@ const ReplySourcePost = ({
   variant = "modal",
   onPostClick,
   showReplyLabel = false,
+  currentUserId,
 }: ReplySourcePostProps) => {
   // 画像データを正規化（文字列化されたJSONを配列に変換）
   let normalizedImageArray: string[] = [];
@@ -60,6 +66,13 @@ const ReplySourcePost = ({
   );
 
   const isClickable = !!onPostClick;
+  const fetchImagesWithAuth = shouldFetchPostImageWithAuth(
+    {
+      authorId: post.authorId ?? post.author?.id,
+      imagesPublic: post.imagesPublic,
+    },
+    currentUserId,
+  );
 
   const renderImages = () => {
     if (!hasImages) {
@@ -81,6 +94,7 @@ const ReplySourcePost = ({
               width={60}
               height={60}
               className="w-16 h-16 min-w-[64px] min-h-[64px] object-cover"
+              fetchWithAuth={fetchImagesWithAuth}
             />
           </div>
         ))}

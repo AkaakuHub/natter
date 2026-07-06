@@ -13,6 +13,7 @@ import { getImageUrl } from "@/utils/postUtils";
 import { useSPANavigation } from "@/core/spa";
 import { appendNormalizedImages } from "@/utils/normalizePostImages";
 import { ui } from "@/styles/ui";
+import { shouldFetchPostImageWithAuth } from "@/domain/posts/imageAccess";
 
 import BackButton from "./components/BackButton";
 import LoadingState from "./components/LoadingState";
@@ -132,6 +133,9 @@ const DetailedPostComponent = ({
     );
   }
   const canInteract = !!currentUser?.id;
+  const fetchImagesWithAuth = post
+    ? shouldFetchPostImageWithAuth(post, currentUser?.id)
+    : true;
 
   return (
     <div className="bg-surface-variant min-h-full">
@@ -153,11 +157,15 @@ const DetailedPostComponent = ({
                   id: post.replyTo.id,
                   content: post.replyTo.content,
                   images: post.replyTo.images || [],
+                  imagesPublic: post.replyTo.imagesPublic,
+                  authorId: post.replyTo.authorId,
                   author: {
+                    id: post.replyTo.author?.id,
                     name: post.replyTo.author?.name,
                     image: post.replyTo.author?.image ?? undefined,
                   },
                 }}
+                currentUserId={currentUser?.id}
                 onParentPostClick={() => {
                   if (post.replyTo?.id) {
                     navigateToPost(post.replyTo.id);
@@ -198,6 +206,7 @@ const DetailedPostComponent = ({
             images={post.images}
             url={post.url}
             character={post.character}
+            fetchImagesWithAuth={fetchImagesWithAuth}
             onImageClick={handleImageClick}
           />
 
@@ -221,6 +230,7 @@ const DetailedPostComponent = ({
           isOpen={isModalOpen}
           images={post.images.map((image) => getImageUrl(image))}
           currentIndex={selectedImageIndex}
+          fetchImagesWithAuth={fetchImagesWithAuth}
           onClose={closeImageModal}
           onPrevious={selectedImageIndex > 0 ? handlePreviousImage : undefined}
           onNext={
@@ -239,7 +249,10 @@ const DetailedPostComponent = ({
             id: post.id,
             content: post.content || "",
             images: post.images || [],
+            imagesPublic: post.imagesPublic,
+            authorId: post.authorId,
             author: {
+              id: post.author?.id || post.authorId || "",
               name: post.author?.name || "Unknown User",
               image: post.author?.image ?? undefined,
             },

@@ -14,6 +14,7 @@ interface PostContentProps {
   images?: string[];
   url?: string;
   character?: Character;
+  fetchImagesWithAuth: boolean;
   onImageClick: (index: number) => void;
 }
 
@@ -22,6 +23,7 @@ const PostContent = ({
   images,
   url,
   character,
+  fetchImagesWithAuth,
   onImageClick,
 }: PostContentProps) => {
   const imageArray = React.useMemo(() => {
@@ -149,6 +151,7 @@ const PostContent = ({
                   height={200}
                   loading="lazy"
                   decoding="async"
+                  fetchWithAuth={fetchImagesWithAuth}
                 />
               </button>
             );

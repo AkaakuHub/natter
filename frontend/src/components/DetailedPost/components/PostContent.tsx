@@ -14,6 +14,7 @@ interface PostContentProps {
   images?: string[];
   url?: string;
   character?: Character;
+  fetchImagesWithAuth: boolean;
   onImageClick: (index: number) => void;
 }
 
@@ -22,6 +23,7 @@ const PostContent = ({
   images,
   url,
   character,
+  fetchImagesWithAuth,
   onImageClick,
 }: PostContentProps) => {
   // 画像URLの配列を作成してプリロード
@@ -131,6 +133,7 @@ const PostContent = ({
                   className="w-full h-auto object-cover cursor-pointer"
                   loading="lazy"
                   decoding="async"
+                  fetchWithAuth={fetchImagesWithAuth}
                 />
               </button>
             );

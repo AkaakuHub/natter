@@ -17,7 +17,10 @@ interface ReplyModalProps {
     id: number;
     content: string;
     images?: string[];
+    imagesPublic?: boolean;
+    authorId?: string;
     author: {
+      id?: string;
       name: string;
       image?: string;
     };
@@ -77,7 +80,10 @@ const ReplyModal = ({
         className={`${ui.surface.modal} max-w-lg w-full mt-16 max-h-[80vh] overflow-y-auto`}
       >
         <ModalHeader onClose={onClose} />
-        <OriginalPost replyToPost={replyToPost} />
+        <OriginalPost
+          replyToPost={replyToPost}
+          currentUserId={currentUser.id}
+        />
         <ReplyForm
           currentUser={currentUser}
           content={content}
