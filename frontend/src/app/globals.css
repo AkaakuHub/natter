@@ -14,6 +14,7 @@
 
   --color-border: #eff3f4;
   --color-border-muted: #f7f9f9;
+  --color-border-strong: #cfd9de;
   --color-border-focus: #1d9bf0;
 
   --color-interactive: #0f1419;
@@ -50,6 +51,8 @@
   --shadow-sm: 0 1px 2px rgb(15 20 25 / 0.08);
   --shadow-md: 0 4px 12px rgb(15 20 25 / 0.08);
   --shadow-lg: 0 12px 24px rgb(15 20 25 / 0.12);
+  --shadow-popover:
+    0 0 0 1px rgb(15 20 25 / 0.08), 0 8px 24px rgb(15 20 25 / 0.14);
 
   /* Spacing */
   --space-1: 0.25rem;
@@ -94,6 +97,7 @@ body {
 
   --color-border: #2f3336;
   --color-border-muted: #202327;
+  --color-border-strong: #536471;
   --color-border-focus: #1d9bf0;
 
   --color-interactive: #eff3f4;
@@ -119,6 +123,9 @@ body {
   --color-special-white: #dddddd;
   --color-surface-hover: #202327;
   --color-surface-pressed: #2f3336;
+
+  --shadow-popover:
+    0 0 0 1px rgb(255 255 255 / 0.08), 0 12px 28px rgb(0 0 0 / 0.38);
 }
 
 @supports (font-variation-settings: normal) {

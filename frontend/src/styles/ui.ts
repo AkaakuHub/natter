@@ -5,9 +5,9 @@ const controlBase =
 
 export const ui = {
   surface: {
-    panel: "bg-surface border border-border rounded-lg shadow-sm",
-    modal: "bg-surface border border-border rounded-xl shadow-lg",
-    menu: "bg-surface border border-border rounded-lg shadow-md overflow-hidden",
+    panel: "bg-surface border border-border-strong rounded-lg shadow-sm",
+    modal: "bg-surface border border-border-strong rounded-xl shadow-popover",
+    menu: "bg-surface border border-border-strong rounded-lg shadow-popover overflow-hidden",
     subtle: "bg-surface-variant border border-border rounded-md",
     media: "overflow-hidden rounded-lg border border-border bg-surface",
   },

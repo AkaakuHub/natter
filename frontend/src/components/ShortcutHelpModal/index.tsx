@@ -81,7 +81,9 @@ const ShortcutHelpModal: React.FC<ShortcutHelpModalProps> = ({
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >
-      <div className="bg-surface rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto border border-border">
+      <div
+        className={`${ui.surface.modal} max-w-2xl w-full max-h-[80vh] overflow-y-auto`}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-2">

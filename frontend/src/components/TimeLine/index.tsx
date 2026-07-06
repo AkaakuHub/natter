@@ -195,7 +195,7 @@ const TimeLine = ({ currentUser, scrollContainerRef }: TimeLineProps) => {
               opacity: isPulling ? Math.min(pullDistance / 80, 1) : 1,
             }}
           >
-            <div className="bg-surface rounded-full p-2 shadow-lg border border-border">
+            <div className="rounded-lg border border-border-strong bg-surface p-2 shadow-popover">
               <div
                 className={`w-4 h-4 border-2 border-interactive border-t-transparent rounded-full ${
                   isRefreshing ? "animate-pulse bg-interactive/20" : ""

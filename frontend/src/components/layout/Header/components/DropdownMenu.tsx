@@ -7,6 +7,7 @@ import {
   IconDeviceDesktop,
 } from "@tabler/icons-react";
 import { useTheme, Theme } from "@/hooks/useTheme";
+import { ui } from "@/styles/ui";
 
 interface DropdownMenuProps {
   isOpen: boolean;
@@ -50,7 +51,9 @@ const DropdownMenu = ({
   };
 
   return (
-    <div className="absolute top-full left-0 mt-2 w-56 bg-surface-secondary rounded-xl shadow-lg border border-border overflow-hidden z-50">
+    <div
+      className={`${ui.surface.menu} absolute top-full left-0 mt-2 w-56 z-50`}
+    >
       <button
         onClick={onProfileClick}
         className="w-full px-4 py-3 text-left hover:bg-surface-elevated flex items-center gap-3 transition-colors"
