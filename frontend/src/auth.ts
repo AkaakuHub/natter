@@ -17,6 +17,11 @@ export type AuthSession = {
   };
 };
 
+type AuthMode = "link-auth" | "local-header";
+
+const LOCAL_DEV_USER_ID = "local-dev-user";
+const LOCAL_DEV_USER_NAME = "Local Dev User";
+
 export function loadAuthConfig() {
   return loadLinkAuthAppConfig({
     ACCOUNT_URL: requireEnv("ACCOUNT_URL"),
@@ -29,6 +34,10 @@ export function loadAuthConfig() {
 export async function getAuthSession(
   request: Request,
 ): Promise<AuthSession | null> {
+  if (getAuthMode() === "local-header") {
+    return getLocalHeaderAuthSession();
+  }
+
   const user = await getLinkAuthUser({
     config: loadAuthConfig(),
     request,
@@ -39,6 +48,10 @@ export async function getAuthSession(
 export async function getLocalAuthSession(
   request: Request,
 ): Promise<AuthSession | null> {
+  if (getAuthMode() === "local-header") {
+    return getLocalHeaderAuthSession();
+  }
+
   const user = await getLinkAuthSessionUser({
     config: loadAuthConfig(),
     request,
@@ -47,6 +60,10 @@ export async function getLocalAuthSession(
 }
 
 export function getAppSessionToken(request: Request): string | null {
+  if (getAuthMode() === "local-header") {
+    return null;
+  }
+
   return getLinkAuthSessionToken({
     config: loadAuthConfig(),
     request,
@@ -54,6 +71,10 @@ export function getAppSessionToken(request: Request): string | null {
 }
 
 export function getAppSessionCookieHeader(request: Request): string | null {
+  if (getAuthMode() === "local-header") {
+    return null;
+  }
+
   const token = getAppSessionToken(request);
   if (!token) {
     return null;
@@ -61,7 +82,20 @@ export function getAppSessionCookieHeader(request: Request): string | null {
   return `${getLinkAuthSessionCookieName(loadAuthConfig().appId)}=${encodeURIComponent(token)}`;
 }
 
+export function applyLocalHeaderAuth(headers: Headers): void {
+  if (getAuthMode() !== "local-header") {
+    return;
+  }
+
+  headers.set("x-natter-dev-discord-id", LOCAL_DEV_USER_ID);
+  headers.set("x-natter-dev-name", LOCAL_DEV_USER_NAME);
+}
+
 export async function handleAuthRoute(request: Request): Promise<Response> {
+  if (getAuthMode() === "local-header") {
+    return noStoreRedirect(new URL("/", request.url));
+  }
+
   return await handleAppAuthRequest({
     authFailedResponse: (url) =>
       noStoreRedirect(new URL("/login?error=AuthFailed", url.origin)),
@@ -88,6 +122,19 @@ function authSessionFromLinkAuthUser(user: LinkAuthUser): AuthSession {
       id: user.discord_id,
       name: user.display_name,
       image: user.avatar_url ?? undefined,
+    },
+  };
+}
+
+function getAuthMode(): AuthMode {
+  return process.env.AUTH_MODE === "local-header" ? "local-header" : "link-auth";
+}
+
+function getLocalHeaderAuthSession(): AuthSession {
+  return {
+    user: {
+      id: LOCAL_DEV_USER_ID,
+      name: LOCAL_DEV_USER_NAME,
     },
   };
 }

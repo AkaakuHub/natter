@@ -1,4 +1,4 @@
-import { getAppSessionCookieHeader } from "@/auth";
+import { applyLocalHeaderAuth, getAppSessionCookieHeader } from "@/auth";
 import { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -73,6 +73,7 @@ async function forwardApiRequest(
   if (appSessionCookie) {
     headers.set("cookie", appSessionCookie);
   }
+  applyLocalHeaderAuth(headers);
 
   return fetch(upstreamUrl, {
     body: bodylessMethod(request.method) ? undefined : request.body,
