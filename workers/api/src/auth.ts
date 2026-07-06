@@ -1,6 +1,5 @@
 import {
   getLinkAuthSessionUser,
-  getLinkAuthUser,
   loadLinkAuthAppConfig,
   type LinkAuthUser,
 } from "link-auth";
@@ -27,31 +26,7 @@ export async function requireAuthUser(
   return authUser;
 }
 
-export async function requireSessionAuthUser(
-  request: Request,
-  env: Env,
-): Promise<AuthUser> {
-  const authUser = await authenticateConfiguredSessionAuthUser(request, env);
-  if (!authUser) {
-    throw new HttpError(401, "Unauthorized");
-  }
-  return authUser;
-}
-
 async function authenticateConfiguredAuthUser(
-  request: Request,
-  env: Env,
-): Promise<AuthUser | undefined> {
-  if (env.AUTH_MODE === "link-auth") {
-    return authenticateLinkAuthUser(request, env);
-  }
-  if (env.AUTH_MODE === "local-header") {
-    return authenticateLocalHeaderUser(request, env);
-  }
-  throw new HttpError(500, "Invalid auth mode");
-}
-
-async function authenticateConfiguredSessionAuthUser(
   request: Request,
   env: Env,
 ): Promise<AuthUser | undefined> {
@@ -87,20 +62,6 @@ async function authenticateLocalHeaderUser(
 
 function isLocalHostname(hostname: string): boolean {
   return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
-}
-
-async function authenticateLinkAuthUser(
-  request: Request,
-  env: Env,
-): Promise<AuthUser | undefined> {
-  const linkAuthUser = await getLinkAuthUser({
-    config: loadLinkAuthAppConfig(env),
-    request,
-  });
-  if (!linkAuthUser) {
-    return undefined;
-  }
-  return upsertLinkAuthUser(linkAuthUser, env);
 }
 
 async function authenticateLinkAuthSessionUser(
