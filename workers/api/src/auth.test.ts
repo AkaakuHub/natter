@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { requireAuthUser } from "./auth";
+import { requireAuthUser, requireSessionAuthUser } from "./auth";
 import type { Env } from "./env";
 import { HttpError } from "./http";
 
@@ -115,6 +115,40 @@ describe("requireAuthUser local-header mode", () => {
     ).rejects.toMatchObject({
       status: 403,
       message: "Local auth is only available on localhost",
+    } satisfies Partial<HttpError>);
+  });
+});
+
+describe("requireSessionAuthUser local-header mode", () => {
+  it("returns a local auth user from localhost development headers", async () => {
+    await expect(
+      requireSessionAuthUser(
+        new Request("http://localhost/posts/images/image.jpg", {
+          headers: {
+            "x-natter-dev-discord-id": "user-1",
+            "x-natter-dev-name": "Alice",
+            "x-natter-dev-image": "https://example.com/avatar.png",
+          },
+        }),
+        createLocalHeaderEnv(),
+      ),
+    ).resolves.toEqual({
+      id: "user-1",
+      discordId: "user-1",
+      name: "Alice",
+      image: "https://example.com/avatar.png",
+    });
+  });
+
+  it("throws 401 when the local user header is missing", async () => {
+    await expect(
+      requireSessionAuthUser(
+        new Request("http://localhost/posts/images/image.jpg"),
+        createLocalHeaderEnv(),
+      ),
+    ).rejects.toMatchObject({
+      status: 401,
+      message: "Unauthorized",
     } satisfies Partial<HttpError>);
   });
 });

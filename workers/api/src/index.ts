@@ -14,7 +14,7 @@ import {
   readJsonObject,
   requireString,
 } from "./http";
-import { requireAuthUser } from "./auth";
+import { requireAuthUser, requireSessionAuthUser } from "./auth";
 import {
   Character,
   Like,
@@ -907,7 +907,7 @@ async function handleImage(
   env: Env,
   filename: string,
 ): Promise<Response> {
-  const authUser = await requireAuthUser(request, env);
+  const authUser = await requireSessionAuthUser(request, env);
   const row = await firstRow(
     env.DB,
     `SELECT * FROM "Post" WHERE instr("images", ?) > 0 LIMIT 1`,

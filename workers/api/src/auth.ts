@@ -1,4 +1,5 @@
 import {
+  getLinkAuthSessionUser,
   getLinkAuthUser,
   loadLinkAuthAppConfig,
   type LinkAuthUser,
@@ -26,12 +27,36 @@ export async function requireAuthUser(
   return authUser;
 }
 
+export async function requireSessionAuthUser(
+  request: Request,
+  env: Env,
+): Promise<AuthUser> {
+  const authUser = await authenticateConfiguredSessionAuthUser(request, env);
+  if (!authUser) {
+    throw new HttpError(401, "Unauthorized");
+  }
+  return authUser;
+}
+
 async function authenticateConfiguredAuthUser(
   request: Request,
   env: Env,
 ): Promise<AuthUser | undefined> {
   if (env.AUTH_MODE === "link-auth") {
     return authenticateLinkAuthUser(request, env);
+  }
+  if (env.AUTH_MODE === "local-header") {
+    return authenticateLocalHeaderUser(request, env);
+  }
+  throw new HttpError(500, "Invalid auth mode");
+}
+
+async function authenticateConfiguredSessionAuthUser(
+  request: Request,
+  env: Env,
+): Promise<AuthUser | undefined> {
+  if (env.AUTH_MODE === "link-auth") {
+    return authenticateLinkAuthSessionUser(request, env);
   }
   if (env.AUTH_MODE === "local-header") {
     return authenticateLocalHeaderUser(request, env);
@@ -75,6 +100,27 @@ async function authenticateLinkAuthUser(
   if (!linkAuthUser) {
     return undefined;
   }
+  return upsertLinkAuthUser(linkAuthUser, env);
+}
+
+async function authenticateLinkAuthSessionUser(
+  request: Request,
+  env: Env,
+): Promise<AuthUser | undefined> {
+  const linkAuthUser = await getLinkAuthSessionUser({
+    config: loadLinkAuthAppConfig(env),
+    request,
+  });
+  if (!linkAuthUser) {
+    return undefined;
+  }
+  return upsertLinkAuthUser(linkAuthUser, env);
+}
+
+async function upsertLinkAuthUser(
+  linkAuthUser: LinkAuthUser,
+  env: Env,
+): Promise<AuthUser> {
   const user = await upsertAuthUser(env.DB, {
     discordId: linkAuthUser.discord_id,
     name: linkAuthUser.display_name,
