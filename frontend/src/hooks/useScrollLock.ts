@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { primaryScrollContainerSelector } from "@/components/layout/scrollLayout";
 
 export const useScrollLock = (isLocked: boolean) => {
   const scrollPosition = useRef<number>(0);
@@ -8,9 +9,8 @@ export const useScrollLock = (isLocked: boolean) => {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // 実際のスクロールコンテナを取得
     scrollContainer.current = document.querySelector(
-      ".flex-1.overflow-y-auto",
+      primaryScrollContainerSelector,
     ) as HTMLElement;
 
     if (isLocked && !wasLocked.current && scrollContainer.current) {

@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { QUERY_KEYS } from "@/hooks/queries/usePosts";
 import { parsePostCreatedEvent } from "@/hooks/realtimePostEvent";
+import { primaryScrollContainerSelector } from "@/components/layout/scrollLayout";
 
 interface NewPostNotificationState {
   hasNewPosts: boolean;
@@ -88,7 +89,9 @@ export const useNewPostNotification = () => {
 
     window.scrollTo({ top: 0, behavior: "smooth" });
 
-    const scrollContainer = document.querySelector("[data-scroll-container]");
+    const scrollContainer = document.querySelector(
+      primaryScrollContainerSelector,
+    );
     if (scrollContainer) {
       scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
     }

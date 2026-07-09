@@ -15,6 +15,11 @@ import { useSwipeBackNavigation } from "@/hooks/useSwipeBackNavigation";
 import ServerErrorBanner from "../common/ServerErrorBanner";
 import { avatarImageUrl } from "@/utils/avatarImage";
 import SkeletonLoading from "../common/SkeletonLoading";
+import {
+  AppViewport,
+  MainContentArea,
+  PlainScrollContainer,
+} from "./AppScrollLayout";
 
 // 遅延読み込みコンポーネント（既存の優れた実装保護）
 const CreatePostModal = lazy(() => import("../CreatePostModal"));
@@ -86,7 +91,7 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
   // 【最優先】サーバーがオフラインの場合はエラーメッセージを表示
   if (isOnline === false) {
     return (
-      <div className="app-viewport w-full flex flex-col">
+      <AppViewport>
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="max-w-md w-full">
             <ServerErrorBanner />
@@ -97,7 +102,7 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
             </div>
           </div>
         </div>
-      </div>
+      </AppViewport>
     );
   }
 
@@ -113,11 +118,11 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
 
   if (!session) {
     return (
-      <div className="app-viewport w-full flex flex-col">
-        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
+      <AppViewport>
+        <PlainScrollContainer ref={scrollContainerRef}>
           {children}
-        </div>
-      </div>
+        </PlainScrollContainer>
+      </AppViewport>
     );
   }
 
@@ -126,7 +131,7 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
   }
 
   return (
-    <div className="app-viewport w-full flex flex-col">
+    <AppViewport>
       {/* 新ポスト通知バナー */}
       {session && userExists && (
         <Suspense fallback={<div />}>
@@ -142,43 +147,33 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
         scrollContainerRef={scrollContainerRef}
       />
 
-      {/* メインコンテンツエリア（既存実装保護） */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* メインコンテンツ */}
-        <div
-          ref={scrollContainerRef}
-          data-scroll-container
-          className="mobile-safe-scroll flex-1 overflow-y-auto bg-surface-variant max-w-md mx-auto lg:mx-0 lg:max-w-none scrollbar-hide"
-          style={{
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-          }}
-        >
-          {children}
-        </div>
-
-        {/* サイドバー（大画面のみ表示）（既存実装保護） */}
-        {isLargeScreen && (
-          <div className="w-80 bg-surface border-l border-border mb-[60px] overflow-y-auto">
-            <div className="p-4 space-y-6">
-              <Suspense
-                fallback={
-                  <div className="h-32 bg-surface-variant animate-pulse rounded-lg" />
-                }
-              >
-                <TrendingPosts />
-              </Suspense>
-              <Suspense
-                fallback={
-                  <div className="h-32 bg-surface-variant animate-pulse rounded-lg" />
-                }
-              >
-                <RecommendedUsers currentUserId={session?.user?.id} />
-              </Suspense>
+      <MainContentArea
+        scrollContainerRef={scrollContainerRef}
+        sidebar={
+          isLargeScreen ? (
+            <div className="w-80 bg-surface border-l border-border mb-[60px] overflow-y-auto">
+              <div className="p-4 space-y-6">
+                <Suspense
+                  fallback={
+                    <div className="h-32 bg-surface-variant animate-pulse rounded-lg" />
+                  }
+                >
+                  <TrendingPosts />
+                </Suspense>
+                <Suspense
+                  fallback={
+                    <div className="h-32 bg-surface-variant animate-pulse rounded-lg" />
+                  }
+                >
+                  <RecommendedUsers currentUserId={session?.user?.id} />
+                </Suspense>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          ) : null
+        }
+      >
+        {children}
+      </MainContentArea>
 
       {/* フッターメニュー（ハイブリッド対応） */}
       <HybridFooterMenu
@@ -221,7 +216,7 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
           />
         </Suspense>
       )}
-    </div>
+    </AppViewport>
   );
 };
 
