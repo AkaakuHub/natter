@@ -86,7 +86,7 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
   // 【最優先】サーバーがオフラインの場合はエラーメッセージを表示
   if (isOnline === false) {
     return (
-      <div className="w-full h-screen flex flex-col">
+      <div className="app-viewport w-full flex flex-col">
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="max-w-md w-full">
             <ServerErrorBanner />
@@ -113,7 +113,7 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
 
   if (!session) {
     return (
-      <div className="w-full h-screen flex flex-col">
+      <div className="app-viewport w-full flex flex-col">
         <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
           {children}
         </div>
@@ -126,7 +126,7 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
   }
 
   return (
-    <div className="w-full h-screen flex flex-col">
+    <div className="app-viewport w-full flex flex-col">
       {/* 新ポスト通知バナー */}
       {session && userExists && (
         <Suspense fallback={<div />}>
@@ -148,11 +148,10 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
         <div
           ref={scrollContainerRef}
           data-scroll-container
-          className="flex-1 overflow-y-auto bg-surface-variant max-w-md mx-auto lg:mx-0 lg:max-w-none scrollbar-hide"
+          className="mobile-safe-scroll flex-1 overflow-y-auto bg-surface-variant max-w-md mx-auto lg:mx-0 lg:max-w-none scrollbar-hide"
           style={{
             scrollbarWidth: "none",
             msOverflowStyle: "none",
-            paddingBottom: "60px",
           }}
         >
           {children}

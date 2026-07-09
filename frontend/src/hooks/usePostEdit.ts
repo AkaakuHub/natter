@@ -8,12 +8,17 @@ import { appendNormalizedImages } from "@/utils/normalizePostImages";
 interface UsePostEditResult {
   isEditing: boolean;
   error: string | null;
-  editPost: (
-    id: number,
-    content: string,
-    images?: File[],
-  ) => Promise<Post | null>;
+  editPost: (id: number, input: EditPostInput) => Promise<Post | null>;
   canEdit: (post: Post) => boolean;
+}
+
+interface EditPostInput {
+  content: string;
+  retainedImages: string[];
+  newImages: File[];
+  imagesPublic: boolean;
+  url: string;
+  characterId: number | null;
 }
 
 export const usePostEdit = (): UsePostEditResult => {
@@ -28,8 +33,7 @@ export const usePostEdit = (): UsePostEditResult => {
 
   const editPost = async (
     id: number,
-    content: string,
-    images?: File[],
+    input: EditPostInput,
   ): Promise<Post | null> => {
     if (!currentUser) {
       setError("ログインが必要です");
@@ -42,18 +46,30 @@ export const usePostEdit = (): UsePostEditResult => {
 
       let updatedPost: Post;
 
-      if (images && images.length > 0) {
-        // 画像がある場合はFormDataを使用
+      if (input.newImages.length > 0) {
         const formData = new FormData();
-        formData.append("content", content);
+        formData.append("content", input.content);
+        formData.append("imagesPublic", input.imagesPublic.toString());
+        formData.append("url", input.url.trim());
+        if (input.characterId !== null) {
+          formData.append("characterId", input.characterId.toString());
+        } else {
+          formData.append("characterId", "");
+        }
+        input.retainedImages.forEach((image) => {
+          formData.append("existingImages", image);
+        });
 
-        await appendNormalizedImages(formData, images);
+        await appendNormalizedImages(formData, input.newImages);
 
         updatedPost = await PostsApi.updatePostWithImages(id, formData);
       } else {
-        // テキストのみの場合は通常のAPIを使用
         updatedPost = await PostsApi.updatePost(id, {
-          content,
+          content: input.content,
+          images: input.retainedImages,
+          imagesPublic: input.imagesPublic,
+          url: input.url.trim(),
+          characterId: input.characterId,
         });
       }
       showToast("投稿を編集しました", "success");

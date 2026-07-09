@@ -475,11 +475,26 @@ export class PostsService {
   }
 
   async update(id: number, updatePostDto: UpdatePostDto) {
-    const { images, ...postData } = updatePostDto;
+    const updateData = { ...updatePostDto };
+    delete updateData.existingImages;
+    const { images, ...postData } = updateData;
+    const characterId =
+      postData.characterId === ''
+        ? null
+        : typeof postData.characterId === 'string'
+          ? parseInt(postData.characterId, 10)
+          : postData.characterId;
     return this.prisma.post.update({
       where: { id },
       data: {
         ...postData,
+        characterId,
+        url:
+          postData.url === ''
+            ? null
+            : postData.url
+              ? this.sanitizeContent(postData.url)
+              : undefined,
         images: images ? JSON.stringify(images) : undefined,
       },
       include: {
@@ -523,17 +538,44 @@ export class PostsService {
       throw new ForbiddenException('You can only edit your own posts');
     }
 
-    const { images, ...postData } = updatePostDto;
+    const updateData = { ...updatePostDto };
+    delete updateData.existingImages;
+    const { images, ...postData } = updateData;
+    const characterId =
+      postData.characterId === ''
+        ? null
+        : typeof postData.characterId === 'string'
+          ? parseInt(postData.characterId, 10)
+          : postData.characterId;
+
+    if (characterId) {
+      const character = await this.prisma.character.findFirst({
+        where: { id: characterId, userId },
+      });
+
+      if (!character) {
+        throw new BadRequestException(
+          'Character does not exist or does not belong to the user',
+        );
+      }
+    }
 
     // コンテンツをサニタイズ（URLを保護）
     const sanitizedPostData = {
       ...postData,
+      characterId,
       title: postData.title ? this.sanitizeContent(postData.title) : undefined,
       content: postData.content
         ? this.sanitizeContentPreservingUrls(postData.content)
         : undefined,
+      url:
+        postData.url === ''
+          ? null
+          : postData.url
+            ? this.sanitizeContent(postData.url)
+            : undefined,
     };
-    return this.prisma.post.update({
+    const updatedPost = await this.prisma.post.update({
       where: { id },
       data: {
         ...sanitizedPostData,
@@ -560,6 +602,31 @@ export class PostsService {
         },
       },
     });
+
+    if (characterId !== undefined && post.characterId !== characterId) {
+      if (post.characterId) {
+        await this.prisma.character.update({
+          where: { id: post.characterId },
+          data: {
+            postsCount: {
+              decrement: post.characterId ? 1 : 0,
+            },
+          },
+        });
+      }
+      if (characterId) {
+        await this.prisma.character.update({
+          where: { id: characterId },
+          data: {
+            postsCount: {
+              increment: 1,
+            },
+          },
+        });
+      }
+    }
+
+    return updatedPost;
   }
 
   async remove(id: number) {

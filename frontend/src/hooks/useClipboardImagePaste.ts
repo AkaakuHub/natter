@@ -1,4 +1,5 @@
 import { RefObject, useEffect, useRef } from "react";
+import { imageFilesFromClipboardItems } from "@/hooks/clipboardImages";
 
 interface ClipboardImagePasteOptions {
   enabled: boolean;
@@ -34,14 +35,7 @@ export const useClipboardImagePaste = ({
         }
       }
 
-      const files = Array.from(event.clipboardData.items)
-        .map((item) => {
-          if (item.kind !== "file" || !item.type.startsWith("image/")) {
-            return null;
-          }
-          return item.getAsFile();
-        })
-        .filter((file): file is File => file !== null);
+      const files = imageFilesFromClipboardItems(event.clipboardData.items);
 
       if (files.length === 0) {
         return;

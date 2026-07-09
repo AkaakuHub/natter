@@ -43,7 +43,11 @@ import { contentTypeForImageFilename } from "./images/contentType";
 import {
   formBoolean,
   formInteger,
+  formNullableInteger,
+  formNullableString,
   formString,
+  getNullableInteger,
+  getOptionalStringArray,
   getStringArray,
   isMultipart,
   type PostInput,
@@ -221,7 +225,7 @@ async function handlePosts(
         throw new HttpError(403, "You can only edit your own posts");
       }
       const input = await readPostUpdateInput(request, env, authUser.id);
-      await updatePost(env.DB, postId, input);
+      await updatePost(env.DB, postId, input, existing, authUser.id);
       return jsonResponse(env, request, await getPostResponse(env.DB, postId, authUser.id));
     }
 
@@ -644,13 +648,21 @@ async function readPostUpdateInput(
   if (isMultipart(request)) {
     const formData = await request.formData();
     const uploadedImages = await savePostImages(env, formData.getAll("images"));
+    const existingImages = formData
+      .getAll("existingImages")
+      .filter((image): image is string => typeof image === "string");
+    const images =
+      formData.has("existingImages") || uploadedImages.length > 0
+        ? [...existingImages, ...uploadedImages]
+        : undefined;
     return {
       title: formString(formData, "title"),
       content: formString(formData, "content"),
-      images: uploadedImages.length > 0 ? uploadedImages : undefined,
+      images,
       imagesPublic: formBoolean(formData, "imagesPublic"),
       url: formString(formData, "url"),
       published: formBoolean(formData, "published"),
+      characterId: formNullableInteger(formData, "characterId"),
     };
   }
 
@@ -658,10 +670,11 @@ async function readPostUpdateInput(
   return {
     title: getString(body.title),
     content: getString(body.content),
-    images: body.images === undefined ? undefined : getStringArray(body.images),
+    images: getOptionalStringArray(body.images),
     imagesPublic: getBoolean(body.imagesPublic),
     url: getString(body.url),
     published: getBoolean(body.published),
+    characterId: getNullableInteger(body.characterId),
   };
 }
 
@@ -710,9 +723,18 @@ async function updatePost(
   db: D1Database,
   postId: number,
   input: PostUpdateInput,
+  existingPost: Post,
+  authorId: string,
 ): Promise<void> {
   const updates: string[] = [];
   const values: unknown[] = [];
+  if (
+    input.characterId !== undefined &&
+    input.characterId !== null &&
+    !(await getOwnedCharacter(db, input.characterId, authorId))
+  ) {
+    throw new HttpError(400, "Character does not exist or does not belong to the user");
+  }
   if (input.title !== undefined) {
     updates.push(`"title" = ?`);
     values.push(input.title ? sanitizeContent(input.title) : null);
@@ -739,13 +761,39 @@ async function updatePost(
     updates.push(`"published" = ?`);
     values.push(input.published);
   }
+  if (input.characterId !== undefined) {
+    updates.push(`"characterId" = ?`);
+    values.push(input.characterId);
+  }
   updates.push(`"updatedAt" = ?`);
-  values.push(new Date().toISOString(), postId);
+  const now = new Date().toISOString();
+  values.push(now, postId);
   await run(
     db,
     `UPDATE "Post" SET ${updates.join(", ")} WHERE "id" = ?`,
     ...values,
   );
+  if (
+    input.characterId !== undefined &&
+    existingPost.characterId !== input.characterId
+  ) {
+    if (existingPost.characterId) {
+      await run(
+        db,
+        `UPDATE "Character" SET "postsCount" = CASE WHEN "postsCount" > 0 THEN "postsCount" - 1 ELSE 0 END, "updatedAt" = ? WHERE "id" = ?`,
+        now,
+        existingPost.characterId,
+      );
+    }
+    if (input.characterId) {
+      await run(
+        db,
+        `UPDATE "Character" SET "postsCount" = "postsCount" + 1, "updatedAt" = ? WHERE "id" = ?`,
+        now,
+        input.characterId,
+      );
+    }
+  }
 }
 
 async function softDeletePost(db: D1Database, post: Post): Promise<void> {

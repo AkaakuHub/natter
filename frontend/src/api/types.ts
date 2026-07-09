@@ -62,6 +62,7 @@ export interface UpdatePostDto {
   imagesPublic?: boolean;
   url?: string;
   published?: boolean;
+  characterId?: number | null;
 }
 
 export interface LikeResponse {

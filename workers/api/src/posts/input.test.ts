@@ -4,7 +4,11 @@ import { HttpError } from "../http";
 import {
   formBoolean,
   formInteger,
+  formNullableInteger,
+  formNullableString,
   formString,
+  getNullableInteger,
+  getOptionalStringArray,
   getStringArray,
   isMultipart,
 } from "./input";
@@ -31,6 +35,9 @@ describe("post input helpers", () => {
     expect(formString(formData, "content")).toBe("hello");
     expect(formString(formData, "empty")).toBeUndefined();
     expect(formString(formData, "missing")).toBeUndefined();
+    expect(formNullableString(formData, "content")).toBe("hello");
+    expect(formNullableString(formData, "empty")).toBeNull();
+    expect(formNullableString(formData, "missing")).toBeUndefined();
   });
 
   it("reads boolean and integer form values", () => {
@@ -48,9 +55,28 @@ describe("post input helpers", () => {
     expect(formInteger(formData, "missing")).toBeUndefined();
   });
 
+  it("reads nullable integer form values", () => {
+    const formData = new FormData();
+    formData.set("selected", "12");
+    formData.set("cleared", "");
+
+    expect(formNullableInteger(formData, "selected")).toBe(12);
+    expect(formNullableInteger(formData, "cleared")).toBeNull();
+    expect(formNullableInteger(formData, "missing")).toBeUndefined();
+  });
+
   it("reads optional string arrays from JSON request bodies", () => {
     expect(getStringArray(undefined)).toEqual([]);
+    expect(getOptionalStringArray(undefined)).toBeUndefined();
+    expect(getOptionalStringArray(["a.jpg"])).toEqual(["a.jpg"]);
     expect(getStringArray(["a.jpg", "b.jpg"])).toEqual(["a.jpg", "b.jpg"]);
+  });
+
+  it("reads nullable integer values from JSON request bodies", () => {
+    expect(getNullableInteger(12)).toBe(12);
+    expect(getNullableInteger(null)).toBeNull();
+    expect(getNullableInteger(undefined)).toBeUndefined();
+    expect(getNullableInteger("12")).toBeUndefined();
   });
 
   it("rejects non-array image values and non-string image items", () => {

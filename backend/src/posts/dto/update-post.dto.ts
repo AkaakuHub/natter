@@ -22,6 +22,9 @@ export class UpdatePostDto {
   images?: string[];
 
   @IsOptional()
+  existingImages?: string[] | string;
+
+  @IsOptional()
   @IsBoolean()
   imagesPublic?: boolean;
 
@@ -33,4 +36,7 @@ export class UpdatePostDto {
   @IsOptional()
   @IsBoolean()
   published?: boolean;
+
+  @IsOptional()
+  characterId?: number | string | null;
 }

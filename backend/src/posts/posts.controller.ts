@@ -189,10 +189,27 @@ export class PostsController {
     @Req() req: Request & { user?: { id: string } },
   ) {
     const userId = this.extractUserIdFromRequest(req);
-    const imagePaths = files ? files.map((file) => file.filename) : undefined;
+    const existingImages = Array.isArray(updatePostDto.existingImages)
+      ? updatePostDto.existingImages
+      : updatePostDto.existingImages
+        ? [updatePostDto.existingImages]
+        : [];
+    const uploadedImages = files ? files.map((file) => file.filename) : [];
+    const imagePaths =
+      existingImages.length > 0 || uploadedImages.length > 0
+        ? [...existingImages, ...uploadedImages]
+        : updatePostDto.images;
+    const characterId =
+      updatePostDto.characterId === ''
+        ? null
+        : updatePostDto.characterId
+          ? parseInt(updatePostDto.characterId.toString(), 10)
+          : undefined;
     return this.postsService.updateWithOwnerCheck(id, userId, {
       ...updatePostDto,
       images: imagePaths,
+      characterId,
+      existingImages: undefined,
     });
   }
 

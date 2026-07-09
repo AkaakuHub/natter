@@ -16,8 +16,9 @@ export interface PostUpdateInput {
   content?: string;
   images?: string[];
   imagesPublic?: boolean;
-  url?: string;
+  url?: string | null;
   published?: boolean;
+  characterId?: number | null;
 }
 
 export function isMultipart(request: Request): boolean {
@@ -27,6 +28,20 @@ export function isMultipart(request: Request): boolean {
 export function formString(formData: FormData, name: string): string | undefined {
   const value = formData.get(name);
   return typeof value === "string" && value !== "" ? value : undefined;
+}
+
+export function formNullableString(
+  formData: FormData,
+  name: string,
+): string | null | undefined {
+  if (!formData.has(name)) {
+    return undefined;
+  }
+  const value = formData.get(name);
+  if (value === "") {
+    return null;
+  }
+  return typeof value === "string" ? value : undefined;
 }
 
 export function formBoolean(
@@ -55,6 +70,24 @@ export function formInteger(
   return Number.isInteger(parsed) ? parsed : undefined;
 }
 
+export function formNullableInteger(
+  formData: FormData,
+  name: string,
+): number | null | undefined {
+  if (!formData.has(name)) {
+    return undefined;
+  }
+  const value = formData.get(name);
+  if (value === "") {
+    return null;
+  }
+  if (typeof value !== "string") {
+    return undefined;
+  }
+  const parsed = Number(value);
+  return Number.isInteger(parsed) ? parsed : undefined;
+}
+
 export function getStringArray(value: unknown): string[] {
   if (value === undefined) {
     return [];
@@ -68,4 +101,21 @@ export function getStringArray(value: unknown): string[] {
     }
     return item;
   });
+}
+
+export function getOptionalStringArray(value: unknown): string[] | undefined {
+  return value === undefined ? undefined : getStringArray(value);
+}
+
+export function getNullableInteger(value: unknown): number | null | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (value === null) {
+    return null;
+  }
+  if (typeof value !== "number" || !Number.isInteger(value)) {
+    return undefined;
+  }
+  return value;
 }

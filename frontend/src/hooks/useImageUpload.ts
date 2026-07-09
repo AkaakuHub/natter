@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
+import { selectImageFilesToAdd } from "@/hooks/imageUploadState";
 import { normalizePostImages } from "@/utils/normalizePostImages";
 
 interface UseImageUploadResult {
@@ -15,6 +16,7 @@ export const useImageUpload = (
 ): UseImageUploadResult => {
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const imagesRef = useRef<File[]>([]);
 
   const handleFilesAdd = useCallback(
     async (fileSource: File[] | FileList | null) => {
@@ -42,36 +44,25 @@ export const useImageUpload = (
         return;
       }
 
-      let filesToPreview: File[] = [];
-      let limitMessage: string | null = null;
+      const { filesToAdd, limitMessage } = selectImageFilesToAdd(
+        imagesRef.current.length,
+        validFiles,
+        maxImages,
+      );
 
-      setImages((prevImages) => {
-        const remainingSlots = maxImages - prevImages.length;
-
-        if (remainingSlots <= 0) {
-          limitMessage = `画像は最大${maxImages}枚までアップロードできます`;
-          return prevImages;
+      if (filesToAdd.length === 0) {
+        if (limitMessage) {
+          alert(limitMessage);
         }
-
-        filesToPreview = validFiles.slice(0, remainingSlots);
-
-        if (validFiles.length > remainingSlots) {
-          limitMessage = `画像は最大${maxImages}枚までです。${remainingSlots}枚のみ追加されました。`;
-        }
-
-        if (filesToPreview.length === 0) {
-          return prevImages;
-        }
-
-        return [...prevImages, ...filesToPreview];
-      });
-
-      if (filesToPreview.length > 0) {
-        const previewUrls = filesToPreview.map((file) =>
-          URL.createObjectURL(file),
-        );
-        setImagePreviewUrls((prev) => [...prev, ...previewUrls]);
+        return;
       }
+
+      imagesRef.current = [...imagesRef.current, ...filesToAdd];
+      setImages(imagesRef.current);
+      setImagePreviewUrls((prev) => [
+        ...prev,
+        ...filesToAdd.map((file) => URL.createObjectURL(file)),
+      ]);
 
       if (limitMessage) {
         alert(limitMessage);
@@ -118,7 +109,8 @@ export const useImageUpload = (
   }, [handleFilesAdd, images.length, maxImages]);
 
   const handleImageRemove = useCallback((index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
+    imagesRef.current = imagesRef.current.filter((_, i) => i !== index);
+    setImages(imagesRef.current);
     setImagePreviewUrls((prev) => {
       URL.revokeObjectURL(prev[index]);
       return prev.filter((_, i) => i !== index);
@@ -130,6 +122,7 @@ export const useImageUpload = (
       prev.forEach((url) => URL.revokeObjectURL(url));
       return [];
     });
+    imagesRef.current = [];
     setImages([]);
   }, []);
 
