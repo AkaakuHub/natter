@@ -13,15 +13,19 @@ const TabNames: Record<TabType, string> = {
 interface TabsComponentProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
+  counts: Record<TabType, number>;
 }
 
-const TabsComponent = ({ activeTab, onTabChange }: TabsComponentProps) => {
-  const tabs = TabKinds
-    // キャラクタータブは常に表示
-    .map((tab) => ({
-      id: tab,
-      label: TabNames[tab],
-    }));
+const TabsComponent = ({
+  activeTab,
+  onTabChange,
+  counts,
+}: TabsComponentProps) => {
+  const tabs = TabKinds.map((tab) => ({
+    id: tab,
+    label: TabNames[tab],
+    count: counts[tab],
+  }));
 
   return (
     <div className="border-b border-border">
@@ -36,7 +40,10 @@ const TabsComponent = ({ activeTab, onTabChange }: TabsComponentProps) => {
                 : "text-text-muted hover:text-text"
             }`}
           >
-            <span className="inline">{tab.label}</span>
+            <span className="inline-flex items-center justify-center gap-1">
+              <span>{tab.label}</span>
+              <span className="text-xs text-text-muted">{tab.count}</span>
+            </span>
           </button>
         ))}
       </div>

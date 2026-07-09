@@ -1,15 +1,16 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import clsx from "clsx";
 
 import PostComponent from "@/components/Post";
 import SkeletonCard from "@/components/common/SkeletonCard";
 import CharacterList from "@/components/CharacterList";
 
 import { PostsApi, Post } from "@/api";
+import { useCharacters } from "@/hooks/queries/useCharacters";
 import ProfileHeader from "./ProfileHeader";
 import TabsComponent, { TabType, TabNames } from "./TabsComponent";
+import { profileTabCounts } from "@/domain/profile/profileTabCounts";
 import { transformPostToPostComponent } from "@/domain/posts/postTransformers";
 
 import { ExtendedSession } from "@/types";
@@ -42,12 +43,18 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
   const [likedPosts, setLikedPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isHeaderCompact, setIsHeaderCompact] = useState(false);
   const lastTargetUserIdRef = useRef<string | undefined>(undefined);
+  const targetUserId = userId || session?.user?.id;
+  const { data: characters = [] } = useCharacters(targetUserId);
+  const tabCounts = profileTabCounts({
+    posts,
+    mediaPosts,
+    likedPosts,
+    characters,
+  });
 
   useEffect(() => {
     const fetchUserPosts = async () => {
-      const targetUserId = userId || session?.user?.id;
       if (!targetUserId) return;
 
       // 同じユーザーIDの場合は再実行しない
@@ -80,40 +87,7 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
     };
 
     fetchUserPosts();
-  }, [session?.user?.id, userId]);
-
-  // スクロールイベントリスナー（BaseLayoutのスクロールコンテナを使用）
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      // BaseLayoutのスクロールコンテナを取得
-      const scrollContainer = document.querySelector(
-        ".flex-1.overflow-y-auto.bg-surface-variant",
-      ) as HTMLElement;
-
-      if (!scrollContainer) {
-        return;
-      }
-
-      const handleScroll = () => {
-        const scrollTop = scrollContainer.scrollTop;
-        const shouldCompact = scrollTop > 50; // 50px以上スクロールしたらコンパクト化
-
-        setIsHeaderCompact(shouldCompact);
-      };
-
-      scrollContainer.addEventListener("scroll", handleScroll, {
-        passive: true,
-      });
-
-      return () => {
-        scrollContainer.removeEventListener("scroll", handleScroll);
-      };
-    }, 100);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [loading, error]);
+  }, [targetUserId]);
 
   const handleTabChange = (tab: TabType) => setActiveTab(tab);
 
@@ -135,16 +109,13 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
 
   if (loading) {
     return (
-      <div
-        className={clsx(
-          "w-full bg-surface text-text flex flex-col transition-transform duration-300 ease-out",
-          isHeaderCompact
-            ? "-translate-y-16 sm:-translate-y-20 h-[calc(100%+20rem)] sm:h-[calc(100%+24rem)]"
-            : "translate-y-0 h-full",
-        )}
-      >
+      <div className="flex min-h-full w-full flex-col bg-surface text-text">
         <ProfileHeader session={session} userId={userId} isCompact={false} />
-        <TabsComponent activeTab={activeTab} onTabChange={handleTabChange} />
+        <TabsComponent
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          counts={tabCounts}
+        />
         <div className="w-full">
           {[...Array(3)].map((_, i) => (
             <SkeletonCard key={i} />
@@ -156,16 +127,13 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
 
   if (error) {
     return (
-      <div
-        className={clsx(
-          "w-full bg-surface text-text flex flex-col transition-transform duration-300 ease-out",
-          isHeaderCompact
-            ? "-translate-y-16 sm:-translate-y-20 h-[calc(100%+20rem)] sm:h-[calc(100%+24rem)]"
-            : "translate-y-0 h-full",
-        )}
-      >
+      <div className="flex min-h-full w-full flex-col bg-surface text-text">
         <ProfileHeader session={session} userId={userId} isCompact={false} />
-        <TabsComponent activeTab={activeTab} onTabChange={handleTabChange} />
+        <TabsComponent
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          counts={tabCounts}
+        />
         <div className="flex justify-center py-8">
           <div className="text-error">{error}</div>
         </div>
@@ -228,17 +196,14 @@ const ProfileComponent = ({ session, userId }: ProfileComponentProps) => {
   };
 
   return (
-    <div
-      className={clsx(
-        "w-full bg-surface text-text flex flex-col transition-transform duration-300 ease-out",
-        isHeaderCompact
-          ? "-translate-y-16 sm:-translate-y-20 h-[calc(100%+20rem)] sm:h-[calc(100%+24rem)]"
-          : "translate-y-0 h-full",
-      )}
-    >
+    <div className="flex min-h-full w-full flex-col bg-surface text-text">
       <ProfileHeader session={session} userId={userId} isCompact={false} />
-      <TabsComponent activeTab={activeTab} onTabChange={handleTabChange} />
-      <div className="flex-1 w-full pb-[60px]">{renderTabContent()}</div>
+      <TabsComponent
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        counts={tabCounts}
+      />
+      <div className="w-full flex-1 bg-surface">{renderTabContent()}</div>
     </div>
   );
 };

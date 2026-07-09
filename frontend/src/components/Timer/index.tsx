@@ -83,7 +83,7 @@ const Timer: React.FC<TimerProps> = ({ className = "" }) => {
 
   return (
     <div
-      className={`flex flex-col items-center justify-center min-h-[calc(100vh-124px)] bg-surface-variant p-4 sm:p-6 ${className}`}
+      className={`flex min-h-full flex-col items-center justify-center bg-surface-variant p-4 sm:p-6 ${className}`}
     >
       {/* メインタイマー表示 */}
       <div className="relative mb-8">
