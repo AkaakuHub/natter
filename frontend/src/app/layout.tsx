@@ -29,7 +29,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ja">
+    <html
+      lang="ja"
+      className="min-h-full scroll-smooth motion-reduce:scroll-auto"
+    >
       <head>
         <title>Natter</title>
         <meta name="description" content="A simple post app" />
@@ -56,7 +59,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} antialiased bg-surface text-text`}
+        className={`${geistSans.variable} min-h-full bg-surface text-text antialiased tabular-nums overscroll-y-none [touch-action:pan-x_pan-y]`}
       >
         <AppProviders>
           <ServerStatusProvider>

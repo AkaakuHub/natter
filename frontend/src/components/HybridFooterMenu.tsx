@@ -42,7 +42,7 @@ export function HybridFooterMenu({
   };
 
   return (
-    <div className="mobile-safe-footer fixed bottom-0 left-0 right-0 z-50 bg-surface border-t border-border backdrop-blur-sm">
+    <div className="fixed right-0 bottom-0 left-0 z-50 h-[calc(60px+env(safe-area-inset-bottom))] border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] backdrop-blur-sm">
       <div className="flex items-center h-full">
         {items.map((item) => {
           const IconComponent = getIconComponent(item.icon);

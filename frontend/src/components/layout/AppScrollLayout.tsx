@@ -6,7 +6,6 @@ import {
   plainScrollContainerClassName,
   primaryScrollContainerAttribute,
   primaryScrollContainerClassName,
-  scrollbarHiddenStyle,
 } from "./scrollLayout";
 
 interface AppViewportProps {
@@ -43,7 +42,6 @@ export const PrimaryScrollContainer = forwardRef<
       ref={ref}
       {...{ [primaryScrollContainerAttribute]: true }}
       className={primaryScrollContainerClassName}
-      style={scrollbarHiddenStyle}
     >
       {children}
     </div>

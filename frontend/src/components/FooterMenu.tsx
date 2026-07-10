@@ -32,7 +32,7 @@ export function FooterMenu({ path, scrollContainerRef }: BottomMenuProps) {
   };
 
   return (
-    <footer className="mobile-safe-footer fixed bottom-0 left-0 right-0 border-t border-border bg-surface z-10">
+    <footer className="fixed right-0 bottom-0 left-0 z-10 h-[calc(60px+env(safe-area-inset-bottom))] border-t border-border bg-surface pb-[env(safe-area-inset-bottom)]">
       <nav className="flex items-center h-full">
         {items.map((item, index) => {
           const IconComponent = getIconComponent(item.icon);

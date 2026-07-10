@@ -30,7 +30,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   return (
     <div className={`relative ${className}`}>
       {isLoading && (
-        <div className="absolute inset-0 bg-surface-variant animate-pulse rounded-inherit" />
+        <div className="absolute inset-0 animate-pulse rounded-[inherit] bg-surface-variant" />
       )}
       <Image
         src={error ? fallback : src}

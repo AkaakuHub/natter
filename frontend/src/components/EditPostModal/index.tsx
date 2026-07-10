@@ -169,7 +169,7 @@ const EditPostModal = ({
 
   const modalContent = (
     <div
-      className="mobile-safe-overlay fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto bg-overlay p-3 sm:p-4"
+      className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto bg-overlay p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-4 sm:pt-4"
       onClick={(e) => {
         e.stopPropagation();
         if (e.target === e.currentTarget) {
@@ -178,7 +178,7 @@ const EditPostModal = ({
       }}
     >
       <div
-        className={`${ui.surface.modal} mobile-safe-modal mt-2 flex w-full max-w-lg flex-col overflow-hidden sm:mt-16 sm:max-h-[80dvh]`}
+        className={`${ui.surface.modal} mt-2 flex max-h-[calc(100dvh-1rem-env(safe-area-inset-bottom))] w-full max-w-lg flex-col overflow-hidden sm:mt-16`}
         onClick={(e) => e.stopPropagation()}
       >
         <ModalHeader onClose={handleClose} />

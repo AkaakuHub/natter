@@ -5,6 +5,7 @@ import {
   primaryScrollContainerAttribute,
   primaryScrollContainerClassName,
   primaryScrollContainerSelector,
+  scrollLockedClassName,
 } from "./scrollLayout";
 
 describe("scroll layout contract", () => {
@@ -14,8 +15,11 @@ describe("scroll layout contract", () => {
   });
 
   it("keeps viewport and primary scroll ownership in the shared classes", () => {
-    expect(appViewportClassName).toContain("app-viewport");
-    expect(primaryScrollContainerClassName).toContain("mobile-safe-scroll");
+    expect(appViewportClassName).toContain("h-dvh");
+    expect(primaryScrollContainerClassName).toContain(
+      "pb-[calc(60px+env(safe-area-inset-bottom))]",
+    );
     expect(primaryScrollContainerClassName).toContain("overflow-y-auto");
+    expect(scrollLockedClassName).toBe("!overflow-hidden");
   });
 });

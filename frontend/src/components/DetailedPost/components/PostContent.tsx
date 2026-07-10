@@ -51,7 +51,7 @@ const PostContent = ({
       )}
 
       <div className="prose prose-lg max-w-none">
-        <div className="text-text text-lg leading-relaxed whitespace-pre-wrap font-medium break-words selectable-text break-long-words cursor-text">
+        <div className="cursor-text break-all text-lg leading-relaxed font-medium whitespace-pre-wrap text-text select-text [overflow-wrap:break-word] hyphens-auto">
           <RichText
             className="whitespace-pre-wrap"
             showUrlPreviews={true}

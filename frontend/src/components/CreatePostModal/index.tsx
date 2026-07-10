@@ -169,9 +169,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
   }
 
   return (
-    <div className="mobile-safe-overlay fixed inset-0 bg-overlay flex items-start justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-overlay p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-4 sm:pt-4">
       <div
-        className={`${ui.surface.modal} mobile-safe-modal max-w-lg w-full mt-2 sm:mt-16 relative sm:max-h-[80dvh] flex flex-col overflow-hidden`}
+        className={`${ui.surface.modal} relative mt-2 flex max-h-[calc(100dvh-1rem-env(safe-area-inset-bottom))] w-full max-w-lg flex-col overflow-hidden sm:mt-16`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-4 border-b border-border flex-shrink-0">
