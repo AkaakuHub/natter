@@ -1,8 +1,13 @@
 import React from "react";
 import Image from "next/image";
 import { IconX } from "@tabler/icons-react";
+import AuthenticatedImage from "@/components/common/AuthenticatedImage";
 import { useImagePreload } from "@/hooks/useImagePreload";
 import { ui } from "@/styles/ui";
+import {
+  getDirectImagePreviewUrls,
+  isAuthenticatedPostImagePreview,
+} from "./imagePreviewSource";
 
 interface ImagePreviewProps {
   imageUrls: string[];
@@ -10,8 +15,11 @@ interface ImagePreviewProps {
 }
 
 const ImagePreview = ({ imageUrls, onRemove }: ImagePreviewProps) => {
-  // 画像をプリロード
-  useImagePreload(imageUrls);
+  const directImagePreviewUrls = React.useMemo(
+    () => getDirectImagePreviewUrls(imageUrls),
+    [imageUrls],
+  );
+  useImagePreload(directImagePreviewUrls);
 
   if (imageUrls.length === 0) return null;
 
@@ -19,13 +27,23 @@ const ImagePreview = ({ imageUrls, onRemove }: ImagePreviewProps) => {
     <div className="mt-4 grid grid-cols-2 gap-3">
       {imageUrls.map((imageUrl, index) => (
         <div key={index} className="relative">
-          <Image
-            src={imageUrl}
-            alt={`添付画像 ${index + 1}`}
-            className="w-full h-32 object-cover rounded-lg border border-border"
-            width={200}
-            height={128}
-          />
+          {isAuthenticatedPostImagePreview(imageUrl) ? (
+            <AuthenticatedImage
+              src={imageUrl}
+              alt={`添付画像 ${index + 1}`}
+              className="w-full h-32 overflow-hidden rounded-lg border border-border object-cover"
+              width={200}
+              height={128}
+            />
+          ) : (
+            <Image
+              src={imageUrl}
+              alt={`添付画像 ${index + 1}`}
+              className="w-full h-32 object-cover rounded-lg border border-border"
+              width={200}
+              height={128}
+            />
+          )}
           <button
             type="button"
             onClick={() => onRemove(index)}
