@@ -58,7 +58,6 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
       isShortcutHelpModalOpen ||
       isInputFocused,
     onBack: () => router.back(),
-    scrollContainerRef,
   });
 
   // グローバルキーボードショートカット

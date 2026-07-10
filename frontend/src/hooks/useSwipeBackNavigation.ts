@@ -1,31 +1,14 @@
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef } from "react";
+import { decideSwipeBackGesture } from "@/domain/navigation/swipeBackGesture";
 
 interface UseSwipeBackNavigationOptions {
   disabled?: boolean;
   onBack: () => void;
-  scrollContainerRef: RefObject<HTMLDivElement | null>;
 }
-
-const MIN_BACK_DISTANCE = 80;
-const MAX_VERTICAL_DISTANCE = 48;
-const EDGE_START_WIDTH = 32;
-
-const isInteractiveElement = (target: EventTarget | null): boolean => {
-  if (!(target instanceof Element)) {
-    return false;
-  }
-
-  return Boolean(
-    target.closest(
-      'a, button, input, textarea, select, [role="button"], [contenteditable="true"]',
-    ),
-  );
-};
 
 export const useSwipeBackNavigation = ({
   disabled = false,
   onBack,
-  scrollContainerRef,
 }: UseSwipeBackNavigationOptions) => {
   const startX = useRef(0);
   const startY = useRef(0);
@@ -33,17 +16,14 @@ export const useSwipeBackNavigation = ({
   const hasNavigated = useRef(false);
 
   useEffect(() => {
-    const element = scrollContainerRef.current;
-    if (!element || disabled) {
+    if (disabled) {
       return;
     }
 
+    document.documentElement.classList.add("overscroll-x-none", "touch-pan-y");
+
     const handleTouchStart = (event: TouchEvent) => {
-      if (
-        event.touches.length !== 1 ||
-        isInteractiveElement(event.target) ||
-        event.touches[0].clientX > EDGE_START_WIDTH
-      ) {
+      if (event.touches.length !== 1) {
         isTracking.current = false;
         return;
       }
@@ -63,17 +43,21 @@ export const useSwipeBackNavigation = ({
       const touch = event.touches[0];
       const deltaX = touch.clientX - startX.current;
       const deltaY = touch.clientY - startY.current;
+      const decision = decideSwipeBackGesture(deltaX, deltaY);
 
-      if (Math.abs(deltaY) > MAX_VERTICAL_DISTANCE) {
+      if (decision.shouldCancel) {
         isTracking.current = false;
         return;
       }
 
-      if (deltaX < MIN_BACK_DISTANCE) {
+      if (decision.shouldPreventDefault) {
+        event.preventDefault();
+      }
+
+      if (!decision.shouldNavigateBack) {
         return;
       }
 
-      event.preventDefault();
       hasNavigated.current = true;
       isTracking.current = false;
       onBack();
@@ -84,24 +68,28 @@ export const useSwipeBackNavigation = ({
       hasNavigated.current = false;
     };
 
-    element.addEventListener("touchstart", handleTouchStart, {
+    document.addEventListener("touchstart", handleTouchStart, {
       passive: true,
     });
-    element.addEventListener("touchmove", handleTouchMove, {
+    document.addEventListener("touchmove", handleTouchMove, {
       passive: false,
     });
-    element.addEventListener("touchend", handleTouchEnd, {
+    document.addEventListener("touchend", handleTouchEnd, {
       passive: true,
     });
-    element.addEventListener("touchcancel", handleTouchEnd, {
+    document.addEventListener("touchcancel", handleTouchEnd, {
       passive: true,
     });
 
     return () => {
-      element.removeEventListener("touchstart", handleTouchStart);
-      element.removeEventListener("touchmove", handleTouchMove);
-      element.removeEventListener("touchend", handleTouchEnd);
-      element.removeEventListener("touchcancel", handleTouchEnd);
+      document.documentElement.classList.remove(
+        "overscroll-x-none",
+        "touch-pan-y",
+      );
+      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener("touchcancel", handleTouchEnd);
     };
-  }, [disabled, onBack, scrollContainerRef]);
+  }, [disabled, onBack]);
 };

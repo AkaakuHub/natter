@@ -62,7 +62,6 @@ const HybridBaseLayout = ({ children }: HybridBaseLayoutProps) => {
       isInitialLoad ||
       !isHydrated,
     onBack: () => window.history.back(),
-    scrollContainerRef,
   });
 
   // グローバルキーボードショートカット（既存機能保護）
